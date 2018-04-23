@@ -1,6 +1,5 @@
 package com.idroi.marketsense.adapter;
 
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -16,6 +15,7 @@ public class NewsViewHolder {
 
     View mainView;
     TextView titleView;
+    TextView dateView;
     SimpleDraweeView mainImageView;
 
     static final NewsViewHolder EMPTY_VIEW_HOLDER = new NewsViewHolder();
@@ -26,8 +26,9 @@ public class NewsViewHolder {
         final NewsViewHolder newsViewHolder = new NewsViewHolder();
         newsViewHolder.mainView = view;
         try {
-            newsViewHolder.titleView = view.findViewById(R.id.infohub_news_title_tv);
-            newsViewHolder.mainImageView = view.findViewById(R.id.infohub_news_image_iv);
+            newsViewHolder.titleView = view.findViewById(R.id.marketsense_news_title_tv);
+            newsViewHolder.mainImageView = view.findViewById(R.id.marketsense_news_image_iv);
+            newsViewHolder.dateView = view.findViewById(R.id.marketsense_news_date_tv);
             return newsViewHolder;
         } catch (ClassCastException exception) {
             MSLog.e(exception.toString());

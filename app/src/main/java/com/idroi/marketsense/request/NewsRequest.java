@@ -7,6 +7,7 @@ import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
+import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.common.MarketSenseNetworkError;
 import com.idroi.marketsense.data.News;
@@ -48,6 +49,7 @@ public class NewsRequest extends Request<ArrayList<News>> {
     protected Response<ArrayList<News>> parseNetworkResponse(NetworkResponse response) {
         try {
             JSONArray newsJsonArray = getNewsResult(new JSONObject(new String(response.data)));
+
             if(newsJsonArray != null) {
                 ArrayList<News> newsArrayList = new ArrayList<>();
                 for(int i = 0; i < newsJsonArray.length(); i++) {

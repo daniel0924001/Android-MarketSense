@@ -7,11 +7,27 @@
     android:layout_height="match_parent"
     tools:context="com.idroi.marketsense.MainActivity">
 
-    <FrameLayout
-        android:id="@+id/frameLay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1" />
+    <net.lucode.hackware.magicindicator.MagicIndicator
+        android:id="@+id/tabs"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:background="@drawable/background_tab"
+        android:fontFamily="Roboto-Regular"
+        android:textSize="18sp"
+        android:textStyle="normal"
+        android:textColor="@color/marketsense_text_black"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/pager"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/tabs"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/navigation"/>
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"

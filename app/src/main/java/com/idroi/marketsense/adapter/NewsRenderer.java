@@ -48,6 +48,7 @@ public class NewsRenderer implements MarketSenseRenderer<News>{
 
     private void update(final NewsViewHolder newsViewHolder, News content) {
         MarketSenseRendererHelper.addTextView(newsViewHolder.titleView, content.getTitle());
+        MarketSenseRendererHelper.addTextView(newsViewHolder.dateView, content.getDate());
         if(!TextUtils.isEmpty(content.getUrlImage())) {
             FrescoImageHelper.loadImageView(content.getUrlImage(),
                     newsViewHolder.mainImageView, FrescoImageHelper.MAIN_IMAGE_RATIO);

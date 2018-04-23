@@ -22,6 +22,7 @@ import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.common.MarketSenseNetworkError;
 import com.idroi.marketsense.data.News;
+import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.request.NewsRequest;
 import com.idroi.marketsense.util.DeviceUtils;
 

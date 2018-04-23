@@ -9,8 +9,12 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Iterator;
+import java.util.Locale;
 
 /**
  * Created by daniel.hsieh on 2018/4/18.
@@ -18,17 +22,25 @@ import java.util.Iterator;
 
 public class News {
 
+    private final static Long CURRENT_TS;
+
+    static {
+        CURRENT_TS = System.currentTimeMillis() / 1000;
+    }
+
     private static final String TITLE = "title";
     private static final String SOURCE_NAME = "source_name";
     private static final String PAGE_LINK = "page_link";
     private static final String ORIGIN_LINK = "link";
     private static final String IMAGE_URL_ARRAY = "image_url_array";
+    private static final String SOURCE_DATE_INT = "source_date_int";
 
     private String mTitle;
     private String mSourceName;
     private String mUrlImage;
     private String mUrlNewsPage;
     private String mUrlOriginPage;
+    private String mDate;
 
     public News() {
 
@@ -54,6 +66,10 @@ public class News {
         mUrlImage = urlImage;
     }
 
+    public void setDate(String date) {
+        mDate = date;
+    }
+
     public String getTitle() {
         return mTitle;
     }
@@ -64,6 +80,10 @@ public class News {
 
     public String getOriginLink() {
         return mUrlOriginPage;
+    }
+
+    public String getDate() {
+        return mDate;
     }
 
     public static News JsonObjectToNews(JSONObject jsonObject) {
@@ -91,6 +111,8 @@ public class News {
                             news.setUrlImage(imageArray.optString(0));
                         }
                         break;
+                    case SOURCE_DATE_INT:
+                        news.setDate(convertToDate(jsonObject.optInt(SOURCE_DATE_INT)));
                     default:
                         break;
                 }
@@ -122,5 +144,21 @@ public class News {
         return new HashCodeBuilder()
                 .append(getOriginLink())
                 .toHashCode();
+    }
+
+    private static String convertToDate(int sourceDate) {
+        long difference = CURRENT_TS - sourceDate;
+        if(difference < 3600) {
+            long lastMinutes = difference / 60;
+            return lastMinutes + "分前";
+        } else if(difference >= 3600 && difference < 24 * 3600){
+            long lastHours = difference / 3600;
+            return lastHours + "小時前";
+        } else {
+            Calendar cal = Calendar.getInstance(Locale.CHINESE);
+            cal.setTimeInMillis(sourceDate * 1000L);
+            SimpleDateFormat df = new SimpleDateFormat("MM/DD", Locale.CHINESE);
+            return df.format(cal.getTime());
+        }
     }
 }

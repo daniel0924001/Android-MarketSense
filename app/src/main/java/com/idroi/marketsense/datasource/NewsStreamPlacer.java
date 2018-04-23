@@ -34,6 +34,10 @@ public class NewsStreamPlacer {
     }
 
     public void expandNews(final int number, final NewsRecyclerAdapter.NewsExpandListener listener) {
+        if(mNewsArrayList == null) {
+            return;
+        }
+
         int increaseAmount = 0;
         int start = mNewsArrayList.size();
         for(int i = 0; i < number; i++) {

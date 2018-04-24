@@ -15,4 +15,6 @@ public interface MarketSenseRenderer <T> {
     View createView(@NonNull Context context, @Nullable ViewGroup parent);
 
     void renderView(@NonNull View view, @NonNull T content);
+
+    void clear();
 }

@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.fragments.NewsFragment;
+import com.idroi.marketsense.fragments.StockListFragment;
 
 /**
  * Created by daniel.hsieh on 2018/4/23.
@@ -22,6 +23,6 @@ public class ChoiceScreenSlidePagerAdapter extends BaseScreenSlidePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return new NewsFragment();
+        return new StockListFragment();
     }
 }

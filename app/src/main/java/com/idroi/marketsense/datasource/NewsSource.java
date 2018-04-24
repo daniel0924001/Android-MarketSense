@@ -75,7 +75,9 @@ public class NewsSource {
 
                 if(!mFirstTimeNewsAvailable) {
                     mFirstTimeNewsAvailable = true;
-                    mNewsSourceListener.onNewsAvailable();
+                    if(mNewsSourceListener != null) {
+                        mNewsSourceListener.onNewsAvailable();
+                    }
                 }
 
                 if(moreFlag) {

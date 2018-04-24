@@ -93,8 +93,7 @@ public class MarketSenseNewsFetcher {
             return;
         }
 
-        String url = urlBuilder("business", "TW", "zh",
-                SystemClock.uptimeMillis(), 10);
+        String url = urlBuilder("business", "TW", "zh");
 
         mNewsRequest = new NewsRequest(Request.Method.GET, url, null, new Response.Listener<ArrayList<News>>() {
             @Override
@@ -141,25 +140,19 @@ public class MarketSenseNewsFetcher {
     }
 
     private static final String API_URL = "http://adzodiac.droi.com:8888/get_news?";
-    private static final String PARAM_LIMIT = "&limit=";
     private static final String PARAM_LANG = "&language=";
     private static final String PARAM_CATEGORY = "&category=";
-    private static final String PARAM_TS = "&timestamp=";
     private static final String PARAM_COUNTRY = "&country=";
 
     public static String urlBuilder(String category,
                                     String country,
-                                    String language,
-                                    long timestamp,
-                                    int limit) {
+                                    String language) {
 
         StringBuilder builder = new StringBuilder(API_URL);
 
         builder.append(PARAM_CATEGORY).append(category);
         builder.append(PARAM_COUNTRY).append(country);
         builder.append(PARAM_LANG).append(language);
-//        builder.append(PARAM_LIMIT).append(limit);
-//        builder.append(PARAM_TS).append(timestamp);
 
         return builder.toString();
     }

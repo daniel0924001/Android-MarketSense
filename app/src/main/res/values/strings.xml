@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">市覺</string>
+    <string name="user_avatar">大頭照</string>
     <string name="title_news_tab">新聞</string>
     <string name="title_choices_tab">自選</string>
     <string name="title_notifications_tab">推播</string>
@@ -14,4 +15,7 @@
 
     <string name="title_notification_list">自選推播</string>
     <string name="title_notification_hot">熱門推播</string>
+
+    <string name="title_action_bar_search">搜尋</string>
+    <string name="title_action_bar_setting">設定</string>
 </resources>

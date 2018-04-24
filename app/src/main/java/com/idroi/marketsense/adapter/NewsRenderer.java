@@ -64,7 +64,8 @@ public class NewsRenderer implements MarketSenseRenderer<News>{
         }
     }
 
-    void clear() {
+    @Override
+    public void clear() {
         mViewHolderMap.clear();
     }
 }

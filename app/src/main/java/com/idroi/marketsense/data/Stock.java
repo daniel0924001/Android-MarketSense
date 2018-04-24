@@ -5,4 +5,18 @@ package com.idroi.marketsense.data;
  */
 
 public class Stock {
+
+    private String mName;
+
+    public Stock() {
+
+    }
+
+    public void setName(String name) {
+        mName = name;
+    }
+
+    public String getName() {
+        return mName;
+    }
 }

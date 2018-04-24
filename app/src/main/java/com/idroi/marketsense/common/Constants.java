@@ -5,7 +5,7 @@ package com.idroi.marketsense.common;
  */
 
 public class Constants {
-    public String[] HOT_STOCKS_KEYWORDS = new String[] {
+    public static final String[] HOT_STOCKS_KEYWORDS = new String[] {
             "台積電",
             "鴻海",
             "大立光"

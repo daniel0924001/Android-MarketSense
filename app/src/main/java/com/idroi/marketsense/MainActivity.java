@@ -5,8 +5,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.facebook.cache.disk.DiskCacheConfig;
 import com.facebook.common.internal.Supplier;
@@ -124,7 +127,24 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
+        setActionBar();
         setViewPager();
+    }
+
+    private void setActionBar() {
+        final ActionBar actionBar = getSupportActionBar();
+
+        if(actionBar != null) {
+            View view = LayoutInflater.from(actionBar.getThemedContext())
+                    .inflate(R.layout.main_action_bar, null);
+            actionBar.setDisplayShowHomeEnabled(false);
+            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setCustomView(view,
+                    new ActionBar.LayoutParams(
+                            ActionBar.LayoutParams.MATCH_PARENT,
+                            ActionBar.LayoutParams.MATCH_PARENT));
+            actionBar.setDisplayShowCustomEnabled(true);
+        }
     }
 
     private void setViewPager() {

@@ -1,6 +1,10 @@
 package com.idroi.marketsense.adapter;
 
 import android.view.View;
+import android.widget.TextView;
+
+import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.R;
 
 /**
  * Created by daniel.hsieh on 2018/4/23.
@@ -9,6 +13,21 @@ import android.view.View;
 public class StockViewHolder {
 
     View mainView;
+    TextView nameView;
 
     static final StockViewHolder EMPTY_VIEW_HOLDER = new StockViewHolder();
+
+    private StockViewHolder() {}
+
+    static StockViewHolder convertToViewHolder(final View view) {
+        final StockViewHolder stockViewHolder = new StockViewHolder();
+        stockViewHolder.mainView = view;
+        try {
+            stockViewHolder.nameView = view.findViewById(R.id.marketsense_stock_name_tv);
+            return stockViewHolder;
+        } catch (ClassCastException exception) {
+            MSLog.e(exception.toString());
+            return EMPTY_VIEW_HOLDER;
+        }
+    }
 }

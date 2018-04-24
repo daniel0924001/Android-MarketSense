@@ -73,7 +73,7 @@ public class MarketSenseNewsFetcher {
         };
     }
 
-    void makeRequest() {
+    void makeRequest(String url) {
         final Context context = getContextOrDestroy();
         if(context == null) {
             return;
@@ -84,17 +84,16 @@ public class MarketSenseNewsFetcher {
             return;
         }
 
-        requestNews();
+        requestNews(url);
     }
 
-    private void requestNews() {
+    private void requestNews(String url) {
         final Context context = getContextOrDestroy();
         if(context == null) {
             return;
         }
 
-        String url = urlBuilder("business", "TW", "zh");
-
+        MSLog.e("Loading news...: " + url);
         mNewsRequest = new NewsRequest(Request.Method.GET, url, null, new Response.Listener<ArrayList<News>>() {
             @Override
             public void onResponse(ArrayList<News> response) {
@@ -127,7 +126,7 @@ public class MarketSenseNewsFetcher {
         return context;
     }
 
-    public void destroy() {
+    void destroy() {
         mContext.clear();
         if(mNewsRequest != null) {
             mNewsRequest.cancel();
@@ -138,23 +137,4 @@ public class MarketSenseNewsFetcher {
             mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
         }
     }
-
-    private static final String API_URL = "http://adzodiac.droi.com:8888/get_news?";
-    private static final String PARAM_LANG = "&language=";
-    private static final String PARAM_CATEGORY = "&category=";
-    private static final String PARAM_COUNTRY = "&country=";
-
-    public static String urlBuilder(String category,
-                                    String country,
-                                    String language) {
-
-        StringBuilder builder = new StringBuilder(API_URL);
-
-        builder.append(PARAM_CATEGORY).append(category);
-        builder.append(PARAM_COUNTRY).append(country);
-        builder.append(PARAM_LANG).append(language);
-
-        return builder.toString();
-    }
-
 }

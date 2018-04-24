@@ -67,8 +67,8 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
         };
     }
 
-    public void loadNews() {
-        mNewsStreamPlacer.loadNews();
+    public void loadNews(String url) {
+        mNewsStreamPlacer.loadNews(url);
     }
 
     public void expand(int number) {

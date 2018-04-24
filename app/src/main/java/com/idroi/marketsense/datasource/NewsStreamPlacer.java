@@ -29,8 +29,8 @@ public class NewsStreamPlacer {
         mNewsSource.setNewsSourceListener(listener);
     }
 
-    public void loadNews() {
-        mNewsSource.loadNews(mActivity);
+    public void loadNews(String url) {
+        mNewsSource.loadNews(mActivity, url);
     }
 
     public void expandNews(final int number, final NewsRecyclerAdapter.NewsExpandListener listener) {
@@ -69,6 +69,10 @@ public class NewsStreamPlacer {
         if(mNewsArrayList != null) {
             mNewsArrayList.clear();
             mNewsArrayList = null;
+        }
+        if(mNewsSource != null) {
+            mNewsSource.clear();
+            mNewsSource = null;
         }
     }
 

@@ -12,12 +12,30 @@ import android.view.ViewGroup;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.adapter.NewsRecyclerAdapter;
+import com.idroi.marketsense.request.NewsRequest;
 
 /**
  * Created by daniel.hsieh on 2018/4/18.
  */
 
 public class NewsFragment extends Fragment {
+
+    public final static String TASK_NAME = "TASK_NAME";
+    public final static String KEYWORD_NAME = "KEYWORD_NAME";
+    public final static int GENERAL_TASK_ID = 1;
+    public final static int KEYWORD_TASK_ID = 2;
+
+    public enum TASK {
+        GENERAL(GENERAL_TASK_ID), KEYWORD(KEYWORD_TASK_ID);
+        int taskId;
+        TASK(int id) {
+            taskId = id;
+        }
+
+        public int getTaskId() {
+            return taskId;
+        }
+    }
 
     private RecyclerView mRecyclerView;
     private NewsRecyclerAdapter mNewsRecyclerAdapter;
@@ -40,7 +58,7 @@ public class NewsFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mNewsRecyclerAdapter.loadNews();
+        mNewsRecyclerAdapter.loadNews(generateURL());
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -58,6 +76,20 @@ public class NewsFragment extends Fragment {
                 }
             }
         });
+    }
+
+    public String generateURL() {
+        if(getArguments() == null) {
+            return NewsRequest.queryNewsURL("business", "TW", "zh");
+        }
+
+        int taskId = getArguments().getInt(TASK_NAME);
+        switch (taskId) {
+            case KEYWORD_TASK_ID:
+                return NewsRequest.queryKeywordNewsURL(getArguments().getString(KEYWORD_NAME));
+            default:
+                return NewsRequest.queryNewsURL("business", "TW", "zh");
+        }
     }
 
     @Override

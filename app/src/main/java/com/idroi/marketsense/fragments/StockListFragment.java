@@ -1,5 +1,6 @@
 package com.idroi.marketsense.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,7 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.idroi.marketsense.MainActivity;
 import com.idroi.marketsense.R;
+import com.idroi.marketsense.StockActivity;
 import com.idroi.marketsense.adapter.StockListRecyclerAdapter;
 import com.idroi.marketsense.data.Stock;
 
@@ -18,7 +21,7 @@ import com.idroi.marketsense.data.Stock;
  * Created by daniel.hsieh on 2018/4/23.
  */
 
-public class StockListFragment extends Fragment{
+public class StockListFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private StockListRecyclerAdapter mStockListRecyclerAdapter;
@@ -46,7 +49,9 @@ public class StockListFragment extends Fragment{
         mStockListRecyclerAdapter.setOnItemClickListener(new StockListRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Stock stock) {
-                Toast.makeText(getContext(), "stock name: " + stock.getName(), Toast.LENGTH_SHORT).show();
+                startActivity(StockActivity.generateStockActivityIntent(
+                        getContext(), stock.getName()));
+                getActivity().overridePendingTransition(R.anim.enter, R.anim.stop);
             }
         });
     }

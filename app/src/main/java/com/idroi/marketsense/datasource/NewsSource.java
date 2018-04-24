@@ -41,6 +41,8 @@ public class NewsSource {
     private boolean mFirstTimeNewsAvailable;
     private NewsSourceListener mNewsSourceListener;
 
+    private String mUrl;
+
     NewsSource(Activity activity) {
         mActivity = new WeakReference<Activity>(activity);
         mNewsCache = new ArrayList<News>();
@@ -145,7 +147,8 @@ public class NewsSource {
         mCurrentRetries = 0;
     }
 
-    public void loadNews(Activity activity) {
+    public void loadNews(Activity activity, String url) {
+        mUrl = url;
         loadNews(new MarketSenseNewsFetcher(activity, mMarketSenseNewsNetworkListener));
     }
 
@@ -155,7 +158,7 @@ public class NewsSource {
         replenishCache();
     }
 
-    private void clear() {
+    public void clear() {
         mNewsCache.clear();
         if(mNewsFetcher != null) {
             mNewsFetcher.destroy();
@@ -169,7 +172,7 @@ public class NewsSource {
     private void replenishCache() {
         if(!mRequestInFlight && mNewsFetcher != null && mNewsCache.size() < DEFAULT_CACHE_LIMIT) {
             mRequestInFlight = true;
-            mNewsFetcher.makeRequest();
+            mNewsFetcher.makeRequest(mUrl);
         }
     }
 }

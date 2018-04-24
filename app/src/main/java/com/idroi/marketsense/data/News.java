@@ -157,7 +157,7 @@ public class News {
         } else {
             Calendar cal = Calendar.getInstance(Locale.CHINESE);
             cal.setTimeInMillis(sourceDate * 1000L);
-            SimpleDateFormat df = new SimpleDateFormat("MM/DD", Locale.CHINESE);
+            SimpleDateFormat df = new SimpleDateFormat("MM/dd", Locale.CHINESE);
             return df.format(cal.getTime());
         }
     }

@@ -8,6 +8,8 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.fragments.NewsFragment;
 
+import java.lang.ref.WeakReference;
+
 /**
  * Created by daniel.hsieh on 2018/4/23.
  */

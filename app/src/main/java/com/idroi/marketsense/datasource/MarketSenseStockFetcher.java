@@ -109,6 +109,7 @@ public class MarketSenseStockFetcher {
         });
 
         mTimeoutHandler.postDelayed(mTimeoutRunnable, 3000);
+        MSLog.e("Loading stock list...");
         Networking.getRequestQueue(context).add(mStockRequest);
     }
 

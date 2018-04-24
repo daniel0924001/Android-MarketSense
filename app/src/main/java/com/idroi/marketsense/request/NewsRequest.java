@@ -82,4 +82,31 @@ public class NewsRequest extends Request<ArrayList<News>> {
         return null;
     }
 
+    private static final String API_URL = "http://adzodiac.droi.com:8888/get_news?";
+    private static final String PARAM_LANG = "&language=";
+    private static final String PARAM_CATEGORY = "&category=";
+    private static final String PARAM_COUNTRY = "&country=";
+
+    private static final String API_KEYWORD_URL = "http://apiv2.infohubapp.com/v1/keyword?";
+    private static final String PARAM_KEYWORD = "&keyword=";
+
+    public static String queryNewsURL(String category,
+                                      String country,
+                                      String language) {
+        StringBuilder builder = new StringBuilder(API_URL);
+
+        builder.append(PARAM_CATEGORY).append(category);
+        builder.append(PARAM_COUNTRY).append(country);
+        builder.append(PARAM_LANG).append(language);
+
+        return builder.toString();
+    }
+
+    public static String queryKeywordNewsURL(String keyword) {
+        StringBuilder builder = new StringBuilder(API_KEYWORD_URL);
+
+        builder.append(PARAM_KEYWORD).append(keyword);
+
+        return builder.toString();
+    }
 }

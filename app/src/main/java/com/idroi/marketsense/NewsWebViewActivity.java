@@ -3,22 +3,30 @@ package com.idroi.marketsense;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.common.FrescoImageHelper;
+
+import java.io.ByteArrayInputStream;
 
 /**
  * Created by daniel.hsieh on 2018/4/25.
@@ -26,11 +34,46 @@ import com.idroi.marketsense.Logging.MSLog;
 
 public class NewsWebViewActivity extends AppCompatActivity {
 
+    private static final String UTM_PARAM_STRING = "utm_source=infohub&utm_medium=android_app&utm_campaign=news_click";
+    private static final String PAGELINK_PARM_STRING = "user_name=infohub|android_app|news_click";
+    private static final String PAGELINK_PARM_KEY = "config=";
+
+    public static final String EXTRA_MIDDLE_TITLE = "EXTRA_MIDDLE_TITLE";
+    public static final String EXTRA_MIDDLE_DATE = "EXTRA_MIDDLE_SOURCE_DATE";
+    public static final String EXTRA_MIDDLE_IMAGE_URL = "EXTRA_MIDDLE_IMAGE_URL";
     public static final String EXTRA_MIDDLE_PAGE_URL = "EXTRA_MIDDLE_PAGE_URL";
     public static final String EXTRA_ORIGINAL_PAGE_URL = "EXTRA_ORIGINAL_PAGE_URL";
 
+    private String mTitle, mImageUrl, mSourceDate;
     private String mMiddlePageUrl;
     private String mOriginalPageUrl;
+    private String mPageLink;
+
+    private View mImageMask;
+    private ConstraintLayout mUpperBlock;
+    private NewsWebView mNewsWebViewOriginal;
+    private NewsWebView mNewsWebViewMiddle;
+    private TextView mNewsWebViewMiddleTitleTextView;
+    private TextView mNewsWebViewMiddleDateTextView;
+    private SimpleDraweeView mNewsWebViewMiddleImageView;
+    private FloatingActionButton mFabIcon;
+
+    public static final int sPostDelayMilliSeconds = 1200;
+    private boolean mIsOriginalVisible = false;
+    private boolean mTryToLoadOtherWebViewFlag = false;
+    private Handler mHandler = new Handler();
+    private Runnable mLoadOriginalWebViewRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if(!mTryToLoadOtherWebViewFlag) {
+                mTryToLoadOtherWebViewFlag = true;
+                if (mNewsWebViewOriginal != null) {
+                    MSLog.i("Loading web page (original): " + mOriginalPageUrl);
+                    mNewsWebViewOriginal.loadUrl(mOriginalPageUrl);
+                }
+            }
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,9 +84,18 @@ public class NewsWebViewActivity extends AppCompatActivity {
             return;
         }
 
+        mFabIcon = (FloatingActionButton) findViewById(R.id.fab_convert_webview);
+        mFabIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeVisibility();
+            }
+        });
+
         setInformation();
         setActionBar();
-        setWebView();
+        initUpperBlock();
+        initWebView();
     }
 
     @Override
@@ -55,6 +107,9 @@ public class NewsWebViewActivity extends AppCompatActivity {
     private void setInformation() {
         mMiddlePageUrl = getIntent().getStringExtra(EXTRA_MIDDLE_PAGE_URL);
         mOriginalPageUrl = getIntent().getStringExtra(EXTRA_ORIGINAL_PAGE_URL);
+        mTitle = getIntent().getStringExtra(EXTRA_MIDDLE_TITLE);
+        mImageUrl = getIntent().getStringExtra(EXTRA_MIDDLE_IMAGE_URL);
+        mSourceDate = getIntent().getStringExtra(EXTRA_MIDDLE_DATE);
     }
 
     private void setActionBar() {
@@ -90,29 +145,149 @@ public class NewsWebViewActivity extends AppCompatActivity {
         }
     }
 
+    private void initUpperBlock() {
+
+        MSLog.i("title: " + mTitle + ", source: " + mSourceDate + ", image: " + mImageUrl);
+        mUpperBlock = findViewById(R.id.marketsense_webview_upper_block);
+        mImageMask = findViewById(R.id.marketsense_webview_activity_image_mask);
+        mNewsWebViewMiddleTitleTextView = findViewById(R.id.marketsense_webview_activity_title);
+        mNewsWebViewMiddleDateTextView = findViewById(R.id.marketsense_webview_activity_source_date);
+        if(mNewsWebViewMiddleTitleTextView != null) {
+            mNewsWebViewMiddleTitleTextView.setText(mTitle);
+        }
+        if(mNewsWebViewMiddleDateTextView != null) {
+            mNewsWebViewMiddleDateTextView.setText(mSourceDate);
+        }
+        mNewsWebViewMiddleImageView = findViewById(R.id.marketsense_webview_activity_image);
+        if(mNewsWebViewMiddleImageView != null && mImageUrl != null) {
+            FrescoImageHelper.loadImageView(mImageUrl,
+                    mNewsWebViewMiddleImageView, FrescoImageHelper.MAIN_IMAGE_RATIO);
+            mImageMask.setVisibility(View.VISIBLE);
+        }
+
+        if(mImageUrl == null) {
+            mNewsWebViewMiddleDateTextView.setTextColor(getResources().getColor(R.color.marketsense_text_black));
+            mNewsWebViewMiddleTitleTextView.setTextColor(getResources().getColor(R.color.marketsense_text_black));
+        }
+    }
+
     @SuppressLint("SetJavaScriptEnabled")
-    public void setWebView() {
-        WebView webView = (WebView) findViewById(R.id.news_webview);
+    private void initWebView() {
 
-        WebSettings webSettings = webView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
+        mNewsWebViewOriginal = (NewsWebView) findViewById(R.id.news_webview_original);
+        mNewsWebViewOriginal.setVerticalScrollBarEnabled(true);
+        mNewsWebViewOriginal.setHorizontalFadingEdgeEnabled(false);
+        mNewsWebViewOriginal.getSettings().setBlockNetworkImage(true);
 
-        webView.setWebViewClient(new WebViewClient() {
+        mNewsWebViewMiddle = (NewsWebView) findViewById(R.id.news_webview_middle);
+        mNewsWebViewMiddle.setVerticalScrollBarEnabled(true);
+        mNewsWebViewMiddle.setHorizontalFadingEdgeEnabled(false);
+        mNewsWebViewMiddle.getSettings().setAppCachePath(getApplicationContext().getCacheDir().getAbsolutePath());
+        mNewsWebViewMiddle.getSettings().setAllowFileAccess(true);
+        mNewsWebViewMiddle.getSettings().setAppCacheEnabled(true);
+        mNewsWebViewMiddle.getSettings().setBlockNetworkImage(true);
+
+        mNewsWebViewMiddle.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+
+        mNewsWebViewMiddle.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                return false;
+            }
+
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+                if(url.contains("adsbygoogle.js")) {
+                    return new WebResourceResponse("text/plain", "utf-8", new ByteArrayInputStream("".getBytes()));
+                }
+                return super.shouldInterceptRequest(view, url);
+            }
+        });
+
+        mNewsWebViewMiddle.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public void onProgressChanged(WebView view, int newProgress) {
+
+                if(newProgress >= 80) {
+                    mNewsWebViewMiddle.getSettings().setBlockNetworkImage(false);
+                }
+
+                if(newProgress >= 80 && !mTryToLoadOtherWebViewFlag) {
+                    MSLog.w("GOOD!! start to load original web view");
+                    mHandler.post(mLoadOriginalWebViewRunnable);
+                }
+                super.onProgressChanged(view, newProgress);
+            }
+        });
+
+        mNewsWebViewOriginal.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 return false;
             }
         });
 
-        MSLog.i("Loading web page: " + mOriginalPageUrl);
-        webView.loadUrl(mOriginalPageUrl);
+        mNewsWebViewOriginal.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public void onProgressChanged(WebView view, int newProgress) {
+                if(newProgress >= 80) {
+                    mNewsWebViewOriginal.getSettings().setBlockNetworkImage(false);
+                }
+                super.onProgressChanged(view, newProgress);
+            }
+        });
+
+        String text = Base64.encodeToString(PAGELINK_PARM_STRING.getBytes(), Base64.DEFAULT);
+        mPageLink = mMiddlePageUrl + '?' + UTM_PARAM_STRING + '&' + PAGELINK_PARM_KEY + text;
+
+        MSLog.i("Loading web page (middle): " + mPageLink);
+        mNewsWebViewMiddle.loadUrl(mPageLink);
+        mHandler.postDelayed(mLoadOriginalWebViewRunnable, sPostDelayMilliSeconds);
     }
 
     public static Intent generateNewsWebViewActivityIntent(
-            Context context, String middleUrl, String originalUrl) {
+            Context context, String title, String imageUrl, String sourceDate, String middleUrl, String originalUrl) {
         Intent intent = new Intent(context, NewsWebViewActivity.class);
+        intent.putExtra(EXTRA_MIDDLE_TITLE, title);
+        intent.putExtra(EXTRA_MIDDLE_DATE, sourceDate);
+        intent.putExtra(EXTRA_MIDDLE_IMAGE_URL, imageUrl);
         intent.putExtra(EXTRA_MIDDLE_PAGE_URL, middleUrl);
         intent.putExtra(EXTRA_ORIGINAL_PAGE_URL, originalUrl);
         return intent;
+    }
+
+    private void changeVisibility() {
+        if(mIsOriginalVisible) {
+            // show our webview
+            mIsOriginalVisible = false;
+            mNewsWebViewMiddle.setVisibility(View.VISIBLE);
+            mNewsWebViewOriginal.setVisibility(View.GONE);
+            mUpperBlock.setVisibility(View.VISIBLE);
+            mFabIcon.setImageResource(R.drawable.ic_web_white_24px);
+        } else {
+            // show original webview
+            mIsOriginalVisible = true;
+            mNewsWebViewMiddle.setVisibility(View.GONE);
+            mNewsWebViewOriginal.setVisibility(View.VISIBLE);
+            mUpperBlock.setVisibility(View.GONE);
+            mFabIcon.setImageResource(R.drawable.ic_web_asset_white_24px);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if(mHandler != null) {
+            mHandler.removeCallbacks(mLoadOriginalWebViewRunnable);
+            mHandler = null;
+        }
+        if(mNewsWebViewMiddle != null) {
+            mNewsWebViewMiddle.destroy();
+            mNewsWebViewMiddle = null;
+        }
+        if(mNewsWebViewOriginal != null) {
+            mNewsWebViewOriginal.destroy();
+            mNewsWebViewOriginal = null;
+        }
+        super.onDestroy();
     }
 }

@@ -101,7 +101,9 @@ public class MarketSenseStockFetcher {
             @Override
             public void onErrorResponse(VolleyError error) {
                 MSLog.e("Stock Request error: " + error.getMessage(), error);
-                MSLog.e("Stock Request error: " + new String(error.networkResponse.data), error);
+                if(error.networkResponse != null) {
+                    MSLog.e("Stock Request error: " + new String(error.networkResponse.data), error);
+                }
                 mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
                 if(error instanceof MarketSenseNetworkError) {
                     MarketSenseNetworkError networkError = (MarketSenseNetworkError) error;

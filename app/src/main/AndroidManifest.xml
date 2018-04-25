@@ -27,6 +27,11 @@
             android:name=".StockActivity"
             android:label="@string/activity_stock_name">
         </activity>
+
+        <activity android:name=".NewsWebViewActivity"
+            android:label="@string/activity_news_web_name">
+        </activity>
+
     </application>
 
 </manifest>

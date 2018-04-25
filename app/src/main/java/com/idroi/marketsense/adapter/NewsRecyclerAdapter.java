@@ -3,10 +3,11 @@ package com.idroi.marketsense.adapter;
 import android.app.Activity;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.view.ViewGroup;
 
-import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.data.News;
+import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.datasource.NewsSource;
 import com.idroi.marketsense.datasource.NewsStreamPlacer;
 
@@ -23,6 +24,10 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
         void onExpandFailed();
     }
 
+    public interface OnItemClickListener {
+        void onItemClick(News stock);
+    }
+
     private Activity mActivity;
     private NewsStreamPlacer mNewsStreamPlacer;
     private Handler mHandler;
@@ -30,6 +35,7 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
     // TODO: maybe multiple renderer in someday
     private NewsRenderer mNewsRenderer;
     private NewsExpandListener mNewsExpandListener;
+    private OnItemClickListener mOnItemClickListener;
 
     public NewsRecyclerAdapter(final Activity activity) {
         mActivity = activity;
@@ -79,17 +85,27 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
         mNewsExpandListener = listener;
     }
 
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mOnItemClickListener = listener;
+    }
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new MarketSenseViewHolder(mNewsRenderer.createView(mActivity, parent));
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
         News news = mNewsStreamPlacer.getNewsData(position);
         if(news != null) {
             mNewsRenderer.renderView(holder.itemView, news);
         }
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mOnItemClickListener.onItemClick(mNewsStreamPlacer.getNewsData(holder.getAdapterPosition()));
+            }
+        });
     }
 
     @Override

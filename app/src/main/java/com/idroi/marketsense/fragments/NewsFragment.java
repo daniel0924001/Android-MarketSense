@@ -10,8 +10,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.NewsWebViewActivity;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.adapter.NewsRecyclerAdapter;
+import com.idroi.marketsense.data.News;
+import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.request.NewsRequest;
 
 /**
@@ -74,6 +77,15 @@ public class NewsFragment extends Fragment {
                 if (pastVisibleItems + visibleItemCount >= totalItemCount) {
                     mNewsRecyclerAdapter.expand(7);
                 }
+            }
+        });
+
+        mNewsRecyclerAdapter.setOnItemClickListener(new NewsRecyclerAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(News news) {
+                startActivity(NewsWebViewActivity.generateNewsWebViewActivityIntent(
+                        getContext(), news.getPageLink(), news.getOriginLink()));
+                getActivity().overridePendingTransition(R.anim.enter, R.anim.stop);
             }
         });
     }

@@ -93,7 +93,7 @@ public class MarketSenseNewsFetcher {
             return;
         }
 
-        MSLog.e("Loading news...: " + url);
+        MSLog.i("Loading news...: " + url);
         mNewsRequest = new NewsRequest(Request.Method.GET, url, null, new Response.Listener<ArrayList<News>>() {
             @Override
             public void onResponse(ArrayList<News> response) {
@@ -103,6 +103,10 @@ public class MarketSenseNewsFetcher {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                MSLog.e("News Request error: " + error.getMessage(), error);
+                if(error.networkResponse != null) {
+                    MSLog.e("News Request error: " + new String(error.networkResponse.data), error);
+                }
                 mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
                 if(error instanceof MarketSenseNetworkError) {
                     MarketSenseNetworkError networkError = (MarketSenseNetworkError) error;

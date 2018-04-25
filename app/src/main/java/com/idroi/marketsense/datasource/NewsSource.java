@@ -61,7 +61,7 @@ public class NewsSource {
 
                 boolean moreFlag = false;
 
-                if(mNewsFetcher == null) {
+                if(mNewsFetcher == null || mActivity.get() == null) {
                     return;
                 }
 

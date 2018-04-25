@@ -3,6 +3,7 @@ package com.idroi.marketsense.datasource;
 import android.content.Context;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -88,7 +89,7 @@ public class MarketSenseStockFetcher {
 
         // TODO
         String fakeURL = "http://apiv2.infohubapp.com/v1/keyword?keyword=%E9%B4%BB%E6%B5%B7";
-
+        MSLog.i("Loading stock list...");
         mStockRequest = new StockRequest(Request.Method.GET, fakeURL, null, new Response.Listener<ArrayList<Stock>>() {
             @Override
             public void onResponse(ArrayList<Stock> response) {
@@ -99,7 +100,8 @@ public class MarketSenseStockFetcher {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                MSLog.e("Stock Request error: " + error.toString());
+                MSLog.e("Stock Request error: " + error.getMessage(), error);
+                MSLog.e("Stock Request error: " + new String(error.networkResponse.data), error);
                 mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
                 if(error instanceof MarketSenseNetworkError) {
                     MarketSenseNetworkError networkError = (MarketSenseNetworkError) error;
@@ -109,7 +111,6 @@ public class MarketSenseStockFetcher {
         });
 
         mTimeoutHandler.postDelayed(mTimeoutRunnable, 3000);
-        MSLog.e("Loading stock list...");
         Networking.getRequestQueue(context).add(mStockRequest);
     }
 

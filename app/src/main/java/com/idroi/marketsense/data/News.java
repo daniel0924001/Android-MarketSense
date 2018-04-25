@@ -22,12 +22,6 @@ import java.util.Locale;
 
 public class News {
 
-    private final static Long CURRENT_TS;
-
-    static {
-        CURRENT_TS = System.currentTimeMillis() / 1000;
-    }
-
     private static final String TITLE = "title";
     private static final String SOURCE_NAME = "source_name";
     private static final String PAGE_LINK = "page_link";
@@ -43,7 +37,6 @@ public class News {
     private String mDate;
 
     public News() {
-
     }
 
     public void setTitle(String title) {
@@ -80,6 +73,10 @@ public class News {
 
     public String getOriginLink() {
         return mUrlOriginPage;
+    }
+
+    public String getPageLink() {
+        return mUrlNewsPage;
     }
 
     public String getDate() {
@@ -147,7 +144,7 @@ public class News {
     }
 
     private static String convertToDate(int sourceDate) {
-        long difference = CURRENT_TS - sourceDate;
+        long difference = (System.currentTimeMillis() / 1000) - sourceDate;
         if(difference < 3600) {
             long lastMinutes = difference / 60;
             return lastMinutes + "分前";

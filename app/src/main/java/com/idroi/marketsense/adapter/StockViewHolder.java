@@ -14,6 +14,7 @@ public class StockViewHolder {
 
     View mainView;
     TextView nameView;
+    TextView codeView;
 
     static final StockViewHolder EMPTY_VIEW_HOLDER = new StockViewHolder();
 
@@ -24,6 +25,7 @@ public class StockViewHolder {
         stockViewHolder.mainView = view;
         try {
             stockViewHolder.nameView = view.findViewById(R.id.marketsense_stock_name_tv);
+            stockViewHolder.codeView = view.findViewById(R.id.marketsense_stock_code_tv);
             return stockViewHolder;
         } catch (ClassCastException exception) {
             MSLog.e(exception.toString());

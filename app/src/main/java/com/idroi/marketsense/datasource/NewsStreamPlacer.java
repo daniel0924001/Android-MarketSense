@@ -4,6 +4,7 @@ import android.app.Activity;
 
 import java.util.ArrayList;
 
+import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.adapter.NewsRecyclerAdapter;
 import com.idroi.marketsense.data.News;
 
@@ -27,6 +28,16 @@ public class NewsStreamPlacer {
 
     public void setNewsSourceListener(NewsSource.NewsSourceListener listener) {
         mNewsSource.setNewsSourceListener(listener);
+    }
+
+    public int clearNews() {
+        if(mNewsArrayList != null) {
+            int size = mNewsArrayList.size();
+            MSLog.d("clear size: " + size);
+            mNewsArrayList.clear();
+            return size;
+        }
+        return 0;
     }
 
     public void loadNews(String url) {

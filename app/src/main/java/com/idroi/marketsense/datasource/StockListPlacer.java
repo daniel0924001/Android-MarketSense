@@ -2,11 +2,13 @@ package com.idroi.marketsense.datasource;
 
 import android.app.Activity;
 
+import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.Constants;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.data.Stock;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by daniel.hsieh on 2018/4/23.
@@ -27,6 +29,7 @@ public class StockListPlacer {
 
     private Activity mActivity;
     private MarketSenseStockFetcher mMarketSenseStockFetcher;
+    private String mUrl;
 
     public StockListPlacer(Activity activity) {
         mActivity = activity;
@@ -44,7 +47,7 @@ public class StockListPlacer {
             public void onStockListFail(MarketSenseError marketSenseError) {
                 increaseRetryTime();
                 if(isRetry()) {
-                    mMarketSenseStockFetcher.makeRequest();
+                    mMarketSenseStockFetcher.makeRequest(mUrl);
                 } else {
                     generateDefaultStockList();
                     mStockListListener.onStockListLoaded();
@@ -72,14 +75,15 @@ public class StockListPlacer {
         mStockListListener = listener;
     }
 
-    public void loadStockList() {
+    public void loadStockList(String url) {
+        mUrl = url;
         loadStockList(new MarketSenseStockFetcher(mActivity, mMarketSenseStockNetworkListener));
     }
 
-    public void loadStockList(MarketSenseStockFetcher stockFetcher) {
+    private void loadStockList(MarketSenseStockFetcher stockFetcher) {
         clear();
         mMarketSenseStockFetcher = stockFetcher;
-        mMarketSenseStockFetcher.makeRequest();
+        mMarketSenseStockFetcher.makeRequest(mUrl);
     }
 
     public void clear() {
@@ -94,14 +98,11 @@ public class StockListPlacer {
     }
 
     public void generateDefaultStockList() {
+        MSLog.e("Stock generate default stock list");
         if(mStockArrayList == null) {
             mStockArrayList = new ArrayList<Stock>();
         }
-        for(int i = 0; i < Constants.HOT_STOCKS_KEYWORDS.length; i++) {
-            Stock stock = new Stock();
-            stock.setName(Constants.HOT_STOCKS_KEYWORDS[i]);
-            mStockArrayList.add(stock);
-        }
+        mStockArrayList.addAll(Arrays.asList(Constants.HOT_STOCKS_KEYWORDS));
     }
 
     public int getItemCount() {

@@ -1,6 +1,7 @@
 package com.idroi.marketsense.adapter;
 
 import android.app.Activity;
+import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,14 +24,22 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
     private StockListRenderer mStockListRenderer;
     private OnItemClickListener mOnItemClickListener;
 
+    private Handler mHandler;
+
     public StockListRecyclerAdapter(final Activity activity) {
         mActivity = activity;
         mStockListPlacer = new StockListPlacer(activity);
         mStockListRenderer = new StockListRenderer();
+        mHandler = new Handler();
         mStockListPlacer.setStockListListener(new StockListPlacer.StockListListener() {
             @Override
             public void onStockListLoaded() {
-                notifyDataSetChanged();
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        notifyDataSetChanged();
+                    }
+                });
             }
         });
     }
@@ -39,8 +48,8 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
         mOnItemClickListener = listener;
     }
 
-    public void loadStockList() {
-        mStockListPlacer.loadStockList();
+    public void loadStockList(String url) {
+        mStockListPlacer.loadStockList(url);
     }
 
     @Override

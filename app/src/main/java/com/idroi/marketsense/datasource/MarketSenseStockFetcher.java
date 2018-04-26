@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
 
+import com.android.volley.Cache;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -16,6 +17,8 @@ import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.request.NewsRequest;
 import com.idroi.marketsense.request.StockRequest;
 import com.idroi.marketsense.util.DeviceUtils;
+
+import org.json.JSONException;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -67,7 +70,7 @@ public class MarketSenseStockFetcher {
         };
     }
 
-    void makeRequest() {
+    void makeRequest(String url) {
         final Context context = getContextOrDestroy();
         if(context == null) {
             return;
@@ -78,22 +81,36 @@ public class MarketSenseStockFetcher {
             return;
         }
 
-        requestStock();
+        requestStock(url);
     }
 
-    private void requestStock() {
+    private void requestStock(String url) {
         final Context context = getContextOrDestroy();
         if(context == null) {
             return;
         }
 
-        // TODO
-        String fakeURL = "http://apiv2.infohubapp.com/v1/keyword?keyword=%E9%B4%BB%E6%B5%B7";
-        MSLog.i("Loading stock list...");
-        mStockRequest = new StockRequest(Request.Method.GET, fakeURL, null, new Response.Listener<ArrayList<Stock>>() {
+        MSLog.i("Loading stock list...: " + url);
+
+        MSLog.i("Loading stock list...(cache): " + url);
+        Cache cache = Networking.getRequestQueue(context).getCache();
+        Cache.Entry entry = cache.get(url);
+        if(entry != null) {
+            try {
+                ArrayList<Stock> stockArrayList = StockRequest.stockParseResponse(entry.data);
+                MSLog.i("Loading stock list...(cache hit): " + new String(entry.data));
+                mMarketSenseStockNetworkListener.onStockListLoad(stockArrayList);
+            } catch (JSONException e) {
+                MSLog.e("Loading stock list...(cache failed JSONException)");
+            }
+        } else {
+            MSLog.i("Loading stock list...(cache miss)");
+        }
+
+        mStockRequest = new StockRequest(Request.Method.GET, url, null, new Response.Listener<ArrayList<Stock>>() {
             @Override
             public void onResponse(ArrayList<Stock> response) {
-                MSLog.e("Stock Request success: ");
+                MSLog.i("Stock Request success: " + response);
                 mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
                 mMarketSenseStockNetworkListener.onStockListLoad(response);
             }
@@ -108,6 +125,8 @@ public class MarketSenseStockFetcher {
                 if(error instanceof MarketSenseNetworkError) {
                     MarketSenseNetworkError networkError = (MarketSenseNetworkError) error;
                     mMarketSenseStockNetworkListener.onStockListFail(networkError.getReason());
+                } else {
+                    mMarketSenseStockNetworkListener.onStockListFail(MarketSenseError.NETWORK_VOLLEY_ERROR);
                 }
             }
         });

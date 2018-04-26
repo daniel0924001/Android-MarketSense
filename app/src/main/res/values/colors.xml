@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="marketsense_text_black">#4a4a4a</color>
+    <color name="marketsense_text_gray">#898989</color>
     <color name="marketsense_text_white">#fff</color>
     <color name="marketsense_trans_black">#4c000000</color>
 </resources>

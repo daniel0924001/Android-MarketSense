@@ -47,19 +47,14 @@ public class NewsRequest extends Request<ArrayList<News>> {
 
     @Override
     protected Response<ArrayList<News>> parseNetworkResponse(NetworkResponse response) {
-        try {
-            JSONArray newsJsonArray = getNewsResult(new JSONObject(new String(response.data)));
 
-            if(newsJsonArray != null) {
-                ArrayList<News> newsArrayList = new ArrayList<>();
-                for(int i = 0; i < newsJsonArray.length(); i++) {
-                    newsArrayList.add(News.JsonObjectToNews(newsJsonArray.getJSONObject(i)));
-                }
+        try {
+            ArrayList<News> newsArrayList = newsParseResponse(response.data);
+            if(newsArrayList != null) {
                 return Response.success(newsArrayList, HttpHeaderParser.parseCacheHeaders(response));
             } else {
                 return Response.error(new MarketSenseNetworkError(MarketSenseError.JSON_PARSED_NO_DATA));
             }
-
         } catch (JSONException e) {
             return Response.error(new MarketSenseNetworkError(MarketSenseError.JSON_PARSED_ERROR));
         }
@@ -70,7 +65,21 @@ public class NewsRequest extends Request<ArrayList<News>> {
         mListener.onResponse(response);
     }
 
-    private JSONArray getNewsResult(JSONObject jsonResponse) {
+    public static ArrayList<News> newsParseResponse(byte[] data) throws JSONException {
+        JSONArray newsJsonArray = getNewsResult(new JSONObject(new String(data)));
+
+        if(newsJsonArray != null) {
+            ArrayList<News> newsArrayList = new ArrayList<>();
+            for(int i = 0; i < newsJsonArray.length(); i++) {
+                newsArrayList.add(News.JsonObjectToNews(newsJsonArray.getJSONObject(i)));
+            }
+            return newsArrayList;
+        }
+
+        return null;
+    }
+
+    private static JSONArray getNewsResult(JSONObject jsonResponse) {
 
         if(jsonResponse.optInt(PARAM_CODE) == 0 && jsonResponse.opt(PARAM_RESULT) != null) {
             JSONObject jsonResult = jsonResponse.optJSONObject(PARAM_RESULT);

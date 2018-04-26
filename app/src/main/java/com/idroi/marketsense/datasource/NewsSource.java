@@ -2,7 +2,6 @@ package com.idroi.marketsense.datasource;
 
 import android.app.Activity;
 import android.os.Handler;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
@@ -20,11 +19,13 @@ public class NewsSource {
 
     public interface NewsSourceListener {
         void onNewsAvailable();
+        void onNotifyRemove();
     }
 
     private static final int DEFAULT_CACHE_LIMIT = 20;
 
     private final ArrayList<News> mNewsCache;
+    private boolean mIsCache = false;
 
     private MarketSenseNewsFetcher mNewsFetcher;
     private MarketSenseNewsFetcher.MarketSenseNewsNetworkListener mMarketSenseNewsNetworkListener;
@@ -42,6 +43,7 @@ public class NewsSource {
     private NewsSourceListener mNewsSourceListener;
 
     private String mUrl;
+    private boolean mShouldReadFromCache;
 
     NewsSource(Activity activity) {
         mActivity = new WeakReference<Activity>(activity);
@@ -57,7 +59,20 @@ public class NewsSource {
 
         mMarketSenseNewsNetworkListener = new MarketSenseNewsFetcher.MarketSenseNewsNetworkListener() {
             @Override
-            public void onNewsLoad(ArrayList<News> newsArray) {
+            public void onNewsLoad(ArrayList<News> newsArray, boolean isCache) {
+
+                if(mIsCache && isCache) {
+                    return;
+                }
+
+                if(mIsCache && !isCache) {
+                     // mIsCache = true;  last data is from cache
+                     // isCache = false;  recent data is from network
+                     // we have to clear cache data if the data is from network
+                    mNewsCache.clear();
+                    mNewsSourceListener.onNotifyRemove();
+                    mIsCache = false;
+                }
 
                 boolean moreFlag = false;
 
@@ -76,6 +91,7 @@ public class NewsSource {
                 }
 
                 if(!mFirstTimeNewsAvailable) {
+                    mShouldReadFromCache = false;
                     mFirstTimeNewsAvailable = true;
                     if(mNewsSourceListener != null) {
                         mNewsSourceListener.onNewsAvailable();
@@ -110,6 +126,7 @@ public class NewsSource {
 
         mRequestInFlight = false;
         mFirstTimeNewsAvailable = false;
+        mShouldReadFromCache = true;
         resetRetryTime();
     }
 
@@ -166,13 +183,14 @@ public class NewsSource {
         }
         mRequestInFlight = false;
         mFirstTimeNewsAvailable = false;
+        mShouldReadFromCache = true;
         mReplenishCacheHandler.removeCallbacks(mReplenishCacheRunnable);
     }
 
     private void replenishCache() {
         if(!mRequestInFlight && mNewsFetcher != null && mNewsCache.size() < DEFAULT_CACHE_LIMIT) {
             mRequestInFlight = true;
-            mNewsFetcher.makeRequest(mUrl);
+            mNewsFetcher.makeRequest(mUrl, mShouldReadFromCache);
         }
     }
 }

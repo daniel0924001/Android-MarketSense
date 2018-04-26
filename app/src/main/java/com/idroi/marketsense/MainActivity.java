@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MSLog.i("Enter MainActivity");
         setContentView(R.layout.activity_main);
 
         if(savedInstanceState != null) {
@@ -129,6 +130,12 @@ public class MainActivity extends AppCompatActivity {
 
         setActionBar();
         setViewPager();
+    }
+
+    @Override
+    protected void onDestroy() {
+        MSLog.i("Exit MainActivity");
+        super.onDestroy();
     }
 
     private void setActionBar() {

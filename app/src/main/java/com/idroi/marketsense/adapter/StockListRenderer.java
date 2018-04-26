@@ -46,6 +46,7 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
 
     private void update(final StockViewHolder stockViewHolder, Stock content) {
         MarketSenseRendererHelper.addTextView(stockViewHolder.nameView, content.getName());
+        MarketSenseRendererHelper.addTextView(stockViewHolder.codeView, content.getCode());
     }
 
     private void setViewVisibility(final StockViewHolder stockViewHolder, final int visibility) {

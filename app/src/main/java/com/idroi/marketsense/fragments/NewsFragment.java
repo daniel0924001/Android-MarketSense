@@ -60,6 +60,7 @@ public class NewsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        MSLog.i("Enter NewsFragment");
 
         mNewsRecyclerAdapter.loadNews(generateURL());
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -107,6 +108,7 @@ public class NewsFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        MSLog.i("Exit NewsFragment");
         mNewsRecyclerAdapter.destroy();
         super.onDestroyView();
     }

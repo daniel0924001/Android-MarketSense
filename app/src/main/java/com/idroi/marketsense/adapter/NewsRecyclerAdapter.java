@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.datasource.NewsSource;
@@ -45,7 +46,24 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
         mNewsStreamPlacer.setNewsSourceListener(new NewsSource.NewsSourceListener() {
             @Override
             public void onNewsAvailable() {
-                expand(15);
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        expand(15);
+                    }
+                });
+            }
+
+            @Override
+            public void onNotifyRemove() {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        int size = mNewsStreamPlacer.clearNews();
+                        notifyItemRangeRemoved(0, size);
+                    }
+                });
+
             }
         });
 
@@ -99,13 +117,13 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
         News news = mNewsStreamPlacer.getNewsData(position);
         if(news != null) {
             mNewsRenderer.renderView(holder.itemView, news);
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mOnItemClickListener.onItemClick(mNewsStreamPlacer.getNewsData(holder.getAdapterPosition()));
+                }
+            });
         }
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mOnItemClickListener.onItemClick(mNewsStreamPlacer.getNewsData(holder.getAdapterPosition()));
-            }
-        });
     }
 
     @Override

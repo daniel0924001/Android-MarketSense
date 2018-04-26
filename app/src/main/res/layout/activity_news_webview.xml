@@ -10,9 +10,11 @@
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/marketsense_webview_upper_block"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintDimensionRatio="1.67">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintDimensionRatio="2">
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/marketsense_webview_activity_image"

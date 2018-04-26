@@ -80,8 +80,7 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
 
             @Override
             public void onExpandFailed() {
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
+                mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         expand(15);

@@ -197,7 +197,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
 
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-                if(url.contains("adsbygoogle.js")) {
+                if(url.contains("adsbygoogle.js") || url.contains("ebay") || url.contains("amazon")) {
                     return new WebResourceResponse("text/plain", "utf-8", new ByteArrayInputStream("".getBytes()));
                 }
                 return super.shouldInterceptRequest(view, url);
@@ -207,7 +207,6 @@ public class NewsWebViewActivity extends AppCompatActivity {
         mNewsWebViewMiddle.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
-
                 if(newProgress >= 80) {
                     mNewsWebViewMiddle.getSettings().setBlockNetworkImage(false);
                 }

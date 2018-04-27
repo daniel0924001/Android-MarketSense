@@ -10,6 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.facebook.cache.disk.DiskCacheConfig;
 import com.facebook.common.internal.Supplier;
@@ -151,6 +153,25 @@ public class MainActivity extends AppCompatActivity {
                             ActionBar.LayoutParams.MATCH_PARENT,
                             ActionBar.LayoutParams.MATCH_PARENT));
             actionBar.setDisplayShowCustomEnabled(true);
+
+            ImageView userProfileView = view.findViewById(R.id.action_bar_avatar);
+            if(userProfileView != null) {
+                userProfileView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                    }
+                });
+            }
+
+            ImageView notificationView = view.findViewById(R.id.action_bar_notification);
+            if(notificationView != null) {
+                notificationView.setVisibility(View.VISIBLE);
+                notificationView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                    }
+                });
+            }
         }
     }
 

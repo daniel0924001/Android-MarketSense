@@ -13,11 +13,11 @@ import android.widget.TextView;
  * Created by daniel.hsieh on 2018/4/27.
  */
 
-public class NotificationActivity extends AppCompatActivity{
+public class SettingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_notification);
+        setContentView(R.layout.activity_setting);
 
         setActionBar();
     }
@@ -42,7 +42,7 @@ public class NotificationActivity extends AppCompatActivity{
 
             TextView textView = view.findViewById(R.id.action_bar_name);
             if(textView != null) {
-                textView.setText(getResources().getText(R.string.activity_news_notification));
+                textView.setText(getResources().getText(R.string.activity_news_setting));
             }
 
             actionBar.setDisplayShowHomeEnabled(false);

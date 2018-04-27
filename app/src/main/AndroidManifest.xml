@@ -39,6 +39,14 @@
             android:label="@string/activity_news_web_name">
         </activity>
 
+        <activity android:name=".NotificationActivity"
+            android:label="@string/activity_news_notification">
+        </activity>
+
+        <activity android:name=".SettingActivity"
+            android:label="@string/activity_news_setting">
+        </activity>
+
     </application>
 
 </manifest>

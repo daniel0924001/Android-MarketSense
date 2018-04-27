@@ -1,5 +1,6 @@
 package com.idroi.marketsense;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -159,6 +160,9 @@ public class MainActivity extends AppCompatActivity {
                 userProfileView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        Intent intent = new Intent(MainActivity.this, SettingActivity.class);
+                        startActivity(intent);
+                        overridePendingTransition(R.anim.enter, R.anim.stop);
                     }
                 });
             }
@@ -169,6 +173,9 @@ public class MainActivity extends AppCompatActivity {
                 notificationView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
+                        startActivity(intent);
+                        overridePendingTransition(R.anim.enter, R.anim.stop);
                     }
                 });
             }

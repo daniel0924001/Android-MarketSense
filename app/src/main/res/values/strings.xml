@@ -2,6 +2,8 @@
     <string name="app_name">市覺</string>
     <string name="activity_stock_name">個股總覽</string>
     <string name="activity_news_web_name">市覺新聞</string>
+    <string name="activity_news_notification">通知</string>
+    <string name="activity_news_setting">設定</string>
     <string name="activity_splash">市覺</string>
     <string name="user_avatar">大頭照</string>
     <string name="notification">推播</string>
@@ -43,4 +45,6 @@
     <string name="title_confidence">信心</string>
     <string name="iv_up_down">升降圖</string>
     <string name="iv_alarm">警告</string>
+
+    <string name="no_notification">暫無通知</string>
 </resources>

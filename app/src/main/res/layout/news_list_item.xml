@@ -64,7 +64,7 @@
         android:layout_marginStart="15dp"
         android:visibility="gone"
         android:contentDescription="@string/iv_alarm"
-        app:srcCompat="@drawable/ic_notifications_black_24px"
+        app:srcCompat="@drawable/ic_notifications_red_24px"
         app:layout_constraintStart_toEndOf="@id/marketsense_news_date_tv"
         app:layout_constraintBottom_toBottomOf="parent" />
 

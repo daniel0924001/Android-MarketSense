@@ -11,6 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.ethanhua.skeleton.RecyclerViewSkeletonScreen;
+import com.ethanhua.skeleton.Skeleton;
+import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.MainActivity;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.StockActivity;
@@ -50,6 +53,7 @@ public class StockListFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private StockListRecyclerAdapter mStockListRecyclerAdapter;
+    private RecyclerViewSkeletonScreen mSkeletonScreen;
 
     @Nullable
     @Override
@@ -61,6 +65,10 @@ public class StockListFragment extends Fragment {
         mStockListRecyclerAdapter = new StockListRecyclerAdapter(getActivity());
         mRecyclerView.setAdapter(mStockListRecyclerAdapter);
 
+        mSkeletonScreen = Skeleton.bind(mRecyclerView)
+                .adapter(mStockListRecyclerAdapter)
+                .load(R.layout.layout_default_item_skeleton).show();
+
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         return view;
@@ -70,7 +78,16 @@ public class StockListFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mStockListRecyclerAdapter.setStockListAvailableListener(new StockListRecyclerAdapter.StockListAvailableListener() {
+            @Override
+            public void onStockListAvailable() {
+                if(mSkeletonScreen != null) {
+                    mSkeletonScreen.hide();
+                }
+            }
+        });
         mStockListRecyclerAdapter.loadStockList(generateURL());
+
         mStockListRecyclerAdapter.setOnItemClickListener(new StockListRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Stock stock) {

@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.ethanhua.skeleton.RecyclerViewSkeletonScreen;
+import com.ethanhua.skeleton.Skeleton;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.NewsWebViewActivity;
 import com.idroi.marketsense.R;
@@ -42,6 +44,7 @@ public class NewsFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private NewsRecyclerAdapter mNewsRecyclerAdapter;
+    private RecyclerViewSkeletonScreen mSkeletonScreen;
 
     @Nullable
     @Override
@@ -53,6 +56,9 @@ public class NewsFragment extends Fragment {
         mNewsRecyclerAdapter = new NewsRecyclerAdapter(getActivity());
         mRecyclerView.setAdapter(mNewsRecyclerAdapter);
 
+        mSkeletonScreen = Skeleton.bind(mRecyclerView)
+                .adapter(mNewsRecyclerAdapter).load(R.layout.layout_default_item_skeleton).show();
+
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         return view;
     }
@@ -62,7 +68,16 @@ public class NewsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         MSLog.i("Enter NewsFragment");
 
+        mNewsRecyclerAdapter.setNewsAvailableListener(new NewsRecyclerAdapter.NewsAvailableListener() {
+            @Override
+            public void onNewsAvailable() {
+                if(mSkeletonScreen != null) {
+                    mSkeletonScreen.hide();
+                }
+            }
+        });
         mNewsRecyclerAdapter.loadNews(generateURL());
+
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {

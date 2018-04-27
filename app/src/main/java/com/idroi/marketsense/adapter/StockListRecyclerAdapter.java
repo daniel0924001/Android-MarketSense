@@ -19,10 +19,15 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
         void onItemClick(Stock stock);
     }
 
+    public interface StockListAvailableListener {
+        void onStockListAvailable();
+    }
+
     private Activity mActivity;
     private StockListPlacer mStockListPlacer;
     private StockListRenderer mStockListRenderer;
     private OnItemClickListener mOnItemClickListener;
+    private StockListAvailableListener mStockListAvailableListener;
 
     private Handler mHandler;
 
@@ -34,6 +39,9 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
         mStockListPlacer.setStockListListener(new StockListPlacer.StockListListener() {
             @Override
             public void onStockListLoaded() {
+                if(mStockListAvailableListener != null) {
+                    mStockListAvailableListener.onStockListAvailable();
+                }
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -42,6 +50,10 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
                 });
             }
         });
+    }
+
+    public void setStockListAvailableListener(StockListAvailableListener listener) {
+        mStockListAvailableListener = listener;
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {

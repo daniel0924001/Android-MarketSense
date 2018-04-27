@@ -67,6 +67,9 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.5'
     implementation 'com.astuetz:pagerslidingtabstrip:1.0.1'
     implementation 'com.github.hackware1993:MagicIndicator:1.5.0'
+
+    implementation 'com.ethanhua:skeleton:1.1.0'
+    implementation 'io.supercharge:shimmerlayout:2.0.0'
 }
 
 static def getJenkinsBuildNumber() {

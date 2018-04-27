@@ -22,6 +22,8 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.ethanhua.skeleton.Skeleton;
+import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.FrescoImageHelper;
@@ -187,9 +189,19 @@ public class NewsWebViewActivity extends AppCompatActivity {
         mNewsWebViewMiddle.getSettings().setAppCacheEnabled(true);
         mNewsWebViewMiddle.getSettings().setBlockNetworkImage(true);
 
+        final ViewSkeletonScreen skeletonScreen =
+                Skeleton.bind(mNewsWebViewMiddle).load(R.layout.skeleton_webview).show();
+
         mNewsWebViewMiddle.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
 
         mNewsWebViewMiddle.setWebViewClient(new WebViewClient() {
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                skeletonScreen.hide();
+                super.onPageFinished(view, url);
+            }
+
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 return false;

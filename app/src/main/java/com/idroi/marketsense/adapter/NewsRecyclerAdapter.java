@@ -25,6 +25,10 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
         void onExpandFailed();
     }
 
+    public interface NewsAvailableListener {
+        void onNewsAvailable();
+    }
+
     public interface OnItemClickListener {
         void onItemClick(News stock);
     }
@@ -37,6 +41,7 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
     private NewsRenderer mNewsRenderer;
     private NewsExpandListener mNewsExpandListener;
     private OnItemClickListener mOnItemClickListener;
+    private NewsAvailableListener mNewsAvailableListener;
 
     public NewsRecyclerAdapter(final Activity activity) {
         mActivity = activity;
@@ -46,6 +51,9 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
         mNewsStreamPlacer.setNewsSourceListener(new NewsSource.NewsSourceListener() {
             @Override
             public void onNewsAvailable() {
+                if(mNewsAvailableListener != null) {
+                    mNewsAvailableListener.onNewsAvailable();
+                }
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -88,6 +96,10 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
                 }, 1000);
             }
         };
+    }
+
+    public void setNewsAvailableListener(NewsAvailableListener listener) {
+        mNewsAvailableListener = listener;
     }
 
     public void loadNews(String url) {

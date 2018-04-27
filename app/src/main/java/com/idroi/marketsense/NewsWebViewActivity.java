@@ -19,6 +19,7 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -58,7 +59,8 @@ public class NewsWebViewActivity extends AppCompatActivity {
     private TextView mNewsWebViewMiddleTitleTextView;
     private TextView mNewsWebViewMiddleDateTextView;
     private SimpleDraweeView mNewsWebViewMiddleImageView;
-    private FloatingActionButton mFabIcon;
+
+    private Button mReadButton;
 
     public static final int sPostDelayMilliSeconds = 1200;
     private boolean mIsOriginalVisible = false;
@@ -86,8 +88,8 @@ public class NewsWebViewActivity extends AppCompatActivity {
             return;
         }
 
-        mFabIcon = (FloatingActionButton) findViewById(R.id.fab_convert_webview);
-        mFabIcon.setOnClickListener(new View.OnClickListener() {
+        mReadButton = (Button) findViewById(R.id.btn_convert_webview);
+        mReadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 changeVisibility();
@@ -275,14 +277,14 @@ public class NewsWebViewActivity extends AppCompatActivity {
             mNewsWebViewMiddle.setVisibility(View.VISIBLE);
             mNewsWebViewOriginal.setVisibility(View.GONE);
             mUpperBlock.setVisibility(View.VISIBLE);
-            mFabIcon.setImageResource(R.drawable.ic_web_white_24px);
+            mReadButton.setText(R.string.title_news_read_original);
         } else {
             // show original webview
             mIsOriginalVisible = true;
             mNewsWebViewMiddle.setVisibility(View.GONE);
             mNewsWebViewOriginal.setVisibility(View.VISIBLE);
             mUpperBlock.setVisibility(View.GONE);
-            mFabIcon.setImageResource(R.drawable.ic_web_asset_white_24px);
+            mReadButton.setText(R.string.title_news_read_middle);
         }
     }
 

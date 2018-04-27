@@ -35,6 +35,7 @@ public class News {
     private String mUrlNewsPage;
     private String mUrlOriginPage;
     private String mDate;
+    private boolean mImportant;
 
     public News() {
     }
@@ -63,6 +64,10 @@ public class News {
         mDate = date;
     }
 
+    public void setImportant(boolean important) {
+        mImportant = important;
+    }
+
     public String getTitle() {
         return mTitle;
     }
@@ -81,6 +86,10 @@ public class News {
 
     public String getDate() {
         return mDate;
+    }
+
+    public boolean getImportant() {
+        return mImportant;
     }
 
     public static News JsonObjectToNews(JSONObject jsonObject) {

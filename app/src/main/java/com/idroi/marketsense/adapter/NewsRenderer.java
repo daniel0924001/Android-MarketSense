@@ -42,13 +42,19 @@ public class NewsRenderer implements MarketSenseRenderer<News>{
             newsViewHolder = NewsViewHolder.convertToViewHolder(view);
             mViewHolderMap.put(view, newsViewHolder);
         }
-        update(newsViewHolder, content);
+        update(view.getContext(), newsViewHolder, content);
         setViewVisibility(newsViewHolder, View.VISIBLE);
     }
 
-    private void update(final NewsViewHolder newsViewHolder, News content) {
+    private void update(final Context context, final NewsViewHolder newsViewHolder, News content) {
         MarketSenseRendererHelper.addTextView(newsViewHolder.titleView, content.getTitle());
         MarketSenseRendererHelper.addTextView(newsViewHolder.dateView, content.getDate());
+        // TODO: for demo
+        if(!content.getImportant()) {
+            newsViewHolder.dateView.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
+            newsViewHolder.dateView.setTextColor(context.getResources().getColor(R.color.marketsense_text_white));
+            newsViewHolder.alarmImageView.setVisibility(View.VISIBLE);
+        }
         if(!TextUtils.isEmpty(content.getUrlImage())) {
             FrescoImageHelper.loadImageView(content.getUrlImage(),
                     newsViewHolder.mainImageView, FrescoImageHelper.MAIN_IMAGE_RATIO);

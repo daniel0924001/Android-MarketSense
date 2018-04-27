@@ -40,13 +40,79 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
             stockViewHolder = StockViewHolder.convertToViewHolder(view);
             mViewHolderMap.put(view, stockViewHolder);
         }
-        update(stockViewHolder, content);
+        update(view.getContext(), stockViewHolder, content);
         setViewVisibility(stockViewHolder, View.VISIBLE);
     }
 
-    private void update(final StockViewHolder stockViewHolder, Stock content) {
+    private void update(final Context context, final StockViewHolder stockViewHolder, Stock content) {
         MarketSenseRendererHelper.addTextView(stockViewHolder.nameView, content.getName());
         MarketSenseRendererHelper.addTextView(stockViewHolder.codeView, content.getCode());
+
+
+        switch (content.getTrend()) {
+            case Stock.TREND_UP:
+                stockViewHolder.trendImageView.setImageResource(R.drawable.ic_trending_up_white_24px);
+                stockViewHolder.trendTextView.setTextColor(context.getResources().getColor(R.color.colorTrendUp));
+                String rankNameUp = context.getResources().getString(R.string.title_down) +
+                        content.getRankTrend() + context.getResources().getString(R.string.title_rank);
+                MarketSenseRendererHelper.addTextView(
+                        stockViewHolder.trendTextView, rankNameUp);
+                break;
+            case Stock.TREND_FLAT:
+                stockViewHolder.trendImageView.setImageResource(R.drawable.ic_trending_flat_white_24px);
+                stockViewHolder.trendTextView.setTextColor(context.getResources().getColor(R.color.colorTrendFlat));
+                MarketSenseRendererHelper.addTextView(
+                        stockViewHolder.trendTextView, String.valueOf(0));
+                break;
+            case Stock.TREND_DOWN:
+                stockViewHolder.trendImageView.setImageResource(R.drawable.ic_trending_down_white_24px);
+                stockViewHolder.trendTextView.setTextColor(context.getResources().getColor(R.color.colorTrendDown));
+                String rankNameDown = context.getResources().getString(R.string.title_down) +
+                        content.getRankTrend() + context.getResources().getString(R.string.title_rank);
+                MarketSenseRendererHelper.addTextView(
+                        stockViewHolder.trendTextView, rankNameDown);
+                break;
+            default:
+                stockViewHolder.trendImageView.setImageResource(R.drawable.ic_trending_up_white_24px);
+                stockViewHolder.trendTextView.setTextColor(context.getResources().getColor(R.color.colorTrendUp));
+                MarketSenseRendererHelper.addTextView(
+                        stockViewHolder.trendTextView, String.valueOf(87));
+        }
+
+        stockViewHolder.progressBar.setProgress(content.getConfidence());
+        switch (content.getConfidenceDirection()) {
+            case Stock.TREND_UP:
+                String confidenceUp = content.getRankTrend() + "% " +
+                        context.getResources().getString(R.string.title_go_up);
+                MarketSenseRendererHelper.addTextView(
+                        stockViewHolder.confidenceTextView, confidenceUp);
+                stockViewHolder.confidenceTextView.setTextColor(context.getResources().getColor(R.color.colorTrendUp));
+                stockViewHolder.progressBar.setProgressDrawable(context.getResources().getDrawable(R.drawable.progressbar_go_up));
+                break;
+            case Stock.TREND_FLAT:
+                String confidenceFlat = content.getRankTrend() + "% " +
+                        context.getResources().getString(R.string.title_go_flat);
+                MarketSenseRendererHelper.addTextView(
+                        stockViewHolder.confidenceTextView, confidenceFlat);
+                stockViewHolder.confidenceTextView.setTextColor(context.getResources().getColor(R.color.colorTrendFlat));
+                stockViewHolder.progressBar.setProgressDrawable(context.getResources().getDrawable(R.drawable.progressbar_go_up));
+                break;
+            case Stock.TREND_DOWN:
+                String confidenceDown = content.getRankTrend() + "% " +
+                        context.getResources().getString(R.string.title_go_down);
+                MarketSenseRendererHelper.addTextView(
+                        stockViewHolder.confidenceTextView, confidenceDown);
+                stockViewHolder.confidenceTextView.setTextColor(context.getResources().getColor(R.color.colorTrendDown));
+                stockViewHolder.progressBar.setProgressDrawable(context.getResources().getDrawable(R.drawable.progressbar_go_down));
+                break;
+            default:
+                String confidenceName = content.getRankTrend() + "% " +
+                        context.getResources().getString(R.string.title_go_up);
+                MarketSenseRendererHelper.addTextView(
+                        stockViewHolder.confidenceTextView, confidenceName);
+                stockViewHolder.confidenceTextView.setTextColor(context.getResources().getColor(R.color.colorTrendUp));
+                stockViewHolder.progressBar.setProgressDrawable(context.getResources().getDrawable(R.drawable.progressbar_go_up));
+        }
     }
 
     private void setViewVisibility(final StockViewHolder stockViewHolder, final int visibility) {

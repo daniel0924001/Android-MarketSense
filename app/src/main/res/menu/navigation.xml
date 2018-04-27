@@ -2,18 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/navigation_predict"
+        android:icon="@drawable/ic_poll_black_24px"
+        android:title="@string/title_predict_tab" />
+
+    <item
         android:id="@+id/navigation_news"
-        android:icon="@drawable/ic_home_black_24dp"
+        android:icon="@drawable/ic_public_black_24px"
         android:title="@string/title_news_tab" />
 
     <item
-        android:id="@+id/navigation_choice"
+        android:id="@+id/navigation_choices"
         android:icon="@drawable/ic_dashboard_black_24dp"
         android:title="@string/title_choices_tab" />
-
-    <item
-        android:id="@+id/navigation_notifications"
-        android:icon="@drawable/ic_notifications_black_24dp"
-        android:title="@string/title_notifications_tab" />
 
 </menu>

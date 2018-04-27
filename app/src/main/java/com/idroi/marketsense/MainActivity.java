@@ -20,8 +20,8 @@ import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.adapter.BaseScreenSlidePagerAdapter;
 import com.idroi.marketsense.adapter.ChoiceScreenSlidePagerAdapter;
+import com.idroi.marketsense.adapter.PredictScreenSlidePagerAdapter;
 import com.idroi.marketsense.adapter.NewsScreenSlidePagerAdapter;
-import com.idroi.marketsense.adapter.NotificationScreenSlidePagerAdapter;
 import com.idroi.marketsense.common.MarketSenseCommonNavigator;
 
 import net.lucode.hackware.magicindicator.MagicIndicator;
@@ -54,14 +54,14 @@ public class MainActivity extends AppCompatActivity {
             if(mLastSelectedItemId != item.getItemId()) {
                 mLastSelectedItemId = item.getItemId();
                 switch (item.getItemId()) {
+                    case R.id.navigation_predict:
+                        setViewPager(R.id.navigation_predict);
+                        return true;
                     case R.id.navigation_news:
                         setViewPager(R.id.navigation_news);
                         return true;
-                    case R.id.navigation_choice:
-                        setViewPager(R.id.navigation_choice);
-                        return true;
-                    case R.id.navigation_notifications:
-                        setViewPager(R.id.navigation_notifications);
+                    case R.id.navigation_choices:
+                        setViewPager(R.id.navigation_choices);
                         return true;
                 }
             }
@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setViewPager() {
-        setViewPager(R.id.navigation_news);
+        setViewPager(R.id.navigation_predict);
     }
 
     private void setViewPager(int itemId) {
@@ -166,17 +166,17 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = findViewById(R.id.pager);
         BaseScreenSlidePagerAdapter baseScreenSlidePagerAdapter = null;
         switch (itemId) {
+            case R.id.navigation_predict:
+                baseScreenSlidePagerAdapter =
+                        new PredictScreenSlidePagerAdapter(this, getSupportFragmentManager());
+                break;
             case R.id.navigation_news:
                 baseScreenSlidePagerAdapter =
                         new NewsScreenSlidePagerAdapter(this, getSupportFragmentManager());
                 break;
-            case R.id.navigation_choice:
+            case R.id.navigation_choices:
                 baseScreenSlidePagerAdapter =
                         new ChoiceScreenSlidePagerAdapter(this, getSupportFragmentManager());
-                break;
-            case R.id.navigation_notifications:
-                baseScreenSlidePagerAdapter =
-                        new NotificationScreenSlidePagerAdapter(this, getSupportFragmentManager());
                 break;
             default:
                 // invalid category

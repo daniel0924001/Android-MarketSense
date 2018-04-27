@@ -190,7 +190,8 @@ public class NewsWebViewActivity extends AppCompatActivity {
         mNewsWebViewMiddle.getSettings().setBlockNetworkImage(true);
 
         final ViewSkeletonScreen skeletonScreen =
-                Skeleton.bind(mNewsWebViewMiddle).load(R.layout.skeleton_webview).show();
+                Skeleton.bind(mNewsWebViewMiddle).shimmer(false)
+                        .load(R.layout.skeleton_webview).show();
 
         mNewsWebViewMiddle.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
 

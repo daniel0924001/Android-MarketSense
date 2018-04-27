@@ -6,7 +6,7 @@
     <string name="user_avatar">大頭照</string>
     <string name="title_news_tab">新聞</string>
     <string name="title_choices_tab">自選</string>
-    <string name="title_notifications_tab">推播</string>
+    <string name="title_predict_tab">預測</string>
 
     <string name="title_news_win_predict">預測漲最多股票</string>
     <string name="title_news_lose_predict">預測跌最多股票</string>
@@ -26,4 +26,18 @@
 
     <string name="title_action_bar_search">搜尋</string>
     <string name="title_action_bar_setting">設定</string>
+
+    <string name="title_company_name">公司名稱</string>
+    <string name="title_company_code">公司代碼</string>
+    <string name="title_company_trend">公司趨勢</string>
+    <string name="title_company_confidence">公司信心指數</string>
+    <string name="title_up">升</string>
+    <string name="title_down">降</string>
+    <string name="title_go_up">上漲</string>
+    <string name="title_go_down">下跌</string>
+    <string name="title_go_flat">持平</string>
+    <string name="title_rank">名次</string>
+    <string name="title_confidence">信心</string>
+    <string name="iv_up_down">升降圖</string>
+    <string name="iv_alarm">警告</string>
 </resources>

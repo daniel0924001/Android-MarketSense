@@ -15,8 +15,16 @@ public class Stock {
     private static final String CODE = "code";
     private static final String NAME = "name";
 
+    public static final int TREND_UP = 1;
+    public static final int TREND_DOWN = 2;
+    public static final int TREND_FLAT = 3;
+
     private String mCode;
     private String mName;
+    private int mRankTrend = 3;
+    private int mTrend;
+    private int mConfidence = 75;
+    private int mConfidenceDirection;
 
     public Stock() {
 
@@ -35,12 +43,44 @@ public class Stock {
         mCode = id;
     }
 
+    public void setRankTrend(int rankTrend) {
+        mRankTrend = rankTrend;
+    }
+
+    public void setTrend(int trend) {
+        mTrend = trend;
+    }
+
+    public void setConfidence(int confidence) {
+        mConfidence = confidence;
+    }
+
+    public void setConfidenceDirection(int direction) {
+        mConfidenceDirection = direction;
+    }
+
     public String getName() {
         return mName;
     }
 
     public String getCode() {
         return mCode;
+    }
+
+    public int getRankTrend() {
+        return mRankTrend;
+    }
+
+    public int getTrend() {
+        return mTrend;
+    }
+
+    public int getConfidence() {
+        return mConfidence;
+    }
+
+    public int getConfidenceDirection() {
+        return mConfidenceDirection;
     }
 
     public static Stock jsonObjectToStock(JSONObject jsonObject) {

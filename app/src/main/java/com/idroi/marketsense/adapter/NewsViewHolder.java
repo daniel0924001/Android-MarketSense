@@ -1,6 +1,7 @@
 package com.idroi.marketsense.adapter;
 
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -17,6 +18,7 @@ public class NewsViewHolder {
     TextView titleView;
     TextView dateView;
     SimpleDraweeView mainImageView;
+    ImageView alarmImageView;
 
     static final NewsViewHolder EMPTY_VIEW_HOLDER = new NewsViewHolder();
 
@@ -29,6 +31,7 @@ public class NewsViewHolder {
             newsViewHolder.titleView = view.findViewById(R.id.marketsense_news_title_tv);
             newsViewHolder.mainImageView = view.findViewById(R.id.marketsense_news_image_iv);
             newsViewHolder.dateView = view.findViewById(R.id.marketsense_news_date_tv);
+            newsViewHolder.alarmImageView = view.findViewById(R.id.marketsense_news_alarm);
             return newsViewHolder;
         } catch (ClassCastException exception) {
             MSLog.e(exception.toString());

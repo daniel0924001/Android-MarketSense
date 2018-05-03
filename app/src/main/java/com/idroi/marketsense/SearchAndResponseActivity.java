@@ -6,12 +6,18 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.adapter.StockListArrayAdapter;
+import com.idroi.marketsense.common.ClientData;
 
 /**
  * Created by daniel.hsieh on 2018/4/27.
@@ -20,24 +26,28 @@ import com.idroi.marketsense.Logging.MSLog;
 public class SearchAndResponseActivity extends AppCompatActivity {
 
     public static final String EXTRA_SELECTED_COMPANY_KEY = "extra_selected_company";
-    private String mSelectCompany = "0050";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
+        ClientData.getInstance(this);
+        StockListArrayAdapter adapter = new StockListArrayAdapter(this,
+                R.layout.stock_list_simple_item,
+                ClientData.getInstance(this).getAllStocksListInfo());
+
+        final AutoCompleteTextView autoCompleteTextView = findViewById(R.id.stock_search_ctv);
+        autoCompleteTextView.setThreshold(1);
+        autoCompleteTextView.setAdapter(adapter);
+
         Button button = findViewById(R.id.search_btn);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent();
-                if(mSelectCompany != null) {
-                    intent.putExtra(EXTRA_SELECTED_COMPANY_KEY, mSelectCompany);
-                    setResult(RESULT_OK, intent);
-                } else {
-                    setResult(RESULT_CANCELED);
-                }
+                intent.putExtra(EXTRA_SELECTED_COMPANY_KEY, autoCompleteTextView.getText().toString());
+                setResult(RESULT_OK, intent);
                 finish();
                 overridePendingTransition(R.anim.stop, R.anim.right_to_left);
             }

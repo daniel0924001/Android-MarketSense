@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.common.ClientData;
 
 /**
  * Created by daniel.hsieh on 2018/4/26.
@@ -16,6 +17,9 @@ public class SplashActivity extends AppCompatActivity{
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MSLog.i("Enter SplashActivity");
+
+        MSLog.i("Initialize ClientData");
+        ClientData.getInstance(this);
 
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);

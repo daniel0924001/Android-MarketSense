@@ -24,7 +24,8 @@
 
     <string name="title_choices_list">自選列表</string>
     <string name="title_choices_news">自選新聞</string>
-    <string name="title_search_hint_stock">輸入想要搜尋的股票名稱或代號</string>
+    <string name="title_search_hint_stock">輸入想搜尋的股票名稱或代碼</string>
+    <string name="title_search_add">加入自選</string>
 
     <string name="title_notification_list">自選推播</string>
     <string name="title_notification_hot">熱門推播</string>

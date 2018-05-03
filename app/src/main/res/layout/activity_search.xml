@@ -5,11 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/search_src_text"
-        android:hint="@string/title_search_hint_stock"
+    <android.support.v7.widget.AppCompatAutoCompleteTextView
+        android:id="@+id/stock_search_ctv"
         android:layout_width="0dp"
         android:layout_height="60dp"
+        android:hint="@string/title_search_hint_stock"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/search_btn" />
@@ -18,9 +18,9 @@
         android:id="@+id/search_btn"
         android:layout_width="wrap_content"
         android:layout_height="60dp"
-        android:text="@string/title_action_bar_search"
+        android:text="@string/title_search_add"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@id/search_src_text"
+        app:layout_constraintStart_toEndOf="@id/stock_search_ctv"
         app:layout_constraintEnd_toEndOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>

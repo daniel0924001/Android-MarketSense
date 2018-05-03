@@ -47,6 +47,10 @@
             android:label="@string/activity_news_setting">
         </activity>
 
+        <activity android:name=".SearchAndResponseActivity"
+            android:label="@string/activity_news_search">
+        </activity>
+
     </application>
 
 </manifest>

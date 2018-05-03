@@ -15,6 +15,7 @@ public class NewsScreenSlidePagerAdapter extends BaseScreenSlidePagerAdapter {
 
     public NewsScreenSlidePagerAdapter(Context context, FragmentManager fm) {
         super(context, fm, new String[]{
+                context.getResources().getString(R.string.title_news_important),
                 context.getResources().getString(R.string.title_news_optimistic),
                 context.getResources().getString(R.string.title_news_pessimistic)
         });

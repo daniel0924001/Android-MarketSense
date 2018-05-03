@@ -49,6 +49,6 @@ public class PredictScreenSlidePagerAdapter extends BaseScreenSlidePagerAdapter 
                 break;
         }
         stockListFragment.setArguments(bundle);
-        return new StockListFragment();
+        return stockListFragment;
     }
 }

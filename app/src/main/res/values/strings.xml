@@ -4,6 +4,7 @@
     <string name="activity_news_web_name">市覺新聞</string>
     <string name="activity_news_notification">通知</string>
     <string name="activity_news_setting">設定</string>
+    <string name="activity_news_search">搜尋</string>
     <string name="activity_splash">市覺</string>
     <string name="user_avatar">大頭照</string>
     <string name="notification">推播</string>
@@ -15,6 +16,7 @@
     <string name="title_news_lose_predict">預測跌最多股票</string>
     <string name="title_news_win_today">今日漲最多股票</string>
     <string name="title_news_lose_today">今日漲最多股票</string>
+    <string name="title_news_important">重點新聞</string>
     <string name="title_news_optimistic">利多新聞</string>
     <string name="title_news_pessimistic">利空新聞</string>
     <string name="title_news_read_original">閱讀原始新聞</string>
@@ -22,6 +24,7 @@
 
     <string name="title_choices_list">自選列表</string>
     <string name="title_choices_news">自選新聞</string>
+    <string name="title_search_hint_stock">輸入想要搜尋的股票名稱或代號</string>
 
     <string name="title_notification_list">自選推播</string>
     <string name="title_notification_hot">熱門推播</string>
@@ -47,4 +50,19 @@
     <string name="iv_alarm">警告</string>
 
     <string name="no_notification">暫無通知</string>
+
+    <string name="preference_icon">設定圖示</string>
+    <string name="preference_switch">開關</string>
+    <string name="preference_notification">推播通知</string>
+    <string name="preference_category">分類設定</string>
+    <string name="preference_share">分享 APP</string>
+    <string name="preference_line">加入市覺 Line@</string>
+    <string name="preference_copyright">著作權</string>
+    <string name="preference_about">關於</string>
+    <string name="preference_feedback_and_start">意見與評價</string>
+    <string name="preference_feedback">意見回饋</string>
+    <string name="preference_star">評價 APP</string>
+
+    <string name="hello">Hello, 市覺使用者</string>
+    <string name="login">登入</string>
 </resources>

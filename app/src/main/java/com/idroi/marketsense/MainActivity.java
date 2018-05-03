@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -30,6 +31,8 @@ import com.idroi.marketsense.common.MarketSenseCommonNavigator;
 import net.lucode.hackware.magicindicator.MagicIndicator;
 import net.lucode.hackware.magicindicator.ViewPagerHelper;
 
+import static com.idroi.marketsense.SearchAndResponseActivity.EXTRA_SELECTED_COMPANY_KEY;
+
 public class MainActivity extends AppCompatActivity {
 
     public static final int MAX_IMAGE_SIZE = ByteConstants.MB;
@@ -48,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private MagicIndicator mMagicIndicator;
     private int mLastSelectedItemId = -1;
+
+    public final static int sSearchRequestCode = 1;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -93,6 +98,16 @@ public class MainActivity extends AppCompatActivity {
             if(mMagicIndicator != null) {
                 mMagicIndicator.onPageScrollStateChanged(state);
             }
+        }
+    };
+
+    private FloatingActionButton.OnClickListener mOnFabClickListener
+            = new FloatingActionButton.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Intent intent = new Intent(MainActivity.this, SearchAndResponseActivity.class);
+            startActivityForResult(intent, sSearchRequestCode);
+            overridePendingTransition(R.anim.enter, R.anim.stop);
         }
     };
 
@@ -182,6 +197,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void setFab(boolean show) {
+        final FloatingActionButton fab = findViewById(R.id.fab_add);
+        if(fab != null) {
+            if (show) {
+                fab.setVisibility(View.VISIBLE);
+                fab.setOnClickListener(mOnFabClickListener);
+            } else {
+                fab.setVisibility(View.GONE);
+                fab.setOnClickListener(null);
+            }
+        }
+    }
+
     private void setViewPager() {
         setViewPager(R.id.navigation_predict);
     }
@@ -197,14 +225,17 @@ public class MainActivity extends AppCompatActivity {
             case R.id.navigation_predict:
                 baseScreenSlidePagerAdapter =
                         new PredictScreenSlidePagerAdapter(this, getSupportFragmentManager());
+                setFab(false);
                 break;
             case R.id.navigation_news:
                 baseScreenSlidePagerAdapter =
                         new NewsScreenSlidePagerAdapter(this, getSupportFragmentManager());
+                setFab(false);
                 break;
             case R.id.navigation_choices:
                 baseScreenSlidePagerAdapter =
                         new ChoiceScreenSlidePagerAdapter(this, getSupportFragmentManager());
+                setFab(true);
                 break;
             default:
                 // invalid category
@@ -221,6 +252,17 @@ public class MainActivity extends AppCompatActivity {
 
         mMagicIndicator.setNavigator(commonNavigator);
         ViewPagerHelper.bind(mMagicIndicator, mViewPager);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == sSearchRequestCode) {
+            if(resultCode == RESULT_OK) {
+                String name = data.getStringExtra(EXTRA_SELECTED_COMPANY_KEY);
+                Toast.makeText(this, "user pickup: " + name, Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void clearViewPager() {

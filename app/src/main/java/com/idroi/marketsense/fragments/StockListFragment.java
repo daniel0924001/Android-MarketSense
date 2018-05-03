@@ -34,12 +34,14 @@ public class StockListFragment extends Fragment {
     public final static int PREDICT_LOSE_ID = 2;
     public final static int ACTUAL_WIN_ID = 3;
     public final static int ACTUAL_LOSE_ID = 4;
+    public final static int SELF_CHOICES_ID = 5;
 
     public enum TASK {
         PREDICT_WIN(PREDICT_WIN_ID),
         PREDICT_LOSE(PREDICT_LOSE_ID),
         ACTUAL_WIN(PREDICT_WIN_ID),
-        ACTUAL_LOSE(PREDICT_LOSE_ID);
+        ACTUAL_LOSE(PREDICT_LOSE_ID),
+        SELF_CHOICES(SELF_CHOICES_ID);
 
         int taskId;
         TASK(int id) {
@@ -110,6 +112,8 @@ public class StockListFragment extends Fragment {
             case ACTUAL_WIN_ID:
             case ACTUAL_LOSE_ID:
                 return StockRequest.queryStockList();
+            case SELF_CHOICES_ID:
+                return "marketsense://stock_favorite";
             default:
                 return StockRequest.queryStockList();
         }

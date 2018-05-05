@@ -7,7 +7,6 @@ import android.support.v4.app.FragmentManager;
 
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.fragments.NewsFragment;
-import com.idroi.marketsense.fragments.StockListFragment;
 
 import static com.idroi.marketsense.fragments.NewsFragment.KEYWORD_NAME;
 import static com.idroi.marketsense.fragments.NewsFragment.TASK_NAME;

@@ -22,12 +22,16 @@ import java.util.Locale;
 
 public class News {
 
+    private static final int BEST_RISING_LEVEL = 3;
+    private static final int BEST_FALLING_LEVEL = -3;
+
     private static final String TITLE = "title";
     private static final String SOURCE_NAME = "source_name";
     private static final String PAGE_LINK = "page_link";
     private static final String ORIGIN_LINK = "link";
     private static final String IMAGE_URL_ARRAY = "image_url_array";
     private static final String SOURCE_DATE_INT = "source_date_int";
+    private static final String PREDICTION = "prediction";
 
     private String mTitle;
     private String mSourceName;
@@ -36,6 +40,7 @@ public class News {
     private String mUrlOriginPage;
     private String mDate;
     private boolean mImportant;
+    private int mLevel;
 
     public News() {
     }
@@ -64,8 +69,9 @@ public class News {
         mDate = date;
     }
 
-    public void setImportant(boolean important) {
-        mImportant = important;
+    public void setLevel(int level) {
+        mLevel = level;
+        mImportant = (level == BEST_FALLING_LEVEL || level == BEST_RISING_LEVEL);
     }
 
     public String getTitle() {
@@ -92,6 +98,18 @@ public class News {
         return mImportant;
     }
 
+    public int getLevel() {
+        return mLevel;
+    }
+
+    public boolean isOptimistic() {
+        return mLevel > 0;
+    }
+
+    public boolean isPessimistic() {
+        return mLevel < 0;
+    }
+
     public static News JsonObjectToNews(JSONObject jsonObject) {
         News news = new News();
         Iterator<String> iterator = jsonObject.keys();
@@ -100,25 +118,29 @@ public class News {
             try {
                 switch (key) {
                     case TITLE:
-                        news.setTitle((String) jsonObject.opt(TITLE));
+                        news.setTitle(jsonObject.optString(key));
                         break;
                     case SOURCE_NAME:
-                        news.setSourceName((String) jsonObject.opt(SOURCE_NAME));
+                        news.setSourceName(jsonObject.optString(key));
                         break;
                     case PAGE_LINK:
-                        news.setPageLink((String) jsonObject.opt(PAGE_LINK));
+                        news.setPageLink(jsonObject.optString(key));
                         break;
                     case ORIGIN_LINK:
-                        news.setOriginLink((String) jsonObject.opt(ORIGIN_LINK));
+                        news.setOriginLink(jsonObject.optString(key));
                         break;
                     case IMAGE_URL_ARRAY:
-                        JSONArray imageArray = jsonObject.optJSONArray(IMAGE_URL_ARRAY);
+                        JSONArray imageArray = jsonObject.optJSONArray(key);
                         if(imageArray != null && imageArray.length() > 0) {
                             news.setUrlImage(imageArray.optString(0));
                         }
                         break;
                     case SOURCE_DATE_INT:
-                        news.setDate(convertToDate(jsonObject.optInt(SOURCE_DATE_INT)));
+                        news.setDate(convertToDate(jsonObject.optInt(key)));
+                        break;
+                    case PREDICTION:
+                        news.setLevel(jsonObject.optInt(key));
+                        break;
                     default:
                         break;
                 }

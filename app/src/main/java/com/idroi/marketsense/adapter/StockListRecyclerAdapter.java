@@ -31,9 +31,9 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
 
     private Handler mHandler;
 
-    public StockListRecyclerAdapter(final Activity activity) {
+    public StockListRecyclerAdapter(final Activity activity, int taskId) {
         mActivity = activity;
-        mStockListPlacer = new StockListPlacer(activity);
+        mStockListPlacer = new StockListPlacer(activity, taskId);
         mStockListRenderer = new StockListRenderer();
         mHandler = new Handler();
         mStockListPlacer.setStockListListener(new StockListPlacer.StockListListener() {

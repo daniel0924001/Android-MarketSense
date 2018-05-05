@@ -93,7 +93,7 @@ public class MarketSenseStockFetcher {
         MSLog.i("Loading stock list...: " + url);
 
         MSLog.i("Loading stock list...(cache): " + url);
-        Cache cache = Networking.getRequestQueue(context).getCache();
+        final Cache cache = Networking.getRequestQueue(context).getCache();
         Cache.Entry entry = cache.get(url);
         if(entry != null) {
             try {
@@ -110,7 +110,6 @@ public class MarketSenseStockFetcher {
         mStockRequest = new StockRequest(Request.Method.GET, url, null, new Response.Listener<ArrayList<Stock>>() {
             @Override
             public void onResponse(ArrayList<Stock> response) {
-                MSLog.i("Stock Request success: " + response);
                 mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
                 mMarketSenseStockNetworkListener.onStockListLoad(response);
             }

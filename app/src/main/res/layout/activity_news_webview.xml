@@ -101,6 +101,36 @@
         android:text="@string/title_news_read_original"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btn_say_good"
+        app:layout_constraintRight_toLeftOf="@id/btn_say_good"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <Button
+        android:id="@+id/btn_say_good"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/btn_round_red"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="30dp"
+        android:drawableTop="@drawable/ic_trending_up_white_24px"
+        android:textColor="@color/marketsense_text_white"
+        android:text="@string/title_vote"
+        app:layout_constraintEnd_toStartOf="@id/btn_say_bad"
+        app:layout_constraintRight_toLeftOf="@id/btn_say_bad"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <Button
+        android:id="@+id/btn_say_bad"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/btn_round_green"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="30dp"
+        android:drawableTop="@drawable/ic_trending_down_white_24px"
+        android:textColor="@color/marketsense_text_white"
+        android:text="@string/title_vote"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>

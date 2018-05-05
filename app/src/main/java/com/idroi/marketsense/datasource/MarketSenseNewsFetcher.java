@@ -98,7 +98,7 @@ public class MarketSenseNewsFetcher {
 
         MSLog.i("Loading news...: " + url);
 
-        if(shouldReadFromCache) {
+        if(false) {
             MSLog.i("Loading news...(cache): " + url);
             Cache cache = Networking.getRequestQueue(context).getCache();
             Cache.Entry entry = cache.get(url);
@@ -114,6 +114,7 @@ public class MarketSenseNewsFetcher {
                 MSLog.i("Loading news...(cache miss)");
             }
         }
+
 
         mNewsRequest = new NewsRequest(Request.Method.GET, url, null, new Response.Listener<ArrayList<News>>() {
             @Override

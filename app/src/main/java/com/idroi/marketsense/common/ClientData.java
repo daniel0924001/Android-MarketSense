@@ -100,7 +100,6 @@ public class ClientData {
         mStocksListRequest = new StocksListRequest(Request.Method.GET, url, null, new Response.Listener<ArrayList<Stock>>() {
             @Override
             public void onResponse(ArrayList<Stock> response) {
-                MSLog.i("Stocks List Request success: " + response);
                 setAllStocksListInfo(response);
             }
         }, new Response.ErrorListener() {

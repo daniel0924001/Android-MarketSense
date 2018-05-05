@@ -1,6 +1,7 @@
 package com.idroi.marketsense.adapter;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -49,11 +50,23 @@ public class NewsRenderer implements MarketSenseRenderer<News>{
     private void update(final Context context, final NewsViewHolder newsViewHolder, News content) {
         MarketSenseRendererHelper.addTextView(newsViewHolder.titleView, content.getTitle());
         MarketSenseRendererHelper.addTextView(newsViewHolder.dateView, content.getDate());
-        // TODO: for demo
-        if(!content.getImportant()) {
-            newsViewHolder.dateView.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
+
+        if(content.getImportant()) {
+            if(content.isOptimistic()) {
+                newsViewHolder.dateView.setBackgroundColor(context.getResources().getColor(R.color.colorTrendUp));
+                newsViewHolder.alarmImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_notifications_red_24px));
+                newsViewHolder.dateView.setBackgroundColor(context.getResources().getColor(R.color.colorTrendUp));
+            } else {
+                newsViewHolder.dateView.setBackgroundColor(context.getResources().getColor(R.color.colorTrendDown));
+                newsViewHolder.alarmImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_notifications_green_24px));
+                newsViewHolder.dateView.setBackgroundColor(context.getResources().getColor(R.color.colorTrendDown));
+            }
             newsViewHolder.dateView.setTextColor(context.getResources().getColor(R.color.marketsense_text_white));
             newsViewHolder.alarmImageView.setVisibility(View.VISIBLE);
+        } else {
+            newsViewHolder.dateView.setBackgroundColor(context.getResources().getColor(R.color.marketsense_text_white));
+            newsViewHolder.dateView.setTextColor(context.getResources().getColor(R.color.marketsense_text_gray));
+            newsViewHolder.alarmImageView.setVisibility(View.GONE);
         }
         if(!TextUtils.isEmpty(content.getUrlImage())) {
             FrescoImageHelper.loadImageView(content.getUrlImage(),

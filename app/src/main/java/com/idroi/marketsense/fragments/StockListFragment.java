@@ -39,8 +39,8 @@ public class StockListFragment extends Fragment {
     public enum TASK {
         PREDICT_WIN(PREDICT_WIN_ID),
         PREDICT_LOSE(PREDICT_LOSE_ID),
-        ACTUAL_WIN(PREDICT_WIN_ID),
-        ACTUAL_LOSE(PREDICT_LOSE_ID),
+        ACTUAL_WIN(ACTUAL_WIN_ID),
+        ACTUAL_LOSE(ACTUAL_LOSE_ID),
         SELF_CHOICES(SELF_CHOICES_ID);
 
         int taskId;
@@ -56,20 +56,26 @@ public class StockListFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private StockListRecyclerAdapter mStockListRecyclerAdapter;
     private RecyclerViewSkeletonScreen mSkeletonScreen;
+    private int mTaskId;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+
+        mTaskId = getArguments().getInt(TASK_NAME);
+
         final View view = inflater.inflate(R.layout.stock_fragment, container, false);
         mRecyclerView = view.findViewById(R.id.stock_recycler_view);
 
-        mStockListRecyclerAdapter = new StockListRecyclerAdapter(getActivity());
+        mStockListRecyclerAdapter = new StockListRecyclerAdapter(getActivity(), mTaskId);
         mRecyclerView.setAdapter(mStockListRecyclerAdapter);
 
         mSkeletonScreen = Skeleton.bind(mRecyclerView)
                 .adapter(mStockListRecyclerAdapter)
-                .load(R.layout.layout_default_item_skeleton).show();
+                .load(R.layout.layout_default_item_skeleton)
+                .shimmer(false)
+                .show();
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
@@ -105,8 +111,7 @@ public class StockListFragment extends Fragment {
             return StockRequest.queryStockList();
         }
 
-        int taskId = getArguments().getInt(TASK_NAME);
-        switch (taskId) {
+        switch (mTaskId) {
             case PREDICT_WIN_ID:
             case PREDICT_LOSE_ID:
             case ACTUAL_WIN_ID:

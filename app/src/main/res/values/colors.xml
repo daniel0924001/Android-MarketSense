@@ -11,7 +11,7 @@
     <color name="marketsense_text_red">#FFFF3131</color>
     <color name="marketsense_trans_black">#4c000000</color>
 
-    <color name="colorTrendUp">#FFFF3131</color>
-    <color name="colorTrendDown">#0eff3e</color>
+    <color name="colorTrendUp">#f11b1b</color>
+    <color name="colorTrendDown">#0ede11</color>
     <color name="colorTrendFlat">#4a4a4a</color>
 </resources>

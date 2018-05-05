@@ -19,6 +19,9 @@ import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.request.NewsRequest;
 
+import static com.idroi.marketsense.request.NewsRequest.PARAM_LEVEL;
+import static com.idroi.marketsense.request.NewsRequest.PARAM_STATUS;
+
 /**
  * Created by daniel.hsieh on 2018/4/18.
  */
@@ -57,7 +60,9 @@ public class NewsFragment extends Fragment {
         mRecyclerView.setAdapter(mNewsRecyclerAdapter);
 
         mSkeletonScreen = Skeleton.bind(mRecyclerView)
-                .adapter(mNewsRecyclerAdapter).load(R.layout.layout_default_item_skeleton).show();
+                .adapter(mNewsRecyclerAdapter)
+                .load(R.layout.layout_default_item_skeleton)
+                .shimmer(false).show();
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         return view;
@@ -109,15 +114,19 @@ public class NewsFragment extends Fragment {
 
     public String generateURL() {
         if(getArguments() == null) {
-            return NewsRequest.queryNewsURL("business", "TW", "zh");
+            return null;
         }
 
         int taskId = getArguments().getInt(TASK_NAME);
         switch (taskId) {
+            case GENERAL_TASK_ID:
+                return NewsRequest.queryNewsURL(
+                        getArguments().getString(PARAM_STATUS),
+                        getArguments().getInt(PARAM_LEVEL));
             case KEYWORD_TASK_ID:
                 return NewsRequest.queryKeywordNewsURL(getArguments().getString(KEYWORD_NAME));
             default:
-                return NewsRequest.queryNewsURL("business", "TW", "zh");
+                return null;
         }
     }
 

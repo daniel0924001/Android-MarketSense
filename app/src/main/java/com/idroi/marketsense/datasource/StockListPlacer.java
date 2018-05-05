@@ -1,6 +1,7 @@
 package com.idroi.marketsense.datasource;
 
 import android.app.Activity;
+import android.content.pm.PackageManager;
 
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.Constants;
@@ -9,6 +10,14 @@ import com.idroi.marketsense.data.Stock;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+
+import static com.idroi.marketsense.fragments.StockListFragment.ACTUAL_LOSE_ID;
+import static com.idroi.marketsense.fragments.StockListFragment.ACTUAL_WIN_ID;
+import static com.idroi.marketsense.fragments.StockListFragment.PREDICT_LOSE_ID;
+import static com.idroi.marketsense.fragments.StockListFragment.PREDICT_WIN_ID;
+import static com.idroi.marketsense.fragments.StockListFragment.SELF_CHOICES_ID;
 
 /**
  * Created by daniel.hsieh on 2018/4/23.
@@ -30,14 +39,29 @@ public class StockListPlacer {
     private Activity mActivity;
     private MarketSenseStockFetcher mMarketSenseStockFetcher;
     private String mUrl;
+    private int mTask;
 
-    public StockListPlacer(Activity activity) {
+    public StockListPlacer(Activity activity, int taskId) {
         mActivity = activity;
 
         mMarketSenseStockNetworkListener = new MarketSenseStockFetcher.MarketSenseStockNetworkListener() {
             @Override
             public void onStockListLoad(ArrayList<Stock> stockArrayList) {
-                mStockArrayList = stockArrayList;
+                if(mStockArrayList != null) {
+                    mStockArrayList.clear();
+                }
+                mStockArrayList = new ArrayList<>(stockArrayList);
+
+                // There are four fragments in PredictionScreenSlidePagerAdapter
+                // 1st: sort by prediction confidence in descending
+                // 2nd: sort by prediction confidence in ascending
+                // 3rd: sort by stock difference in descending
+                // 4th: sort by stock difference in ascending
+                Comparator<Stock> comparator = genComparator(mTask);
+                if (comparator != null) {
+                    Collections.sort(mStockArrayList, comparator);
+                }
+
                 if(mStockListListener != null) {
                     mStockListListener.onStockListLoaded();
                 }
@@ -54,6 +78,7 @@ public class StockListPlacer {
                 }
             }
         };
+        mTask = taskId;
         resetRetryTime();
     }
 
@@ -120,4 +145,58 @@ public class StockListPlacer {
         return mStockArrayList.get(position);
     }
 
+    private Comparator<Stock> genComparator(int taskId) {
+        switch (taskId) {
+            case PREDICT_LOSE_ID:
+                return new Comparator<Stock>() {
+                    @Override
+                    public int compare(Stock stock1, Stock stock2) {
+                        return compareValue(
+                                stock1.getConfidenceDirection() * stock1.getConfidence(),
+                                stock2.getConfidenceDirection() * stock2.getConfidence());
+                    }
+                };
+            case PREDICT_WIN_ID:
+                return new Comparator<Stock>() {
+                    @Override
+                    public int compare(Stock stock1, Stock stock2) {
+                        return compareValue(
+                                stock2.getConfidenceDirection() * stock2.getConfidence(),
+                                stock1.getConfidenceDirection() * stock1.getConfidence());
+                    }
+                };
+            case ACTUAL_LOSE_ID:
+                return new Comparator<Stock>() {
+                    @Override
+                    public int compare(Stock stock1, Stock stock2) {
+                        return compareValue(
+                                stock1.getDiffDirection() * stock1.getDiff(),
+                                stock2.getDiffDirection() * stock2.getDiff());
+                    }
+                };
+            case ACTUAL_WIN_ID:
+                return new Comparator<Stock>() {
+                    @Override
+                    public int compare(Stock stock1, Stock stock2) {
+                        return compareValue(
+                                stock2.getDiffDirection() * stock2.getDiff(),
+                                stock1.getDiffDirection() * stock1.getDiff());
+                    }
+                };
+            case SELF_CHOICES_ID:
+                return null;
+            default:
+                return null;
+        }
+    }
+
+    private int compareValue(double double1, double double2) {
+        if(double1 > double2) {
+            return 1;
+        } else if(double1 == double2) {
+            return 0;
+        } else {
+            return -1;
+        }
+    }
 }

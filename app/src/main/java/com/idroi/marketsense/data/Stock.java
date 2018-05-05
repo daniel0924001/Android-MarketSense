@@ -1,5 +1,7 @@
 package com.idroi.marketsense.data;
 
+import android.support.annotation.Nullable;
+
 import com.idroi.marketsense.Logging.MSLog;
 
 import org.json.JSONObject;
@@ -14,16 +16,19 @@ public class Stock {
 
     private static final String CODE = "code";
     private static final String NAME = "name";
+    private static final String DIFF = "diff";
+    private static final String PRED = "prediction";
+    private static final String PRICE = "price";
 
     public static final int TREND_UP = 1;
-    public static final int TREND_DOWN = 2;
-    public static final int TREND_FLAT = 3;
+    public static final int TREND_DOWN = -1;
+    public static final int TREND_FLAT = 0;
 
     private String mCode;
     private String mName;
-    private int mRankTrend = 3;
-    private int mTrend;
-    private int mConfidence = 75;
+    private double mDiff;
+    private int mDiffDirection = 3;
+    private double mConfidence = 75;
     private int mConfidenceDirection;
 
     public Stock() {
@@ -43,20 +48,32 @@ public class Stock {
         mCode = id;
     }
 
-    public void setRankTrend(int rankTrend) {
-        mRankTrend = rankTrend;
+    public void setDiffDirection(double rankTrend) {
+        if(rankTrend > 0) {
+            mDiffDirection = Stock.TREND_UP;
+        } else if(rankTrend == 0) {
+            mDiffDirection = Stock.TREND_FLAT;
+        } else {
+            mDiffDirection = Stock.TREND_DOWN;
+        }
     }
 
-    public void setTrend(int trend) {
-        mTrend = trend;
+    public void setDiff(double trend) {
+        mDiff = Math.abs(trend);
     }
 
-    public void setConfidence(int confidence) {
-        mConfidence = confidence;
+    public void setConfidenceDirection(double direction) {
+        if(direction > 0) {
+            mConfidenceDirection = Stock.TREND_UP;
+        } else if(direction == 0) {
+            mConfidenceDirection = Stock.TREND_FLAT;
+        } else {
+            mConfidenceDirection = Stock.TREND_DOWN;
+        }
     }
 
-    public void setConfidenceDirection(int direction) {
-        mConfidenceDirection = direction;
+    public void setConfidence(double confidence) {
+        mConfidence = Math.abs(confidence);
     }
 
     public String getName() {
@@ -67,15 +84,15 @@ public class Stock {
         return mCode;
     }
 
-    public int getRankTrend() {
-        return mRankTrend;
+    public int getDiffDirection() {
+        return mDiffDirection;
     }
 
-    public int getTrend() {
-        return mTrend;
+    public double getDiff() {
+        return mDiff;
     }
 
-    public int getConfidence() {
+    public double getConfidence() {
         return mConfidence;
     }
 
@@ -83,7 +100,8 @@ public class Stock {
         return mConfidenceDirection;
     }
 
-    public static Stock jsonObjectToStock(JSONObject jsonObject) {
+    @Nullable
+    public static Stock jsonObjectToStock(JSONObject jsonObject, boolean removeNan) {
         Stock stock = new Stock();
         Iterator<String> iterator = jsonObject.keys();
         while(iterator.hasNext()) {
@@ -95,6 +113,21 @@ public class Stock {
                         break;
                     case NAME:
                         stock.setName((String) jsonObject.opt(NAME));
+                        break;
+                    case PRED:
+                        double pred = jsonObject.optDouble(PRED);
+                        stock.setConfidence(pred);
+                        stock.setConfidenceDirection(pred);
+                        break;
+                    case DIFF:
+                        double diff = jsonObject.optDouble(DIFF);
+                        double price = jsonObject.optDouble(PRICE) - diff;
+                        double value = 100 * diff / price;
+                        if(removeNan && (jsonObject.optDouble(PRICE) == 0 || Double.isNaN(value))) {
+                            return null;
+                        }
+                        stock.setDiff(value);
+                        stock.setDiffDirection(value);
                         break;
                     default:
                         break;

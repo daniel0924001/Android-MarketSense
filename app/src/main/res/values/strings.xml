@@ -16,7 +16,8 @@
     <string name="title_news_lose_predict">預測跌最多股票</string>
     <string name="title_news_win_today">今日漲最多股票</string>
     <string name="title_news_lose_today">今日漲最多股票</string>
-    <string name="title_news_important">重點新聞</string>
+    <string name="title_news_best_optimistic">重點利多新聞</string>
+    <string name="title_news_best_pessimistic">重點利空新聞</string>
     <string name="title_news_optimistic">利多新聞</string>
     <string name="title_news_pessimistic">利空新聞</string>
     <string name="title_news_read_original">閱讀原始新聞</string>
@@ -40,15 +41,20 @@
     <string name="title_company_code">公司代碼</string>
     <string name="title_company_trend">公司趨勢</string>
     <string name="title_company_confidence">公司信心指數</string>
-    <string name="title_up">升</string>
-    <string name="title_down">降</string>
-    <string name="title_go_up">上漲</string>
-    <string name="title_go_down">下跌</string>
-    <string name="title_go_flat">持平</string>
+    <string name="title_up">漲</string>
+    <string name="title_down">跌</string>
+    <string name="title_percent">%</string>
+    <string name="title_go_up"> 上漲</string>
+    <string name="title_go_down"> 下跌</string>
+    <string name="title_go_flat"> 持平</string>
     <string name="title_rank">名次</string>
+    <string name="title_predict">預測 </string>
     <string name="title_confidence">信心</string>
     <string name="iv_up_down">升降圖</string>
     <string name="iv_alarm">警告</string>
+    <string name="title_predict_up">看漲</string>
+    <string name="title_predict_down">看空</string>
+    <string name="title_vote">投票</string>
 
     <string name="no_notification">暫無通知</string>
 

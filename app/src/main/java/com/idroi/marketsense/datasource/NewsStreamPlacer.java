@@ -54,8 +54,12 @@ public class NewsStreamPlacer {
         for(int i = 0; i < number; i++) {
             News news = mNewsSource.dequeueNews();
             if(news != null) {
-                mNewsArrayList.add(news);
-                increaseAmount++;
+                if(!mNewsArrayList.contains(news)) {
+                    mNewsArrayList.add(news);
+                    increaseAmount++;
+                }
+            } else {
+                break;
             }
         }
 

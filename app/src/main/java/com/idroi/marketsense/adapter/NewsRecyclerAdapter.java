@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.data.News;
-import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.datasource.NewsSource;
 import com.idroi.marketsense.datasource.NewsStreamPlacer;
 
@@ -42,6 +41,10 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
     private NewsExpandListener mNewsExpandListener;
     private OnItemClickListener mOnItemClickListener;
     private NewsAvailableListener mNewsAvailableListener;
+
+    private static final int MAXIMUM_RETRY_TIME_MILLISECONDS = 5 * 60 * 1000; // 5 minutes.
+    private static final int[] RETRY_TIME_ARRAY_MILLISECONDS = new int[]{1000, 3000, 5000, 25000, 60000, MAXIMUM_RETRY_TIME_MILLISECONDS};
+    private int mCurrentRetries = 0;
 
     public NewsRecyclerAdapter(final Activity activity) {
         mActivity = activity;
@@ -84,18 +87,45 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
                         notifyItemRangeInserted(start, amount);
                     }
                 });
+                resetRetryTime();
             }
 
             @Override
             public void onExpandFailed() {
+
+                if (mCurrentRetries >= RETRY_TIME_ARRAY_MILLISECONDS.length - 1) {
+                    MSLog.w("Stopping expand after the max retry count.");
+                    resetRetryTime();
+                    return;
+                }
+
+                MSLog.w("Wait for " + getRetryTime() + " milliseconds to expand.");
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         expand(15);
                     }
-                }, 1000);
+                }, getRetryTime());
+                updateRetryTime();
             }
         };
+    }
+
+    private int getRetryTime() {
+        if (mCurrentRetries >= RETRY_TIME_ARRAY_MILLISECONDS.length) {
+            mCurrentRetries = RETRY_TIME_ARRAY_MILLISECONDS.length - 1;
+        }
+        return RETRY_TIME_ARRAY_MILLISECONDS[mCurrentRetries];
+    }
+
+    private void updateRetryTime() {
+        if (mCurrentRetries < RETRY_TIME_ARRAY_MILLISECONDS.length - 1) {
+            mCurrentRetries++;
+        }
+    }
+
+    private void resetRetryTime() {
+        mCurrentRetries = 0;
     }
 
     public void setNewsAvailableListener(NewsAvailableListener listener) {

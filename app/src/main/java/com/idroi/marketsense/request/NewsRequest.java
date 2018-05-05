@@ -25,11 +25,8 @@ import java.util.Map;
 
 public class NewsRequest extends Request<ArrayList<News>> {
 
-    private static final String PARAM_CODE = "Code";
-    private static final String PARAM_RESULT = "Result";
-    private static final String PARAM_MSG = "message";
-    private static final String PARAM_NEWS_RESULT = "news_results";
-    private static final String PARAM_OK = "OK";
+    private static final String PARAM_CODE = "status";
+    private static final String PARAM_RESULT = "result";
 
     private final Map<String, String> mHeader;
     private final Response.Listener<ArrayList<News>> mListener;
@@ -50,7 +47,7 @@ public class NewsRequest extends Request<ArrayList<News>> {
 
         try {
             ArrayList<News> newsArrayList = newsParseResponse(response.data);
-            if(newsArrayList != null) {
+            if(newsArrayList != null && newsArrayList.size() != 0) {
                 return Response.success(newsArrayList, HttpHeaderParser.parseCacheHeaders(response));
             } else {
                 return Response.error(new MarketSenseNetworkError(MarketSenseError.JSON_PARSED_NO_DATA));
@@ -71,7 +68,10 @@ public class NewsRequest extends Request<ArrayList<News>> {
         if(newsJsonArray != null) {
             ArrayList<News> newsArrayList = new ArrayList<>();
             for(int i = 0; i < newsJsonArray.length(); i++) {
-                newsArrayList.add(News.JsonObjectToNews(newsJsonArray.getJSONObject(i)));
+                News news = News.JsonObjectToNews(newsJsonArray.getJSONObject(i));
+                if(news != null) {
+                    newsArrayList.add(news);
+                }
             }
             return newsArrayList;
         }
@@ -82,40 +82,41 @@ public class NewsRequest extends Request<ArrayList<News>> {
     private static JSONArray getNewsResult(JSONObject jsonResponse) {
 
         if(jsonResponse.optInt(PARAM_CODE) == 0 && jsonResponse.opt(PARAM_RESULT) != null) {
-            JSONObject jsonResult = jsonResponse.optJSONObject(PARAM_RESULT);
-            if(jsonResult.opt(PARAM_MSG).equals(PARAM_OK)) {
-                return jsonResult.optJSONArray(PARAM_NEWS_RESULT);
-            }
+            return jsonResponse.optJSONArray(PARAM_RESULT);
         }
 
         return null;
     }
 
-    private static final String API_URL = "http://adzodiac.droi.com:8888/get_news?";
-    private static final String PARAM_LANG = "&language=";
-    private static final String PARAM_CATEGORY = "&category=";
-    private static final String PARAM_COUNTRY = "&country=";
+    private static final String API_URL = "http://apiv2.infohubapp.com/v1/stock/news?";
+    private static final String PARAM_LIMIT = "&limit=";
+    public static final String PARAM_STATUS = "&status=";
+    public static final String PARAM_LEVEL = "&level=";
+    private static final String PARAM_TIMESTAMP = "&timestamp=";
+    private static final String PARAM_MAGIC_NUM = "&magic_number=";
 
-    private static final String API_KEYWORD_URL = "http://apiv2.infohubapp.com/v1/keyword?";
+    private static final String API_KEYWORD_URL = "http://apiv2.infohubapp.com/v1/stock/search?";
     private static final String PARAM_KEYWORD = "&keyword=";
 
-    public static String queryNewsURL(String category,
-                                      String country,
-                                      String language) {
-        StringBuilder builder = new StringBuilder(API_URL);
+    public static final String PARAM_STATUS_RISING = "r";
+    public static final String PARAM_STATUS_FALLING = "f";
 
-        builder.append(PARAM_CATEGORY).append(category);
-        builder.append(PARAM_COUNTRY).append(country);
-        builder.append(PARAM_LANG).append(language);
-
-        return builder.toString();
+    public static String queryNewsURL(String status,
+                                      int level) {
+        return API_URL + PARAM_LIMIT + 10 +
+                PARAM_STATUS + status +
+                PARAM_LEVEL + level +
+                PARAM_TIMESTAMP + System.currentTimeMillis() / (300 * 1000);
     }
 
     public static String queryKeywordNewsURL(String keyword) {
-        StringBuilder builder = new StringBuilder(API_KEYWORD_URL);
 
-        builder.append(PARAM_KEYWORD).append(keyword);
+        return API_KEYWORD_URL + PARAM_KEYWORD + keyword +
+                PARAM_TIMESTAMP + System.currentTimeMillis() / (300 * 1000);
+    }
 
-        return builder.toString();
+    public static String appendMagicString(String url, int magic) {
+        url = url + PARAM_MAGIC_NUM + magic;
+        return url;
     }
 }

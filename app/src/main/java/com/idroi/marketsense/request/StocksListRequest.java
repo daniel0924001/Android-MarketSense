@@ -5,6 +5,7 @@ import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
+import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.common.MarketSenseNetworkError;
 import com.idroi.marketsense.data.Stock;
@@ -22,9 +23,8 @@ import java.util.Map;
 
 public class StocksListRequest extends Request<ArrayList<Stock>> {
 
-    private static final String PARAM_CODE = "Code";
-    private static final String PARAM_RESULT = "Result";
-    private static final String PARAM_NEWS_RESULT = "Stocks";
+    private static final String PARAM_STATUS = "status";
+    private static final String PARAM_RESULT = "result";
 
     private final Map<String, String> mHeader;
     private final Response.Listener<ArrayList<Stock>> mListener;
@@ -46,6 +46,7 @@ public class StocksListRequest extends Request<ArrayList<Stock>> {
         try {
             ArrayList<Stock> stockArrayList = stockParseResponse(response.data);
             if(stockArrayList != null) {
+                MSLog.i("Stocks List Request success: " + new String(response.data));
                 return Response.success(stockArrayList, HttpHeaderParser.parseCacheHeaders(response));
             } else {
                 return Response.error(new MarketSenseNetworkError(MarketSenseError.JSON_PARSED_NO_DATA));
@@ -61,7 +62,10 @@ public class StocksListRequest extends Request<ArrayList<Stock>> {
         if(stocksJsonArray != null) {
             ArrayList<Stock> stockArrayList = new ArrayList<>();
             for(int i = 0; i < stocksJsonArray.length(); i++) {
-                stockArrayList.add(Stock.jsonObjectToStock(stocksJsonArray.getJSONObject(i)));
+                Stock stock = Stock.jsonObjectToStock(stocksJsonArray.getJSONObject(i), false);
+                if(stock != null) {
+                    stockArrayList.add(stock);
+                }
             }
             return stockArrayList;
         }
@@ -76,15 +80,14 @@ public class StocksListRequest extends Request<ArrayList<Stock>> {
 
     private static JSONArray getStockResult(JSONObject jsonResponse) {
 
-        if(jsonResponse.optInt(PARAM_CODE) == 0 && jsonResponse.opt(PARAM_RESULT) != null) {
-            JSONObject jsonResult = jsonResponse.optJSONObject(PARAM_RESULT);
-            return jsonResult.optJSONArray(PARAM_NEWS_RESULT);
+        if(jsonResponse.optBoolean(PARAM_STATUS) && jsonResponse.opt(PARAM_RESULT) != null) {
+            return jsonResponse.optJSONArray(PARAM_RESULT);
         }
 
         return null;
     }
 
-    private static final String API_URL = "http://apiv2.infohubapp.com/v1/stocks";
+    private static final String API_URL = "http://apiv2.infohubapp.com/v1/stock/codes";
 
     public static String queryStockListURL() {
         return API_URL;

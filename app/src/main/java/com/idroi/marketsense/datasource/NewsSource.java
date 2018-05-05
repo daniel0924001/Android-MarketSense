@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.data.News;
+import com.idroi.marketsense.request.NewsRequest;
 
 /**
  * Created by daniel.hsieh on 2018/4/18.
@@ -43,7 +44,9 @@ public class NewsSource {
     private NewsSourceListener mNewsSourceListener;
 
     private String mUrl;
+    private int mSequenceNumber;
     private boolean mShouldReadFromCache;
+    private boolean mHasShowNoMore = false;
 
     NewsSource(Activity activity) {
         mActivity = new WeakReference<Activity>(activity);
@@ -81,12 +84,14 @@ public class NewsSource {
                 }
 
                 mRequestInFlight = false;
+                mSequenceNumber++;
                 resetRetryTime();
 
                 for(int i = 0; i < newsArray.size(); i++) {
                     if(!mNewsCache.contains(newsArray.get(i))) {
                         mNewsCache.add(newsArray.get(i));
                         moreFlag = true;
+                        mHasShowNoMore = false;
                     }
                 }
 
@@ -100,8 +105,10 @@ public class NewsSource {
 
                 if(moreFlag) {
                     replenishCache();
-                } else if(mActivity.get() != null) {
-                    Toast.makeText(mActivity.get(), "No more data.", Toast.LENGTH_SHORT).show();
+                } else if(mActivity.get() != null && !mHasShowNoMore) {
+                    mHasShowNoMore = true;
+                    MSLog.w("no more data, maybe duplicate");
+                    Toast.makeText(mActivity.get(), "暫時沒有新聞資料，請稍候...", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -127,6 +134,7 @@ public class NewsSource {
         mRequestInFlight = false;
         mFirstTimeNewsAvailable = false;
         mShouldReadFromCache = true;
+        mSequenceNumber = 0;
         resetRetryTime();
     }
 
@@ -184,13 +192,14 @@ public class NewsSource {
         mRequestInFlight = false;
         mFirstTimeNewsAvailable = false;
         mShouldReadFromCache = true;
+        mSequenceNumber = 0;
         mReplenishCacheHandler.removeCallbacks(mReplenishCacheRunnable);
     }
 
     private void replenishCache() {
         if(!mRequestInFlight && mNewsFetcher != null && mNewsCache.size() < DEFAULT_CACHE_LIMIT) {
             mRequestInFlight = true;
-            mNewsFetcher.makeRequest(mUrl, mShouldReadFromCache);
+            mNewsFetcher.makeRequest(NewsRequest.appendMagicString(mUrl, mSequenceNumber), mShouldReadFromCache);
         }
     }
 }

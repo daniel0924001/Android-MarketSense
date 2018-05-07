@@ -29,6 +29,7 @@ import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.FrescoImageHelper;
+import com.idroi.marketsense.data.PostEvent;
 
 import java.io.ByteArrayInputStream;
 
@@ -42,13 +43,14 @@ public class NewsWebViewActivity extends AppCompatActivity {
     private static final String PAGELINK_PARM_STRING = "user_name=infohub|android_app|news_click";
     private static final String PAGELINK_PARM_KEY = "config=";
 
+    public static final String EXTRA_MIDDLE_ID = "EXTRA_MIDDLE_ID";
     public static final String EXTRA_MIDDLE_TITLE = "EXTRA_MIDDLE_TITLE";
     public static final String EXTRA_MIDDLE_DATE = "EXTRA_MIDDLE_SOURCE_DATE";
     public static final String EXTRA_MIDDLE_IMAGE_URL = "EXTRA_MIDDLE_IMAGE_URL";
     public static final String EXTRA_MIDDLE_PAGE_URL = "EXTRA_MIDDLE_PAGE_URL";
     public static final String EXTRA_ORIGINAL_PAGE_URL = "EXTRA_ORIGINAL_PAGE_URL";
 
-    private String mTitle, mImageUrl, mSourceDate;
+    private String mId, mTitle, mImageUrl, mSourceDate;
     private String mMiddlePageUrl;
     private String mOriginalPageUrl;
     private String mPageLink;
@@ -101,6 +103,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
         setActionBar();
         initUpperBlock();
         initWebView();
+        initVotingBtn();
     }
 
     @Override
@@ -110,11 +113,41 @@ public class NewsWebViewActivity extends AppCompatActivity {
     }
 
     private void setInformation() {
+        mId = getIntent().getStringExtra(EXTRA_MIDDLE_ID);
         mMiddlePageUrl = getIntent().getStringExtra(EXTRA_MIDDLE_PAGE_URL);
         mOriginalPageUrl = getIntent().getStringExtra(EXTRA_ORIGINAL_PAGE_URL);
         mTitle = getIntent().getStringExtra(EXTRA_MIDDLE_TITLE);
         mImageUrl = getIntent().getStringExtra(EXTRA_MIDDLE_IMAGE_URL);
         mSourceDate = getIntent().getStringExtra(EXTRA_MIDDLE_DATE);
+    }
+
+    private void initVotingBtn() {
+        final Button buttonRaise = findViewById(R.id.btn_say_good);
+        final Button buttonFall = findViewById(R.id.btn_say_bad);
+
+        buttonRaise.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.Event.VOTE_RAISE.getEventName(), 1);
+                MSLog.e("click good in news: " + mId);
+                buttonRaise.setEnabled(false);
+                buttonRaise.setAlpha(0.5f);
+                buttonFall.setEnabled(true);
+                buttonFall.setAlpha(1);
+            }
+        });
+
+        buttonFall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MSLog.e("click bad in news: " + mId);
+                PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.Event.VOTE_FALL.getEventName(), 1);
+                buttonRaise.setEnabled(true);
+                buttonRaise.setAlpha(1);
+                buttonFall.setEnabled(false);
+                buttonFall.setAlpha(0.5f);
+            }
+        });
     }
 
     private void setActionBar() {
@@ -261,8 +294,9 @@ public class NewsWebViewActivity extends AppCompatActivity {
     }
 
     public static Intent generateNewsWebViewActivityIntent(
-            Context context, String title, String imageUrl, String sourceDate, String middleUrl, String originalUrl) {
+            Context context, String id, String title, String imageUrl, String sourceDate, String middleUrl, String originalUrl) {
         Intent intent = new Intent(context, NewsWebViewActivity.class);
+        intent.putExtra(EXTRA_MIDDLE_ID, id);
         intent.putExtra(EXTRA_MIDDLE_TITLE, title);
         intent.putExtra(EXTRA_MIDDLE_DATE, sourceDate);
         intent.putExtra(EXTRA_MIDDLE_IMAGE_URL, imageUrl);

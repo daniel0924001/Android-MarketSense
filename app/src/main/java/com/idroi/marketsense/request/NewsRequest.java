@@ -81,7 +81,7 @@ public class NewsRequest extends Request<ArrayList<News>> {
 
     private static JSONArray getNewsResult(JSONObject jsonResponse) {
 
-        if(jsonResponse.optInt(PARAM_CODE) == 0 && jsonResponse.opt(PARAM_RESULT) != null) {
+        if(jsonResponse.optBoolean(PARAM_CODE) && jsonResponse.opt(PARAM_RESULT) != null) {
             return jsonResponse.optJSONArray(PARAM_RESULT);
         }
 
@@ -108,7 +108,7 @@ public class NewsRequest extends Request<ArrayList<News>> {
                 PARAM_STATUS + status +
                 PARAM_LEVEL + level +
                 PARAM_RANDOM + "0" +
-                PARAM_TIMESTAMP + System.currentTimeMillis() / (300 * 1000);
+                PARAM_TIMESTAMP + (System.currentTimeMillis() / (300 * 1000));
     }
 
     public static String queryKeywordNewsURL(String keyword) {

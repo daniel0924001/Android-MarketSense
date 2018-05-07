@@ -25,6 +25,7 @@ public class News {
     private static final int BEST_RISING_LEVEL = 3;
     private static final int BEST_FALLING_LEVEL = -3;
 
+    private static final String ID = "id";
     private static final String TITLE = "title";
     private static final String SOURCE_NAME = "source_name";
     private static final String PAGE_LINK = "page_link";
@@ -33,6 +34,7 @@ public class News {
     private static final String SOURCE_DATE_INT = "source_date_int";
     private static final String PREDICTION = "prediction";
 
+    private String mId;
     private String mTitle;
     private String mSourceName;
     private String mUrlImage;
@@ -44,6 +46,10 @@ public class News {
     private int mLevel;
 
     public News() {
+    }
+
+    public void setId(String id) {
+        mId = id;
     }
 
     public void setTitle(String title) {
@@ -77,6 +83,10 @@ public class News {
 
     public void setSourceDateInt(int sourceDateInt) {
         mSourceDateInt = sourceDateInt;
+    }
+
+    public String getId() {
+        return mId;
     }
 
     public String getTitle() {
@@ -126,6 +136,9 @@ public class News {
             String key = iterator.next();
             try {
                 switch (key) {
+                    case ID:
+                        news.setId(jsonObject.optString(key));
+                        break;
                     case TITLE:
                         news.setTitle(jsonObject.optString(key));
                         break;

@@ -28,6 +28,7 @@ public class ClientData {
     private ArrayList<Stock> mAllStocksListInfo;
 
     private StocksListRequest mStocksListRequest;
+    private int mScreenWidth, mScreenHeight;
 
     /**
      * Returns the singleton ClientMetadata object, using the context to obtain data if necessary.
@@ -70,8 +71,21 @@ public class ClientData {
         loadAllStocksListTask();
     }
 
+    public void setScreenSize(int width, int height) {
+        mScreenWidth = width;
+        mScreenHeight = height;
+    }
+
     private void setAllStocksListInfo(ArrayList<Stock> stocksListInfo) {
         mAllStocksListInfo = stocksListInfo;
+    }
+
+    public int getScreenWidth() {
+        return mScreenWidth;
+    }
+
+    public int getScreenHeight() {
+        return mScreenHeight;
     }
 
     public ArrayList<Stock> getAllStocksListInfo() {

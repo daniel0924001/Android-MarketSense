@@ -1,6 +1,5 @@
 package com.idroi.marketsense.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,17 +8,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.ethanhua.skeleton.RecyclerViewSkeletonScreen;
 import com.ethanhua.skeleton.Skeleton;
-import com.idroi.marketsense.Logging.MSLog;
-import com.idroi.marketsense.MainActivity;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.StockActivity;
 import com.idroi.marketsense.adapter.StockListRecyclerAdapter;
 import com.idroi.marketsense.data.Stock;
-import com.idroi.marketsense.request.NewsRequest;
 import com.idroi.marketsense.request.StockRequest;
 
 /**
@@ -65,7 +60,7 @@ public class StockListFragment extends Fragment {
 
         mTaskId = getArguments().getInt(TASK_NAME);
 
-        final View view = inflater.inflate(R.layout.stock_fragment, container, false);
+        final View view = inflater.inflate(R.layout.stock_list_fragment, container, false);
         mRecyclerView = view.findViewById(R.id.stock_recycler_view);
 
         mStockListRecyclerAdapter = new StockListRecyclerAdapter(getActivity(), mTaskId);
@@ -100,7 +95,7 @@ public class StockListFragment extends Fragment {
             @Override
             public void onItemClick(Stock stock) {
                 startActivity(StockActivity.generateStockActivityIntent(
-                        getContext(), stock.getName()));
+                        getContext(), stock.getName(), stock.getCode()));
                 getActivity().overridePendingTransition(R.anim.enter, R.anim.stop);
             }
         });

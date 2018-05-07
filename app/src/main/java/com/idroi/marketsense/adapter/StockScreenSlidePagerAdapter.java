@@ -7,9 +7,11 @@ import android.support.v4.app.FragmentManager;
 
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.fragments.NewsFragment;
+import com.idroi.marketsense.fragments.StockFragment;
 
 import static com.idroi.marketsense.fragments.NewsFragment.KEYWORD_NAME;
 import static com.idroi.marketsense.fragments.NewsFragment.TASK_NAME;
+import static com.idroi.marketsense.fragments.StockFragment.STOCK_CODE;
 
 /**
  * Created by daniel.hsieh on 2018/4/24.
@@ -18,22 +20,33 @@ import static com.idroi.marketsense.fragments.NewsFragment.TASK_NAME;
 public class StockScreenSlidePagerAdapter extends BaseScreenSlidePagerAdapter {
 
     private String mStockName;
+    private String mCode;
 
-    public StockScreenSlidePagerAdapter(Context context, FragmentManager fm, String stockName) {
+    public StockScreenSlidePagerAdapter(Context context, FragmentManager fm,
+                                        String stockName, String code) {
         super(context, fm, new String[] {
                 context.getResources().getString(R.string.title_stock_overview),
                 context.getResources().getString(R.string.title_stock_related_news)
         });
         mStockName = stockName;
+        mCode = code;
     }
 
     @Override
     public Fragment getItem(int position) {
-        NewsFragment newsFragment = new NewsFragment();
-        Bundle bundle = new Bundle();
-        bundle.putInt(TASK_NAME, NewsFragment.TASK.KEYWORD.getTaskId());
-        bundle.putString(KEYWORD_NAME, mStockName);
-        newsFragment.setArguments(bundle);
-        return newsFragment;
+        if(position == 0) {
+            StockFragment stockFragment = new StockFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString(STOCK_CODE, mCode);
+            stockFragment.setArguments(bundle);
+            return stockFragment;
+        } else {
+            NewsFragment newsFragment = new NewsFragment();
+            Bundle bundle = new Bundle();
+            bundle.putInt(TASK_NAME, NewsFragment.TASK.KEYWORD.getTaskId());
+            bundle.putString(KEYWORD_NAME, mStockName);
+            newsFragment.setArguments(bundle);
+            return newsFragment;
+        }
     }
 }

@@ -16,7 +16,6 @@ import com.idroi.marketsense.NewsWebViewActivity;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.adapter.NewsRecyclerAdapter;
 import com.idroi.marketsense.data.News;
-import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.request.NewsRequest;
 
 import static com.idroi.marketsense.request.NewsRequest.PARAM_LEVEL;

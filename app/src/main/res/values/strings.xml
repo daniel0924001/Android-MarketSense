@@ -15,7 +15,7 @@
     <string name="title_news_win_predict">預測漲最多股票</string>
     <string name="title_news_lose_predict">預測跌最多股票</string>
     <string name="title_news_win_today">今日漲最多股票</string>
-    <string name="title_news_lose_today">今日漲最多股票</string>
+    <string name="title_news_lose_today">今日跌最多股票</string>
     <string name="title_news_best_optimistic">重點利多新聞</string>
     <string name="title_news_best_pessimistic">重點利空新聞</string>
     <string name="title_news_optimistic">利多新聞</string>

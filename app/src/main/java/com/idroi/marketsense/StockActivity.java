@@ -24,10 +24,13 @@ import net.lucode.hackware.magicindicator.ViewPagerHelper;
 
 public class StockActivity extends AppCompatActivity {
 
+    public final static String EXTRA_CODE = "com.idroi.marketsense.StockActivity.extra_code";
+
     private ViewPager mViewPager;
     private MagicIndicator mMagicIndicator;
 
     private String mStockName;
+    private String mCode;
 
     private ViewPager.OnPageChangeListener mOnPageChangeListener
             = new ViewPager.OnPageChangeListener() {
@@ -82,6 +85,7 @@ public class StockActivity extends AppCompatActivity {
 
     private void setInformation() {
         mStockName = getIntent().getStringExtra(Intent.EXTRA_TITLE);
+        mCode = getIntent().getStringExtra(EXTRA_CODE);
     }
 
     private void setActionBar() {
@@ -104,7 +108,8 @@ public class StockActivity extends AppCompatActivity {
 
             TextView textView = view.findViewById(R.id.action_bar_name);
             if(textView != null) {
-                textView.setText(mStockName);
+                String title = mStockName + " " + mCode;
+                textView.setText(title);
             }
 
             actionBar.setDisplayShowHomeEnabled(false);
@@ -121,7 +126,7 @@ public class StockActivity extends AppCompatActivity {
         mViewPager = findViewById(R.id.pager);
         StockScreenSlidePagerAdapter stockScreenSlidePagerAdapter =
                 new StockScreenSlidePagerAdapter(
-                        this, getSupportFragmentManager(), mStockName);
+                        this, getSupportFragmentManager(), mStockName, mCode);
         mViewPager.setAdapter(stockScreenSlidePagerAdapter);
 
         mMagicIndicator = (MagicIndicator) findViewById(R.id.tabs);
@@ -147,9 +152,10 @@ public class StockActivity extends AppCompatActivity {
         }
     }
 
-    public static Intent generateStockActivityIntent(Context context, String title) {
+    public static Intent generateStockActivityIntent(Context context, String title, String code) {
         Intent intent = new Intent(context, StockActivity.class);
         intent.putExtra(Intent.EXTRA_TITLE, title);
+        intent.putExtra(EXTRA_CODE, code);
         return intent;
     }
 }

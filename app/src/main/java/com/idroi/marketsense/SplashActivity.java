@@ -1,9 +1,12 @@
 package com.idroi.marketsense;
 
 import android.content.Intent;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
+import android.view.Display;
 
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.ClientData;
@@ -19,7 +22,11 @@ public class SplashActivity extends AppCompatActivity{
         MSLog.i("Enter SplashActivity");
 
         MSLog.i("Initialize ClientData");
-        ClientData.getInstance(this);
+        ClientData clientData = ClientData.getInstance(this);
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        int width = (int)Math.ceil((double)metrics.widthPixels/metrics.density);
+        int height = (int)Math.ceil((double)metrics.heightPixels/metrics.density);
+        clientData.setScreenSize(width, height);
 
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);

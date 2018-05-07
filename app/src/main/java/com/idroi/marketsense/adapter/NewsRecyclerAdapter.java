@@ -93,20 +93,21 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
             @Override
             public void onExpandFailed() {
 
-                if (mCurrentRetries >= RETRY_TIME_ARRAY_MILLISECONDS.length - 1) {
-                    MSLog.w("Stopping expand after the max retry count.");
-                    resetRetryTime();
-                    return;
-                }
+                // we only query one time
+//                if (mCurrentRetries >= RETRY_TIME_ARRAY_MILLISECONDS.length - 1) {
+//                    MSLog.w("Stopping expand after the max retry count.");
+//                    resetRetryTime();
+//                    return;
+//                }
 
-                MSLog.w("Wait for " + getRetryTime() + " milliseconds to expand.");
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        expand(15);
-                    }
-                }, getRetryTime());
-                updateRetryTime();
+//                MSLog.w("Wait for " + getRetryTime() + " milliseconds to expand.");
+//                mHandler.postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        expand(15);
+//                    }
+//                }, getRetryTime());
+//                updateRetryTime();
             }
         };
     }

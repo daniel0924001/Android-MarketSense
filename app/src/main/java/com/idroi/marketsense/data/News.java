@@ -39,6 +39,7 @@ public class News {
     private String mUrlNewsPage;
     private String mUrlOriginPage;
     private String mDate;
+    private int mSourceDateInt;
     private boolean mImportant;
     private int mLevel;
 
@@ -74,6 +75,10 @@ public class News {
         mImportant = (level == BEST_FALLING_LEVEL || level == BEST_RISING_LEVEL);
     }
 
+    public void setSourceDateInt(int sourceDateInt) {
+        mSourceDateInt = sourceDateInt;
+    }
+
     public String getTitle() {
         return mTitle;
     }
@@ -92,6 +97,10 @@ public class News {
 
     public String getDate() {
         return mDate;
+    }
+
+    public int getSourceDateInt() {
+        return mSourceDateInt;
     }
 
     public boolean getImportant() {
@@ -137,6 +146,7 @@ public class News {
                         break;
                     case SOURCE_DATE_INT:
                         news.setDate(convertToDate(jsonObject.optInt(key)));
+                        news.setSourceDateInt(jsonObject.optInt(key));
                         break;
                     case PREDICTION:
                         news.setLevel(jsonObject.optInt(key));

@@ -6,6 +6,9 @@ import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.MarketSenseError;
@@ -35,8 +38,8 @@ public class NewsSource {
     private static final int[] RETRY_TIME_ARRAY_MILLISECONDS = new int[]{1000, 3000, 5000, 25000, 60000, MAXIMUM_RETRY_TIME_MILLISECONDS};
 
     private WeakReference<Activity> mActivity;
-    private Handler mReplenishCacheHandler;
-    private Runnable mReplenishCacheRunnable;
+//    private Handler mReplenishCacheHandler;
+//    private Runnable mReplenishCacheRunnable;
     private boolean mRequestInFlight;
     private boolean mRetryInFlight;
     private int mCurrentRetries = 0;
@@ -51,14 +54,14 @@ public class NewsSource {
     NewsSource(Activity activity) {
         mActivity = new WeakReference<Activity>(activity);
         mNewsCache = new ArrayList<News>();
-        mReplenishCacheHandler = new Handler();
-        mReplenishCacheRunnable = new Runnable() {
-            @Override
-            public void run() {
-                mRetryInFlight = false;
-                replenishCache();
-            }
-        };
+//        mReplenishCacheHandler = new Handler();
+//        mReplenishCacheRunnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                mRetryInFlight = false;
+//                replenishCache();
+//            }
+//        };
 
         mMarketSenseNewsNetworkListener = new MarketSenseNewsFetcher.MarketSenseNewsNetworkListener() {
             @Override
@@ -87,6 +90,8 @@ public class NewsSource {
                 mSequenceNumber++;
                 resetRetryTime();
 
+                Comparator<News> comparator = genComparator();
+                Collections.sort(newsArray, comparator);
                 for(int i = 0; i < newsArray.size(); i++) {
                     if(!mNewsCache.contains(newsArray.get(i))) {
                         mNewsCache.add(newsArray.get(i));
@@ -103,13 +108,14 @@ public class NewsSource {
                     }
                 }
 
-                if(moreFlag) {
-                    replenishCache();
-                } else if(mActivity.get() != null && !mHasShowNoMore) {
-                    mHasShowNoMore = true;
-                    MSLog.w("no more data, maybe duplicate");
-                    Toast.makeText(mActivity.get(), "暫時沒有新聞資料，請稍候...", Toast.LENGTH_SHORT).show();
-                }
+                // we only query one time
+//                if(moreFlag) {
+//                    replenishCache();
+//                } else if(mActivity.get() != null && !mHasShowNoMore) {
+//                    mHasShowNoMore = true;
+//                    MSLog.w("no more data, maybe duplicate");
+//                    Toast.makeText(mActivity.get(), "暫時沒有新聞資料，請稍候...", Toast.LENGTH_SHORT).show();
+//                }
             }
 
             @Override
@@ -125,8 +131,8 @@ public class NewsSource {
                 }
 
                 mRetryInFlight = true;
-                MSLog.w("Wait for " + getRetryTime() + " milliseconds.");
-                mReplenishCacheHandler.postDelayed(mReplenishCacheRunnable, getRetryTime());
+                MSLog.w("Wait for " + getRetryTime() + " milliseconds. (Do nothing in this version)");
+//                mReplenishCacheHandler.postDelayed(mReplenishCacheRunnable, getRetryTime());
                 updateRetryTime();
             }
         };
@@ -144,7 +150,7 @@ public class NewsSource {
 
     News dequeueNews() {
         if (!mRequestInFlight && !mRetryInFlight) {
-            mReplenishCacheHandler.post(mReplenishCacheRunnable);
+//            mReplenishCacheHandler.post(mReplenishCacheRunnable);
         }
 
         if(!mNewsCache.isEmpty()) {
@@ -193,13 +199,23 @@ public class NewsSource {
         mFirstTimeNewsAvailable = false;
         mShouldReadFromCache = true;
         mSequenceNumber = 0;
-        mReplenishCacheHandler.removeCallbacks(mReplenishCacheRunnable);
+//        mReplenishCacheHandler.removeCallbacks(mReplenishCacheRunnable);
     }
 
     private void replenishCache() {
         if(!mRequestInFlight && mNewsFetcher != null && mNewsCache.size() < DEFAULT_CACHE_LIMIT) {
             mRequestInFlight = true;
-            mNewsFetcher.makeRequest(NewsRequest.appendMagicString(mUrl, mSequenceNumber), mShouldReadFromCache);
+//            mNewsFetcher.makeRequest(NewsRequest.appendMagicString(mUrl, mSequenceNumber), mShouldReadFromCache);
+            mNewsFetcher.makeRequest(mUrl, mShouldReadFromCache);
         }
+    }
+
+    private Comparator<News> genComparator() {
+        return new Comparator<News>() {
+            @Override
+            public int compare(News news1, News news2) {
+                return news2.getSourceDateInt() - news1.getSourceDateInt();
+            }
+        };
     }
 }

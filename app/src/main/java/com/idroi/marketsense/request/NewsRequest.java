@@ -92,6 +92,7 @@ public class NewsRequest extends Request<ArrayList<News>> {
     private static final String PARAM_LIMIT = "&limit=";
     public static final String PARAM_STATUS = "&status=";
     public static final String PARAM_LEVEL = "&level=";
+    public static final String PARAM_RANDOM = "&level=";
     private static final String PARAM_TIMESTAMP = "&timestamp=";
     private static final String PARAM_MAGIC_NUM = "&magic_number=";
 
@@ -103,9 +104,10 @@ public class NewsRequest extends Request<ArrayList<News>> {
 
     public static String queryNewsURL(String status,
                                       int level) {
-        return API_URL + PARAM_LIMIT + 10 +
+        return API_URL + PARAM_LIMIT + 300 +
                 PARAM_STATUS + status +
                 PARAM_LEVEL + level +
+                PARAM_RANDOM + "0" +
                 PARAM_TIMESTAMP + System.currentTimeMillis() / (300 * 1000);
     }
 

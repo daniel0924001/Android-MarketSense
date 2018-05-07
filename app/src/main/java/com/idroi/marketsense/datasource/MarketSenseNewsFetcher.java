@@ -98,7 +98,7 @@ public class MarketSenseNewsFetcher {
 
         MSLog.i("Loading news...: " + url);
 
-        if(false) {
+        if(shouldReadFromCache) {
             MSLog.i("Loading news...(cache): " + url);
             Cache cache = Networking.getRequestQueue(context).getCache();
             Cache.Entry entry = cache.get(url);
@@ -107,6 +107,8 @@ public class MarketSenseNewsFetcher {
                     ArrayList<News> newsArrayList = NewsRequest.newsParseResponse(entry.data);
                     MSLog.i("Loading news list...(cache hit): " + new String(entry.data));
                     mMarketSenseNewsNetworkListener.onNewsLoad(newsArrayList, true);
+                    // if it is cached, we do not need to do network query.
+                    return;
                 } catch (JSONException e) {
                     MSLog.e("Loading news list...(cache failed JSONException)");
                 }

@@ -5,12 +5,16 @@
     <string name="activity_news_notification">通知</string>
     <string name="activity_news_setting">設定</string>
     <string name="activity_news_search">搜尋</string>
+    <string name="activity_rich_editor">撰寫評論</string>
     <string name="activity_splash">市覺</string>
     <string name="user_avatar">大頭照</string>
     <string name="notification">推播</string>
+    <string name="preview">預覽</string>
     <string name="title_news_tab">新聞</string>
     <string name="title_choices_tab">自選</string>
     <string name="title_predict_tab">預測</string>
+    <string name="title_no_comment">暫無評論</string>
+    <string name="title_send_first">立馬搶頭香</string>
 
     <string name="title_news_win_predict">預測漲最多股票</string>
     <string name="title_news_lose_predict">預測跌最多股票</string>
@@ -27,6 +31,9 @@
     <string name="title_choices_news">自選新聞</string>
     <string name="title_search_hint_stock">輸入想搜尋的股票名稱或代碼</string>
     <string name="title_search_add">加入自選</string>
+
+    <string name="title_comment_user_name">使用者名稱</string>
+    <string name="title_comment_create_time">留言時間</string>
 
     <string name="title_notification_list">自選推播</string>
     <string name="title_notification_hot">熱門推播</string>
@@ -55,6 +62,8 @@
     <string name="title_predict_up">看漲</string>
     <string name="title_predict_down">看空</string>
     <string name="title_vote">投票</string>
+    <string name="title_comment">評論</string>
+    <string name="title_comment_create">發佈</string>
 
     <string name="no_notification">暫無通知</string>
 
@@ -72,4 +81,7 @@
 
     <string name="hello">Hello, 市覺使用者</string>
     <string name="login">登入</string>
+
+    <string name="comment_warning">我們歡迎各位在此留言，請不要散播垃圾訊息，
+        並且謹記勿用任何具有不雅、歧視或仇恨的字眼與言論，讓我們共同維護與創造良好的交流環境。</string>
 </resources>

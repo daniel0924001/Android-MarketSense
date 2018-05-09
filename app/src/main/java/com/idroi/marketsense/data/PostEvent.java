@@ -42,13 +42,18 @@ public class PostEvent {
     private static final String POST_FIELD_EVENT_DETAIL = "event_detail";
     private static final String POST_FIELD_EVENT_TYPE = "event_type";
     private static final String POST_FIELD_EVENT_VALUE = "event_value";
+    private static final String POST_FIELD_EVENT_TARGET = "event_target";
+
+    private static final String NEWS_CONST = "news";
+    private static final String STOCK_CONST = "stock";
 
     private String mUserId;
     private String mEvent;
     private String mEventContent;
     private String mEventType;
-    private Integer mEventValue;
+    private Object mEventValue; // String or Integer
     private String mEventDetail;
+    private String mEventTarget;
 
     private PostEvent(String userId, Event event) {
         mUserId = userId;
@@ -65,13 +70,23 @@ public class PostEvent {
         return this;
     }
 
-    private PostEvent setEventValue(Integer eventValue) {
+    private PostEvent setEventValueInteger(Integer eventValue) {
+        mEventValue = eventValue;
+        return this;
+    }
+
+    private PostEvent setEventValueString(String eventValue) {
         mEventValue = eventValue;
         return this;
     }
 
     private PostEvent setEventDetail(String eventDetail) {
         mEventDetail = eventDetail;
+        return this;
+    }
+
+    private PostEvent setEventTarget(String eventTarget) {
+        mEventTarget = eventTarget;
         return this;
     }
 
@@ -84,6 +99,7 @@ public class PostEvent {
             postJsonObject.putOpt(POST_FIELD_EVENT_DETAIL, mEventDetail);
             postJsonObject.putOpt(POST_FIELD_EVENT_TYPE, mEventType);
             postJsonObject.putOpt(POST_FIELD_EVENT_VALUE, mEventValue);
+            postJsonObject.putOpt(POST_FIELD_EVENT_TARGET, mEventTarget);
 
             MSLog.d(postJsonObject.toString());
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
@@ -105,6 +121,7 @@ public class PostEvent {
                             }
                         }
                     });
+            jsonObjectRequest.setShouldCache(false);
             Networking.getRequestQueue(context).add(jsonObjectRequest);
         } catch (JSONException e) {
             MSLog.e("JSONException in PostEvent send method.");
@@ -114,16 +131,36 @@ public class PostEvent {
     public static void sendStockVote(Context context, String code, String type, int value) {
         new PostEvent("Terry", Event.VOTING)
                 .setEventContent(code)
-                .setEventValue(value)
+                .setEventValueInteger(value)
                 .setEventType(type)
+                .setEventTarget(STOCK_CONST)
                 .send(context);
     }
 
     public static void sendNewsVote(Context context, String newsId, String type, int value) {
         new PostEvent("Terry", Event.VOTING)
                 .setEventContent(newsId)
-                .setEventValue(value)
+                .setEventValueInteger(value)
                 .setEventType(type)
+                .setEventTarget(NEWS_CONST)
+                .send(context);
+    }
+
+    public static void sendStockComment(Context context, String code, String html) {
+        new PostEvent("Terry", Event.COMMENT)
+                .setEventContent(code)
+                .setEventValueString(html)
+                .setEventType("normal")
+                .setEventTarget(STOCK_CONST)
+                .send(context);
+    }
+
+    public static void sendNewsComment(Context context, String newsId, String html) {
+        new PostEvent("Terry", Event.COMMENT)
+                .setEventContent(newsId)
+                .setEventValueString(html)
+                .setEventType("normal")
+                .setEventTarget(NEWS_CONST)
                 .send(context);
     }
 }

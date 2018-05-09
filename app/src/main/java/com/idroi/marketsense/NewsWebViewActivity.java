@@ -7,9 +7,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,17 +22,23 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ethanhua.skeleton.Skeleton;
 import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter;
 import com.idroi.marketsense.common.FrescoImageHelper;
+import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.PostEvent;
+import com.idroi.marketsense.request.SingleNewsRequest;
 
 import java.io.ByteArrayInputStream;
+
+import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_HTML;
+import static com.idroi.marketsense.RichEditorActivity.sEditorRequestCode;
 
 /**
  * Created by daniel.hsieh on 2018/4/25.
@@ -56,14 +63,18 @@ public class NewsWebViewActivity extends AppCompatActivity {
     private String mPageLink;
 
     private View mImageMask;
-    private ConstraintLayout mUpperBlock;
+    private ScrollView mUpperBlock;
     private NewsWebView mNewsWebViewOriginal;
     private NewsWebView mNewsWebViewMiddle;
     private TextView mNewsWebViewMiddleTitleTextView;
     private TextView mNewsWebViewMiddleDateTextView;
     private SimpleDraweeView mNewsWebViewMiddleImageView;
+    private CommentsRecyclerViewAdapter mCommentsRecyclerViewAdapter;
+    private RecyclerView mCommentRecyclerView;
 
-    private Button mReadButton;
+    private Button mReadOriginalButton, mReadMiddleButton,
+            mMiddleRaiseBtn, mMiddleFallBtn, mMiddleCommentBtn, mMiddleSendFirstBtn,
+            mOriginalRaiseBtn, mOriginalFallBtn, mOriginalCommentBtn;
 
     public static final int sPostDelayMilliSeconds = 1200;
     private boolean mIsOriginalVisible = false;
@@ -91,25 +102,23 @@ public class NewsWebViewActivity extends AppCompatActivity {
             return;
         }
 
-        mReadButton = (Button) findViewById(R.id.btn_convert_webview);
-        mReadButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                changeVisibility();
-            }
-        });
-
         setInformation();
         setActionBar();
         initUpperBlock();
         initWebView();
-        initVotingBtn();
+
+        initComments();
+        initBtn();
     }
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        overridePendingTransition(R.anim.stop, R.anim.right_to_left);
+        if(mIsOriginalVisible) {
+            changeVisibility();
+        } else {
+            super.onBackPressed();
+            overridePendingTransition(R.anim.stop, R.anim.right_to_left);
+        }
     }
 
     private void setInformation() {
@@ -121,33 +130,187 @@ public class NewsWebViewActivity extends AppCompatActivity {
         mSourceDate = getIntent().getStringExtra(EXTRA_MIDDLE_DATE);
     }
 
-    private void initVotingBtn() {
-        final Button buttonRaise = findViewById(R.id.btn_say_good);
-        final Button buttonFall = findViewById(R.id.btn_say_bad);
+    private void initComments() {
+        TextView commentTitle = findViewById(R.id.marketsense_block_title_tv);
+        commentTitle.setText(getResources().getString(R.string.title_comment));
+        mCommentRecyclerView = findViewById(R.id.marketsense_webview_comment_rv);
 
-        buttonRaise.setOnClickListener(new View.OnClickListener() {
+        mCommentsRecyclerViewAdapter = new CommentsRecyclerViewAdapter(this);
+        mCommentRecyclerView.setAdapter(mCommentsRecyclerViewAdapter);
+
+        mCommentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mCommentsRecyclerViewAdapter.setCommentsAvailableListener(new CommentsRecyclerViewAdapter.CommentsAvailableListener() {
+            @Override
+            public void onCommentsAvailable() {
+                showCommentBlock();
+            }
+        });
+        mCommentsRecyclerViewAdapter.loadCommentsList(SingleNewsRequest.querySingleNewsUrl(mId));
+    }
+
+    private void showCommentBlock() {
+        findViewById(R.id.marketsense_webview_no_comment_iv).setVisibility(View.GONE);
+        findViewById(R.id.marketsense_webview_no_comment_tv).setVisibility(View.GONE);
+        findViewById(R.id.btn_send_first).setVisibility(View.GONE);
+        mCommentRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    private void initBtn() {
+
+        mReadMiddleButton = (Button) findViewById(R.id.btn_convert_webview);
+        mReadOriginalButton = (Button) findViewById(R.id.btn_convert_webview_original);
+        mReadMiddleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeVisibility();
+            }
+        });
+        mReadOriginalButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeVisibility();
+            }
+        });
+
+        mMiddleRaiseBtn = findViewById(R.id.btn_say_good);
+        mMiddleFallBtn = findViewById(R.id.btn_say_bad);
+        mMiddleCommentBtn = findViewById(R.id.btn_say_comment);
+        mMiddleSendFirstBtn = findViewById(R.id.btn_send_first);
+        mOriginalRaiseBtn = findViewById(R.id.btn_say_good_original);
+        mOriginalFallBtn = findViewById(R.id.btn_say_bad_original);
+        mOriginalCommentBtn = findViewById(R.id.btn_say_comment_original);
+
+        mMiddleRaiseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.Event.VOTE_RAISE.getEventName(), 1);
                 MSLog.e("click good in news: " + mId);
-                buttonRaise.setEnabled(false);
-                buttonRaise.setAlpha(0.5f);
-                buttonFall.setEnabled(true);
-                buttonFall.setAlpha(1);
+                setRaiseDisable();
             }
         });
 
-        buttonFall.setOnClickListener(new View.OnClickListener() {
+        mMiddleFallBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 MSLog.e("click bad in news: " + mId);
                 PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.Event.VOTE_FALL.getEventName(), 1);
-                buttonRaise.setEnabled(true);
-                buttonRaise.setAlpha(1);
-                buttonFall.setEnabled(false);
-                buttonFall.setAlpha(0.5f);
+                setFallDisable();
             }
         });
+
+        mOriginalRaiseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.Event.VOTE_RAISE.getEventName(), 1);
+                MSLog.e("click good in news: " + mId);
+                setRaiseDisable();
+            }
+        });
+
+        mOriginalFallBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MSLog.e("click bad in news: " + mId);
+                PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.Event.VOTE_FALL.getEventName(), 1);
+                setFallDisable();
+            }
+        });
+
+        mMiddleCommentBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
+                        NewsWebViewActivity.this, RichEditorActivity.TYPE.NEWS, mId),
+                        sEditorRequestCode);
+                overridePendingTransition(R.anim.enter, R.anim.stop);
+            }
+        });
+
+        mOriginalCommentBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
+                        NewsWebViewActivity.this, RichEditorActivity.TYPE.NEWS, mId),
+                        sEditorRequestCode);
+                overridePendingTransition(R.anim.enter, R.anim.stop);
+            }
+        });
+
+        mMiddleSendFirstBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
+                        NewsWebViewActivity.this, RichEditorActivity.TYPE.NEWS, mId),
+                        sEditorRequestCode);
+                overridePendingTransition(R.anim.enter, R.anim.stop);
+            }
+        });
+    }
+
+    private void changeVisibility() {
+        if(mIsOriginalVisible) {
+            // show our webview
+            mIsOriginalVisible = false;
+            mNewsWebViewMiddle.setVisibility(View.VISIBLE);
+            mNewsWebViewOriginal.setVisibility(View.GONE);
+            mUpperBlock.setVisibility(View.VISIBLE);
+            setOriginalBtnVisibility(View.GONE);
+        } else {
+            // show original webview
+            mIsOriginalVisible = true;
+            mNewsWebViewMiddle.setVisibility(View.GONE);
+            mNewsWebViewOriginal.setVisibility(View.VISIBLE);
+            mUpperBlock.setVisibility(View.GONE);
+            setOriginalBtnVisibility(View.VISIBLE);
+        }
+    }
+
+    private void setOriginalBtnVisibility(int visibility) {
+        mOriginalCommentBtn.setVisibility(visibility);
+        mOriginalFallBtn.setVisibility(visibility);
+        mOriginalRaiseBtn.setVisibility(visibility);
+        mReadOriginalButton.setVisibility(visibility);
+    }
+
+    private void setRaiseDisable() {
+        mMiddleRaiseBtn.setEnabled(false);
+        mMiddleRaiseBtn.setAlpha(0.5f);
+        mMiddleFallBtn.setEnabled(true);
+        mMiddleFallBtn.setAlpha(1);
+
+        mOriginalRaiseBtn.setEnabled(false);
+        mOriginalRaiseBtn.setAlpha(0.5f);
+        mOriginalFallBtn.setEnabled(true);
+        mOriginalFallBtn.setAlpha(1);
+    }
+
+    private void setFallDisable() {
+        mMiddleRaiseBtn.setEnabled(true);
+        mMiddleRaiseBtn.setAlpha(1);
+        mMiddleFallBtn.setEnabled(false);
+        mMiddleFallBtn.setAlpha(0.5f);
+
+        mOriginalRaiseBtn.setEnabled(true);
+        mOriginalRaiseBtn.setAlpha(1);
+        mOriginalFallBtn.setEnabled(false);
+        mOriginalFallBtn.setAlpha(0.5f);
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == sEditorRequestCode) {
+            if(resultCode == RESULT_OK) {
+                String html = data.getStringExtra(EXTRA_RES_HTML);
+                Comment comment = new Comment();
+                comment.setCommentHtml(html);
+                mCommentsRecyclerViewAdapter.addOneComment(comment);
+                showCommentBlock();
+                MSLog.d("use send comment on id: " + mId);
+                MSLog.d("use send comment of html: " + html);
+            }
+        }
     }
 
     private void setActionBar() {
@@ -186,7 +349,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
     private void initUpperBlock() {
 
         MSLog.i("title: " + mTitle + ", source: " + mSourceDate + ", image: " + mImageUrl);
-        mUpperBlock = findViewById(R.id.marketsense_webview_upper_block);
+        mUpperBlock = findViewById(R.id.marketsense_webview_middle_sv);
         mImageMask = findViewById(R.id.marketsense_webview_activity_image_mask);
         mNewsWebViewMiddleTitleTextView = findViewById(R.id.marketsense_webview_activity_title);
         mNewsWebViewMiddleDateTextView = findViewById(R.id.marketsense_webview_activity_source_date);
@@ -305,24 +468,6 @@ public class NewsWebViewActivity extends AppCompatActivity {
         return intent;
     }
 
-    private void changeVisibility() {
-        if(mIsOriginalVisible) {
-            // show our webview
-            mIsOriginalVisible = false;
-            mNewsWebViewMiddle.setVisibility(View.VISIBLE);
-            mNewsWebViewOriginal.setVisibility(View.GONE);
-            mUpperBlock.setVisibility(View.VISIBLE);
-            mReadButton.setText(R.string.title_news_read_original);
-        } else {
-            // show original webview
-            mIsOriginalVisible = true;
-            mNewsWebViewMiddle.setVisibility(View.GONE);
-            mNewsWebViewOriginal.setVisibility(View.VISIBLE);
-            mUpperBlock.setVisibility(View.GONE);
-            mReadButton.setText(R.string.title_news_read_middle);
-        }
-    }
-
     @Override
     protected void onDestroy() {
         if(mHandler != null) {
@@ -336,6 +481,10 @@ public class NewsWebViewActivity extends AppCompatActivity {
         if(mNewsWebViewOriginal != null) {
             mNewsWebViewOriginal.destroy();
             mNewsWebViewOriginal = null;
+        }
+        if(mCommentsRecyclerViewAdapter != null) {
+            mCommentsRecyclerViewAdapter.destroy();
+            mCommentsRecyclerViewAdapter = null;
         }
         super.onDestroy();
     }

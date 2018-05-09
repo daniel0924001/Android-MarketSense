@@ -51,6 +51,10 @@
             android:label="@string/activity_news_search">
         </activity>
 
+        <activity android:name=".RichEditorActivity"
+            android:label="@string/activity_rich_editor">
+        </activity>
+
     </application>
 
 </manifest>

@@ -138,8 +138,8 @@ public class MarketSenseStockFetcher {
         final Context context = mContext.get();
         if (context == null) {
             destroy();
-            MSLog.d("Weak reference to Context in MarketSenseNewsFetcher became null. " +
-                    "This instance of MarketSenseNewsFetcher is destroyed and " +
+            MSLog.d("Weak reference to Context in MarketSenseStockFetcher became null. " +
+                    "This instance of MarketSenseStockFetcher is destroyed and " +
                     "no more requests will be processed.");
         }
         return context;

@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.idroi.marketsense"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
         versionName "1.0.0"
@@ -20,6 +20,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
+            minifyEnabled false
 //            signingConfig signingConfigs.debug
         }
     }
@@ -70,6 +71,8 @@ dependencies {
 
     implementation 'com.ethanhua:skeleton:1.1.0'
     implementation 'io.supercharge:shimmerlayout:2.0.0'
+
+    implementation 'jp.wasabeef:richeditor-android:1.2.2'
 }
 
 static def getJenkinsBuildNumber() {

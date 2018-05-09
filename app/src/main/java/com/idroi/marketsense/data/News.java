@@ -3,6 +3,7 @@ package com.idroi.marketsense.data;
 import android.util.Log;
 
 import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.common.DateConverter;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -158,7 +159,7 @@ public class News {
                         }
                         break;
                     case SOURCE_DATE_INT:
-                        news.setDate(convertToDate(jsonObject.optInt(key)));
+                        news.setDate(DateConverter.convertToDate(jsonObject.optInt(key)));
                         news.setSourceDateInt(jsonObject.optInt(key));
                         break;
                     case PREDICTION:
@@ -195,21 +196,5 @@ public class News {
         return new HashCodeBuilder()
                 .append(getOriginLink())
                 .toHashCode();
-    }
-
-    private static String convertToDate(int sourceDate) {
-        long difference = (System.currentTimeMillis() / 1000) - sourceDate;
-        if(difference < 3600) {
-            long lastMinutes = difference / 60;
-            return lastMinutes + "分前";
-        } else if(difference >= 3600 && difference < 24 * 3600){
-            long lastHours = difference / 3600;
-            return lastHours + "小時前";
-        } else {
-            Calendar cal = Calendar.getInstance(Locale.CHINESE);
-            cal.setTimeInMillis(sourceDate * 1000L);
-            SimpleDateFormat df = new SimpleDateFormat("MM/dd", Locale.CHINESE);
-            return df.format(cal.getTime());
-        }
     }
 }

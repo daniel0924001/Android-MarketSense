@@ -38,8 +38,8 @@ public class NewsSource {
     private static final int[] RETRY_TIME_ARRAY_MILLISECONDS = new int[]{1000, 3000, 5000, 25000, 60000, MAXIMUM_RETRY_TIME_MILLISECONDS};
 
     private WeakReference<Activity> mActivity;
-//    private Handler mReplenishCacheHandler;
-//    private Runnable mReplenishCacheRunnable;
+    private Handler mReplenishCacheHandler;
+    private Runnable mReplenishCacheRunnable;
     private boolean mRequestInFlight;
     private boolean mRetryInFlight;
     private int mCurrentRetries = 0;
@@ -54,14 +54,14 @@ public class NewsSource {
     NewsSource(Activity activity) {
         mActivity = new WeakReference<Activity>(activity);
         mNewsCache = new ArrayList<News>();
-//        mReplenishCacheHandler = new Handler();
-//        mReplenishCacheRunnable = new Runnable() {
-//            @Override
-//            public void run() {
-//                mRetryInFlight = false;
-//                replenishCache();
-//            }
-//        };
+        mReplenishCacheHandler = new Handler();
+        mReplenishCacheRunnable = new Runnable() {
+            @Override
+            public void run() {
+                mRetryInFlight = false;
+                replenishCache();
+            }
+        };
 
         mMarketSenseNewsNetworkListener = new MarketSenseNewsFetcher.MarketSenseNewsNetworkListener() {
             @Override
@@ -132,7 +132,9 @@ public class NewsSource {
 
                 mRetryInFlight = true;
                 MSLog.w("Wait for " + getRetryTime() + " milliseconds. (Do nothing in this version)");
-//                mReplenishCacheHandler.postDelayed(mReplenishCacheRunnable, getRetryTime());
+                if(!mFirstTimeNewsAvailable) {
+                    mReplenishCacheHandler.postDelayed(mReplenishCacheRunnable, getRetryTime());
+                }
                 updateRetryTime();
             }
         };
@@ -199,7 +201,7 @@ public class NewsSource {
         mFirstTimeNewsAvailable = false;
         mShouldReadFromCache = true;
         mSequenceNumber = 0;
-//        mReplenishCacheHandler.removeCallbacks(mReplenishCacheRunnable);
+        mReplenishCacheHandler.removeCallbacks(mReplenishCacheRunnable);
     }
 
     private void replenishCache() {

@@ -1,0 +1,403 @@
+package com.idroi.marketsense;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.data.PostEvent;
+
+import jp.wasabeef.richeditor.RichEditor;
+
+/**
+ * Created by daniel.hsieh on 2018/5/8.
+ */
+
+public class RichEditorActivity extends AppCompatActivity {
+
+    RichEditor mEditor;
+    String mEditorString;
+    View mLastPressView;
+
+    public static final String EXTRA_REQ_TYPE = "extra_type";
+    public static final String EXTRA_REQ_ID = "extra_id";
+    public static final String EXTRA_RES_HTML = "extra_response_html";
+    public final static int sEditorRequestCode = 2;
+
+    private String mType;
+    private String mId;
+
+    public enum TYPE {
+        NEWS("news"),
+        STOCK("stock");
+
+        private String mType;
+
+        TYPE(String type) {
+            mType = type;
+        }
+
+        public String getType() {
+            return mType;
+        }
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_rich_editor);
+
+        setActionBar();
+        setRichEditor();
+        setPostBtn();
+    }
+
+    private void setPostBtn() {
+
+        mId = getIntent().getStringExtra(EXTRA_REQ_ID);
+        mType = getIntent().getStringExtra(EXTRA_REQ_TYPE);
+
+        final Button sendBtn = findViewById(R.id.btn_say_comment_send);
+        sendBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String html = mEditor.getHtml();
+                if(mType.equals(TYPE.NEWS.getType())) {
+                    MSLog.i("send news comment (" + mId + "): " + html);
+                    PostEvent.sendNewsComment(RichEditorActivity.this, mId, html);
+                } else if(mType.equals(TYPE.STOCK.getType())) {
+                    MSLog.i("send stock comment (" + mId + "): " + html);
+                    PostEvent.sendStockComment(RichEditorActivity.this, mId, html);
+                }
+                Intent intent = new Intent();
+                intent.putExtra(EXTRA_RES_HTML, html);
+                setResult(RESULT_OK, intent);
+                finish();
+                overridePendingTransition(R.anim.stop, R.anim.right_to_left);
+            }
+        });
+    }
+
+    private void changeBtnBackgroundColor(View view) {
+        if(mLastPressView != view) {
+            if(mLastPressView != null) {
+                mLastPressView.setBackgroundColor(
+                        getResources().getColor(R.color.marketsense_rich_edit_black_background));
+            }
+            view.setBackgroundColor(
+                    getResources().getColor(R.color.colorTrendUp));
+            mLastPressView = view;
+        } else {
+            view.setBackgroundColor(
+                    getResources().getColor(R.color.marketsense_rich_edit_black_background));
+            mLastPressView = null;
+        }
+    }
+
+    private boolean changeBtnBackgroundColorImmediately(View view, MotionEvent motionEvent) {
+        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+            // Pressed
+            if(mLastPressView != null) {
+                mLastPressView.setBackgroundColor(
+                        getResources().getColor(R.color.marketsense_rich_edit_black_background));
+            }
+            view.setBackgroundColor(
+                    getResources().getColor(R.color.colorTrendUp));
+            mLastPressView = view;
+            view.performClick();
+        } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+            // Released
+            view.setBackgroundColor(
+                    getResources().getColor(R.color.marketsense_rich_edit_black_background));
+        }
+
+        return false;
+    }
+
+    private void setRichEditor() {
+        mEditor = (RichEditor) findViewById(R.id.rich_editor);
+        mEditor.setEditorHeight(200);
+        mEditor.setEditorFontSize(22);
+        mEditor.setEditorFontColor(getResources().getColor(R.color.marketsense_text_black));
+        //mEditor.setEditorBackgroundColor(Color.BLUE);
+        //mEditor.setBackgroundColor(Color.BLUE);
+        //mEditor.setBackgroundResource(R.drawable.bg);
+        mEditor.setPadding(10, 10, 10, 10);
+        //    mEditor.setBackground("https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg");
+        mEditor.setPlaceholder(getResources().getString(R.string.comment_warning));
+
+        mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
+            @Override public void onTextChange(String text) {
+                mEditorString = text;
+            }
+        });
+
+        findViewById(R.id.action_undo).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                mEditor.undo();
+//                changeBtnBackgroundColor(v);
+            }
+        });
+        findViewById(R.id.action_undo).setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return changeBtnBackgroundColorImmediately(view, motionEvent);
+            }
+        });
+
+        findViewById(R.id.action_redo).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                mEditor.redo();
+                changeBtnBackgroundColor(v);
+            }
+        });
+        findViewById(R.id.action_redo).setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return changeBtnBackgroundColorImmediately(view, motionEvent);
+            }
+        });
+
+        findViewById(R.id.action_bold).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                mEditor.setBold();
+                changeBtnBackgroundColor(v);
+            }
+        });
+
+        findViewById(R.id.action_italic).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                mEditor.setItalic();
+                changeBtnBackgroundColor(v);
+            }
+        });
+
+        findViewById(R.id.action_subscript).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                mEditor.setSubscript();
+                changeBtnBackgroundColor(v);
+            }
+        });
+
+        findViewById(R.id.action_superscript).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                mEditor.setSuperscript();
+                changeBtnBackgroundColor(v);
+            }
+        });
+
+        findViewById(R.id.action_strikethrough).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                mEditor.setStrikeThrough();
+                changeBtnBackgroundColor(v);
+            }
+        });
+
+        findViewById(R.id.action_underline).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                mEditor.setUnderline();
+                changeBtnBackgroundColor(v);
+            }
+        });
+
+        findViewById(R.id.action_heading1).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                mEditor.setHeading(1);
+                changeBtnBackgroundColor(v);
+            }
+        });
+
+        findViewById(R.id.action_heading2).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                mEditor.setHeading(2);
+                changeBtnBackgroundColor(v);
+            }
+        });
+
+        findViewById(R.id.action_heading3).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                mEditor.setHeading(3);
+                changeBtnBackgroundColor(v);
+            }
+        });
+
+        findViewById(R.id.action_heading4).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                mEditor.setHeading(4);
+                changeBtnBackgroundColor(v);
+            }
+        });
+
+        findViewById(R.id.action_heading5).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                mEditor.setHeading(5);
+                changeBtnBackgroundColor(v);
+            }
+        });
+
+        findViewById(R.id.action_heading6).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                mEditor.setHeading(6);
+                changeBtnBackgroundColor(v);
+            }
+        });
+
+        findViewById(R.id.action_txt_color).setOnClickListener(new View.OnClickListener() {
+            private boolean isChanged;
+
+            @Override public void onClick(View view) {
+                mEditor.setTextColor(isChanged ?
+                        getResources().getColor(R.color.marketsense_text_black) :
+                        getResources().getColor(R.color.marketsense_text_red));
+                view.setBackgroundColor(isChanged ?
+                        getResources().getColor(R.color.marketsense_rich_edit_black_background) :
+                        getResources().getColor(R.color.colorTrendUp));
+                isChanged = !isChanged;
+            }
+        });
+
+        findViewById(R.id.action_bg_color).setOnClickListener(new View.OnClickListener() {
+            private boolean isChanged;
+
+            @Override public void onClick(View view) {
+                mEditor.setTextBackgroundColor(isChanged ?
+                        getResources().getColor(R.color.marketsense_trans) :
+                        Color.YELLOW);
+                view.setBackgroundColor(isChanged ?
+                        getResources().getColor(R.color.marketsense_rich_edit_black_background) :
+                        getResources().getColor(R.color.colorTrendUp));
+                isChanged = !isChanged;
+            }
+        });
+
+        findViewById(R.id.action_indent).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                mEditor.setIndent();
+                changeBtnBackgroundColor(v);
+            }
+        });
+
+        findViewById(R.id.action_outdent).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                mEditor.setOutdent();
+                changeBtnBackgroundColor(v);
+            }
+        });
+
+        findViewById(R.id.action_align_left).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                mEditor.setAlignLeft();
+                changeBtnBackgroundColor(v);
+            }
+        });
+
+        findViewById(R.id.action_align_center).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                mEditor.setAlignCenter();
+                changeBtnBackgroundColor(v);
+            }
+        });
+
+        findViewById(R.id.action_align_right).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                mEditor.setAlignRight();
+                changeBtnBackgroundColor(v);
+            }
+        });
+
+        findViewById(R.id.action_blockquote).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                mEditor.setBlockquote();
+                changeBtnBackgroundColor(v);
+            }
+        });
+
+        findViewById(R.id.action_insert_image).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                mEditor.insertImage("http://www.1honeywan.com/dachshund/image/7.21/7.21_3_thumb.JPG",
+                        "dachshund");
+                changeBtnBackgroundColor(v);
+            }
+        });
+
+        findViewById(R.id.action_insert_link).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                mEditor.insertLink("https://github.com/wasabeef", "wasabeef");
+                changeBtnBackgroundColor(v);
+            }
+        });
+
+        findViewById(R.id.action_insert_checkbox).setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                mEditor.insertTodo();
+                changeBtnBackgroundColor(v);
+            }
+        });
+    }
+
+    private void setActionBar() {
+        final ActionBar actionBar = getSupportActionBar();
+
+        if(actionBar != null) {
+            View view = LayoutInflater.from(actionBar.getThemedContext())
+                    .inflate(R.layout.main_action_bar, null);
+
+            ImageView imageView = view.findViewById(R.id.action_bar_avatar);
+            if(imageView != null) {
+                imageView.setImageResource(R.drawable.ic_keyboard_backspace_white_24px);
+                imageView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onBackPressed();
+                    }
+                });
+            }
+
+            TextView textView = view.findViewById(R.id.action_bar_name);
+            if(textView != null) {
+                textView.setText(getResources().getText(R.string.activity_rich_editor));
+            }
+
+            actionBar.setDisplayShowHomeEnabled(false);
+            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setCustomView(view,
+                    new ActionBar.LayoutParams(
+                            ActionBar.LayoutParams.MATCH_PARENT,
+                            ActionBar.LayoutParams.MATCH_PARENT));
+            actionBar.setDisplayShowCustomEnabled(true);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.stop, R.anim.right_to_left);
+    }
+
+    @Override
+    protected void onDestroy() {
+        mEditor.destroy();
+        mEditor = null;
+        super.onDestroy();
+    }
+
+    public static Intent generateRichEditorActivityIntent(Context context, TYPE type, String id) {
+        Intent intent = new Intent(context, RichEditorActivity.class);
+        intent.putExtra(EXTRA_REQ_TYPE, type.getType());
+        intent.putExtra(EXTRA_REQ_ID, id);
+        return intent;
+    }
+}

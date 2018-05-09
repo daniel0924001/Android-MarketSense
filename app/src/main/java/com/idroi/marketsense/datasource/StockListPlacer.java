@@ -74,7 +74,9 @@ public class StockListPlacer {
                     mMarketSenseStockFetcher.makeRequest(mUrl);
                 } else {
                     generateDefaultStockList();
-                    mStockListListener.onStockListLoaded();
+                    if(mStockListListener != null) {
+                        mStockListListener.onStockListLoaded();
+                    }
                 }
             }
         };
@@ -122,7 +124,7 @@ public class StockListPlacer {
         }
     }
 
-    public void generateDefaultStockList() {
+    private void generateDefaultStockList() {
         MSLog.e("Stock generate default stock list");
         if(mStockArrayList == null) {
             mStockArrayList = new ArrayList<Stock>();
@@ -139,7 +141,7 @@ public class StockListPlacer {
     }
 
     public Stock getStockData(int position) {
-        if(mStockArrayList == null || position > mStockArrayList.size() || position < 0) {
+        if(mStockArrayList == null || position >= mStockArrayList.size() || position < 0) {
             return null;
         }
         return mStockArrayList.get(position);

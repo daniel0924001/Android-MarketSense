@@ -102,7 +102,7 @@ public class ClientData {
         if(entry != null) {
             try {
                 ArrayList<Stock> stockArrayList = StocksListRequest.stockParseResponse(entry.data);
-                MSLog.i("Loading stock list...(cache hit): " + new String(entry.data));
+                MSLog.i("Loading all stock list...(cache hit): " + new String(entry.data));
                 setAllStocksListInfo(stockArrayList);
             } catch (JSONException e) {
                 MSLog.e("Loading all stocks list...(cache failed JSONException)");

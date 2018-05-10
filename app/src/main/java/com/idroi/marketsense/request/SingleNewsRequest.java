@@ -27,6 +27,23 @@ public class SingleNewsRequest extends Request<ArrayList<Comment>> {
     private static final String PARAM_COMMENTS = "comments";
     private static final String PARAM_EVENT = "event";
 
+    final static int NEWS_COMMENT_ID = 1;
+    final static int STOCK_COMMENT_ID = 2;
+
+    public enum TASK {
+        NEWS_COMMENT(NEWS_COMMENT_ID),
+        STOCK_COMMENT(STOCK_COMMENT_ID);
+
+        int taskId;
+        TASK(int id) {
+            taskId = id;
+        }
+
+        public int getTaskId() {
+            return taskId;
+        }
+    }
+
     private final Response.Listener<ArrayList<Comment>> mListener;
 
     public SingleNewsRequest(int method, String url, Response.Listener<ArrayList<Comment>> listener, Response.ErrorListener errorListener) {
@@ -84,9 +101,16 @@ public class SingleNewsRequest extends Request<ArrayList<Comment>> {
         mListener.onResponse(response);
     }
 
-    private static final String API_URL = "http://apiv2.infohubapp.com/v1/stock/news/";
+    private static final String API_URL_NEWS = "http://apiv2.infohubapp.com/v1/stock/news/";
+    private static final String API_URL_STOCK = "http://apiv2.infohubapp.com/v1/stock/code/";
 
-    public static String querySingleNewsUrl(String newsId) {
-        return API_URL + newsId + "?timestamp=" + System.currentTimeMillis() / (300 * 1000);
+    public static String querySingleNewsUrl(String newsId, TASK task) {
+        switch (task.getTaskId()) {
+            case NEWS_COMMENT_ID:
+                return API_URL_NEWS + newsId + "?timestamp=" + System.currentTimeMillis() / (300 * 1000);
+            case STOCK_COMMENT_ID:
+                return API_URL_STOCK + newsId + "?timestamp=" + System.currentTimeMillis() / (300 * 1000);
+        }
+        return null;
     }
 }

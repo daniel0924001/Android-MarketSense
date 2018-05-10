@@ -46,7 +46,11 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
         MarketSenseRendererHelper.addTextView(commentViewHolder.createTimeView, content.getDateString());
         FrescoImageHelper.loadImageView(content.getAvatarUrl(),
                 commentViewHolder.avatarView, FrescoImageHelper.ICON_IMAGE_RATIO);
-        commentViewHolder.commentBodyView.loadData(content.getCommentHtml(), "text/html", "UTF-8");
+
+        // chinese characters can not be decoded.
+        // https://blog.csdn.net/top_code/article/details/9163597
+        commentViewHolder.commentBodyView.
+                loadDataWithBaseURL(null, content.getCommentHtml(), "text/html", "UTF-8", null);
 
         setViewVisibility(commentViewHolder, View.VISIBLE);
     }

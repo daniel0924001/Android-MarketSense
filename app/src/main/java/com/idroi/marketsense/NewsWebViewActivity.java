@@ -132,7 +132,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
 
     private void initComments() {
         TextView commentTitle = findViewById(R.id.marketsense_block_title_tv);
-        commentTitle.setText(getResources().getString(R.string.title_comment));
+        commentTitle.setText(getResources().getString(R.string.title_action));
         mCommentRecyclerView = findViewById(R.id.marketsense_webview_comment_rv);
 
         mCommentsRecyclerViewAdapter = new CommentsRecyclerViewAdapter(this);
@@ -145,7 +145,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
                 showCommentBlock();
             }
         });
-        mCommentsRecyclerViewAdapter.loadCommentsList(SingleNewsRequest.querySingleNewsUrl(mId));
+        mCommentsRecyclerViewAdapter.loadCommentsList(SingleNewsRequest.querySingleNewsUrl(mId, SingleNewsRequest.TASK.NEWS_COMMENT));
     }
 
     private void showCommentBlock() {
@@ -307,8 +307,8 @@ public class NewsWebViewActivity extends AppCompatActivity {
                 comment.setCommentHtml(html);
                 mCommentsRecyclerViewAdapter.addOneComment(comment);
                 showCommentBlock();
-                MSLog.d("use send comment on id: " + mId);
-                MSLog.d("use send comment of html: " + html);
+                MSLog.d("user send a comment on id: " + mId);
+                MSLog.d("user send a comment of html: " + html);
             }
         }
     }

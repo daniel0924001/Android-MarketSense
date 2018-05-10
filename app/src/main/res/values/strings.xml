@@ -59,11 +59,15 @@
     <string name="title_confidence">信心</string>
     <string name="iv_up_down">升降圖</string>
     <string name="iv_alarm">警告</string>
-    <string name="title_predict_up">看漲</string>
-    <string name="title_predict_down">看空</string>
+    <string name="title_predict_up">看多:</string>
+    <string name="title_predict_down">看空:</string>
     <string name="title_vote">投票</string>
     <string name="title_comment">評論</string>
+    <string name="title_comment_colon">評論:</string>
+    <string name="title_action">快來表達你的想法吧！</string>
     <string name="title_comment_create">發佈</string>
+    <string name="title_leave_rich_editor">
+        看起來你只編輯到一半，你確定要離開編輯頁面嗎？假如是，請在「點擊返回一次」。</string>
 
     <string name="no_notification">暫無通知</string>
 

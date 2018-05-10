@@ -24,23 +24,6 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
         void onCommentsAvailable();
     }
 
-    public final static int NEWS_COMMENT_ID = 1;
-    public final static int STOCK_COMMENT_ID = 2;
-
-    public enum TASK {
-        NEWS_COMMENT(NEWS_COMMENT_ID),
-        STOCK_COMMENT(STOCK_COMMENT_ID);
-
-        int taskId;
-        TASK(int id) {
-            taskId = id;
-        }
-
-        public int getTaskId() {
-            return taskId;
-        }
-    }
-
     private Activity mActivity;
     private CommentsPlacer mCommentsPlacer;
     private CommentsRenderer mCommentsRenderer;

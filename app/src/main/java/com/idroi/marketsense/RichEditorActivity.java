@@ -2,17 +2,20 @@ package com.idroi.marketsense;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +25,8 @@ import com.idroi.marketsense.data.PostEvent;
 
 import jp.wasabeef.richeditor.RichEditor;
 
+import static com.idroi.marketsense.common.Constants.HTTP;
+
 /**
  * Created by daniel.hsieh on 2018/5/8.
  */
@@ -29,7 +34,7 @@ import jp.wasabeef.richeditor.RichEditor;
 public class RichEditorActivity extends AppCompatActivity {
 
     RichEditor mEditor;
-    String mEditorString;
+//    String mEditorString;
     View mLastPressView;
 
     public static final String EXTRA_REQ_TYPE = "extra_type";
@@ -40,6 +45,8 @@ public class RichEditorActivity extends AppCompatActivity {
     private String mType;
     private String mId;
     private boolean mDoubleClickBack = false;
+    private AlertDialog mImageAlertDialog;
+    private AlertDialog mUrlAlertDialog;
 
     public enum TYPE {
         NEWS("news"),
@@ -64,6 +71,21 @@ public class RichEditorActivity extends AppCompatActivity {
         setActionBar();
         setRichEditor();
         setPostBtn();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if(mImageAlertDialog != null) {
+            mImageAlertDialog.dismiss();
+            mImageAlertDialog = null;
+        }
+
+        if(mUrlAlertDialog != null) {
+            mUrlAlertDialog.dismiss();
+            mUrlAlertDialog = null;
+        }
     }
 
     private void setPostBtn() {
@@ -136,20 +158,13 @@ public class RichEditorActivity extends AppCompatActivity {
         //mEditor.setEditorBackgroundColor(Color.BLUE);
         //mEditor.setBackgroundColor(Color.BLUE);
         //mEditor.setBackgroundResource(R.drawable.bg);
-        mEditor.setPadding(10, 10, 10, 10);
+        mEditor.setPadding(15, 15, 15, 15);
         //    mEditor.setBackground("https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg");
         mEditor.setPlaceholder(getResources().getString(R.string.comment_warning));
-
-        mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
-            @Override public void onTextChange(String text) {
-                mEditorString = text;
-            }
-        });
 
         findViewById(R.id.action_undo).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 mEditor.undo();
-//                changeBtnBackgroundColor(v);
             }
         });
         findViewById(R.id.action_undo).setOnTouchListener(new View.OnTouchListener() {
@@ -163,7 +178,6 @@ public class RichEditorActivity extends AppCompatActivity {
         findViewById(R.id.action_redo).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 mEditor.redo();
-                changeBtnBackgroundColor(v);
             }
         });
         findViewById(R.id.action_redo).setOnTouchListener(new View.OnTouchListener() {
@@ -328,18 +342,71 @@ public class RichEditorActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.action_insert_image).setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                mEditor.insertImage("http://www.1honeywan.com/dachshund/image/7.21/7.21_3_thumb.JPG",
-                        "dachshund");
-                changeBtnBackgroundColor(v);
+        findViewById(R.id.action_insert_image).setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                mEditor.focusEditor();
+                final View alertView = LayoutInflater.from(RichEditorActivity.this)
+                        .inflate(R.layout.alertdialog_single_input, null);
+                if(mImageAlertDialog != null) {
+                    mImageAlertDialog.dismiss();
+                    mImageAlertDialog = null;
+                }
+                final EditText editText = alertView.findViewById(R.id.alert_dialog_input);
+                editText.setText(HTTP);
+                mImageAlertDialog = new AlertDialog.Builder(RichEditorActivity.this)
+                        .setTitle(R.string.insert_image_url)
+                        .setView(alertView)
+                        .setPositiveButton(R.string.insert_ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                mEditor.insertImage(editText.getText().toString(),
+                                        getResources().getString(R.string.image_alt));
+                                mImageAlertDialog.dismiss();
+                            }
+                        }).setNegativeButton(R.string.insert_cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                mImageAlertDialog.dismiss();
+                            }
+                        }).show();
+                return changeBtnBackgroundColorImmediately(view, motionEvent);
             }
         });
 
-        findViewById(R.id.action_insert_link).setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                mEditor.insertLink("https://github.com/wasabeef", "wasabeef");
-                changeBtnBackgroundColor(v);
+        findViewById(R.id.action_insert_link).setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                mEditor.focusEditor();
+                final View alertView = LayoutInflater.from(RichEditorActivity.this)
+                        .inflate(R.layout.alertdialog_two_inputs, null);
+                if(mUrlAlertDialog != null) {
+                    mUrlAlertDialog.dismiss();
+                    mUrlAlertDialog = null;
+                }
+                final EditText editTextUrl = alertView.findViewById(R.id.alert_dialog_input_2);
+                editTextUrl.setText(HTTP);
+                mUrlAlertDialog = new AlertDialog.Builder(RichEditorActivity.this)
+                        .setTitle(R.string.insert_hyperlink)
+                        .setView(alertView)
+                        .setPositiveButton(R.string.insert_ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                EditText editTextTitle = alertView.findViewById(R.id.alert_dialog_input_1);
+                                mEditor.insertLink(
+                                        editTextUrl.getText().toString(),
+                                        editTextTitle.getText().toString());
+                                mUrlAlertDialog.dismiss();
+                            }
+                        }).setNegativeButton(R.string.insert_cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                mUrlAlertDialog.dismiss();
+                            }
+                        }).show();
+                return changeBtnBackgroundColorImmediately(view, motionEvent);
             }
         });
 

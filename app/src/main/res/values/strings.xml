@@ -51,11 +51,11 @@
     <string name="title_up">漲</string>
     <string name="title_down">跌</string>
     <string name="title_percent">%</string>
-    <string name="title_go_up"> 上漲</string>
-    <string name="title_go_down"> 下跌</string>
+    <string name="title_go_up"> 可能漲</string>
+    <string name="title_go_down">可能跌</string>
     <string name="title_go_flat"> 持平</string>
     <string name="title_rank">名次</string>
-    <string name="title_predict">預測 </string>
+    <string name="title_predict">未來 </string>
     <string name="title_confidence">信心</string>
     <string name="iv_up_down">升降圖</string>
     <string name="iv_alarm">警告</string>
@@ -85,7 +85,21 @@
 
     <string name="hello">Hello, 市覺使用者</string>
     <string name="login">登入</string>
+    <string name="login_facebook">以Facebook登入</string>
+    <string name="login_google">以Google登入</string>
+    <string name="login_page_title">登入市覺會員</string>
+    <string name="login_page_subtitle">快來追蹤你的喜好標的吧！</string>
 
     <string name="comment_warning">我們歡迎各位在此留言，請不要散播垃圾訊息，
         並且謹記勿用任何具有不雅、歧視或仇恨的字眼與言論，讓我們共同維護與創造良好的交流環境。</string>
+    <string name="image_alt">無此圖片</string>
+    <string name="hint_input_image_url">輸入圖片連結</string>
+    <string name="title_hyperlink_title">超連結標題</string>
+    <string name="title_hyperlink_url">超連結網址</string>
+    <string name="hint_input_hyperlink_title">輸入超連結標題</string>
+    <string name="hint_input_hyperlink_url">輸入超連結網址</string>
+    <string name="insert_hyperlink">插入超連結</string>
+    <string name="insert_image_url">插入圖片</string>
+    <string name="insert_ok">插入</string>
+    <string name="insert_cancel">取消</string>
 </resources>

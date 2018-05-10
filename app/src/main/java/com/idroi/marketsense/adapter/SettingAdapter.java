@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.CompoundButton;
 
 import com.idroi.marketsense.R;
 
@@ -17,6 +19,11 @@ import java.util.List;
 
 public class SettingAdapter extends BaseAdapter {
 
+    public interface SettingOnClickListener {
+        void onLoginBtnClick();
+        void onSwitchClick(boolean isChecked);
+    }
+
     private WeakReference<Activity> mActivity;
     private List<String> mStringData;
     private List<Integer> mDrawableIdData;
@@ -25,10 +32,16 @@ public class SettingAdapter extends BaseAdapter {
     private static final int TYPE_OTHER = 1;
     private static final int TYPE_MAX_COUNT = TYPE_OTHER + 1;
 
+    private SettingOnClickListener mLoginOnClickListener;
+
     public SettingAdapter(Activity activity, List<String> titleList, List<Integer> idList) {
         mActivity = new WeakReference<Activity>(activity);
         mStringData = titleList;
         mDrawableIdData = idList;
+    }
+
+    public void setSettingOnClickListener(SettingOnClickListener listener) {
+        mLoginOnClickListener = listener;
     }
 
     @Override
@@ -66,6 +79,15 @@ public class SettingAdapter extends BaseAdapter {
                 case TYPE_USER:
                     convertView = LayoutInflater.from(mActivity.get())
                             .inflate(R.layout.setting_list_item_user, viewGroup, false);
+                    Button loginBtn = convertView.findViewById(R.id.setting_login_btn);
+                    loginBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            if(mLoginOnClickListener != null) {
+                                mLoginOnClickListener.onLoginBtnClick();
+                            }
+                        }
+                    });
                     break;
                 case TYPE_OTHER:
                     convertView = LayoutInflater.from(mActivity.get())
@@ -83,12 +105,20 @@ public class SettingAdapter extends BaseAdapter {
             if (position == 1) {
                 settingViewHolder.switchView.setVisibility(View.VISIBLE);
                 settingViewHolder.gotoView.setVisibility(View.GONE);
+                settingViewHolder.switchView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                        if(mLoginOnClickListener != null) {
+                            mLoginOnClickListener.onSwitchClick(isChecked);
+                        }
+                    }
+                });
             } else {
                 settingViewHolder.switchView.setVisibility(View.GONE);
                 settingViewHolder.gotoView.setVisibility(View.VISIBLE);
-                settingViewHolder.iconView.setImageDrawable(
-                        mActivity.get().getResources().getDrawable(getDrawableId(position)));
             }
+            settingViewHolder.iconView.setImageDrawable(
+                    mActivity.get().getResources().getDrawable(getDrawableId(position)));
         }
 
         return convertView;

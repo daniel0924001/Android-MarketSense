@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -68,6 +69,16 @@ public class SettingActivity extends AppCompatActivity {
         list2.addAll(Arrays.asList(mDrawableIds));
 
         SettingAdapter settingAdapter = new SettingAdapter(this, list, list2);
+        settingAdapter.setSettingOnClickListener(new SettingAdapter.SettingOnClickListener() {
+            @Override
+            public void onLoginBtnClick() {
+                showLoginAlertDialog();
+            }
+
+            @Override
+            public void onSwitchClick(boolean isChecked) {
+            }
+        });
         listView.setAdapter(settingAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -76,6 +87,10 @@ public class SettingActivity extends AppCompatActivity {
                 handleListClick(position);
             }
         });
+    }
+
+    private void showLoginAlertDialog() {
+        // TODO: login
     }
 
     private void handleListClick(int position) {

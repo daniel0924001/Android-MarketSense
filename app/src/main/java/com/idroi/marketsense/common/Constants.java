@@ -7,6 +7,9 @@ import com.idroi.marketsense.data.Stock;
  */
 
 public class Constants {
+
+    public static final String HTTP = "http://";
+
     public static final Stock[] HOT_STOCKS_KEYWORDS = new Stock[] {
             new Stock("2454", "聯發科"),
             new Stock("2330", "台積電"),

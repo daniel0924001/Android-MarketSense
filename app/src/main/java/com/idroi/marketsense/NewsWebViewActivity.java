@@ -32,6 +32,7 @@ import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter;
 import com.idroi.marketsense.common.FrescoImageHelper;
 import com.idroi.marketsense.data.Comment;
+import com.idroi.marketsense.data.CommentAndVote;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.request.SingleNewsRequest;
 
@@ -132,7 +133,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
 
     private void initComments() {
         TextView commentTitle = findViewById(R.id.marketsense_block_title_tv);
-        commentTitle.setText(getResources().getString(R.string.title_action));
+        commentTitle.setText(getResources().getString(R.string.title_comment));
         mCommentRecyclerView = findViewById(R.id.marketsense_webview_comment_rv);
 
         mCommentsRecyclerViewAdapter = new CommentsRecyclerViewAdapter(this);
@@ -141,8 +142,12 @@ public class NewsWebViewActivity extends AppCompatActivity {
         mCommentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mCommentsRecyclerViewAdapter.setCommentsAvailableListener(new CommentsRecyclerViewAdapter.CommentsAvailableListener() {
             @Override
-            public void onCommentsAvailable() {
-                showCommentBlock();
+            public void onCommentsAvailable(CommentAndVote commentAndVote) {
+                if(commentAndVote.getCommentSize() > 0) {
+                    showCommentBlock();
+                }
+                MSLog.d("raise number: " + commentAndVote.getRaiseNumber());
+                MSLog.d("fall number: " + commentAndVote.getFallNumber());
             }
         });
         mCommentsRecyclerViewAdapter.loadCommentsList(SingleNewsRequest.querySingleNewsUrl(mId, SingleNewsRequest.TASK.NEWS_COMMENT));

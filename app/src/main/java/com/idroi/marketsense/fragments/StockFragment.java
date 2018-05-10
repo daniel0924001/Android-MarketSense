@@ -24,6 +24,7 @@ import com.idroi.marketsense.RichEditorActivity;
 import com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.data.Comment;
+import com.idroi.marketsense.data.CommentAndVote;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.request.SingleNewsRequest;
@@ -81,8 +82,12 @@ public class StockFragment extends Fragment {
         mCommentRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mCommentsRecyclerViewAdapter.setCommentsAvailableListener(new CommentsRecyclerViewAdapter.CommentsAvailableListener() {
             @Override
-            public void onCommentsAvailable() {
-                showCommentBlock(view);
+            public void onCommentsAvailable(CommentAndVote commentAndVote) {
+                if(commentAndVote.getCommentSize() > 0) {
+                    showCommentBlock(view);
+                }
+                MSLog.d("raise number: " + commentAndVote.getRaiseNumber());
+                MSLog.d("fall number: " + commentAndVote.getFallNumber());
             }
         });
         mCommentsRecyclerViewAdapter.loadCommentsList(SingleNewsRequest.querySingleNewsUrl(mStockId, SingleNewsRequest.TASK.STOCK_COMMENT));

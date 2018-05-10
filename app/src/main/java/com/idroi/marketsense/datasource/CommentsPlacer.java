@@ -2,9 +2,9 @@ package com.idroi.marketsense.datasource;
 
 import android.app.Activity;
 
-import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.data.Comment;
+import com.idroi.marketsense.data.CommentAndVote;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,14 +17,16 @@ import java.util.Comparator;
 public class CommentsPlacer {
 
     public interface CommentsListener {
-        void onCommentsLoaded();
-        void onCommentsNoneOrFailed();
+        void onCommentsLoaded(CommentAndVote commentAndVote);
+        void onCommentsFailed();
     }
 
     private static final int RETRY_TIME_CONST = 2;
     private int mCurrentRetries = 0;
 
     private ArrayList<Comment> mCommentArrayList;
+    private int mRaiseNumber;
+    private int mFallNumber;
     private MarketSenseCommentsFetcher.MarketSenseCommentsNetworkListener mMarketSenseCommentNetworkListener;
     private CommentsListener mCommentsListener;
 
@@ -37,20 +39,20 @@ public class CommentsPlacer {
 
         mMarketSenseCommentNetworkListener = new MarketSenseCommentsFetcher.MarketSenseCommentsNetworkListener() {
             @Override
-            public void onCommentsLoad(ArrayList<Comment> commentArrayList) {
+            public void onCommentsLoad(CommentAndVote commentAndVote) {
                 if(mCommentArrayList != null) {
                     mCommentArrayList.clear();
                 }
-                mCommentArrayList = commentArrayList;
+                mCommentArrayList = commentAndVote.getCommentArray();
+                mRaiseNumber = commentAndVote.getRaiseNumber();
+                mFallNumber = commentAndVote.getFallNumber();
 
-                Collections.sort(mCommentArrayList, genComparator());
+                if(mCommentArrayList != null) {
+                    Collections.sort(mCommentArrayList, genComparator());
+                }
 
                 if(mCommentsListener != null) {
-                    if(mCommentArrayList.size() > 0) {
-                        mCommentsListener.onCommentsLoaded();
-                    } else {
-                        mCommentsListener.onCommentsNoneOrFailed();
-                    }
+                    mCommentsListener.onCommentsLoaded(commentAndVote);
                 }
             }
 
@@ -60,7 +62,7 @@ public class CommentsPlacer {
                 if(isRetry()) {
                     mMarketSenseCommentsFetcher.makeRequest(mUrl);
                 } else {
-                    mCommentsListener.onCommentsNoneOrFailed();
+                    mCommentsListener.onCommentsFailed();
                 }
             }
         };
@@ -88,6 +90,9 @@ public class CommentsPlacer {
     public void addOneComment(Comment comment) {
         if(mCommentArrayList != null) {
             mCommentArrayList.add(0, comment);
+        } else {
+            mCommentArrayList = new ArrayList<>();
+            mCommentArrayList.add(comment);
         }
     }
 
@@ -126,6 +131,14 @@ public class CommentsPlacer {
             return null;
         }
         return mCommentArrayList.get(position);
+    }
+
+    public int getRaiseNumber() {
+        return mRaiseNumber;
+    }
+
+    public int getFallNumber() {
+        return mFallNumber;
     }
 
     private Comparator<Comment> genComparator() {

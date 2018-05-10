@@ -8,6 +8,7 @@ import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.common.MarketSenseNetworkError;
 import com.idroi.marketsense.data.Comment;
+import com.idroi.marketsense.data.CommentAndVote;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,13 +20,15 @@ import java.util.ArrayList;
  * Created by daniel.hsieh on 2018/5/8.
  */
 
-public class SingleNewsRequest extends Request<ArrayList<Comment>> {
+public class SingleNewsRequest extends Request<CommentAndVote> {
 
     private static final String PARAM_STATUS = "status";
     private static final String PARAM_RESULT = "result";
     private static final String PARAM_COMMENT = "comment";
     private static final String PARAM_COMMENTS = "comments";
     private static final String PARAM_EVENT = "event";
+    private static final String PARAM_RAISE_NUMBER = "raise";
+    private static final String PARAM_FALL_NUMBER = "fall";
 
     final static int NEWS_COMMENT_ID = 1;
     final static int STOCK_COMMENT_ID = 2;
@@ -44,20 +47,20 @@ public class SingleNewsRequest extends Request<ArrayList<Comment>> {
         }
     }
 
-    private final Response.Listener<ArrayList<Comment>> mListener;
+    private final Response.Listener<CommentAndVote> mListener;
 
-    public SingleNewsRequest(int method, String url, Response.Listener<ArrayList<Comment>> listener, Response.ErrorListener errorListener) {
+    public SingleNewsRequest(int method, String url, Response.Listener<CommentAndVote> listener, Response.ErrorListener errorListener) {
         super(method, url, errorListener);
         mListener = listener;
     }
 
     @Override
-    protected Response<ArrayList<Comment>> parseNetworkResponse(NetworkResponse response) {
+    protected Response<CommentAndVote> parseNetworkResponse(NetworkResponse response) {
         try {
-            ArrayList<Comment> commentArrayList = commentsParseResponse(response.data);
-            if(commentArrayList != null) {
-                MSLog.i("Single News Request success and has comment size: " + commentArrayList.size());
-                return Response.success(commentArrayList, HttpHeaderParser.parseCacheHeaders(response));
+            CommentAndVote commentAndVote = commentsParseResponse(response.data);
+            if(commentAndVote != null) {
+                MSLog.i("Single News Request success and has comment size: " + commentAndVote.getCommentSize());
+                return Response.success(commentAndVote, HttpHeaderParser.parseCacheHeaders(response));
             } else {
                 return Response.error(new MarketSenseNetworkError(MarketSenseError.JSON_PARSED_NO_DATA));
             }
@@ -66,38 +69,41 @@ public class SingleNewsRequest extends Request<ArrayList<Comment>> {
         }
     }
 
-    private static ArrayList<Comment> commentsParseResponse(byte[] data) throws JSONException {
-        JSONArray commentsJsonArray = getCommentResult(new JSONObject(new String(data)));
+    private static CommentAndVote commentsParseResponse(byte[] data) throws JSONException {
+        CommentAndVote commentAndVote = new CommentAndVote();
+        JSONArray commentsJsonArray = getCommentResult(new JSONObject(new String(data)), commentAndVote);
 
         if(commentsJsonArray != null) {
-            ArrayList<Comment> commentArrayList = new ArrayList<>();
             for(int i = 0; i < commentsJsonArray.length(); i++) {
                 if(commentsJsonArray.getJSONObject(i).optString(PARAM_EVENT).equals(PARAM_COMMENT)) {
                     Comment comment = Comment.jsonObjectToComment(commentsJsonArray.getJSONObject(i));
                     if (comment != null) {
-                        commentArrayList.add(comment);
+                        commentAndVote.addComment(comment);
                     }
                 }
             }
-            return commentArrayList;
+            return commentAndVote;
         }
 
         return null;
     }
 
-    private static JSONArray getCommentResult(JSONObject jsonResponse) {
+    private static JSONArray getCommentResult(JSONObject jsonResponse, CommentAndVote commentAndVote) {
 
-        if(jsonResponse.optBoolean(PARAM_STATUS) &&
-                jsonResponse.optJSONObject(PARAM_RESULT) != null &&
-                jsonResponse.optJSONObject(PARAM_RESULT).optJSONArray(PARAM_COMMENTS) != null) {
-            return jsonResponse.optJSONObject(PARAM_RESULT).optJSONArray(PARAM_COMMENTS);
+        if(jsonResponse.optBoolean(PARAM_STATUS) && jsonResponse.optJSONObject(PARAM_RESULT) != null) {
+            commentAndVote.setRaiseNumber(jsonResponse.optJSONObject(PARAM_RESULT).optInt(PARAM_RAISE_NUMBER));
+            commentAndVote.setFallNumber(jsonResponse.optJSONObject(PARAM_RESULT).optInt(PARAM_FALL_NUMBER));
+            if(jsonResponse.optJSONObject(PARAM_RESULT).optJSONArray(PARAM_COMMENTS) != null) {
+                return jsonResponse.optJSONObject(PARAM_RESULT).optJSONArray(PARAM_COMMENTS);
+            } else {
+                return null;
+            }
         }
-
         return null;
     }
 
     @Override
-    protected void deliverResponse(ArrayList<Comment> response) {
+    protected void deliverResponse(CommentAndVote response) {
         mListener.onResponse(response);
     }
 

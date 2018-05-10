@@ -10,6 +10,7 @@ import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.common.MarketSenseNetworkError;
 import com.idroi.marketsense.data.Comment;
+import com.idroi.marketsense.data.CommentAndVote;
 import com.idroi.marketsense.request.SingleNewsRequest;
 import com.idroi.marketsense.util.DeviceUtils;
 
@@ -23,7 +24,7 @@ import java.util.ArrayList;
 public class MarketSenseCommentsFetcher {
 
     public interface MarketSenseCommentsNetworkListener {
-        void onCommentsLoad(final ArrayList<Comment> commentArrayList);
+        void onCommentsLoad(final CommentAndVote commentAndVote);
         void onCommentsFail(final MarketSenseError marketSenseError);
     }
 
@@ -32,7 +33,7 @@ public class MarketSenseCommentsFetcher {
 
     private static final MarketSenseCommentsNetworkListener EMPTY_NETWORK_LISTENER = new MarketSenseCommentsNetworkListener () {
         @Override
-        public void onCommentsLoad(ArrayList<Comment> commentArrayList) {
+        public void onCommentsLoad(CommentAndVote commentAndVote) {
 
         }
 
@@ -85,9 +86,9 @@ public class MarketSenseCommentsFetcher {
 
         MSLog.i("Loading comments ...: " + url);
 
-        mSingleNewsRequest = new SingleNewsRequest(Request.Method.GET, url, new Response.Listener<ArrayList<Comment>>() {
+        mSingleNewsRequest = new SingleNewsRequest(Request.Method.GET, url, new Response.Listener<CommentAndVote>() {
             @Override
-            public void onResponse(ArrayList<Comment> response) {
+            public void onResponse(CommentAndVote response) {
                 mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
                 mMarketSenseCommentsNetworkListener.onCommentsLoad(response);
             }

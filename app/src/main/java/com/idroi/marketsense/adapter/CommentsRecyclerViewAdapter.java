@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.data.Comment;
+import com.idroi.marketsense.data.CommentAndVote;
 import com.idroi.marketsense.datasource.CommentsPlacer;
 
 /**
@@ -21,7 +22,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
     }
 
     public interface CommentsAvailableListener {
-        void onCommentsAvailable();
+        void onCommentsAvailable(CommentAndVote commentAndVote);
     }
 
     private Activity mActivity;
@@ -39,9 +40,9 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
         mHandler = new Handler();
         mCommentsPlacer.setCommentsListener(new CommentsPlacer.CommentsListener() {
             @Override
-            public void onCommentsLoaded() {
+            public void onCommentsLoaded(CommentAndVote commentAndVote) {
                 if(mCommentsAvailableListener != null) {
-                    mCommentsAvailableListener.onCommentsAvailable();
+                    mCommentsAvailableListener.onCommentsAvailable(commentAndVote);
                 }
                 mHandler.post(new Runnable() {
                     @Override
@@ -52,7 +53,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
             }
 
             @Override
-            public void onCommentsNoneOrFailed() {
+            public void onCommentsFailed() {
                 MSLog.d("no comment or failed");
             }
         });

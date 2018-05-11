@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.data.PostEvent;
 
@@ -425,7 +426,7 @@ public class RichEditorActivity extends AppCompatActivity {
             View view = LayoutInflater.from(actionBar.getThemedContext())
                     .inflate(R.layout.main_action_bar, null);
 
-            ImageView imageView = view.findViewById(R.id.action_bar_avatar);
+            SimpleDraweeView imageView = view.findViewById(R.id.action_bar_avatar);
             if(imageView != null) {
                 imageView.setImageResource(R.drawable.ic_keyboard_backspace_white_24px);
                 imageView.setOnClickListener(new View.OnClickListener() {

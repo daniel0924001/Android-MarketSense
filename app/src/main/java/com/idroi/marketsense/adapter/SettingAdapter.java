@@ -33,6 +33,7 @@ public class SettingAdapter extends BaseAdapter {
     private static final int TYPE_MAX_COUNT = TYPE_OTHER + 1;
 
     private SettingOnClickListener mLoginOnClickListener;
+    private Button mLoginBtn;
 
     public SettingAdapter(Activity activity, List<String> titleList, List<Integer> idList) {
         mActivity = new WeakReference<Activity>(activity);
@@ -79,8 +80,8 @@ public class SettingAdapter extends BaseAdapter {
                 case TYPE_USER:
                     convertView = LayoutInflater.from(mActivity.get())
                             .inflate(R.layout.setting_list_item_user, viewGroup, false);
-                    Button loginBtn = convertView.findViewById(R.id.setting_login_btn);
-                    loginBtn.setOnClickListener(new View.OnClickListener() {
+                    mLoginBtn = convertView.findViewById(R.id.setting_login_btn);
+                    mLoginBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             if(mLoginOnClickListener != null) {

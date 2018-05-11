@@ -188,7 +188,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
         mMiddleRaiseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.Event.VOTE_RAISE.getEventName(), 1);
+                PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.EventVars.VOTE_RAISE, 1);
                 MSLog.e("click good in news: " + mId);
                 setRaiseDisable();
             }
@@ -198,7 +198,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 MSLog.e("click bad in news: " + mId);
-                PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.Event.VOTE_FALL.getEventName(), 1);
+                PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.EventVars.VOTE_FALL, 1);
                 setFallDisable();
             }
         });
@@ -206,7 +206,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
         mOriginalRaiseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.Event.VOTE_RAISE.getEventName(), 1);
+                PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.EventVars.VOTE_RAISE, 1);
                 MSLog.e("click good in news: " + mId);
                 setRaiseDisable();
             }
@@ -216,7 +216,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 MSLog.e("click bad in news: " + mId);
-                PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.Event.VOTE_FALL.getEventName(), 1);
+                PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.EventVars.VOTE_FALL, 1);
                 setFallDisable();
             }
         });
@@ -325,7 +325,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
             View view = LayoutInflater.from(actionBar.getThemedContext())
                     .inflate(R.layout.main_action_bar, null);
 
-            ImageView imageView = view.findViewById(R.id.action_bar_avatar);
+            SimpleDraweeView imageView = view.findViewById(R.id.action_bar_avatar);
             if(imageView != null) {
                 imageView.setImageResource(R.drawable.ic_keyboard_backspace_white_24px);
                 imageView.setOnClickListener(new View.OnClickListener() {

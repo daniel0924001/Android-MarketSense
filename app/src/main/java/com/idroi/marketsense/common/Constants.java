@@ -9,6 +9,8 @@ import com.idroi.marketsense.data.Stock;
 public class Constants {
 
     public static final String HTTP = "http://";
+    public static final String FACEBOOK_CONSTANTS = "Facebook";
+    public static final String GOOGLE_PLUS_CONSTANTS = "GooglePlus";
 
     public static final Stock[] HOT_STOCKS_KEYWORDS = new Stock[] {
             new Stock("2454", "聯發科"),

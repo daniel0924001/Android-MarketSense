@@ -85,6 +85,7 @@
 
     <string name="hello">Hello, 市覺使用者</string>
     <string name="login">登入</string>
+    <string name="logout">登出</string>
     <string name="login_facebook">以Facebook登入</string>
     <string name="login_google">以Google登入</string>
     <string name="login_page_title">登入市覺會員</string>
@@ -102,4 +103,11 @@
     <string name="insert_image_url">插入圖片</string>
     <string name="insert_ok">插入</string>
     <string name="insert_cancel">取消</string>
+
+    <string name="default_user_name">市覺投資專員</string>
+    <string name="default_user_avatar_link">
+        http://monster.infohubapp.com/monsters/ic_mon_01_b.png</string>
+
+    <string name="facebook_app_id">188627345285880</string>
+    <string name="fb_login_protocol_scheme">fb188627345285880</string>
 </resources>

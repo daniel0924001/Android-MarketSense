@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.idroi.marketsense.adapter.StockScreenSlidePagerAdapter;
 import com.idroi.marketsense.common.MarketSenseCommonNavigator;
 
@@ -95,7 +96,7 @@ public class StockActivity extends AppCompatActivity {
             View view = LayoutInflater.from(actionBar.getThemedContext())
                     .inflate(R.layout.main_action_bar, null);
 
-            ImageView imageView = view.findViewById(R.id.action_bar_avatar);
+            SimpleDraweeView imageView = view.findViewById(R.id.action_bar_avatar);
             if(imageView != null) {
                 imageView.setImageResource(R.drawable.ic_keyboard_backspace_white_24px);
                 imageView.setOnClickListener(new View.OnClickListener() {

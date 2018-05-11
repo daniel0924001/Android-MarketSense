@@ -162,7 +162,7 @@ public class StockFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 MSLog.e("click good in company: " + mStockId);
-                PostEvent.sendStockVote(getContext(), mStockId, PostEvent.Event.VOTE_RAISE.getEventName(), 1);
+                PostEvent.sendStockVote(getContext(), mStockId, PostEvent.EventVars.VOTE_RAISE, 1);
                 buttonRaise.setEnabled(false);
                 buttonRaise.setAlpha(0.5f);
                 buttonFall.setEnabled(true);
@@ -174,7 +174,7 @@ public class StockFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 MSLog.e("click bad in company: " + mStockId);
-                PostEvent.sendStockVote(getContext(), mStockId, PostEvent.Event.VOTE_FALL.getEventName(), 1);
+                PostEvent.sendStockVote(getContext(), mStockId, PostEvent.EventVars.VOTE_FALL, 1);
                 buttonRaise.setEnabled(true);
                 buttonRaise.setAlpha(1);
                 buttonFall.setEnabled(false);

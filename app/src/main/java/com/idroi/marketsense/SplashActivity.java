@@ -10,6 +10,9 @@ import android.view.Display;
 
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.ClientData;
+import com.idroi.marketsense.common.FBHelper;
+import com.idroi.marketsense.data.PostEvent;
+import com.idroi.marketsense.data.UserProfile;
 
 /**
  * Created by daniel.hsieh on 2018/4/26.
@@ -27,6 +30,15 @@ public class SplashActivity extends AppCompatActivity{
         int width = (int)Math.ceil((double)metrics.widthPixels/metrics.density);
         int height = (int)Math.ceil((double)metrics.heightPixels/metrics.density);
         clientData.setScreenSize(width, height);
+
+        if(FBHelper.checkFBLogin()) {
+            String id = clientData.getUserProfile().getUserId();
+            String password = UserProfile.generatePassword(
+                    clientData.getUserProfile().getUserId(),
+                    clientData.getUserProfile().getUserType());
+            String email = clientData.getUserProfile().getUserEmail();
+            PostEvent.sendLogin(this, id, password, email);
+        }
 
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);

@@ -19,6 +19,8 @@ import com.facebook.cache.disk.DiskCacheConfig;
 import com.facebook.common.internal.Supplier;
 import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.generic.RoundingParams;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.cache.MemoryCacheParams;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.idroi.marketsense.Logging.MSLog;
@@ -26,6 +28,8 @@ import com.idroi.marketsense.adapter.BaseScreenSlidePagerAdapter;
 import com.idroi.marketsense.adapter.ChoiceScreenSlidePagerAdapter;
 import com.idroi.marketsense.adapter.PredictScreenSlidePagerAdapter;
 import com.idroi.marketsense.adapter.NewsScreenSlidePagerAdapter;
+import com.idroi.marketsense.common.ClientData;
+import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.common.MarketSenseCommonNavigator;
 
 import net.lucode.hackware.magicindicator.MagicIndicator;
@@ -53,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
     private int mLastSelectedItemId = -1;
 
     public final static int sSearchRequestCode = 1;
+    public final static int sSettingRequestCode = 2;
+    private SimpleDraweeView mAvatarImageView;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -156,6 +162,23 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    private void setAvatarImage() {
+        if(mAvatarImageView != null) {
+            if (FBHelper.checkFBLogin()) {
+                mAvatarImageView.setImageURI(
+                        ClientData.getInstance(this).getUserProfile().getUserAvatarLink());
+                RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
+                roundingParams.setRoundAsCircle(true);
+                mAvatarImageView.getHierarchy().setRoundingParams(roundingParams);
+            } else {
+                mAvatarImageView.setImageResource(R.drawable.ic_account_circle_white_24px);
+                RoundingParams roundingParams = RoundingParams.fromCornersRadius(0);
+                roundingParams.setRoundAsCircle(false);
+                mAvatarImageView.getHierarchy().setRoundingParams(roundingParams);
+            }
+        }
+    }
+
     private void setActionBar() {
         final ActionBar actionBar = getSupportActionBar();
 
@@ -170,16 +193,17 @@ public class MainActivity extends AppCompatActivity {
                             ActionBar.LayoutParams.MATCH_PARENT));
             actionBar.setDisplayShowCustomEnabled(true);
 
-            ImageView userProfileView = view.findViewById(R.id.action_bar_avatar);
-            if(userProfileView != null) {
-                userProfileView.setOnClickListener(new View.OnClickListener() {
+            mAvatarImageView = view.findViewById(R.id.action_bar_avatar);
+            if(mAvatarImageView != null) {
+                mAvatarImageView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         Intent intent = new Intent(MainActivity.this, SettingActivity.class);
-                        startActivity(intent);
+                        startActivityForResult(intent, sSettingRequestCode);
                         overridePendingTransition(R.anim.enter, R.anim.stop);
                     }
                 });
+                setAvatarImage();
             }
 
             ImageView notificationView = view.findViewById(R.id.action_bar_notification);
@@ -262,6 +286,8 @@ public class MainActivity extends AppCompatActivity {
                 String name = data.getStringExtra(EXTRA_SELECTED_COMPANY_KEY);
                 Toast.makeText(this, "user pickup: " + name, Toast.LENGTH_SHORT).show();
             }
+        } else if(requestCode == sSettingRequestCode) {
+            setAvatarImage();
         }
     }
 

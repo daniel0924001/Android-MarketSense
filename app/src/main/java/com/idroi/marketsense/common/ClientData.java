@@ -1,6 +1,7 @@
 package com.idroi.marketsense.common;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.android.volley.Cache;
 import com.android.volley.Request;
@@ -8,6 +9,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.data.Stock;
+import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.datasource.Networking;
 import com.idroi.marketsense.request.StockRequest;
 import com.idroi.marketsense.request.StocksListRequest;
@@ -29,6 +31,8 @@ public class ClientData {
 
     private StocksListRequest mStocksListRequest;
     private int mScreenWidth, mScreenHeight;
+    @NonNull private UserProfile mUserProfile;
+    private String mUserToken;
 
     /**
      * Returns the singleton ClientMetadata object, using the context to obtain data if necessary.
@@ -67,6 +71,7 @@ public class ClientData {
 
     private ClientData(Context context) {
         mContext = context.getApplicationContext();
+        mUserProfile = new UserProfile(context, true);
 
         loadAllStocksListTask();
     }
@@ -78,6 +83,18 @@ public class ClientData {
 
     private void setAllStocksListInfo(ArrayList<Stock> stocksListInfo) {
         mAllStocksListInfo = stocksListInfo;
+    }
+
+    public void setUserToken(String token) {
+        mUserToken = token;
+    }
+
+    public String getUserToken() {
+        return mUserToken;
+    }
+
+    public UserProfile getUserProfile() {
+        return mUserProfile;
     }
 
     public int getScreenWidth() {

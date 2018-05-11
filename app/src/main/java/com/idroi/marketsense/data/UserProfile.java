@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
@@ -26,7 +27,7 @@ public class UserProfile {
     private static final String USER_TYPE = "user_type";
     private static final String USER_EMAIL = "email";
     private static final String USER_NAME = "user_name";
-    private static final String USER_TOKEN = "user_token";
+//    private static final String USER_TOKEN = "user_token";
     private static final String USER_AVATAR_LINK = "user_avatar_link";
 
     private static final String SHARE_PREF_ID_KEY = "user_profile_id";
@@ -43,8 +44,10 @@ public class UserProfile {
     private String mUserType;
     private String mUserEmail;
     private String mUserName;
-    private String mUserToken;
+//    private String mUserToken;
     private String mUserAvatarLink;
+
+    private ArrayList<String> mFavoriteStocks;
 
     public UserProfile() {
         this(null, false);
@@ -52,8 +55,13 @@ public class UserProfile {
 
     public UserProfile(Context context, boolean initUserDataFromCache) {
         if(initUserDataFromCache) {
+            mFavoriteStocks = new ArrayList<>();
             initUserData(context);
         }
+    }
+
+    public void addFavoriteStock(String code) {
+        mFavoriteStocks.add(code);
     }
 
     public void setUserId(String userId) {
@@ -72,9 +80,9 @@ public class UserProfile {
         mUserName = userName;
     }
 
-    public void setUserToken(String token) {
-        mUserToken = token;
-    }
+//    public void setUserToken(String token) {
+//        mUserToken = token;
+//    }
 
     public void setUserAvatarLink(String avatarLink) {
         mUserAvatarLink = avatarLink;
@@ -96,12 +104,16 @@ public class UserProfile {
         return mUserName;
     }
 
-    public String getUserToken() {
-        return mUserToken;
-    }
+//    public String getUserToken() {
+//        return mUserToken;
+//    }
 
     public String getUserAvatarLink() {
         return mUserAvatarLink;
+    }
+
+    public ArrayList<String> getFavoriteStocks() {
+        return new ArrayList<>(mFavoriteStocks);
     }
 
     public void updateUserData(Context context) {
@@ -150,9 +162,9 @@ public class UserProfile {
                     case USER_NAME:
                         userProfile.setUserName(jsonObject.optString(USER_NAME));
                         break;
-                    case USER_TOKEN:
-                        userProfile.setUserToken(jsonObject.optString(USER_TOKEN));
-                        break;
+//                    case USER_TOKEN:
+//                        userProfile.setUserToken(jsonObject.optString(USER_TOKEN));
+//                        break;
                     case USER_AVATAR_LINK:
                         userProfile.setUserAvatarLink(jsonObject.optString(USER_AVATAR_LINK));
                         break;

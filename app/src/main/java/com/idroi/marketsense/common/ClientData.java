@@ -13,10 +13,12 @@ import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.datasource.Networking;
 import com.idroi.marketsense.request.StockRequest;
 import com.idroi.marketsense.request.StocksListRequest;
+import com.idroi.marketsense.request.UserEventsAndCodesRequest;
 
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by daniel.hsieh on 2018/5/3.
@@ -29,10 +31,13 @@ public class ClientData {
     private Context mContext;
     private ArrayList<Stock> mAllStocksListInfo;
 
-    private StocksListRequest mStocksListRequest;
     private int mScreenWidth, mScreenHeight;
     @NonNull private UserProfile mUserProfile;
     private String mUserToken;
+
+    private static final int DEFAULT_RETRY_TIME = 3;
+    private int mLoadPreferenceRetryCounter = DEFAULT_RETRY_TIME;
+    private int mLoadAllStockListRetryCounter = DEFAULT_RETRY_TIME;
 
     /**
      * Returns the singleton ClientMetadata object, using the context to obtain data if necessary.
@@ -73,7 +78,7 @@ public class ClientData {
         mContext = context.getApplicationContext();
         mUserProfile = new UserProfile(context, true);
 
-        loadAllStocksListTask();
+        loadAllStocksListTask(true);
     }
 
     public void setScreenSize(int width, int height) {
@@ -109,28 +114,32 @@ public class ClientData {
         return mAllStocksListInfo;
     }
 
-    private void loadAllStocksListTask() {
+    private void loadAllStocksListTask(boolean shouldReadCache) {
         String url = StocksListRequest.queryStockListURL();
         MSLog.i("Loading all stocks list...: " + url);
 
-        MSLog.i("Loading all stocks list...(cache): " + url);
-        Cache cache = Networking.getRequestQueue(mContext).getCache();
-        Cache.Entry entry = cache.get(url);
-        if(entry != null) {
-            try {
-                ArrayList<Stock> stockArrayList = StocksListRequest.stockParseResponse(entry.data);
-                MSLog.i("Loading all stock list...(cache hit): " + new String(entry.data));
-                setAllStocksListInfo(stockArrayList);
-            } catch (JSONException e) {
-                MSLog.e("Loading all stocks list...(cache failed JSONException)");
+        if(shouldReadCache) {
+            MSLog.i("Loading all stocks list...(cache): " + url);
+            Cache cache = Networking.getRequestQueue(mContext).getCache();
+            Cache.Entry entry = cache.get(url);
+            if (entry != null) {
+                try {
+                    ArrayList<Stock> stockArrayList = StocksListRequest.stockParseResponse(entry.data);
+                    MSLog.i("Loading all stock list...(cache hit): " + new String(entry.data));
+                    setAllStocksListInfo(stockArrayList);
+                } catch (JSONException e) {
+                    MSLog.e("Loading all stocks list...(cache failed JSONException)");
+                }
+            } else {
+                MSLog.i("Loading all stocks list...(cache miss)");
             }
-        } else {
-            MSLog.i("Loading all stocks list...(cache miss)");
         }
 
-        mStocksListRequest = new StocksListRequest(Request.Method.GET, url, null, new Response.Listener<ArrayList<Stock>>() {
+        StocksListRequest stocksListRequest = new StocksListRequest(Request.Method.GET, url, null, new Response.Listener<ArrayList<Stock>>() {
             @Override
             public void onResponse(ArrayList<Stock> response) {
+                mLoadAllStockListRetryCounter = DEFAULT_RETRY_TIME;
+                MSLog.i("Stocks List Request success");
                 setAllStocksListInfo(response);
             }
         }, new Response.ErrorListener() {
@@ -140,9 +149,45 @@ public class ClientData {
                 if(error.networkResponse != null) {
                     MSLog.e("Stocks List Request error: " + new String(error.networkResponse.data), error);
                 }
+                if(mLoadAllStockListRetryCounter > 0) {
+                    loadAllStocksListTask(false);
+                } else {
+                    mLoadAllStockListRetryCounter = DEFAULT_RETRY_TIME;
+                }
             }
         });
 
-        Networking.getRequestQueue(mContext).add(mStocksListRequest);
+        Networking.getRequestQueue(mContext).add(stocksListRequest);
+    }
+
+    public void loadPreference() {
+        String url = UserEventsAndCodesRequest.querySelfStockList();
+        MSLog.i("Loading user preference...: " + url);
+
+        UserEventsAndCodesRequest userEventsAndCodesRequest =
+                new UserEventsAndCodesRequest(Request.Method.GET, url, new Response.Listener<Void>() {
+                    @Override
+                    public void onResponse(Void response) {
+                        mLoadPreferenceRetryCounter = DEFAULT_RETRY_TIME;
+                        MSLog.i("User Preference Request success: " +
+                                Arrays.toString(mUserProfile.getFavoriteStocks().toArray()));
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        MSLog.e("User Preference Request error: " + error.getMessage(), error);
+                        if(error.networkResponse != null) {
+                            MSLog.e("User Preference Request error: " + new String(error.networkResponse.data), error);
+                        }
+                        mLoadPreferenceRetryCounter--;
+                        if(mLoadPreferenceRetryCounter > 0) {
+                            loadPreference();
+                        } else {
+                            mLoadPreferenceRetryCounter = DEFAULT_RETRY_TIME;
+                        }
+                    }
+                });
+
+        Networking.getRequestQueue(mContext).add(userEventsAndCodesRequest);
     }
 }

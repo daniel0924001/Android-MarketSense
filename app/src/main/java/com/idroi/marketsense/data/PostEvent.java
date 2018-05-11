@@ -257,6 +257,8 @@ public class PostEvent {
                 String token = result.optString(RESPONSE_USER_TOKEN);
                 MSLog.d("Login success with token: " + token);
                 ClientData.getInstance().setUserToken(token);
+
+                ClientData.getInstance().loadPreference();
             }
         }
     }

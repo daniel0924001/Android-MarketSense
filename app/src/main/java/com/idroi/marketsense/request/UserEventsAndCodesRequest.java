@@ -55,7 +55,10 @@ public class UserEventsAndCodesRequest extends Request<Void> {
         if(jsonResponse.optBoolean(PARAM_STATUS) &&
                 jsonResponse.optJSONObject(PARAM_RESULT) != null &&
                 jsonResponse.optJSONObject(PARAM_RESULT).optJSONArray(PARAM_STOCK_CODES) != null) {
+
             ClientData clientData = ClientData.getInstance();
+            clientData.getUserProfile().clearFavoriteStock();
+
             JSONArray codesJsonArray = jsonResponse.optJSONObject(PARAM_RESULT).optJSONArray(PARAM_STOCK_CODES);
             for(int i = 0; i < codesJsonArray.length(); i++) {
                 if(codesJsonArray.optJSONObject(i) != null) {

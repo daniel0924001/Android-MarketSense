@@ -60,6 +60,10 @@ public class UserProfile {
         }
     }
 
+    public void clearFavoriteStock() {
+        mFavoriteStocks.clear();
+    }
+
     public void addFavoriteStock(String code) {
         mFavoriteStocks.add(code);
     }

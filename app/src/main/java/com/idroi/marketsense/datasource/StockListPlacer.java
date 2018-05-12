@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 
 import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.Constants;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.data.Stock;
+import com.idroi.marketsense.data.UserProfile;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,16 +52,34 @@ public class StockListPlacer {
                 if(mStockArrayList != null) {
                     mStockArrayList.clear();
                 }
-                mStockArrayList = new ArrayList<>(stockArrayList);
 
-                // There are four fragments in PredictionScreenSlidePagerAdapter
-                // 1st: sort by prediction confidence in descending
-                // 2nd: sort by prediction confidence in ascending
-                // 3rd: sort by stock difference in descending
-                // 4th: sort by stock difference in ascending
-                Comparator<Stock> comparator = genComparator(mTask);
-                if (comparator != null) {
-                    Collections.sort(mStockArrayList, comparator);
+                if(mTask == SELF_CHOICES_ID) {
+
+                    ArrayList<Stock> cloneStockArrayList = new ArrayList<>(stockArrayList);
+
+                    mStockArrayList = new ArrayList<>();
+                    UserProfile userProfile = ClientData.getInstance().getUserProfile();
+                    MSLog.d("favorite stocks: " + userProfile.getFavoriteStocksString());
+                    for(int i = 0; i < cloneStockArrayList.size(); i++) {
+                        Stock stock = cloneStockArrayList.get(i);
+                        String code = cloneStockArrayList.get(i).getCode();
+                        if(userProfile.isFavoriteStock(code)) {
+                            mStockArrayList.add(stock);
+                        }
+                    }
+                } else {
+                    mStockArrayList = new ArrayList<>(stockArrayList);
+
+                    // There are four fragments in PredictionScreenSlidePagerAdapter
+                    // 1st: sort by prediction confidence in descending
+                    // 2nd: sort by prediction confidence in ascending
+                    // 3rd: sort by stock difference in descending
+                    // 4th: sort by stock difference in ascending
+                    // 5th: filter by user favorite stock array
+                    Comparator<Stock> comparator = genComparator(mTask);
+                    if (comparator != null) {
+                        Collections.sort(mStockArrayList, comparator);
+                    }
                 }
 
                 if(mStockListListener != null) {

@@ -1,6 +1,7 @@
 package com.idroi.marketsense.fragments;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,11 +12,16 @@ import android.view.ViewGroup;
 
 import com.ethanhua.skeleton.RecyclerViewSkeletonScreen;
 import com.ethanhua.skeleton.Skeleton;
+import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.StockActivity;
 import com.idroi.marketsense.adapter.StockListRecyclerAdapter;
+import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.data.Stock;
+import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.StockRequest;
+
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 
 /**
  * Created by daniel.hsieh on 2018/4/23.
@@ -24,7 +30,6 @@ import com.idroi.marketsense.request.StockRequest;
 public class StockListFragment extends Fragment {
 
     public final static String TASK_NAME = "TASK_NAME";
-    public final static String CONCEPT_NAME = "CONCEPT";
     public final static int PREDICT_WIN_ID = 1;
     public final static int PREDICT_LOSE_ID = 2;
     public final static int ACTUAL_WIN_ID = 3;
@@ -53,12 +58,18 @@ public class StockListFragment extends Fragment {
     private RecyclerViewSkeletonScreen mSkeletonScreen;
     private int mTaskId;
 
+    private UserProfile.UserProfileChangeListener mUserProfileChangeListener;
+
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
-        mTaskId = getArguments().getInt(TASK_NAME);
+        if(getArguments() != null) {
+            mTaskId = getArguments().getInt(TASK_NAME);
+        } else {
+            mTaskId = PREDICT_WIN_ID; // default
+        }
 
         final View view = inflater.inflate(R.layout.stock_list_fragment, container, false);
         mRecyclerView = view.findViewById(R.id.stock_recycler_view);
@@ -74,11 +85,25 @@ public class StockListFragment extends Fragment {
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+        if(mTaskId == SELF_CHOICES_ID) {
+            mUserProfileChangeListener = new UserProfile.UserProfileChangeListener() {
+                @Override
+                public void onUserProfileChange(int notifyId) {
+                    if(notifyId == NOTIFY_ID_FAVORITE_LIST) {
+                        MSLog.d("onUserProfileChange!!!");
+                        mStockListRecyclerAdapter.loadStockList(generateURL());
+                    }
+                }
+            };
+            ClientData.getInstance().getUserProfile()
+                    .addUserProfileChangeListener(mUserProfileChangeListener);
+        }
+
         return view;
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         mStockListRecyclerAdapter.setStockListAvailableListener(new StockListRecyclerAdapter.StockListAvailableListener() {
@@ -96,32 +121,24 @@ public class StockListFragment extends Fragment {
             public void onItemClick(Stock stock) {
                 startActivity(StockActivity.generateStockActivityIntent(
                         getContext(), stock.getName(), stock.getCode()));
-                getActivity().overridePendingTransition(R.anim.enter, R.anim.stop);
+                if(getActivity() != null) {
+                    getActivity().overridePendingTransition(R.anim.enter, R.anim.stop);
+                }
             }
         });
     }
 
     public String generateURL() {
-        if(getArguments() == null) {
-            return StockRequest.queryStockList();
-        }
-
-        switch (mTaskId) {
-            case PREDICT_WIN_ID:
-            case PREDICT_LOSE_ID:
-            case ACTUAL_WIN_ID:
-            case ACTUAL_LOSE_ID:
-                return StockRequest.queryStockList();
-            case SELF_CHOICES_ID:
-                return "marketsense://stock_favorite";
-            default:
-                return StockRequest.queryStockList();
-        }
+        return StockRequest.queryStockList();
     }
 
     @Override
     public void onDestroyView() {
         mStockListRecyclerAdapter.destroy();
+        if(mTaskId == SELF_CHOICES_ID) {
+            ClientData.getInstance().getUserProfile()
+                    .deleteUserProfileChangeListener(mUserProfileChangeListener);
+        }
         super.onDestroyView();
     }
 }

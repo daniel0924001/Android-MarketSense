@@ -2,7 +2,7 @@ package com.idroi.marketsense.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
+import android.support.annotation.Nullable;
 
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.R;
@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -21,13 +22,18 @@ import java.util.Iterator;
 
 public class UserProfile {
 
+    public static final int NOTIFY_ID_FAVORITE_LIST = 1;
+
+    public interface UserProfileChangeListener {
+        void onUserProfileChange(int notifyId);
+    }
+
     private static final String USER_PROFILE_SHARE_PREFERENCE = "user_profile";
 
     private static final String USER_ID = "user_id";
     private static final String USER_TYPE = "user_type";
     private static final String USER_EMAIL = "email";
     private static final String USER_NAME = "user_name";
-//    private static final String USER_TOKEN = "user_token";
     private static final String USER_AVATAR_LINK = "user_avatar_link";
 
     private static final String SHARE_PREF_ID_KEY = "user_profile_id";
@@ -44,28 +50,27 @@ public class UserProfile {
     private String mUserType;
     private String mUserEmail;
     private String mUserName;
-//    private String mUserToken;
     private String mUserAvatarLink;
 
-    private ArrayList<String> mFavoriteStocks;
+    private ArrayList<UserProfileChangeListener> mUserProfileChangeListeners;
 
-    public UserProfile() {
+    @Nullable private ArrayList<String> mFavoriteStocks;
+
+    private UserProfile() {
         this(null, false);
     }
 
     public UserProfile(Context context, boolean initUserDataFromCache) {
+        mUserProfileChangeListeners = new ArrayList<>();
         if(initUserDataFromCache) {
-            mFavoriteStocks = new ArrayList<>();
+            mFavoriteStocks = new ArrayList<String>(){
+                @Override
+                public String toString() {
+                    return Arrays.toString(this.toArray());
+                }
+            };
             initUserData(context);
         }
-    }
-
-    public void clearFavoriteStock() {
-        mFavoriteStocks.clear();
-    }
-
-    public void addFavoriteStock(String code) {
-        mFavoriteStocks.add(code);
     }
 
     public void setUserId(String userId) {
@@ -84,12 +89,22 @@ public class UserProfile {
         mUserName = userName;
     }
 
-//    public void setUserToken(String token) {
-//        mUserToken = token;
-//    }
-
     public void setUserAvatarLink(String avatarLink) {
         mUserAvatarLink = avatarLink;
+    }
+
+    public void addUserProfileChangeListener(UserProfileChangeListener listener) {
+        mUserProfileChangeListeners.add(listener);
+    }
+
+    public void deleteUserProfileChangeListener(UserProfileChangeListener listener) {
+        mUserProfileChangeListeners.remove(listener);
+    }
+
+    public void notifyUserProfile(int notifyId) {
+        for(int i = 0; i < mUserProfileChangeListeners.size(); i++) {
+            mUserProfileChangeListeners.get(i).onUserProfileChange(notifyId);
+        }
     }
 
     public String getUserId() {
@@ -116,9 +131,32 @@ public class UserProfile {
         return mUserAvatarLink;
     }
 
-    public ArrayList<String> getFavoriteStocks() {
-        return new ArrayList<>(mFavoriteStocks);
+    /* favorite stock list */
+    public void clearFavoriteStock() {
+        if(mFavoriteStocks != null) {
+            mFavoriteStocks.clear();
+        }
     }
+
+    public void addFavoriteStock(String code) {
+        if(mFavoriteStocks != null) {
+            mFavoriteStocks.add(code);
+        }
+    }
+
+    @Nullable
+    public String getFavoriteStocksString() {
+        if(mFavoriteStocks != null) {
+            return mFavoriteStocks.toString();
+        } else {
+            return null;
+        }
+    }
+
+    public boolean isFavoriteStock(String code) {
+        return mFavoriteStocks != null && mFavoriteStocks.contains(code);
+    }
+    /* end of favorite stock list */
 
     public void updateUserData(Context context) {
         MSLog.d(String.format("update user data to share preference: %s %s %s %s %s",
@@ -147,7 +185,7 @@ public class UserProfile {
                 mUserId, mUserName, mUserEmail, mUserAvatarLink));
     }
 
-    public static UserProfile jsonObjectToUserProfile(JSONObject jsonObject) {
+    static UserProfile jsonObjectToUserProfile(JSONObject jsonObject) {
         UserProfile userProfile = new UserProfile();
         Iterator<String> iterator = jsonObject.keys();
         while (iterator.hasNext()) {
@@ -166,9 +204,6 @@ public class UserProfile {
                     case USER_NAME:
                         userProfile.setUserName(jsonObject.optString(USER_NAME));
                         break;
-//                    case USER_TOKEN:
-//                        userProfile.setUserToken(jsonObject.optString(USER_TOKEN));
-//                        break;
                     case USER_AVATAR_LINK:
                         userProfile.setUserAvatarLink(jsonObject.optString(USER_AVATAR_LINK));
                         break;

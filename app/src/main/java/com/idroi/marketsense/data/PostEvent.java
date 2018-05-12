@@ -13,6 +13,8 @@ import com.idroi.marketsense.datasource.Networking;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.idroi.marketsense.data.PostEvent.Event.FAVORITE_STOCK_ADD;
+
 /**
  * Created by daniel.hsieh on 2018/5/7.
  */
@@ -23,7 +25,8 @@ public class PostEvent {
         REGISTER("register", POST_TYPE_REGISTER),
         LOGIN("login", POST_TYPE_LOGIN),
         VOTING("voting", POST_TYPE_EVENT),
-        COMMENT("comment", POST_TYPE_EVENT);
+        COMMENT("comment", POST_TYPE_EVENT),
+        FAVORITE_STOCK_ADD("favorite_stock_add", POST_TYPE_ADD_FAVORITE);
 
         private String mEvent;
         private int mPostType;
@@ -60,6 +63,7 @@ public class PostEvent {
     private static final String EVENT_POST_URL = "http://apiv2.infohubapp.com/v1/stock/user/event";
     private static final String LOGIN_POST_URL = "http://apiv2.infohubapp.com/v1/stock/user/login";
     private static final String REGISTER_POST_URL = "http://apiv2.infohubapp.com/v1/stock/user/register";
+    private static final String FAVORITE_STOCKS_POST_URL = "http://apiv2.infohubapp.com/v1/stock/user/stock_code";
 
     private static final String POST_FIELD_USER_ID = "user_id";
     private static final String POST_FIELD_EVENT = "event";
@@ -75,6 +79,8 @@ public class PostEvent {
     private static final String POST_FIELD_EMAIL = "email";
     private static final String POST_FIELD_USER_AVATAR_LINK = "user_avatar_link";
 
+    private static final String POST_FIELD_STOCK_CODE = "stock_code";
+
     private static final String RESPONSE_STATUS = "status";
     private static final String RESPONSE_RESULT = "result";
     private static final String RESPONSE_USER_TOKEN = "user_token";
@@ -83,6 +89,7 @@ public class PostEvent {
     private static final int POST_TYPE_EVENT = 1;
     private static final int POST_TYPE_REGISTER = 2;
     private static final int POST_TYPE_LOGIN = 3;
+    private static final int POST_TYPE_ADD_FAVORITE = 4;
 
     private static final String NEWS_CONST = "news";
     private static final String STOCK_CONST = "stock";
@@ -105,6 +112,9 @@ public class PostEvent {
     private String mUserPassword;
     private String mUserEmail;
     private String mUserAvatarLink;
+
+    // POST_TYPE_ADD_FAVORITE
+    private String mStockCode;
 
     private PostEvent(String userId, Event event) {
         mUserId = userId;
@@ -167,6 +177,11 @@ public class PostEvent {
         return this;
     }
 
+    private PostEvent setStockCode(String code) {
+        mStockCode = code;
+        return this;
+    }
+
     private void send(Context context) {
         JSONObject postJsonObject = new JSONObject();
         String postUrl = null;
@@ -196,6 +211,11 @@ public class PostEvent {
                     postJsonObject.putOpt(POST_FIELD_EMAIL, mUserEmail);
                     postJsonObject.putOpt(POST_FIELD_USER_AVATAR_LINK, mUserAvatarLink);
                     postUrl = REGISTER_POST_URL;
+                    break;
+                case POST_TYPE_ADD_FAVORITE:
+                    postJsonObject.put(POST_FIELD_USER_ID, mUserId);
+                    postJsonObject.put(POST_FIELD_STOCK_CODE, mStockCode);
+                    postUrl = FAVORITE_STOCKS_POST_URL;
                     break;
                 default:
                     MSLog.e("Unknown post type");
@@ -320,6 +340,13 @@ public class PostEvent {
         new PostEvent(userId, Event.LOGIN)
                 .setUserPassword(userPassword)
                 .setUserEmail(userEmail)
+                .send(context);
+    }
+
+    public static void sendFavoriteStocksAdd(Context context, String code) {
+        ClientData clientData = ClientData.getInstance(context);
+        new PostEvent(clientData.getUserProfile().getUserId(), FAVORITE_STOCK_ADD)
+                .setStockCode(code)
                 .send(context);
     }
 }

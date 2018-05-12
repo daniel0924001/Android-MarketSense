@@ -20,7 +20,7 @@ public class ChoiceScreenSlidePagerAdapter extends BaseScreenSlidePagerAdapter {
     public ChoiceScreenSlidePagerAdapter(Context context, FragmentManager fm) {
         super(context, fm, new String[] {
                 context.getResources().getString(R.string.title_choices_list),
-                context.getResources().getString(R.string.title_choices_news)
+//                context.getResources().getString(R.string.title_choices_news)
         });
     }
 

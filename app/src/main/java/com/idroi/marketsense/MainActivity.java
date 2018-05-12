@@ -31,11 +31,15 @@ import com.idroi.marketsense.adapter.NewsScreenSlidePagerAdapter;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.common.MarketSenseCommonNavigator;
+import com.idroi.marketsense.data.PostEvent;
+import com.idroi.marketsense.data.UserProfile;
 
 import net.lucode.hackware.magicindicator.MagicIndicator;
 import net.lucode.hackware.magicindicator.ViewPagerHelper;
 
-import static com.idroi.marketsense.SearchAndResponseActivity.EXTRA_SELECTED_COMPANY_KEY;
+import static com.idroi.marketsense.SearchAndResponseActivity.EXTRA_SELECTED_COMPANY_CODE_KEY;
+import static com.idroi.marketsense.SearchAndResponseActivity.EXTRA_SELECTED_COMPANY_NAME_KEY;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -283,8 +287,10 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == sSearchRequestCode) {
             if(resultCode == RESULT_OK) {
-                String name = data.getStringExtra(EXTRA_SELECTED_COMPANY_KEY);
-                Toast.makeText(this, "user pickup: " + name, Toast.LENGTH_SHORT).show();
+                String name = data.getStringExtra(EXTRA_SELECTED_COMPANY_NAME_KEY);
+                String code = data.getStringExtra(EXTRA_SELECTED_COMPANY_CODE_KEY);
+                MSLog.d("select favorite stock name: " + name + ", code: " + code);
+                addFavoriteStock(code);
             }
         } else if(requestCode == sSettingRequestCode) {
             setAvatarImage();
@@ -301,5 +307,12 @@ public class MainActivity extends AppCompatActivity {
             mMagicIndicator.setNavigator(null);
             mMagicIndicator = null;
         }
+    }
+
+    private void addFavoriteStock(String code) {
+        PostEvent.sendFavoriteStocksAdd(this, code);
+        UserProfile userProfile = ClientData.getInstance(this).getUserProfile();
+        userProfile.addFavoriteStock(code);
+        userProfile.notifyUserProfile(NOTIFY_ID_FAVORITE_LIST);
     }
 }

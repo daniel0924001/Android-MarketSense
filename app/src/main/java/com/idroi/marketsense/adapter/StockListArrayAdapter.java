@@ -33,9 +33,6 @@ public class StockListArrayAdapter extends ArrayAdapter<Stock> {
     public StockListArrayAdapter(Context context, int resource, List<Stock> stockList) {
         super(context, resource, stockList);
         mContext = context;
-        for(Stock stock : stockList) {
-            MSLog.d("StockListArrayAdapter list: " + stock.getName() + ", " + stock.getCode());
-        }
         mStockList = new ArrayList<>(stockList);
         mStockListAll = new ArrayList<>(stockList);
         mLayoutResourceId = resource;

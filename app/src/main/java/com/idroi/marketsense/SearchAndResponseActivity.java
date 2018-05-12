@@ -14,6 +14,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.idroi.marketsense.Logging.MSLog;
@@ -26,7 +27,8 @@ import com.idroi.marketsense.common.ClientData;
 
 public class SearchAndResponseActivity extends AppCompatActivity {
 
-    public static final String EXTRA_SELECTED_COMPANY_KEY = "extra_selected_company";
+    public static final String EXTRA_SELECTED_COMPANY_NAME_KEY = "extra_selected_company_name";
+    public static final String EXTRA_SELECTED_COMPANY_CODE_KEY = "extra_selected_company_code";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,8 +48,24 @@ public class SearchAndResponseActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                String name = autoCompleteTextView.getText().toString();
+                String code = ClientData.getInstance().getCodeFromName(name);
+
+                if(!ClientData.getInstance().isNameAndCodeAreValid(name, code)) {
+                    code = autoCompleteTextView.getText().toString();
+                    name = ClientData.getInstance().getNameFromCode(code);
+
+                    if(!ClientData.getInstance().isNameAndCodeAreValid(name, code)) {
+                        Toast.makeText(SearchAndResponseActivity.this,
+                                R.string.choice_name_or_code_are_invalid, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+
                 Intent intent = new Intent();
-                intent.putExtra(EXTRA_SELECTED_COMPANY_KEY, autoCompleteTextView.getText().toString());
+                intent.putExtra(EXTRA_SELECTED_COMPANY_NAME_KEY, name);
+                intent.putExtra(EXTRA_SELECTED_COMPANY_CODE_KEY, code);
                 setResult(RESULT_OK, intent);
                 finish();
                 overridePendingTransition(R.anim.stop, R.anim.right_to_left);

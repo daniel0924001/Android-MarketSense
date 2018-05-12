@@ -11,7 +11,6 @@ import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.datasource.Networking;
-import com.idroi.marketsense.request.StockRequest;
 import com.idroi.marketsense.request.StocksListRequest;
 import com.idroi.marketsense.request.UserEventsAndCodesRequest;
 
@@ -114,6 +113,34 @@ public class ClientData {
         return mAllStocksListInfo;
     }
 
+    public String getCodeFromName(String name) {
+        if(mAllStocksListInfo != null) {
+            for (int i = 0; i < mAllStocksListInfo.size(); i++) {
+                Stock stock = mAllStocksListInfo.get(i);
+                if(stock.getName().equals(name)) {
+                    return stock.getCode();
+                }
+            }
+        }
+        return null;
+    }
+
+    public String getNameFromCode(String code) {
+        if(mAllStocksListInfo != null) {
+            for (int i = 0; i < mAllStocksListInfo.size(); i++) {
+                Stock stock = mAllStocksListInfo.get(i);
+                if(stock.getCode().equals(code)) {
+                    return stock.getName();
+                }
+            }
+        }
+        return null;
+    }
+
+    public boolean isNameAndCodeAreValid(String name, String code) {
+        return (name != null) && (code != null);
+    }
+
     private void loadAllStocksListTask(boolean shouldReadCache) {
         String url = StocksListRequest.queryStockListURL();
         MSLog.i("Loading all stocks list...: " + url);
@@ -170,7 +197,7 @@ public class ClientData {
                     public void onResponse(Void response) {
                         mLoadPreferenceRetryCounter = DEFAULT_RETRY_TIME;
                         MSLog.i("User Preference Request success: " +
-                                Arrays.toString(mUserProfile.getFavoriteStocks().toArray()));
+                                mUserProfile.getFavoriteStocksString());
                     }
                 }, new Response.ErrorListener() {
                     @Override

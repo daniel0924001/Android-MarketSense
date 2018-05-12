@@ -215,6 +215,7 @@ public class ClientData {
                     }
                 });
 
+        userEventsAndCodesRequest.setShouldCache(false);
         Networking.getRequestQueue(mContext).add(userEventsAndCodesRequest);
     }
 }

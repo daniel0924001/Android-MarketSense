@@ -31,6 +31,11 @@
     <string name="title_choices_news">自選新聞</string>
     <string name="title_search_hint_stock">輸入想搜尋的股票名稱或代碼</string>
     <string name="title_search_add">加入自選</string>
+    <string name="title_hint_delete">長按自選列表裡的項目可刪除你的自選個股</string>
+    <string name="title_delete">請問你要刪除以下這支股票嗎？</string>
+    <string name="message_delete">股票名稱：%s\n股票代碼：%s</string>
+    <string name="cancel">取消</string>
+    <string name="confirm">確定</string>
 
     <string name="title_comment_user_name">使用者名稱</string>
     <string name="title_comment_create_time">留言時間</string>

@@ -45,6 +45,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 
 /**
  * Created by daniel.hsieh on 2018/4/27.
@@ -229,6 +230,10 @@ public class SettingActivity extends AppCompatActivity {
                     MSLog.d("perform logout");
                     LoginManager.getInstance().logOut();
                     internalRefreshFBUi(null, null);
+
+                    UserProfile userProfile = ClientData.getInstance(SettingActivity.this).getUserProfile();
+                    userProfile.clearFavoriteStock();
+                    userProfile.notifyUserProfile(NOTIFY_ID_FAVORITE_LIST);
                 } else {
                     MSLog.d("perform login");
                     showLoginAlertDialog();

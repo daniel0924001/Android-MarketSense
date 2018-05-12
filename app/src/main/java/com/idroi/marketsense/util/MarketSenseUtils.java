@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -15,14 +17,20 @@ import static android.Manifest.permission.INTERNET;
  * Created by daniel.hsieh on 2018/4/18.
  */
 
-public class DeviceUtils {
+public class MarketSenseUtils {
+
+    private static final Handler handler = new Handler(Looper.getMainLooper());
+
+    public static void postOnUiThread(Runnable runnable) {
+        handler.post(runnable);
+    }
 
     public static boolean isNetworkAvailable(@Nullable final Context context) {
         if (context == null) {
             return false;
         }
 
-        if (!DeviceUtils.isPermissionGranted(context, INTERNET)) {
+        if (!MarketSenseUtils.isPermissionGranted(context, INTERNET)) {
             return false;
         }
 
@@ -31,7 +39,7 @@ public class DeviceUtils {
          * It's possible to not have permission to check network state but still be able
          * to access the network itself.
          */
-        if (!DeviceUtils.isPermissionGranted(context, ACCESS_NETWORK_STATE)) {
+        if (!MarketSenseUtils.isPermissionGranted(context, ACCESS_NETWORK_STATE)) {
             return true;
         }
 

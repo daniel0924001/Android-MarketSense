@@ -2,8 +2,6 @@ package com.idroi.marketsense.datasource;
 
 import android.content.Context;
 import android.os.Handler;
-import android.os.SystemClock;
-import android.util.Log;
 
 import com.android.volley.Cache;
 import com.android.volley.Request;
@@ -12,11 +10,9 @@ import com.android.volley.VolleyError;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.common.MarketSenseNetworkError;
-import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.Stock;
-import com.idroi.marketsense.request.NewsRequest;
 import com.idroi.marketsense.request.StockRequest;
-import com.idroi.marketsense.util.DeviceUtils;
+import com.idroi.marketsense.util.MarketSenseUtils;
 
 import org.json.JSONException;
 
@@ -76,7 +72,7 @@ public class MarketSenseStockFetcher {
             return;
         }
 
-        if(!DeviceUtils.isNetworkAvailable(context)) {
+        if(!MarketSenseUtils.isNetworkAvailable(context)) {
             mMarketSenseStockNetworkListener.onStockListFail(MarketSenseError.NETWORK_CONNECTION_FAILED);
             return;
         }

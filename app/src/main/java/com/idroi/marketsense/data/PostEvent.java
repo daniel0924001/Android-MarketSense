@@ -14,6 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import static com.idroi.marketsense.data.PostEvent.Event.FAVORITE_STOCK_ADD;
+import static com.idroi.marketsense.data.PostEvent.Event.FAVORITE_STOCK_DELETE;
 
 /**
  * Created by daniel.hsieh on 2018/5/7.
@@ -26,7 +27,8 @@ public class PostEvent {
         LOGIN("login", POST_TYPE_LOGIN),
         VOTING("voting", POST_TYPE_EVENT),
         COMMENT("comment", POST_TYPE_EVENT),
-        FAVORITE_STOCK_ADD("favorite_stock_add", POST_TYPE_ADD_FAVORITE);
+        FAVORITE_STOCK_ADD("favorite_stock_add", POST_TYPE_ADD_FAVORITE),
+        FAVORITE_STOCK_DELETE("favorite_stock_delete", POST_TYPE_DELETE_FAVORITE);
 
         private String mEvent;
         private int mPostType;
@@ -64,6 +66,8 @@ public class PostEvent {
     private static final String LOGIN_POST_URL = "http://apiv2.infohubapp.com/v1/stock/user/login";
     private static final String REGISTER_POST_URL = "http://apiv2.infohubapp.com/v1/stock/user/register";
     private static final String FAVORITE_STOCKS_POST_URL = "http://apiv2.infohubapp.com/v1/stock/user/stock_code";
+    private static final String FAVORITE_STOCKS_DELETE_URL = "http://apiv2.infohubapp.com/v1/stock/user/stock_code/%s/%s";
+
 
     private static final String POST_FIELD_USER_ID = "user_id";
     private static final String POST_FIELD_EVENT = "event";
@@ -90,11 +94,13 @@ public class PostEvent {
     private static final int POST_TYPE_REGISTER = 2;
     private static final int POST_TYPE_LOGIN = 3;
     private static final int POST_TYPE_ADD_FAVORITE = 4;
+    private static final int POST_TYPE_DELETE_FAVORITE = 5;
 
     private static final String NEWS_CONST = "news";
     private static final String STOCK_CONST = "stock";
 
     private int mPostType;
+    private int mMethod;
 
     // POST_TYPE_EVENT
     private String mUserId;
@@ -114,9 +120,19 @@ public class PostEvent {
     private String mUserAvatarLink;
 
     // POST_TYPE_ADD_FAVORITE
+    // POST_TYPE_DELETE_FAVORITE
     private String mStockCode;
+    private String mUserToken;
 
     private PostEvent(String userId, Event event) {
+        mMethod = Request.Method.POST;
+        mUserId = userId;
+        mEvent = event.getEventName();
+        mPostType = event.getPostType();
+    }
+
+    private PostEvent(int method, String userId, Event event) {
+        mMethod = method;
         mUserId = userId;
         mEvent = event.getEventName();
         mPostType = event.getPostType();
@@ -182,6 +198,11 @@ public class PostEvent {
         return this;
     }
 
+    private PostEvent setUserToken(String token) {
+        mUserToken = token;
+        return this;
+    }
+
     private void send(Context context) {
         JSONObject postJsonObject = new JSONObject();
         String postUrl = null;
@@ -217,14 +238,17 @@ public class PostEvent {
                     postJsonObject.put(POST_FIELD_STOCK_CODE, mStockCode);
                     postUrl = FAVORITE_STOCKS_POST_URL;
                     break;
+                case POST_TYPE_DELETE_FAVORITE:
+                    postUrl = String.format(FAVORITE_STOCKS_DELETE_URL, mStockCode, mUserToken);
+                    break;
                 default:
                     MSLog.e("Unknown post type");
                     return;
             }
 
-            MSLog.d("Post event type: " + mPostType + ", data: " + postJsonObject.toString());
+            MSLog.d("Method: " + mMethod + " event type: " + mPostType + ", data: " + postJsonObject.toString() + ", url: " + postUrl);
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                    Request.Method.POST,
+                    mMethod,
                     postUrl,
                     postJsonObject,
                     new Response.Listener<JSONObject>() {
@@ -267,10 +291,6 @@ public class PostEvent {
     }
 
     private void processLogin(JSONObject jsonObject) {
-        //  {"status":true,"result":{
-        //      "user_id":"1971301159549364","user_type":"Facebook",
-        //      "email":"r02944011@ntu.edu.tw","password":"db102ca1a2440ab5db2eb4bcf222f",
-        //      "user_name":"謝朋儒","user_token":"2c230f2098e3cd07638e565ebc7d5ea9","user_avatar_link":"","events":null,"stock_codes":null}}
         if(jsonObject.optBoolean(RESPONSE_STATUS, false)) {
             JSONObject result = jsonObject.optJSONObject(RESPONSE_RESULT);
             if(result != null) {
@@ -347,6 +367,14 @@ public class PostEvent {
         ClientData clientData = ClientData.getInstance(context);
         new PostEvent(clientData.getUserProfile().getUserId(), FAVORITE_STOCK_ADD)
                 .setStockCode(code)
+                .send(context);
+    }
+
+    public static void sendFavoriteStocksDelete(Context context, String code) {
+        ClientData clientData = ClientData.getInstance(context);
+        new PostEvent(Request.Method.DELETE, clientData.getUserProfile().getUserId(), FAVORITE_STOCK_DELETE)
+                .setStockCode(code)
+                .setUserToken(clientData.getUserToken())
                 .send(context);
     }
 }

@@ -9,13 +9,11 @@ import com.android.volley.VolleyError;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.common.MarketSenseNetworkError;
-import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
 import com.idroi.marketsense.request.SingleNewsRequest;
-import com.idroi.marketsense.util.DeviceUtils;
+import com.idroi.marketsense.util.MarketSenseUtils;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 
 /**
  * Created by daniel.hsieh on 2018/5/8.
@@ -70,7 +68,7 @@ public class MarketSenseCommentsFetcher {
             return;
         }
 
-        if(!DeviceUtils.isNetworkAvailable(context)) {
+        if(!MarketSenseUtils.isNetworkAvailable(context)) {
             mMarketSenseCommentsNetworkListener.onCommentsFail(MarketSenseError.NETWORK_CONNECTION_FAILED);
             return;
         }

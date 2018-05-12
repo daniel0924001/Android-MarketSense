@@ -100,7 +100,6 @@ public class Comment {
         if(mUserProfile != null) {
             return mUserProfile.getUserName();
         } else {
-            // TODO: this should be the login user name
             return "使用者";
         }
     }
@@ -109,7 +108,6 @@ public class Comment {
         if(mUserProfile != null) {
             return mUserProfile.getUserAvatarLink();
         } else {
-            // TODO: this should be the login user name
             return null;
         }
     }

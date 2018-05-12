@@ -2,6 +2,7 @@ package com.idroi.marketsense.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.idroi.marketsense.Logging.MSLog;
@@ -55,6 +56,7 @@ public class UserProfile {
     private ArrayList<UserProfileChangeListener> mUserProfileChangeListeners;
 
     @Nullable private ArrayList<String> mFavoriteStocks;
+    @Nullable private ArrayList<Event> mEventsArrayList;
 
     private UserProfile() {
         this(null, false);
@@ -69,6 +71,7 @@ public class UserProfile {
                     return Arrays.toString(this.toArray());
                 }
             };
+            mEventsArrayList = new ArrayList<>();
             initUserData(context);
         }
     }
@@ -144,12 +147,24 @@ public class UserProfile {
         }
     }
 
+    public void deleteFavoriteStock(String code) {
+        if(mFavoriteStocks != null) {
+            mFavoriteStocks.remove(code);
+        }
+    }
+
     @Nullable
     public String getFavoriteStocksString() {
         if(mFavoriteStocks != null) {
             return mFavoriteStocks.toString();
         } else {
             return null;
+        }
+    }
+
+    public void addEvent(Event event) {
+        if(mEventsArrayList != null) {
+            mEventsArrayList.add(event);
         }
     }
 

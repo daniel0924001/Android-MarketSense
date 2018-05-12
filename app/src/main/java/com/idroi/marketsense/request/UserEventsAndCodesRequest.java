@@ -8,10 +8,14 @@ import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.common.MarketSenseNetworkError;
+import com.idroi.marketsense.data.Event;
+import com.idroi.marketsense.util.MarketSenseUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 
 /**
  * Created by daniel.hsieh on 2018/5/11.
@@ -21,6 +25,9 @@ public class UserEventsAndCodesRequest extends Request<Void> {
 
     private static final String PARAM_STATUS = "status";
     private static final String PARAM_RESULT = "result";
+
+    private static final String PARAM_EVENTS = "events";
+
     private static final String PARAM_STOCK_CODES = "stock_codes";
     private static final String PARAM_STOCK_CODE = "stock_code";
 
@@ -35,8 +42,8 @@ public class UserEventsAndCodesRequest extends Request<Void> {
     protected Response<Void> parseNetworkResponse(NetworkResponse response) {
 
         try {
-            boolean stocksSuccess = setFavoriteStockCodes(new JSONObject(new String(response.data)));
-            if(stocksSuccess) {
+            boolean setPreferenceSuccess = setUserEventAndCodes(new JSONObject(new String(response.data)));
+            if(setPreferenceSuccess) {
                 return Response.success(null, HttpHeaderParser.parseCacheHeaders(response));
             } else {
                 return Response.error(new MarketSenseNetworkError(MarketSenseError.JSON_PARSED_NO_DATA));
@@ -51,14 +58,15 @@ public class UserEventsAndCodesRequest extends Request<Void> {
         mListener.onResponse(response);
     }
 
-    private static boolean setFavoriteStockCodes(JSONObject jsonResponse) {
+    private static boolean setUserEventAndCodes(JSONObject jsonResponse) {
         if(jsonResponse.optBoolean(PARAM_STATUS) &&
                 jsonResponse.optJSONObject(PARAM_RESULT) != null &&
                 jsonResponse.optJSONObject(PARAM_RESULT).optJSONArray(PARAM_STOCK_CODES) != null) {
 
-            ClientData clientData = ClientData.getInstance();
+            final ClientData clientData = ClientData.getInstance();
             clientData.getUserProfile().clearFavoriteStock();
 
+            // favorite stock list
             JSONArray codesJsonArray = jsonResponse.optJSONObject(PARAM_RESULT).optJSONArray(PARAM_STOCK_CODES);
             for(int i = 0; i < codesJsonArray.length(); i++) {
                 if(codesJsonArray.optJSONObject(i) != null) {
@@ -67,6 +75,23 @@ public class UserEventsAndCodesRequest extends Request<Void> {
                         MSLog.d("add favorite code: " + code);
                         clientData.getUserProfile().addFavoriteStock(code);
                     }
+                }
+            }
+
+            MarketSenseUtils.postOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    clientData.getUserProfile().notifyUserProfile(NOTIFY_ID_FAVORITE_LIST);
+                }
+            });
+
+            // event
+            JSONArray eventsJsonArray = jsonResponse.optJSONObject(PARAM_RESULT).optJSONArray(PARAM_EVENTS);
+            for(int i = 0; i < eventsJsonArray.length(); i++) {
+                if(eventsJsonArray.optJSONObject(i) != null) {
+                    Event event = Event.JsonObjectToEvent(eventsJsonArray.optJSONObject(i));
+                    MSLog.d("event: " + event.toString());
+                    clientData.getUserProfile().addEvent(event);
                 }
             }
             return true;
@@ -78,6 +103,6 @@ public class UserEventsAndCodesRequest extends Request<Void> {
 
     public static String querySelfStockList() {
         String token = ClientData.getInstance().getUserToken();
-        return API_URL_SELF_CHOICES + token + "?timestamp=" + System.currentTimeMillis() / (300 * 1000);
+        return API_URL_SELF_CHOICES + token + "?timestamp=" + System.currentTimeMillis();
     }
 }

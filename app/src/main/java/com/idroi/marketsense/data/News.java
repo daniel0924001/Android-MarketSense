@@ -168,8 +168,6 @@ public class News {
                     default:
                         break;
                 }
-            } catch (ClassCastException e) {
-                MSLog.e(e.toString());
             } catch (Exception e) {
                 MSLog.e(e.toString());
             }

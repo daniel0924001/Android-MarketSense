@@ -23,4 +23,18 @@
         app:layout_constraintStart_toEndOf="@id/stock_search_ctv"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:textSize="14sp"
+        android:fontFamily="Roboto-Regular"
+        android:textStyle="bold"
+        android:lineSpacingExtra="4dp"
+        android:text="@string/title_hint_delete"
+        android:textColor="@color/marketsense_text_light_gray"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/stock_search_ctv"/>
+
 </android.support.constraint.ConstraintLayout>

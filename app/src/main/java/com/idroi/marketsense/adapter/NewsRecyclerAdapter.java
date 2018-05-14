@@ -178,6 +178,11 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
         return mNewsStreamPlacer.getItemCount();
     }
 
+    public void clearNews() {
+        mNewsStreamPlacer.clearNews();
+        notifyDataSetChanged();
+    }
+
     public void destroy() {
         mNewsRenderer.clear();
         mNewsStreamPlacer.clear();

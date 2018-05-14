@@ -33,7 +33,6 @@ public class NewsStreamPlacer {
     public int clearNews() {
         if(mNewsArrayList != null) {
             int size = mNewsArrayList.size();
-            MSLog.d("clear size: " + size);
             mNewsArrayList.clear();
             return size;
         }

@@ -20,6 +20,8 @@ import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.request.NewsRequest;
 import com.idroi.marketsense.util.MarketSenseUtils;
 
+import static com.idroi.marketsense.request.NewsRequest.PARAM_KEYWORD_ARRAY;
+
 /**
  * Created by daniel.hsieh on 2018/4/18.
  */
@@ -95,7 +97,14 @@ public class MarketSenseNewsFetcher {
             Cache.Entry entry = cache.get(url);
             if(entry != null) {
                 try {
-                    ArrayList<News> newsArrayList = NewsRequest.newsParseResponse(entry.data);
+
+                    ArrayList<News> newsArrayList = null;
+                    if(url.contains(PARAM_KEYWORD_ARRAY)) {
+                        newsArrayList = NewsRequest.multipleNewsParseResponse(entry.data);
+                    } else {
+                        newsArrayList = NewsRequest.newsParseResponse(entry.data);
+                    }
+
                     MSLog.i("Loading news list...(cache hit): " + new String(entry.data));
                     mMarketSenseNewsNetworkListener.onNewsLoad(newsArrayList, true);
                     // if it is cached, we do not need to do network query.

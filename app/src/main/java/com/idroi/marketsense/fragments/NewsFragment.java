@@ -15,9 +15,12 @@ import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.NewsWebViewActivity;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.adapter.NewsRecyclerAdapter;
+import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.data.News;
+import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.NewsRequest;
 
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 import static com.idroi.marketsense.request.NewsRequest.PARAM_LEVEL;
 import static com.idroi.marketsense.request.NewsRequest.PARAM_STATUS;
 
@@ -31,9 +34,13 @@ public class NewsFragment extends Fragment {
     public final static String KEYWORD_NAME = "KEYWORD_NAME";
     public final static int GENERAL_TASK_ID = 1;
     public final static int KEYWORD_TASK_ID = 2;
+    public final static int KEYWORD_ARRAY_TASK_ID = 3;
 
     public enum TASK {
-        GENERAL(GENERAL_TASK_ID), KEYWORD(KEYWORD_TASK_ID);
+        GENERAL(GENERAL_TASK_ID),
+        KEYWORD(KEYWORD_TASK_ID),
+        KEYWORD_ARRAY(KEYWORD_ARRAY_TASK_ID);
+
         int taskId;
         TASK(int id) {
             taskId = id;
@@ -48,12 +55,21 @@ public class NewsFragment extends Fragment {
     private NewsRecyclerAdapter mNewsRecyclerAdapter;
     private RecyclerViewSkeletonScreen mSkeletonScreen;
 
+    private int mTaskId;
+    private UserProfile.UserProfileChangeListener mUserProfileChangeListener;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         final View view = inflater.inflate(R.layout.news_fragment, container, false);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.news_recycler_view);
+
+        if(getArguments() != null) {
+            mTaskId = getArguments().getInt(TASK_NAME);
+        } else {
+            mTaskId = GENERAL_TASK_ID; // default
+        }
 
         mNewsRecyclerAdapter = new NewsRecyclerAdapter(getActivity());
         mRecyclerView.setAdapter(mNewsRecyclerAdapter);
@@ -72,6 +88,25 @@ public class NewsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         MSLog.i("Enter NewsFragment");
 
+        if(mTaskId == KEYWORD_ARRAY_TASK_ID) {
+            mUserProfileChangeListener = new UserProfile.UserProfileChangeListener() {
+                @Override
+                public void onUserProfileChange(int notifyId) {
+                    if(notifyId == NOTIFY_ID_FAVORITE_LIST) {
+                        String url = generateURL();
+                        MSLog.d("onUserProfileChange in NewsFragment: " + url);
+                        if(url == null) {
+                            mNewsRecyclerAdapter.clearNews();
+                        } else {
+                            mNewsRecyclerAdapter.loadNews(generateURL());
+                        }
+                    }
+                }
+            };
+            ClientData.getInstance().getUserProfile()
+                    .addUserProfileChangeListener(mUserProfileChangeListener);
+        }
+
         mNewsRecyclerAdapter.setNewsAvailableListener(new NewsRecyclerAdapter.NewsAvailableListener() {
             @Override
             public void onNewsAvailable() {
@@ -80,7 +115,11 @@ public class NewsFragment extends Fragment {
                 }
             }
         });
-        mNewsRecyclerAdapter.loadNews(generateURL());
+
+        String url = generateURL();
+        if(url != null) {
+            mNewsRecyclerAdapter.loadNews(generateURL());
+        }
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -116,14 +155,15 @@ public class NewsFragment extends Fragment {
             return null;
         }
 
-        int taskId = getArguments().getInt(TASK_NAME);
-        switch (taskId) {
+        switch (mTaskId) {
             case GENERAL_TASK_ID:
                 return NewsRequest.queryNewsURL(
                         getArguments().getString(PARAM_STATUS),
                         getArguments().getInt(PARAM_LEVEL));
             case KEYWORD_TASK_ID:
                 return NewsRequest.queryKeywordNewsURL(getArguments().getString(KEYWORD_NAME));
+            case KEYWORD_ARRAY_TASK_ID:
+                return NewsRequest.queryKeywordArrayNewsURL();
             default:
                 return null;
         }

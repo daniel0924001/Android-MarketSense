@@ -90,7 +90,7 @@ public class StockListFragment extends Fragment {
                 @Override
                 public void onUserProfileChange(int notifyId) {
                     if(notifyId == NOTIFY_ID_FAVORITE_LIST) {
-                        MSLog.d("onUserProfileChange!!!");
+                        MSLog.d("onUserProfileChange in StockListFragment: " + generateURL());
                         mStockListRecyclerAdapter.loadStockList(generateURL());
                     }
                 }

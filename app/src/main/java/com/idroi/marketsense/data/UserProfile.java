@@ -11,6 +11,7 @@ import com.idroi.marketsense.common.SharedPreferencesCompat;
 
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -162,16 +163,20 @@ public class UserProfile {
         }
     }
 
-    public void addEvent(Event event) {
-        if(mEventsArrayList != null) {
-            mEventsArrayList.add(event);
-        }
+    public ArrayList<String> getFavoriteStocks() {
+        return mFavoriteStocks;
     }
 
     public boolean isFavoriteStock(String code) {
         return mFavoriteStocks != null && mFavoriteStocks.contains(code);
     }
     /* end of favorite stock list */
+
+    public void addEvent(Event event) {
+        if(mEventsArrayList != null) {
+            mEventsArrayList.add(event);
+        }
+    }
 
     public void updateUserData(Context context) {
         MSLog.d(String.format("update user data to share preference: %s %s %s %s %s",

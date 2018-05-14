@@ -90,13 +90,15 @@ public class NewsSource {
                 mSequenceNumber++;
                 resetRetryTime();
 
-                Comparator<News> comparator = genComparator();
-                Collections.sort(newsArray, comparator);
-                for(int i = 0; i < newsArray.size(); i++) {
-                    if(!mNewsCache.contains(newsArray.get(i))) {
-                        mNewsCache.add(newsArray.get(i));
-                        moreFlag = true;
-                        mHasShowNoMore = false;
+                if(newsArray != null) {
+                    Comparator<News> comparator = genComparator();
+                    Collections.sort(newsArray, comparator);
+                    for (int i = 0; i < newsArray.size(); i++) {
+                        if (!mNewsCache.contains(newsArray.get(i))) {
+                            mNewsCache.add(newsArray.get(i));
+                            moreFlag = true;
+                            mHasShowNoMore = false;
+                        }
                     }
                 }
 

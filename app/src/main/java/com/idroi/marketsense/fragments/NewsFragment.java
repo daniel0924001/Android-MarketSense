@@ -173,6 +173,10 @@ public class NewsFragment extends Fragment {
     public void onDestroyView() {
         MSLog.i("Exit NewsFragment");
         mNewsRecyclerAdapter.destroy();
+        if(mTaskId == KEYWORD_ARRAY_TASK_ID) {
+            ClientData.getInstance().getUserProfile()
+                    .deleteUserProfileChangeListener(mUserProfileChangeListener);
+        }
         super.onDestroyView();
     }
 }

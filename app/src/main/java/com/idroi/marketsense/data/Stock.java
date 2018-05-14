@@ -132,8 +132,6 @@ public class Stock {
                     default:
                         break;
                 }
-            } catch (ClassCastException e) {
-                MSLog.e(e.toString());
             } catch (Exception e) {
                 MSLog.e(e.toString());
             }

@@ -8,13 +8,16 @@ import android.support.annotation.Nullable;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.common.SharedPreferencesCompat;
+import com.idroi.marketsense.util.DateUtils;
 
 import org.json.JSONObject;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Iterator;
 
 import static com.idroi.marketsense.data.Event.EVENT_TARGET_NEWS;
@@ -178,6 +181,31 @@ public class UserProfile {
     public void addEvent(Event event) {
         if(mEventsArrayList != null) {
             mEventsArrayList.add(event);
+        }
+    }
+
+    public String getVoteForStockEventCreatedTimestamp(String code) {
+        if(mEventsArrayList != null) {
+            for (int i = 0; i < mEventsArrayList.size(); i++) {
+                Event event = mEventsArrayList.get(i);
+                if(event.getEventTarget().equals(EVENT_TARGET_STOCK)
+                        && event.getEventContent().equals(code)) {
+                    return event.getEventCreatedTs();
+                }
+            }
+        }
+        return null;
+    }
+
+    public boolean canVoteAgain(String code) {
+        String timestamp = getVoteForStockEventCreatedTimestamp(code);
+        if(timestamp != null) {
+            Date thatDate = new Date(Long.parseLong(timestamp) * 1000);
+            Timestamp todayTs = new Timestamp(System.currentTimeMillis());
+            Date today = new Date(todayTs.getTime());
+            return DateUtils.isAfterDay(today, thatDate);
+        } else {
+            return true;
         }
     }
 

@@ -26,12 +26,15 @@ import net.lucode.hackware.magicindicator.ViewPagerHelper;
 public class StockActivity extends AppCompatActivity {
 
     public final static String EXTRA_CODE = "com.idroi.marketsense.StockActivity.extra_code";
+    public final static String EXTRA_RAISE_NUM = "com.idroi.marketsense.StockActivity.extra_raise_number";
+    public final static String EXTRA_FALL_NUM = "com.idroi.marketsense.StockActivity.extra_fall_number";
 
     private ViewPager mViewPager;
     private MagicIndicator mMagicIndicator;
 
     private String mStockName;
     private String mCode;
+    private int mRaiseNum, mFallNum;
 
     private ViewPager.OnPageChangeListener mOnPageChangeListener
             = new ViewPager.OnPageChangeListener() {
@@ -87,6 +90,8 @@ public class StockActivity extends AppCompatActivity {
     private void setInformation() {
         mStockName = getIntent().getStringExtra(Intent.EXTRA_TITLE);
         mCode = getIntent().getStringExtra(EXTRA_CODE);
+        mRaiseNum = getIntent().getIntExtra(EXTRA_RAISE_NUM, 0);
+        mFallNum = getIntent().getIntExtra(EXTRA_FALL_NUM, 0);
     }
 
     private void setActionBar() {
@@ -127,7 +132,8 @@ public class StockActivity extends AppCompatActivity {
         mViewPager = findViewById(R.id.pager);
         StockScreenSlidePagerAdapter stockScreenSlidePagerAdapter =
                 new StockScreenSlidePagerAdapter(
-                        this, getSupportFragmentManager(), mStockName, mCode);
+                        this, getSupportFragmentManager(),
+                        mStockName, mCode, mRaiseNum, mFallNum);
         mViewPager.setAdapter(stockScreenSlidePagerAdapter);
 
         mMagicIndicator = (MagicIndicator) findViewById(R.id.tabs);
@@ -153,10 +159,14 @@ public class StockActivity extends AppCompatActivity {
         }
     }
 
-    public static Intent generateStockActivityIntent(Context context, String title, String code) {
+    public static Intent generateStockActivityIntent(Context context,
+                                                     String title, String code,
+                                                     int raiseNum, int fallNum) {
         Intent intent = new Intent(context, StockActivity.class);
         intent.putExtra(Intent.EXTRA_TITLE, title);
         intent.putExtra(EXTRA_CODE, code);
+        intent.putExtra(EXTRA_RAISE_NUM, raiseNum);
+        intent.putExtra(EXTRA_FALL_NUM, fallNum);
         return intent;
     }
 }

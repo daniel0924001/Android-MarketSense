@@ -19,6 +19,8 @@ public class Stock {
     private static final String DIFF = "diff";
     private static final String PRED = "prediction";
     private static final String PRICE = "price";
+    private static final String RAISE = "raise";
+    private static final String FALL = "fall";
 
     public static final int TREND_UP = 1;
     public static final int TREND_DOWN = -1;
@@ -30,6 +32,7 @@ public class Stock {
     private int mDiffDirection = 3;
     private double mConfidence = 75;
     private int mConfidenceDirection;
+    private int mRaiseNum, mFallNum;
 
     public Stock() {
 
@@ -76,6 +79,14 @@ public class Stock {
         mConfidence = Math.abs(confidence);
     }
 
+    public void setRaiseNum(int number) {
+        mRaiseNum = number;
+    }
+
+    public void setFallNum(int number) {
+        mFallNum = number;
+    }
+
     public String getName() {
         return mName;
     }
@@ -98,6 +109,14 @@ public class Stock {
 
     public int getConfidenceDirection() {
         return mConfidenceDirection;
+    }
+
+    public int getRaiseNum() {
+        return mRaiseNum;
+    }
+
+    public int getFallNum() {
+        return mFallNum;
     }
 
     @Nullable
@@ -128,6 +147,12 @@ public class Stock {
                         }
                         stock.setDiff(value);
                         stock.setDiffDirection(value);
+                        break;
+                    case RAISE:
+                        stock.setRaiseNum(jsonObject.optInt(RAISE));
+                        break;
+                    case FALL:
+                        stock.setFallNum(jsonObject.optInt(FALL));
                         break;
                     default:
                         break;

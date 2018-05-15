@@ -13,12 +13,12 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ethanhua.skeleton.Skeleton;
 import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.NewsWebView;
-import com.idroi.marketsense.NewsWebViewActivity;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.RichEditorActivity;
 import com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter;
@@ -26,9 +26,13 @@ import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
 import com.idroi.marketsense.data.PostEvent;
-import com.idroi.marketsense.data.Stock;
+import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.SingleNewsRequest;
+import com.idroi.marketsense.util.DateUtils;
 
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Locale;
 
 import static android.app.Activity.RESULT_OK;
@@ -42,6 +46,8 @@ import static com.idroi.marketsense.RichEditorActivity.sEditorRequestCode;
 public class StockFragment extends Fragment {
 
     public final static String STOCK_CODE = "STOCK_CODE";
+    public final static String RAISE_BUNDLE = "RAISE_BUNDLE";
+    public final static String FALL_BUNDLE = "FALL_BUNDLE";
     private final static String STOCK_REAL_TIME_URL_PREFIX = "https://so.cnyes.com/JavascriptGraphic/chartstudy.aspx?country=tw&market=twreal&divwidth=%d&divheight=%d&code=%s";
 
     private NewsWebView mStockPriceRealTimeWebView;
@@ -51,12 +57,20 @@ public class StockFragment extends Fragment {
     private RecyclerView mCommentRecyclerView;
     private CommentsRecyclerViewAdapter mCommentsRecyclerViewAdapter;
 
+    private Button mButtonRaise, mButtonFall;
+    private int mVoteRaiseNum, mVoteFallNum;
+    private String mVoteRaisePercentageString, mVoteFallPercentageString;
+
+    private static final float CONST_ENABLE_ALPHA = 1.0f;
+    private static final float CONST_DISABLE_ALPHA = 0.7f;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         final View view = inflater.inflate(R.layout.stock_fragment, container, false);
 
+        setInformation();
         initRealTimeWebView(view);
         initButton(view);
         initComments(view);
@@ -72,7 +86,7 @@ public class StockFragment extends Fragment {
     private void initComments(final View view) {
         TextView actionTitle = view.findViewById(R.id.action_title).findViewById(R.id.marketsense_block_title_tv);
         TextView commentTitle = view.findViewById(R.id.comment_title).findViewById(R.id.marketsense_block_title_tv);
-        actionTitle.setText(getResources().getString(R.string.title_action));
+        actionTitle.setText(getResources().getString(R.string.title_action_seven));
         commentTitle.setText(getResources().getString(R.string.title_comment));
         mCommentRecyclerView = view.findViewById(R.id.marketsense_stock_comment_rv);
 
@@ -86,6 +100,9 @@ public class StockFragment extends Fragment {
                 if(commentAndVote.getCommentSize() > 0) {
                     showCommentBlock(view);
                 }
+                mVoteRaiseNum = commentAndVote.getRaiseNumber();
+                mVoteFallNum = commentAndVote.getFallNumber();
+                setButtonStatus();
                 MSLog.d("raise number: " + commentAndVote.getRaiseNumber());
                 MSLog.d("fall number: " + commentAndVote.getFallNumber());
             }
@@ -121,10 +138,16 @@ public class StockFragment extends Fragment {
         }
     }
 
+    private void setInformation() {
+        Bundle bundle = getArguments();
+        if(bundle != null) {
+            mStockId = bundle.getString(STOCK_CODE);
+            mVoteRaiseNum = bundle.getInt(RAISE_BUNDLE, 0);
+            mVoteFallNum = bundle.getInt(FALL_BUNDLE, 0);
+        }
+    }
+
     private void initRealTimeWebView(View view) {
-
-        mStockId = getArguments().getString(STOCK_CODE);
-
         mStockPriceRealTimeWebView = view.findViewById(R.id.stock_real_time_webview);
         mStockPriceRealTimeWebView.setVerticalScrollBarEnabled(true);
         mStockPriceRealTimeWebView.setHorizontalFadingEdgeEnabled(true);
@@ -153,32 +176,36 @@ public class StockFragment extends Fragment {
     }
 
     private void initButton(View view) {
-        final Button buttonRaise = view.findViewById(R.id.btn_say_good);
-        final Button buttonFall = view.findViewById(R.id.btn_say_bad);
+        mButtonRaise = view.findViewById(R.id.btn_say_good);
+        mButtonFall = view.findViewById(R.id.btn_say_bad);
         final Button buttonComment = view.findViewById(R.id.btn_say_comment);
         final Button buttonSendFirst = view.findViewById(R.id.btn_send_first);
 
-        buttonRaise.setOnClickListener(new View.OnClickListener() {
+        setButtonStatus();
+
+        mButtonRaise.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 MSLog.e("click good in company: " + mStockId);
+                if(getActivity() != null) {
+                    Toast.makeText(getActivity(), R.string.title_welcome_tomorrow, Toast.LENGTH_SHORT).show();
+                }
                 PostEvent.sendStockVote(getContext(), mStockId, PostEvent.EventVars.VOTE_RAISE, 1);
-                buttonRaise.setEnabled(false);
-                buttonRaise.setAlpha(0.5f);
-                buttonFall.setEnabled(true);
-                buttonFall.setAlpha(1);
+                mVoteRaiseNum += 1;
+                setButtonStatus();
             }
         });
 
-        buttonFall.setOnClickListener(new View.OnClickListener() {
+        mButtonFall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 MSLog.e("click bad in company: " + mStockId);
+                if(getActivity() != null) {
+                    Toast.makeText(getActivity(), R.string.title_welcome_tomorrow, Toast.LENGTH_SHORT).show();
+                }
                 PostEvent.sendStockVote(getContext(), mStockId, PostEvent.EventVars.VOTE_FALL, 1);
-                buttonRaise.setEnabled(true);
-                buttonRaise.setAlpha(1);
-                buttonFall.setEnabled(false);
-                buttonFall.setAlpha(0.5f);
+                mVoteFallNum += 1;
+                setButtonStatus();
             }
         });
 
@@ -201,6 +228,37 @@ public class StockFragment extends Fragment {
                 getActivity().overridePendingTransition(R.anim.enter, R.anim.stop);
             }
         });
+    }
+
+    private void setButtonStatus() {
+        if(!ClientData.getInstance(getActivity()).getUserProfile().canVoteAgain(mStockId)) {
+            mButtonRaise.setEnabled(false);
+            mButtonFall.setEnabled(false);
+
+            updateVotePercentageString();
+            mButtonRaise.setText(mVoteRaisePercentageString);
+            mButtonFall.setText(mVoteFallPercentageString);
+
+            mButtonRaise.setAlpha(CONST_DISABLE_ALPHA);
+            mButtonFall.setAlpha(CONST_DISABLE_ALPHA);
+        } else {
+            mButtonRaise.setEnabled(true);
+            mButtonFall.setEnabled(true);
+
+            mButtonRaise.setText(R.string.title_vote);
+            mButtonFall.setText(R.string.title_vote);
+
+            mButtonRaise.setAlpha(CONST_ENABLE_ALPHA);
+            mButtonFall.setAlpha(CONST_ENABLE_ALPHA);
+        }
+    }
+
+    private void updateVotePercentageString() {
+        int total = mVoteFallNum + mVoteRaiseNum;
+        mVoteRaisePercentageString =
+                String.format(Locale.US, "%d%%", (int)(((float) mVoteRaiseNum/total)*100));
+        mVoteFallPercentageString =
+                String.format(Locale.US, "%d%%", (int)(((float) mVoteFallNum/total)*100));
     }
 
 

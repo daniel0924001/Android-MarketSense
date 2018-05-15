@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,7 +20,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -159,7 +157,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
                 }
                 mVoteRaiseNum = commentAndVote.getRaiseNumber();
                 mVoteFallNum = commentAndVote.getFallNumber();
-                setButtonStatue();
+                setButtonStatus();
                 MSLog.d("raise number: " + commentAndVote.getRaiseNumber());
                 MSLog.d("fall number: " + commentAndVote.getFallNumber());
             }
@@ -199,7 +197,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
         mOriginalFallBtn = findViewById(R.id.btn_say_bad_original);
         mOriginalCommentBtn = findViewById(R.id.btn_say_comment_original);
 
-        setButtonStatue();
+        setButtonStatus();
 
         mMiddleRaiseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -207,7 +205,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
                 MSLog.e("click good in news: " + mId);
                 PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.EventVars.VOTE_RAISE, 1);
                 mVoteRaiseNum += 1;
-                setButtonStatue();
+                setButtonStatus();
             }
         });
 
@@ -217,7 +215,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
                 MSLog.e("click bad in news: " + mId);
                 PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.EventVars.VOTE_FALL, 1);
                 mVoteFallNum += 1;
-                setButtonStatue();
+                setButtonStatus();
             }
         });
 
@@ -227,7 +225,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
                 MSLog.e("click good in news: " + mId);
                 PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.EventVars.VOTE_RAISE, 1);
                 mVoteRaiseNum += 1;
-                setButtonStatue();
+                setButtonStatus();
             }
         });
 
@@ -237,7 +235,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
                 MSLog.e("click bad in news: " + mId);
                 PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.EventVars.VOTE_FALL, 1);
                 mVoteFallNum += 1;
-                setButtonStatue();
+                setButtonStatus();
             }
         });
 
@@ -297,7 +295,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
         mReadOriginalButton.setVisibility(visibility);
     }
 
-    private void setButtonStatue() {
+    private void setButtonStatus() {
         if(ClientData.getInstance(this).getUserProfile().hasVoteForNews(mId)) {
             mMiddleFallBtn.setEnabled(false);
             mMiddleRaiseBtn.setEnabled(false);

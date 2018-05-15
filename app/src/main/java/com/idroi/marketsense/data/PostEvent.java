@@ -314,12 +314,15 @@ public class PostEvent {
 
     public static void sendStockVote(Context context, String code, EventVars type, int value) {
         ClientData clientData = ClientData.getInstance(context);
-        new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.VOTING)
+        UserProfile userProfile = clientData.getUserProfile();
+        PostEvent postEvent = new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.VOTING)
                 .setEventContent(code)
                 .setEventValueInteger(value)
                 .setEventType(type.getEventVar())
                 .setEventTarget(STOCK_CONST)
                 .send(context);
+        Event event = postEvent.convertToEvent();
+        userProfile.addEvent(event);
     }
 
     public static void sendNewsVote(Context context, String newsId, EventVars type, int value) {
@@ -337,15 +340,12 @@ public class PostEvent {
 
     public static void sendStockComment(Context context, String code, String html) {
         ClientData clientData = ClientData.getInstance(context);
-        UserProfile userProfile = clientData.getUserProfile();
-        PostEvent postEvent = new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.COMMENT)
+        new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.COMMENT)
                 .setEventContent(code)
                 .setEventValueString(html)
                 .setEventType("normal")
                 .setEventTarget(STOCK_CONST)
                 .send(context);
-        Event event = postEvent.convertToEvent();
-        userProfile.addEvent(event);
     }
 
     public static void sendNewsComment(Context context, String newsId, String html) {

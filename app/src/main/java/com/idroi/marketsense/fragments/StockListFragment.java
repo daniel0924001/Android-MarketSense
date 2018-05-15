@@ -120,7 +120,8 @@ public class StockListFragment extends Fragment {
             @Override
             public void onItemClick(Stock stock) {
                 startActivity(StockActivity.generateStockActivityIntent(
-                        getContext(), stock.getName(), stock.getCode()));
+                        getContext(), stock.getName(), stock.getCode(),
+                        stock.getRaiseNum(), stock.getFallNum()));
                 if(getActivity() != null) {
                     getActivity().overridePendingTransition(R.anim.enter, R.anim.stop);
                 }

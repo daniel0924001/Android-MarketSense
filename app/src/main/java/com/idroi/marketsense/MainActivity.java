@@ -3,10 +3,8 @@ package com.idroi.marketsense;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
@@ -16,10 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -43,7 +38,6 @@ import com.idroi.marketsense.adapter.NewsScreenSlidePagerAdapter;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.common.MarketSenseCommonNavigator;
-import com.idroi.marketsense.common.MarketSenseRendererHelper;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
 
@@ -184,6 +178,12 @@ public class MainActivity extends AppCompatActivity {
 
         setActionBar();
         setViewPager();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setAvatarImage();
     }
 
     @Override
@@ -364,7 +364,7 @@ public class MainActivity extends AppCompatActivity {
         LoginManager.getInstance().registerCallback(mFBCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                MSLog.d("facebook registerCallback onSuccess");
+                MSLog.d("facebook registerCallback onSuccess in MainActivity");
                 getFBUserProfile();
             }
 

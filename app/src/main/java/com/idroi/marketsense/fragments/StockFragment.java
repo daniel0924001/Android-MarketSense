@@ -1,9 +1,11 @@
 package com.idroi.marketsense.fragments;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,27 +19,26 @@ import android.widget.Toast;
 
 import com.ethanhua.skeleton.Skeleton;
 import com.ethanhua.skeleton.ViewSkeletonScreen;
+import com.facebook.login.widget.LoginButton;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.NewsWebView;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.RichEditorActivity;
 import com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter;
 import com.idroi.marketsense.common.ClientData;
+import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.SingleNewsRequest;
-import com.idroi.marketsense.util.DateUtils;
 
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.Locale;
 
 import static android.app.Activity.RESULT_OK;
 import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_HTML;
 import static com.idroi.marketsense.RichEditorActivity.sEditorRequestCode;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_STOCK_COMMENT_CLICK;
 
 /**
  * Created by daniel.hsieh on 2018/5/6.
@@ -57,12 +58,17 @@ public class StockFragment extends Fragment {
     private RecyclerView mCommentRecyclerView;
     private CommentsRecyclerViewAdapter mCommentsRecyclerViewAdapter;
 
-    private Button mButtonRaise, mButtonFall;
+    private Button mButtonRaise, mButtonFall, mButtonComment, mButtonSendFirst;
     private int mVoteRaiseNum, mVoteFallNum;
     private String mVoteRaisePercentageString, mVoteFallPercentageString;
+    private boolean mLastClickedButtonIsComment;
 
     private static final float CONST_ENABLE_ALPHA = 1.0f;
     private static final float CONST_DISABLE_ALPHA = 0.7f;
+
+    private AlertDialog mLoginAlertDialog;
+    private LoginButton mFBLoginBtn;
+    private UserProfile.UserProfileChangeListener mUserProfileChangeListener;
 
     @Nullable
     @Override
@@ -178,56 +184,93 @@ public class StockFragment extends Fragment {
     private void initButton(View view) {
         mButtonRaise = view.findViewById(R.id.btn_say_good);
         mButtonFall = view.findViewById(R.id.btn_say_bad);
-        final Button buttonComment = view.findViewById(R.id.btn_say_comment);
-        final Button buttonSendFirst = view.findViewById(R.id.btn_send_first);
+        mButtonComment = view.findViewById(R.id.btn_say_comment);
+        mButtonSendFirst = view.findViewById(R.id.btn_send_first);
 
+        mLastClickedButtonIsComment = false;
         setButtonStatus();
 
         mButtonRaise.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MSLog.e("click good in company: " + mStockId);
-                if(getActivity() != null) {
-                    Toast.makeText(getActivity(), R.string.title_welcome_tomorrow, Toast.LENGTH_SHORT).show();
+                mLastClickedButtonIsComment = false;
+                if(FBHelper.checkFBLogin()) {
+                    MSLog.e("click good in company: " + mStockId);
+                    if (getActivity() != null) {
+                        Toast.makeText(getActivity(), R.string.title_welcome_tomorrow, Toast.LENGTH_SHORT).show();
+                    }
+                    PostEvent.sendStockVote(getContext(), mStockId, PostEvent.EventVars.VOTE_RAISE, 1);
+                    mVoteRaiseNum += 1;
+                    setButtonStatus();
+                } else {
+                    showLoginAlertDialog();
                 }
-                PostEvent.sendStockVote(getContext(), mStockId, PostEvent.EventVars.VOTE_RAISE, 1);
-                mVoteRaiseNum += 1;
-                setButtonStatus();
             }
         });
 
         mButtonFall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MSLog.e("click bad in company: " + mStockId);
-                if(getActivity() != null) {
-                    Toast.makeText(getActivity(), R.string.title_welcome_tomorrow, Toast.LENGTH_SHORT).show();
+                mLastClickedButtonIsComment = false;
+                if(FBHelper.checkFBLogin()) {
+                    MSLog.e("click bad in company: " + mStockId);
+                    if (getActivity() != null) {
+                        Toast.makeText(getActivity(), R.string.title_welcome_tomorrow, Toast.LENGTH_SHORT).show();
+                    }
+                    PostEvent.sendStockVote(getContext(), mStockId, PostEvent.EventVars.VOTE_FALL, 1);
+                    mVoteFallNum += 1;
+                    setButtonStatus();
+                } else {
+                    showLoginAlertDialog();
                 }
-                PostEvent.sendStockVote(getContext(), mStockId, PostEvent.EventVars.VOTE_FALL, 1);
-                mVoteFallNum += 1;
-                setButtonStatus();
             }
         });
 
-        buttonComment.setOnClickListener(new View.OnClickListener() {
+        mButtonComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
-                        getActivity(), RichEditorActivity.TYPE.STOCK, mStockId),
-                        sEditorRequestCode);
-                getActivity().overridePendingTransition(R.anim.enter, R.anim.stop);
+                mLastClickedButtonIsComment = true;
+                if(FBHelper.checkFBLogin()) {
+                    startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
+                            getActivity(), RichEditorActivity.TYPE.STOCK, mStockId),
+                            sEditorRequestCode);
+                    getActivity().overridePendingTransition(R.anim.enter, R.anim.stop);
+                } else {
+                    showLoginAlertDialog();
+                }
             }
         });
 
-        buttonSendFirst.setOnClickListener(new View.OnClickListener() {
+        mButtonSendFirst.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
-                        getActivity(), RichEditorActivity.TYPE.STOCK, mStockId),
-                        sEditorRequestCode);
-                getActivity().overridePendingTransition(R.anim.enter, R.anim.stop);
+                mLastClickedButtonIsComment = true;
+                if(FBHelper.checkFBLogin()) {
+                    startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
+                            getActivity(), RichEditorActivity.TYPE.STOCK, mStockId),
+                            sEditorRequestCode);
+                    getActivity().overridePendingTransition(R.anim.enter, R.anim.stop);
+                } else {
+                    showLoginAlertDialog();
+                }
             }
         });
+
+        UserProfile userProfile = ClientData.getInstance(getActivity()).getUserProfile();
+        mUserProfileChangeListener = new UserProfile.UserProfileChangeListener() {
+            @Override
+            public void onUserProfileChange(int notifyId) {
+                if(notifyId == NOTIFY_ID_STOCK_COMMENT_CLICK && mLastClickedButtonIsComment) {
+                    if(FBHelper.checkFBLogin() && getActivity() != null) {
+                        startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
+                                getActivity(), RichEditorActivity.TYPE.STOCK, mStockId),
+                                sEditorRequestCode);
+                        getActivity().overridePendingTransition(R.anim.enter, R.anim.stop);
+                    }
+                }
+            }
+        };
+        userProfile.addUserProfileChangeListener(mUserProfileChangeListener);
     }
 
     private void setButtonStatus() {
@@ -268,6 +311,41 @@ public class StockFragment extends Fragment {
             mStockPriceRealTimeWebView.destroy();
             mStockPriceRealTimeWebView = null;
         }
+        UserProfile userProfile = ClientData.getInstance(getActivity()).getUserProfile();
+        userProfile.deleteUserProfileChangeListener(mUserProfileChangeListener);
         super.onDestroy();
+    }
+
+    private void showLoginAlertDialog() {
+        if(mLoginAlertDialog != null) {
+            mLoginAlertDialog.dismiss();
+            mLoginAlertDialog = null;
+        }
+
+        if(getActivity() != null) {
+            final View alertView = LayoutInflater.from(getActivity())
+                    .inflate(R.layout.alertdialog_login, null);
+            mLoginAlertDialog = new AlertDialog.Builder(getActivity())
+                    .setView(alertView).create();
+            mLoginAlertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                @Override
+                public void onShow(DialogInterface dialogInterface) {
+                    mFBLoginBtn = alertView.findViewById(R.id.login_button);
+                    mFBLoginBtn.setReadPermissions("email");
+                    mFBLoginBtn.setReadPermissions("public_profile");
+                }
+            });
+            mLoginAlertDialog.show();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if(mLoginAlertDialog != null) {
+            mLoginAlertDialog.dismiss();
+            mLoginAlertDialog = null;
+        }
     }
 }

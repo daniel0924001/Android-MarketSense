@@ -99,6 +99,11 @@ public class RichEditorActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String html = mEditor.getHtml();
+                if(html == null) {
+                    Toast.makeText(RichEditorActivity.this,
+                            R.string.title_comment_create_null, Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if(mType.equals(TYPE.NEWS.getType())) {
                     MSLog.i("send news comment (" + mId + "): " + html);
                     PostEvent.sendNewsComment(RichEditorActivity.this, mId, html);

@@ -30,6 +30,8 @@ import static com.idroi.marketsense.data.Event.EVENT_TARGET_STOCK;
 public class UserProfile {
 
     public static final int NOTIFY_ID_FAVORITE_LIST = 1;
+    public static final int NOTIFY_ID_STOCK_COMMENT_CLICK = 2;
+    public static final int NOTIFY_ID_NEWS_COMMENT_CLICK = 3;
 
     public interface UserProfileChangeListener {
         void onUserProfileChange(int notifyId);

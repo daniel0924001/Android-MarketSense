@@ -12,12 +12,28 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.adapter.StockScreenSlidePagerAdapter;
+import com.idroi.marketsense.common.ClientData;
+import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.common.MarketSenseCommonNavigator;
+import com.idroi.marketsense.data.PostEvent;
+import com.idroi.marketsense.data.Stock;
+import com.idroi.marketsense.data.UserProfile;
 
 import net.lucode.hackware.magicindicator.MagicIndicator;
 import net.lucode.hackware.magicindicator.ViewPagerHelper;
+
+import org.json.JSONObject;
+
+import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_STOCK_COMMENT_CLICK;
 
 /**
  * Created by daniel.hsieh on 2018/4/24.
@@ -35,6 +51,8 @@ public class StockActivity extends AppCompatActivity {
     private String mStockName;
     private String mCode;
     private int mRaiseNum, mFallNum;
+
+    private CallbackManager mFBCallbackManager;
 
     private ViewPager.OnPageChangeListener mOnPageChangeListener
             = new ViewPager.OnPageChangeListener() {
@@ -70,6 +88,7 @@ public class StockActivity extends AppCompatActivity {
             return;
         }
 
+        initFBLogin();
         setInformation();
         setActionBar();
         setViewPager();
@@ -168,5 +187,51 @@ public class StockActivity extends AppCompatActivity {
         intent.putExtra(EXTRA_RAISE_NUM, raiseNum);
         intent.putExtra(EXTRA_FALL_NUM, fallNum);
         return intent;
+    }
+
+    // fb login part when the user click fab
+    private void initFBLogin() {
+
+        MSLog.d("The user has logged in Facebook: " + FBHelper.checkFBLogin());
+
+        mFBCallbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().registerCallback(mFBCallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                MSLog.d("facebook registerCallback onSuccess in StockActivity");
+                getFBUserProfile();
+            }
+
+            @Override
+            public void onCancel() {
+                MSLog.d("facebook registerCallback onCancel");
+            }
+
+            @Override
+            public void onError(FacebookException exception) {
+                MSLog.d("facebook registerCallback onError: " + exception.toString());
+            }
+        });
+    }
+
+    private void getFBUserProfile() {
+        FBHelper.getFBUserProfile(this, new FBHelper.FBHelperListener() {
+            @Override
+            public void onTaskCompleted(JSONObject data, String avatarLink) {
+                String userName = FBHelper.fetchFbData(data, UserProfile.FB_USER_NAME_KEY);
+                String userId = FBHelper.fetchFbData(data, UserProfile.FB_USER_ID_KEY);
+                String userEmail = FBHelper.fetchFbData(data, UserProfile.FB_USER_EMAIL_KEY);
+                PostEvent.sendRegister(StockActivity.this, userId, userName, FACEBOOK_CONSTANTS,
+                        UserProfile.generatePassword(userId, FACEBOOK_CONSTANTS), userEmail, avatarLink);
+                UserProfile userProfile = ClientData.getInstance(StockActivity.this).getUserProfile();
+                userProfile.notifyUserProfile(NOTIFY_ID_STOCK_COMMENT_CLICK);
+            }
+        }, true);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mFBCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 }

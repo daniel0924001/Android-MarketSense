@@ -111,7 +111,7 @@ public class SettingActivity extends AppCompatActivity {
         LoginManager.getInstance().registerCallback(mFBCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                MSLog.d("facebook registerCallback onSuccess");
+                MSLog.d("facebook registerCallback onSuccess in SettingActivity");
                 getFBUserProfile(true);
             }
 

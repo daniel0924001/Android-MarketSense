@@ -44,8 +44,13 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
 
         MarketSenseRendererHelper.addTextView(commentViewHolder.userNameView, content.getUserName());
         MarketSenseRendererHelper.addTextView(commentViewHolder.createTimeView, content.getDateString());
-        FrescoImageHelper.loadImageView(content.getAvatarUrl(),
-                commentViewHolder.avatarView, FrescoImageHelper.ICON_IMAGE_RATIO);
+        if(content.getAvatarUrl() != null) {
+            FrescoImageHelper.loadImageView(content.getAvatarUrl(),
+                    commentViewHolder.avatarView, FrescoImageHelper.ICON_IMAGE_RATIO);
+        } else {
+            FrescoImageHelper.loadImageView("http://monster.infohubapp.com/monsters/ic_mon_01_y.png",
+                    commentViewHolder.avatarView, FrescoImageHelper.ICON_IMAGE_RATIO);
+        }
 
         // chinese characters can not be decoded.
         // https://blog.csdn.net/top_code/article/details/9163597

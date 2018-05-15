@@ -30,6 +30,7 @@ import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter;
+import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FrescoImageHelper;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
@@ -37,6 +38,7 @@ import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.request.SingleNewsRequest;
 
 import java.io.ByteArrayInputStream;
+import java.util.Locale;
 
 import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_HTML;
 import static com.idroi.marketsense.RichEditorActivity.sEditorRequestCode;
@@ -57,11 +59,18 @@ public class NewsWebViewActivity extends AppCompatActivity {
     public static final String EXTRA_MIDDLE_IMAGE_URL = "EXTRA_MIDDLE_IMAGE_URL";
     public static final String EXTRA_MIDDLE_PAGE_URL = "EXTRA_MIDDLE_PAGE_URL";
     public static final String EXTRA_ORIGINAL_PAGE_URL = "EXTRA_ORIGINAL_PAGE_URL";
+    public static final String EXTRA_VOTE_RAISE_NUM = "EXTRA_VOTE_RAISE_NUM";
+    public static final String EXTRA_VOTE_FALL_NUM = "EXTRA_VOTE_FALL_NUM";
+
+    private static final float CONST_ENABLE_ALPHA = 1.0f;
+    private static final float CONST_DISABLE_ALPHA = 0.8f;
 
     private String mId, mTitle, mImageUrl, mSourceDate;
     private String mMiddlePageUrl;
     private String mOriginalPageUrl;
     private String mPageLink;
+    private int mVoteRaiseNum, mVoteFallNum;
+    private String mVoteRaisePercentageString, mVoteFallPercentageString;
 
     private View mImageMask;
     private ScrollView mUpperBlock;
@@ -129,6 +138,8 @@ public class NewsWebViewActivity extends AppCompatActivity {
         mTitle = getIntent().getStringExtra(EXTRA_MIDDLE_TITLE);
         mImageUrl = getIntent().getStringExtra(EXTRA_MIDDLE_IMAGE_URL);
         mSourceDate = getIntent().getStringExtra(EXTRA_MIDDLE_DATE);
+        mVoteRaiseNum = getIntent().getIntExtra(EXTRA_VOTE_RAISE_NUM, 0);
+        mVoteFallNum = getIntent().getIntExtra(EXTRA_VOTE_FALL_NUM, 0);
     }
 
     private void initComments() {
@@ -146,6 +157,9 @@ public class NewsWebViewActivity extends AppCompatActivity {
                 if(commentAndVote.getCommentSize() > 0) {
                     showCommentBlock();
                 }
+                mVoteRaiseNum = commentAndVote.getRaiseNumber();
+                mVoteFallNum = commentAndVote.getFallNumber();
+                setButtonStatue();
                 MSLog.d("raise number: " + commentAndVote.getRaiseNumber());
                 MSLog.d("fall number: " + commentAndVote.getFallNumber());
             }
@@ -185,12 +199,15 @@ public class NewsWebViewActivity extends AppCompatActivity {
         mOriginalFallBtn = findViewById(R.id.btn_say_bad_original);
         mOriginalCommentBtn = findViewById(R.id.btn_say_comment_original);
 
+        setButtonStatue();
+
         mMiddleRaiseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.EventVars.VOTE_RAISE, 1);
                 MSLog.e("click good in news: " + mId);
-                setRaiseDisable();
+                PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.EventVars.VOTE_RAISE, 1);
+                mVoteRaiseNum += 1;
+                setButtonStatue();
             }
         });
 
@@ -199,16 +216,18 @@ public class NewsWebViewActivity extends AppCompatActivity {
             public void onClick(View view) {
                 MSLog.e("click bad in news: " + mId);
                 PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.EventVars.VOTE_FALL, 1);
-                setFallDisable();
+                mVoteFallNum += 1;
+                setButtonStatue();
             }
         });
 
         mOriginalRaiseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.EventVars.VOTE_RAISE, 1);
                 MSLog.e("click good in news: " + mId);
-                setRaiseDisable();
+                PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.EventVars.VOTE_RAISE, 1);
+                mVoteRaiseNum += 1;
+                setButtonStatue();
             }
         });
 
@@ -217,7 +236,8 @@ public class NewsWebViewActivity extends AppCompatActivity {
             public void onClick(View view) {
                 MSLog.e("click bad in news: " + mId);
                 PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.EventVars.VOTE_FALL, 1);
-                setFallDisable();
+                mVoteFallNum += 1;
+                setButtonStatue();
             }
         });
 
@@ -277,30 +297,49 @@ public class NewsWebViewActivity extends AppCompatActivity {
         mReadOriginalButton.setVisibility(visibility);
     }
 
-    private void setRaiseDisable() {
-        mMiddleRaiseBtn.setEnabled(false);
-        mMiddleRaiseBtn.setAlpha(0.5f);
-        mMiddleFallBtn.setEnabled(true);
-        mMiddleFallBtn.setAlpha(1);
+    private void setButtonStatue() {
+        if(ClientData.getInstance(this).getUserProfile().hasVoteForNews(mId)) {
+            mMiddleFallBtn.setEnabled(false);
+            mMiddleRaiseBtn.setEnabled(false);
+            mOriginalRaiseBtn.setEnabled(false);
+            mOriginalFallBtn.setEnabled(false);
 
-        mOriginalRaiseBtn.setEnabled(false);
-        mOriginalRaiseBtn.setAlpha(0.5f);
-        mOriginalFallBtn.setEnabled(true);
-        mOriginalFallBtn.setAlpha(1);
+            updateVotePercentageString();
+            mMiddleRaiseBtn.setText(mVoteRaisePercentageString);
+            mMiddleFallBtn.setText(mVoteFallPercentageString);
+            mOriginalRaiseBtn.setText(mVoteRaisePercentageString);
+            mOriginalFallBtn.setText(mVoteFallPercentageString);
+
+            mMiddleRaiseBtn.setAlpha(CONST_DISABLE_ALPHA);
+            mMiddleFallBtn.setAlpha(CONST_DISABLE_ALPHA);
+            mOriginalRaiseBtn.setAlpha(CONST_DISABLE_ALPHA);
+            mOriginalFallBtn.setAlpha(CONST_DISABLE_ALPHA);
+
+        } else {
+            mMiddleFallBtn.setEnabled(true);
+            mMiddleRaiseBtn.setEnabled(true);
+            mOriginalRaiseBtn.setEnabled(true);
+            mOriginalFallBtn.setEnabled(true);
+
+            mMiddleRaiseBtn.setText(R.string.title_vote);
+            mMiddleFallBtn.setText(R.string.title_vote);
+            mOriginalRaiseBtn.setText(R.string.title_vote);
+            mOriginalFallBtn.setText(R.string.title_vote);
+
+            mMiddleRaiseBtn.setAlpha(CONST_ENABLE_ALPHA);
+            mMiddleFallBtn.setAlpha(CONST_ENABLE_ALPHA);
+            mOriginalRaiseBtn.setAlpha(CONST_ENABLE_ALPHA);
+            mOriginalFallBtn.setAlpha(CONST_ENABLE_ALPHA);
+        }
     }
 
-    private void setFallDisable() {
-        mMiddleRaiseBtn.setEnabled(true);
-        mMiddleRaiseBtn.setAlpha(1);
-        mMiddleFallBtn.setEnabled(false);
-        mMiddleFallBtn.setAlpha(0.5f);
-
-        mOriginalRaiseBtn.setEnabled(true);
-        mOriginalRaiseBtn.setAlpha(1);
-        mOriginalFallBtn.setEnabled(false);
-        mOriginalFallBtn.setAlpha(0.5f);
+    private void updateVotePercentageString() {
+        int total = mVoteFallNum + mVoteRaiseNum;
+        mVoteRaisePercentageString =
+                String.format(Locale.US, "%d%%", (int)(((float) mVoteRaiseNum/total)*100));
+        mVoteFallPercentageString =
+                String.format(Locale.US, "%d%%", (int)(((float) mVoteFallNum/total)*100));
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -462,7 +501,8 @@ public class NewsWebViewActivity extends AppCompatActivity {
     }
 
     public static Intent generateNewsWebViewActivityIntent(
-            Context context, String id, String title, String imageUrl, String sourceDate, String middleUrl, String originalUrl) {
+            Context context, String id, String title, String imageUrl, String sourceDate,
+            String middleUrl, String originalUrl, int voteRaiseNum, int voteFallNum) {
         Intent intent = new Intent(context, NewsWebViewActivity.class);
         intent.putExtra(EXTRA_MIDDLE_ID, id);
         intent.putExtra(EXTRA_MIDDLE_TITLE, title);
@@ -470,6 +510,8 @@ public class NewsWebViewActivity extends AppCompatActivity {
         intent.putExtra(EXTRA_MIDDLE_IMAGE_URL, imageUrl);
         intent.putExtra(EXTRA_MIDDLE_PAGE_URL, middleUrl);
         intent.putExtra(EXTRA_ORIGINAL_PAGE_URL, originalUrl);
+        intent.putExtra(EXTRA_VOTE_RAISE_NUM, voteRaiseNum);
+        intent.putExtra(EXTRA_VOTE_FALL_NUM, voteFallNum);
         return intent;
     }
 

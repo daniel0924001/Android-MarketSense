@@ -143,8 +143,10 @@ public class NewsFragment extends Fragment {
             @Override
             public void onItemClick(News news) {
                 startActivity(NewsWebViewActivity.generateNewsWebViewActivityIntent(
-                        getContext(), news.getId(), news.getTitle(), news.getUrlImage(), news.getDate(),
-                        news.getPageLink(), news.getOriginLink()));
+                        getContext(), news.getId(), news.getTitle(),
+                        news.getUrlImage(), news.getDate(),
+                        news.getPageLink(), news.getOriginLink(),
+                        news.getVoteRaiseNum(), news.getVoteFallNum()));
                 getActivity().overridePendingTransition(R.anim.enter, R.anim.stop);
             }
         });

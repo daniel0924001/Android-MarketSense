@@ -34,6 +34,8 @@ public class News {
     private static final String IMAGE_URL_ARRAY = "image_url_array";
     private static final String SOURCE_DATE_INT = "source_date_int";
     private static final String PREDICTION = "prediction";
+    private static final String RAISE = "raise";
+    private static final String FALL = "fall";
 
     private String mId;
     private String mTitle;
@@ -45,6 +47,8 @@ public class News {
     private int mSourceDateInt;
     private boolean mImportant;
     private int mLevel;
+    private int mVoteRaiseNum;
+    private int mVoteFallNum;
 
     public News() {
     }
@@ -86,6 +90,14 @@ public class News {
         mSourceDateInt = sourceDateInt;
     }
 
+    public void setVoteRaiseNum(int num) {
+        mVoteRaiseNum = num;
+    }
+
+    public void setVoteFallNum(int num) {
+        mVoteFallNum = num;
+    }
+
     public String getId() {
         return mId;
     }
@@ -120,6 +132,14 @@ public class News {
 
     public int getLevel() {
         return mLevel;
+    }
+
+    public int getVoteRaiseNum() {
+        return mVoteRaiseNum;
+    }
+
+    public int getVoteFallNum() {
+        return mVoteFallNum;
     }
 
     public boolean isOptimistic() {
@@ -164,6 +184,12 @@ public class News {
                         break;
                     case PREDICTION:
                         news.setLevel(jsonObject.optInt(key));
+                        break;
+                    case RAISE:
+                        news.setVoteRaiseNum(jsonObject.optInt(key));
+                        break;
+                    case FALL:
+                        news.setVoteFallNum(jsonObject.optInt(key));
                         break;
                     default:
                         break;

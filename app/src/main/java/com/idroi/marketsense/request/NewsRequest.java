@@ -147,7 +147,7 @@ public class NewsRequest extends Request<ArrayList<News>> {
     private static final String PARAM_LIMIT = "&limit=";
     public static final String PARAM_STATUS = "&status=";
     public static final String PARAM_LEVEL = "&level=";
-    private static final String PARAM_RANDOM = "&level=";
+    private static final String PARAM_RANDOM = "&random=";
     private static final String PARAM_TIMESTAMP = "&timestamp=";
     private static final String PARAM_MAGIC_NUM = "&magic_number=";
 

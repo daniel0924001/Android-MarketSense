@@ -11,12 +11,14 @@ import com.idroi.marketsense.common.SharedPreferencesCompat;
 
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+
+import static com.idroi.marketsense.data.Event.EVENT_TARGET_NEWS;
+import static com.idroi.marketsense.data.Event.EVENT_TARGET_STOCK;
 
 /**
  * Created by daniel.hsieh on 2018/5/8.
@@ -172,11 +174,39 @@ public class UserProfile {
     }
     /* end of favorite stock list */
 
+    /* event */
     public void addEvent(Event event) {
         if(mEventsArrayList != null) {
             mEventsArrayList.add(event);
         }
     }
+
+    public boolean hasVoteForStock(String code) {
+        if(mEventsArrayList != null) {
+            for (int i = 0; i < mEventsArrayList.size(); i++) {
+                Event event = mEventsArrayList.get(i);
+                if(event.getEventTarget().equals(EVENT_TARGET_STOCK)
+                        && event.getEventContent().equals(code)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean hasVoteForNews(String newsId) {
+        if(mEventsArrayList != null) {
+            for (int i = 0; i < mEventsArrayList.size(); i++) {
+                Event event = mEventsArrayList.get(i);
+                if(event.getEventTarget().equals(EVENT_TARGET_NEWS)
+                        && event.getEventContent().equals(newsId)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    /* end of event */
 
     public void updateUserData(Context context) {
         MSLog.d(String.format("update user data to share preference: %s %s %s %s %s",

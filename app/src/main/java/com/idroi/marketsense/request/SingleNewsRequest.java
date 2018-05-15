@@ -113,9 +113,9 @@ public class SingleNewsRequest extends Request<CommentAndVote> {
     public static String querySingleNewsUrl(String newsId, TASK task) {
         switch (task.getTaskId()) {
             case NEWS_COMMENT_ID:
-                return API_URL_NEWS + newsId + "?timestamp=" + System.currentTimeMillis() / (300 * 1000);
+                return API_URL_NEWS + newsId + "?timestamp=" + System.currentTimeMillis();
             case STOCK_COMMENT_ID:
-                return API_URL_STOCK + newsId + "?timestamp=" + System.currentTimeMillis() / (300 * 1000);
+                return API_URL_STOCK + newsId + "?timestamp=" + System.currentTimeMillis();
         }
         return null;
     }

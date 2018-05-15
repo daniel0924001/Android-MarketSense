@@ -21,6 +21,9 @@ public class Event {
     private static final String EVENT_TARGET = "event_target";
     private static final String EVENT_CREATED_TS = "created_ts";
 
+    public static final String EVENT_TARGET_STOCK = "stock";
+    public static final String EVENT_TARGET_NEWS = "news";
+
     private String mId;
     private String mEvent;
     private String mEventContent;
@@ -33,36 +36,44 @@ public class Event {
     public Event() {
     }
 
-    public void setId(String id) {
+    public Event setId(String id) {
         mId = id;
+        return this;
     }
 
-    public void setEvent(String event) {
+    public Event setEvent(String event) {
         mEvent = event;
+        return this;
     }
 
-    public void setEventContent(String content) {
+    public Event setEventContent(String content) {
         mEventContent = content;
+        return this;
     }
 
-    public void setEventType(String type) {
+    public Event setEventType(String type) {
         mEventType = type;
+        return this;
     }
 
-    public void setEventValue(Object value) {
+    public Event setEventValue(Object value) {
         mEventValue = value;
+        return this;
     }
 
-    public void setEventDetail(String detail) {
+    public Event setEventDetail(String detail) {
         mEventDetail = detail;
+        return this;
     }
 
-    public void setEventTarget(String target) {
+    public Event setEventTarget(String target) {
         mEventTarget = target;
+        return this;
     }
 
-    public void setEventCreatedTs(String timestamp) {
+    public Event setEventCreatedTs(String timestamp) {
         mEventCreatedTs = timestamp;
+        return this;
     }
 
     public String getEvent() {

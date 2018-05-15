@@ -1,6 +1,7 @@
 package com.idroi.marketsense.data;
 
 import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.DateConverter;
 
 import org.json.JSONObject;
@@ -100,6 +101,9 @@ public class Comment {
         if(mUserProfile != null) {
             return mUserProfile.getUserName();
         } else {
+            if(ClientData.getInstance().getUserProfile() != null) {
+                return ClientData.getInstance().getUserProfile().getUserName();
+            }
             return "使用者";
         }
     }
@@ -108,6 +112,9 @@ public class Comment {
         if(mUserProfile != null) {
             return mUserProfile.getUserAvatarLink();
         } else {
+            if(ClientData.getInstance().getUserProfile() != null) {
+                return ClientData.getInstance().getUserProfile().getUserAvatarLink();
+            }
             return null;
         }
     }

@@ -13,16 +13,13 @@ import com.idroi.marketsense.datasource.Networking;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static com.idroi.marketsense.data.PostEvent.Event.FAVORITE_STOCK_ADD;
-import static com.idroi.marketsense.data.PostEvent.Event.FAVORITE_STOCK_DELETE;
-
 /**
  * Created by daniel.hsieh on 2018/5/7.
  */
 
 public class PostEvent {
 
-    public enum Event {
+    public enum PostEventType {
         REGISTER("register", POST_TYPE_REGISTER),
         LOGIN("login", POST_TYPE_LOGIN),
         VOTING("voting", POST_TYPE_EVENT),
@@ -33,7 +30,7 @@ public class PostEvent {
         private String mEvent;
         private int mPostType;
 
-        Event(String event, int type) {
+        PostEventType(String event, int type) {
             mEvent = event;
             mPostType = type;
         }
@@ -124,18 +121,18 @@ public class PostEvent {
     private String mStockCode;
     private String mUserToken;
 
-    private PostEvent(String userId, Event event) {
+    private PostEvent(String userId, PostEventType postEventType) {
         mMethod = Request.Method.POST;
         mUserId = userId;
-        mEvent = event.getEventName();
-        mPostType = event.getPostType();
+        mEvent = postEventType.getEventName();
+        mPostType = postEventType.getPostType();
     }
 
-    private PostEvent(int method, String userId, Event event) {
+    private PostEvent(int method, String userId, PostEventType postEventType) {
         mMethod = method;
         mUserId = userId;
-        mEvent = event.getEventName();
-        mPostType = event.getPostType();
+        mEvent = postEventType.getEventName();
+        mPostType = postEventType.getPostType();
     }
 
     private PostEvent setEventContent(String eventContent) {
@@ -203,7 +200,18 @@ public class PostEvent {
         return this;
     }
 
-    private void send(Context context) {
+    public Event convertToEvent() {
+        Event event = new Event();
+        event.setEvent(mEvent)
+            .setEventContent(mEventContent)
+            .setEventType(mEventType)
+            .setEventDetail(mEventDetail)
+            .setEventTarget(mEventTarget)
+            .setEventCreatedTs(String.valueOf((int)(System.currentTimeMillis() / 1000)));
+        return event;
+    }
+
+    private PostEvent send(Context context) {
         JSONObject postJsonObject = new JSONObject();
         String postUrl = null;
         try {
@@ -243,7 +251,7 @@ public class PostEvent {
                     break;
                 default:
                     MSLog.e("Unknown post type");
-                    return;
+                    return this;
             }
 
             MSLog.d("Method: " + mMethod + " event type: " + mPostType + ", data: " + postJsonObject.toString() + ", url: " + postUrl);
@@ -279,6 +287,7 @@ public class PostEvent {
         } catch (JSONException e) {
             MSLog.e("JSONException in PostEvent send method.");
         }
+        return this;
     }
 
     private void processRegister(JSONObject jsonObject) {
@@ -305,7 +314,7 @@ public class PostEvent {
 
     public static void sendStockVote(Context context, String code, EventVars type, int value) {
         ClientData clientData = ClientData.getInstance(context);
-        new PostEvent(clientData.getUserProfile().getUserId(), Event.VOTING)
+        new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.VOTING)
                 .setEventContent(code)
                 .setEventValueInteger(value)
                 .setEventType(type.getEventVar())
@@ -315,27 +324,33 @@ public class PostEvent {
 
     public static void sendNewsVote(Context context, String newsId, EventVars type, int value) {
         ClientData clientData = ClientData.getInstance(context);
-        new PostEvent(clientData.getUserProfile().getUserId(), Event.VOTING)
+        UserProfile userProfile = clientData.getUserProfile();
+        PostEvent postEvent = new PostEvent(userProfile.getUserId(), PostEventType.VOTING)
                 .setEventContent(newsId)
                 .setEventValueInteger(value)
                 .setEventType(type.getEventVar())
                 .setEventTarget(NEWS_CONST)
                 .send(context);
+        Event event = postEvent.convertToEvent();
+        userProfile.addEvent(event);
     }
 
     public static void sendStockComment(Context context, String code, String html) {
         ClientData clientData = ClientData.getInstance(context);
-        new PostEvent(clientData.getUserProfile().getUserId(), Event.COMMENT)
+        UserProfile userProfile = clientData.getUserProfile();
+        PostEvent postEvent = new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.COMMENT)
                 .setEventContent(code)
                 .setEventValueString(html)
                 .setEventType("normal")
                 .setEventTarget(STOCK_CONST)
                 .send(context);
+        Event event = postEvent.convertToEvent();
+        userProfile.addEvent(event);
     }
 
     public static void sendNewsComment(Context context, String newsId, String html) {
         ClientData clientData = ClientData.getInstance(context);
-        new PostEvent(clientData.getUserProfile().getUserId(), Event.COMMENT)
+        new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.COMMENT)
                 .setEventContent(newsId)
                 .setEventValueString(html)
                 .setEventType("normal")
@@ -346,7 +361,7 @@ public class PostEvent {
     public static void sendRegister(Context context,
                                     String userId, String userName, String userType,
                                     String userPassword, String userEmail, String avatarLink) {
-        new PostEvent(userId, Event.REGISTER)
+        new PostEvent(userId, PostEventType.REGISTER)
                 .setUserName(userName)
                 .setUserType(userType)
                 .setUserPassword(userPassword)
@@ -357,7 +372,7 @@ public class PostEvent {
 
     public static void sendLogin(Context context, String userId,
                                  String userPassword, String userEmail) {
-        new PostEvent(userId, Event.LOGIN)
+        new PostEvent(userId, PostEventType.LOGIN)
                 .setUserPassword(userPassword)
                 .setUserEmail(userEmail)
                 .send(context);
@@ -365,14 +380,14 @@ public class PostEvent {
 
     public static void sendFavoriteStocksAdd(Context context, String code) {
         ClientData clientData = ClientData.getInstance(context);
-        new PostEvent(clientData.getUserProfile().getUserId(), FAVORITE_STOCK_ADD)
+        new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.FAVORITE_STOCK_ADD)
                 .setStockCode(code)
                 .send(context);
     }
 
     public static void sendFavoriteStocksDelete(Context context, String code) {
         ClientData clientData = ClientData.getInstance(context);
-        new PostEvent(Request.Method.DELETE, clientData.getUserProfile().getUserId(), FAVORITE_STOCK_DELETE)
+        new PostEvent(Request.Method.DELETE, clientData.getUserProfile().getUserId(), PostEventType.FAVORITE_STOCK_DELETE)
                 .setStockCode(code)
                 .setUserToken(clientData.getUserToken())
                 .send(context);

@@ -26,6 +26,7 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
 
     public interface NewsAvailableListener {
         void onNewsAvailable();
+        void onNewsEmpty();
     }
 
     public interface OnItemClickListener {
@@ -55,7 +56,11 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
             @Override
             public void onNewsAvailable() {
                 if(mNewsAvailableListener != null) {
-                    mNewsAvailableListener.onNewsAvailable();
+                    if(mNewsStreamPlacer.isEmpty()) {
+                        mNewsAvailableListener.onNewsEmpty();
+                    } else {
+                        mNewsAvailableListener.onNewsAvailable();
+                    }
                 }
                 mHandler.post(new Runnable() {
                     @Override

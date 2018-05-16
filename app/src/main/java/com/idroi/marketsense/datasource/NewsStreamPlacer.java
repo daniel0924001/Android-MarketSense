@@ -71,6 +71,11 @@ public class NewsStreamPlacer {
         }
     }
 
+    public boolean isEmpty() {
+        return (mNewsArrayList == null || mNewsArrayList.isEmpty())
+                && (mNewsSource == null || mNewsSource.isCacheEmpty());
+    }
+
     public int getItemCount() {
         if(mNewsArrayList != null) {
             return mNewsArrayList.size();

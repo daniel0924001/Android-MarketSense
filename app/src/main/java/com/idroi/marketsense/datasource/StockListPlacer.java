@@ -118,6 +118,10 @@ public class StockListPlacer {
         mCurrentRetries = 0;
     }
 
+    public boolean isEmpty() {
+        return mStockArrayList == null || mStockArrayList.size() == 0;
+    }
+
     public void setStockListListener(StockListListener listener) {
         mStockListListener = listener;
     }

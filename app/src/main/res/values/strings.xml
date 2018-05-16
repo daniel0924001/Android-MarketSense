@@ -76,6 +76,8 @@
         看起來你只編輯到一半，你確定要離開編輯頁面嗎？假如是，請在「點擊返回一次」。</string>
     <string name="title_comment_create_null">不好意思，不能留下空白言論。</string>
 
+    <string name="ops_something_wrong">暫時沒有資料</string>
+    <string name="add_first_stock">快來新增第一筆自選股</string>
     <string name="no_notification">暫無通知</string>
 
     <string name="preference_icon">設定圖示</string>

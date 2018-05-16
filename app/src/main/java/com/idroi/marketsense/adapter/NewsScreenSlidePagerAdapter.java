@@ -37,11 +37,11 @@ public class NewsScreenSlidePagerAdapter extends BaseScreenSlidePagerAdapter {
         switch (position) {
             case 0:
                 bundle.putString(PARAM_STATUS, PARAM_STATUS_RISING);
-                bundle.putInt(PARAM_LEVEL, 3);
+                bundle.putInt(PARAM_LEVEL, 2);
                 break;
             case 1:
                 bundle.putString(PARAM_STATUS, PARAM_STATUS_FALLING);
-                bundle.putInt(PARAM_LEVEL, -3);
+                bundle.putInt(PARAM_LEVEL, -2);
                 break;
             case 2:
                 bundle.putString(PARAM_STATUS, PARAM_STATUS_RISING);

@@ -165,6 +165,10 @@ public class NewsSource {
         return null;
     }
 
+    public boolean isCacheEmpty() {
+        return mNewsCache == null || mNewsCache.isEmpty();
+    }
+
     private int getRetryTime() {
         if (mCurrentRetries >= RETRY_TIME_ARRAY_MILLISECONDS.length) {
             mCurrentRetries = RETRY_TIME_ARRAY_MILLISECONDS.length - 1;

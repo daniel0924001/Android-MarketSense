@@ -177,6 +177,10 @@ public class UserProfile {
     public boolean isFavoriteStock(String code) {
         return mFavoriteStocks != null && mFavoriteStocks.contains(code);
     }
+
+    public boolean isEmptyFavoriteStock() {
+        return mFavoriteStocks == null || mFavoriteStocks.size() == 0;
+    }
     /* end of favorite stock list */
 
     /* event */

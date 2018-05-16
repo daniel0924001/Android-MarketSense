@@ -31,6 +31,7 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
 
     public interface StockListAvailableListener {
         void onStockListAvailable();
+        void onStockListEmpty();
     }
 
     private Activity mActivity;
@@ -53,7 +54,11 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
             @Override
             public void onStockListLoaded() {
                 if(mStockListAvailableListener != null) {
-                    mStockListAvailableListener.onStockListAvailable();
+                    if(mStockListPlacer.isEmpty()) {
+                        mStockListAvailableListener.onStockListEmpty();
+                    } else {
+                        mStockListAvailableListener.onStockListAvailable();
+                    }
                 }
                 mHandler.post(new Runnable() {
                     @Override

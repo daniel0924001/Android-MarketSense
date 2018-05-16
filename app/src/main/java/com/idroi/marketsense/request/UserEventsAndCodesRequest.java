@@ -90,7 +90,7 @@ public class UserEventsAndCodesRequest extends Request<Void> {
             for(int i = 0; i < eventsJsonArray.length(); i++) {
                 if(eventsJsonArray.optJSONObject(i) != null) {
                     Event event = Event.JsonObjectToEvent(eventsJsonArray.optJSONObject(i));
-                    MSLog.d("event: " + event.toString());
+//                    MSLog.d("event: " + event.toString());
                     clientData.getUserProfile().addEvent(event);
                 }
             }

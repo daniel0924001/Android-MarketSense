@@ -8,6 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.ethanhua.skeleton.RecyclerViewSkeletonScreen;
 import com.ethanhua.skeleton.Skeleton;
@@ -52,6 +54,8 @@ public class NewsFragment extends Fragment {
     }
 
     private RecyclerView mRecyclerView;
+    private ImageView mNoDataImageView;
+    private TextView mNoDataTextView;
     private NewsRecyclerAdapter mNewsRecyclerAdapter;
     private RecyclerViewSkeletonScreen mSkeletonScreen;
 
@@ -64,6 +68,11 @@ public class NewsFragment extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         final View view = inflater.inflate(R.layout.news_fragment, container, false);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.news_recycler_view);
+        mNoDataImageView = view.findViewById(R.id.no_news_iv);
+        if(mTaskId == KEYWORD_ARRAY_TASK_ID) {
+            mNoDataImageView.setImageResource(R.drawable.baseline_playlist_add_24px);
+        }
+        mNoDataTextView = view.findViewById(R.id.no_news_tv);
 
         if(getArguments() != null) {
             mTaskId = getArguments().getInt(TASK_NAME);
@@ -113,6 +122,15 @@ public class NewsFragment extends Fragment {
                 if(mSkeletonScreen != null) {
                     mSkeletonScreen.hide();
                 }
+                setVisibilityForEmptyData(false);
+            }
+
+            @Override
+            public void onNewsEmpty() {
+                if(mSkeletonScreen != null) {
+                    mSkeletonScreen.hide();
+                }
+                setVisibilityForEmptyData(true);
             }
         });
 
@@ -180,5 +198,28 @@ public class NewsFragment extends Fragment {
                     .deleteUserProfileChangeListener(mUserProfileChangeListener);
         }
         super.onDestroyView();
+    }
+
+    private void setVisibilityForEmptyData(boolean isEmpty) {
+        if(isEmpty) {
+            mRecyclerView.setVisibility(View.GONE);
+            mNoDataTextView.setVisibility(View.VISIBLE);
+            mNoDataImageView.setVisibility(View.VISIBLE);
+            if(isSelfNoneChoices()) {
+                mNoDataTextView.setText(R.string.add_first_stock);
+                mNoDataImageView.setImageResource(R.drawable.baseline_playlist_add_24px);
+            } else {
+                mNoDataTextView.setText(R.string.ops_something_wrong);
+                mNoDataImageView.setImageResource(R.drawable.baseline_sentiment_dissatisfied_24px);
+            }
+        } else {
+            mRecyclerView.setVisibility(View.VISIBLE);
+            mNoDataTextView.setVisibility(View.GONE);
+            mNoDataImageView.setVisibility(View.GONE);
+        }
+    }
+
+    private boolean isSelfNoneChoices() {
+        return mTaskId == KEYWORD_ARRAY_TASK_ID && ClientData.getInstance().getUserProfile().isEmptyFavoriteStock();
     }
 }

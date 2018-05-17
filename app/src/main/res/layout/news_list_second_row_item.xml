@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="280dp"
+    android:layout_marginBottom="2dp"
+    android:background="@drawable/news_layout_border">
+    
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/news_left_block"
+        android:layout_width="0dp"
+        android:layout_height="280dp"
+        android:layout_marginEnd="2dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/news_right_block"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        android:background="@drawable/news_layout_right_border">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/marketsense_news_left_image_iv"
+            android:layout_width="0dp"
+            android:layout_height="140dp"
+            fresco:actualImageScaleType="centerCrop"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"/>
+
+        <TextView
+            android:id="@+id/marketsense_news_left_title_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginEnd="15dp"
+            android:maxLines="3"
+            android:ellipsize="end"
+            android:textColor="@color/marketsense_text_black"
+            android:textSize="18sp"
+            android:fontFamily="Roboto-Regular"
+            android:textStyle="bold"
+            android:lineSpacingExtra="4dp"
+            app:layout_constraintTop_toBottomOf="@id/marketsense_news_left_image_iv"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/marketsense_news_left_date_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginBottom="20dp"
+            android:textColor="@color/marketsense_text_gray"
+            android:paddingLeft="5dp"
+            android:paddingStart="5dp"
+            android:paddingRight="5dp"
+            android:paddingEnd="5dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <ImageView
+            android:id="@+id/marketsense_news_left_alarm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="15dp"
+            android:visibility="gone"
+            android:contentDescription="@string/iv_alarm"
+            app:srcCompat="@drawable/ic_notifications_red_24px"
+            app:layout_constraintStart_toEndOf="@id/marketsense_news_left_date_tv"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/news_right_block"
+        android:layout_width="0dp"
+        android:layout_height="280dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/news_left_block"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@drawable/news_layout_border">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/marketsense_news_right_image_iv"
+            android:layout_width="0dp"
+            android:layout_height="140dp"
+            fresco:actualImageScaleType="centerCrop"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"/>
+
+        <TextView
+            android:id="@+id/marketsense_news_right_title_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginEnd="15dp"
+            android:maxLines="3"
+            android:ellipsize="end"
+            android:textColor="@color/marketsense_text_black"
+            android:textSize="18sp"
+            android:fontFamily="Roboto-Regular"
+            android:textStyle="bold"
+            android:lineSpacingExtra="4dp"
+            app:layout_constraintTop_toBottomOf="@id/marketsense_news_right_image_iv"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/marketsense_news_right_date_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginBottom="20dp"
+            android:textColor="@color/marketsense_text_gray"
+            android:paddingLeft="5dp"
+            android:paddingStart="5dp"
+            android:paddingRight="5dp"
+            android:paddingEnd="5dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <ImageView
+            android:id="@+id/marketsense_news_right_alarm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="15dp"
+            android:visibility="gone"
+            android:contentDescription="@string/iv_alarm"
+            app:srcCompat="@drawable/ic_notifications_red_24px"
+            app:layout_constraintStart_toEndOf="@id/marketsense_news_right_date_tv"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.constraint.ConstraintLayout>

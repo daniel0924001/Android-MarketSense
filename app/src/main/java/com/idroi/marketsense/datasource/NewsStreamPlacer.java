@@ -96,7 +96,7 @@ public class NewsStreamPlacer {
     }
 
     public News getNewsData(int position) {
-        if(mNewsArrayList == null || position > mNewsArrayList.size() || position < 0) {
+        if(mNewsArrayList == null || position >= mNewsArrayList.size() || position < 0) {
             return null;
         }
         return mNewsArrayList.get(position);

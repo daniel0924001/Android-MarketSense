@@ -3,10 +3,12 @@ package com.idroi.marketsense.adapter;
 import android.app.Activity;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.datasource.NewsSource;
 import com.idroi.marketsense.datasource.NewsStreamPlacer;
@@ -33,12 +35,24 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
         void onItemClick(News stock);
     }
 
+    public enum ITEM_TYPE {
+        ITEM_FIRST_ROW,
+        ITEM_SECOND_ROW,
+        ITEM_ELSE
+    }
+
+    private static final int NEWS_SINGLE_LAYOUT = 1;
+    private static final int NEWS_MULTIPLE_LAYOUT = 2;
+    private int mInitLayoutType;
+
     private Activity mActivity;
     private NewsStreamPlacer mNewsStreamPlacer;
     private Handler mHandler;
 
     // TODO: maybe multiple renderer in someday
     private NewsRenderer mNewsRenderer;
+    private NewsFirstRowRenderer mNewsFirstRowRenderer;
+    private NewsSecondRowRenderer mNewsSecondRowRenderer;
     private NewsExpandListener mNewsExpandListener;
     private OnItemClickListener mOnItemClickListener;
     private NewsAvailableListener mNewsAvailableListener;
@@ -51,7 +65,11 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
         mActivity = activity;
         mHandler = new Handler();
         mNewsStreamPlacer = new NewsStreamPlacer(activity);
+
         mNewsRenderer = new NewsRenderer();
+        mNewsFirstRowRenderer = new NewsFirstRowRenderer();
+        mNewsSecondRowRenderer = new NewsSecondRowRenderer();
+
         mNewsStreamPlacer.setNewsSourceListener(new NewsSource.NewsSourceListener() {
             @Override
             public void onNewsAvailable() {
@@ -115,6 +133,7 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
 //                updateRetryTime();
             }
         };
+        mInitLayoutType = -1;
     }
 
     private int getRetryTime() {
@@ -156,18 +175,64 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new MarketSenseViewHolder(mNewsRenderer.createView(mActivity, parent));
+        if(viewType == ITEM_TYPE.ITEM_FIRST_ROW.ordinal()) {
+            return new MarketSenseViewHolder(mNewsFirstRowRenderer.createView(mActivity, parent));
+        } else if(viewType == ITEM_TYPE.ITEM_SECOND_ROW.ordinal()) {
+            return new MarketSenseViewHolder(mNewsSecondRowRenderer.createView(mActivity, parent));
+        } else {
+            return new MarketSenseViewHolder(mNewsRenderer.createView(mActivity, parent));
+        }
     }
 
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
-        News news = mNewsStreamPlacer.getNewsData(position);
+        News news = null;
+        final int type = getItemViewType(position);
+
+        if(mInitLayoutType == NEWS_SINGLE_LAYOUT) {
+            news = mNewsStreamPlacer.getNewsData(position);
+        } else {
+            if(type == ITEM_TYPE.ITEM_FIRST_ROW.ordinal()) {
+                news = mNewsStreamPlacer.getNewsData(position);
+            } else if(type == ITEM_TYPE.ITEM_SECOND_ROW.ordinal()) {
+                news = mNewsStreamPlacer.getNewsData(position);
+                News nextNews = mNewsStreamPlacer.getNewsData(position + 1);
+                news.setNextNews(nextNews);
+            } else {
+                news = mNewsStreamPlacer.getNewsData(position + 1);
+            }
+        }
+
         if(news != null) {
-            mNewsRenderer.renderView(holder.itemView, news);
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
+            if(type == ITEM_TYPE.ITEM_FIRST_ROW.ordinal()) {
+                mNewsFirstRowRenderer.renderView(holder.itemView, news);
+            } else if(type == ITEM_TYPE.ITEM_SECOND_ROW.ordinal()) {
+                mNewsSecondRowRenderer.renderView(holder.itemView, news);
+            } else {
+                mNewsRenderer.renderView(holder.itemView, news);
+            }
+
+            holder.itemView.setOnTouchListener(new View.OnTouchListener() {
                 @Override
-                public void onClick(View view) {
-                    mOnItemClickListener.onItemClick(mNewsStreamPlacer.getNewsData(holder.getAdapterPosition()));
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    if(mInitLayoutType == NEWS_SINGLE_LAYOUT) {
+                        mOnItemClickListener.onItemClick(mNewsStreamPlacer.getNewsData(holder.getAdapterPosition()));
+                    } else {
+                        if(type == ITEM_TYPE.ITEM_FIRST_ROW.ordinal()) {
+                            mOnItemClickListener.onItemClick(mNewsStreamPlacer.getNewsData(holder.getAdapterPosition()));
+                        } else if(type == ITEM_TYPE.ITEM_SECOND_ROW.ordinal()) {
+                            if(motionEvent.getX() < ClientData.getInstance().getScreenWidthPixels() - motionEvent.getX()) {
+                                // left part
+                                mOnItemClickListener.onItemClick(mNewsStreamPlacer.getNewsData(holder.getAdapterPosition()));
+                            } else {
+                                // right part
+                                mOnItemClickListener.onItemClick(mNewsStreamPlacer.getNewsData(holder.getAdapterPosition() + 1));
+                            }
+                        } else {
+                            mOnItemClickListener.onItemClick(mNewsStreamPlacer.getNewsData(holder.getAdapterPosition() + 1));
+                        }
+                    }
+                    return false;
                 }
             });
         }
@@ -175,12 +240,35 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
 
     @Override
     public int getItemViewType(int position) {
-        return super.getItemViewType(position);
+        if(mInitLayoutType < 0) {
+            if(mNewsStreamPlacer.getItemCount() > 4) {
+                mInitLayoutType = NEWS_MULTIPLE_LAYOUT;
+            } else {
+                mInitLayoutType = NEWS_SINGLE_LAYOUT;
+            }
+        }
+
+        if(mInitLayoutType == NEWS_MULTIPLE_LAYOUT) {
+            if (position == 0) {
+                return ITEM_TYPE.ITEM_FIRST_ROW.ordinal();
+            } else if (position == 1) {
+                return ITEM_TYPE.ITEM_SECOND_ROW.ordinal();
+            } else {
+                return ITEM_TYPE.ITEM_ELSE.ordinal();
+            }
+        } else {
+            return ITEM_TYPE.ITEM_ELSE.ordinal();
+        }
     }
 
     @Override
     public int getItemCount() {
-        return mNewsStreamPlacer.getItemCount();
+        if(mInitLayoutType == NEWS_MULTIPLE_LAYOUT) {
+            // there must be bigger than 4
+            return mNewsStreamPlacer.getItemCount() - 1;
+        } else {
+            return mNewsStreamPlacer.getItemCount();
+        }
     }
 
     public void clearNews() {
@@ -190,6 +278,7 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
 
     public void destroy() {
         mNewsRenderer.clear();
+        mNewsFirstRowRenderer.clear();
         mNewsStreamPlacer.clear();
     }
 }

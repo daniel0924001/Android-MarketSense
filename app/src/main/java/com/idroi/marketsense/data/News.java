@@ -1,5 +1,6 @@
 package com.idroi.marketsense.data;
 
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.idroi.marketsense.Logging.MSLog;
@@ -50,6 +51,8 @@ public class News {
     private int mVoteRaiseNum;
     private int mVoteFallNum;
 
+    @Nullable private News mNextNews;
+
     public News() {
     }
 
@@ -96,6 +99,10 @@ public class News {
 
     public void setVoteFallNum(int num) {
         mVoteFallNum = num;
+    }
+
+    public void setNextNews(News news) {
+        mNextNews = news;
     }
 
     public String getId() {
@@ -148,6 +155,10 @@ public class News {
 
     public boolean isPessimistic() {
         return mLevel < 0;
+    }
+
+    public News getNextNews() {
+        return mNextNews;
     }
 
     public static News JsonObjectToNews(JSONObject jsonObject) {

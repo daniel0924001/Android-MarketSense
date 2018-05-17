@@ -31,6 +31,7 @@ public class ClientData {
     private ArrayList<Stock> mAllStocksListInfo;
 
     private int mScreenWidth, mScreenHeight;
+    private int mScreenWidthPixels, mScreenHeightPixels;
     @NonNull private UserProfile mUserProfile;
     private String mUserToken;
 
@@ -80,6 +81,11 @@ public class ClientData {
         loadAllStocksListTask(true);
     }
 
+    public void setScreenSizeInPixels(int widthPixels, int heightPixels) {
+        mScreenWidthPixels = widthPixels;
+        mScreenHeightPixels = heightPixels;
+    }
+
     public void setScreenSize(int width, int height) {
         mScreenWidth = width;
         mScreenHeight = height;
@@ -107,6 +113,14 @@ public class ClientData {
 
     public int getScreenHeight() {
         return mScreenHeight;
+    }
+
+    public int getScreenWidthPixels() {
+        return mScreenWidthPixels;
+    }
+
+    public int getScreenHeightPixels() {
+        return mScreenHeightPixels;
     }
 
     public ArrayList<Stock> getAllStocksListInfo() {

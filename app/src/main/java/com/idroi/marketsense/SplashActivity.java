@@ -29,6 +29,7 @@ public class SplashActivity extends AppCompatActivity{
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         int width = (int)Math.ceil((double)metrics.widthPixels/metrics.density);
         int height = (int)Math.ceil((double)metrics.heightPixels/metrics.density);
+        clientData.setScreenSizeInPixels(metrics.widthPixels, metrics.heightPixels);
         clientData.setScreenSize(width, height);
 
         if(FBHelper.checkFBLogin()) {

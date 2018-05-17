@@ -130,7 +130,6 @@ public class FrescoImageHelper {
         }
     }
 
-
     public static void loadImageView(@Nullable final String url, @Nullable final SimpleDraweeView imageView, final float ratio) {
         if(imageView == null){
             return;
@@ -144,6 +143,23 @@ public class FrescoImageHelper {
 
         ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(url))
                 .build();
+
+        loadImageView(request, imageView, ratio);
+    }
+
+    public static void loadImageView(final int resourceId, @Nullable final SimpleDraweeView imageView, final float ratio) {
+        if(imageView == null){
+            return;
+        }
+
+        ImageRequest request = ImageRequestBuilder.newBuilderWithResourceId(resourceId)
+                .build();
+
+        loadImageView(request, imageView, ratio);
+    }
+
+    private static void loadImageView(ImageRequest request, @Nullable final SimpleDraweeView imageView, final float ratio) {
+
 
         DraweeController controller = Fresco.newDraweeControllerBuilder()
                 .setOldController(imageView.getController())

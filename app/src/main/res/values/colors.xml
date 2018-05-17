@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FFFF3131</color>
+    <color name="colorPrimary">#DB564B</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
@@ -10,6 +10,7 @@
     <color name="marketsense_text_white">#fff</color>
     <color name="marketsense_text_red">#FFFF3131</color>
     <color name="marketsense_trans_black">#4c000000</color>
+    <color name="marketsense_trans_light_black">#28000000</color>
     <color name="marketsense_trans">#00ffffff</color>
 
     <color name="marketsense_rich_edit_black_background">#4a4a4a</color>

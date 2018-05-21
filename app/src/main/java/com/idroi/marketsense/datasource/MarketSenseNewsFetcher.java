@@ -121,7 +121,7 @@ public class MarketSenseNewsFetcher {
         mNewsRequest = new NewsRequest(Request.Method.GET, url, null, new Response.Listener<ArrayList<News>>() {
             @Override
             public void onResponse(ArrayList<News> response) {
-                MSLog.i("News Request success: " + response);
+                MSLog.i("News Request success: " + response.size());
                 mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
                 mMarketSenseNewsNetworkListener.onNewsLoad(response, false);
             }

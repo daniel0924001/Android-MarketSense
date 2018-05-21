@@ -90,6 +90,6 @@ public class StockRequest extends Request<ArrayList<Stock>> {
     private static final String API_URL = "http://apiv2.infohubapp.com/v1/stock/prices";
 
     public static String queryStockList() {
-        return API_URL + "?timestamp=" + System.currentTimeMillis() / (300 * 1000);
+        return API_URL + "?timestamp=" + System.currentTimeMillis() / (30 * 1000);
     }
 }

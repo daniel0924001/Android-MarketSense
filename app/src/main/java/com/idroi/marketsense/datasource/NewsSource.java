@@ -34,8 +34,8 @@ public class NewsSource {
     private MarketSenseNewsFetcher mNewsFetcher;
     private MarketSenseNewsFetcher.MarketSenseNewsNetworkListener mMarketSenseNewsNetworkListener;
 
-    private static final int MAXIMUM_RETRY_TIME_MILLISECONDS = 5 * 60 * 1000; // 5 minutes.
-    private static final int[] RETRY_TIME_ARRAY_MILLISECONDS = new int[]{1000, 3000, 5000, 25000, 60000, MAXIMUM_RETRY_TIME_MILLISECONDS};
+    private static final int MAXIMUM_RETRY_TIME_MILLISECONDS = 5 * 1000; // 5 minutes.
+    private static final int[] RETRY_TIME_ARRAY_MILLISECONDS = new int[]{1000, 1000, MAXIMUM_RETRY_TIME_MILLISECONDS};
 
     private WeakReference<Activity> mActivity;
     private Handler mReplenishCacheHandler;
@@ -90,16 +90,19 @@ public class NewsSource {
                 mSequenceNumber++;
                 resetRetryTime();
 
+                int counter = 0;
                 if(newsArray != null) {
                     Comparator<News> comparator = genComparator();
                     Collections.sort(newsArray, comparator);
                     for (int i = 0; i < newsArray.size(); i++) {
                         if (!mNewsCache.contains(newsArray.get(i))) {
+                            counter++;
                             mNewsCache.add(newsArray.get(i));
                             moreFlag = true;
                             mHasShowNoMore = false;
                         }
                     }
+                    MSLog.i("Add " + counter + " news.");
                 }
 
                 if(!mFirstTimeNewsAvailable) {
@@ -129,6 +132,7 @@ public class NewsSource {
                 if (mCurrentRetries >= RETRY_TIME_ARRAY_MILLISECONDS.length - 1) {
                     MSLog.w("Stopping requests after the max retry count.");
                     resetRetryTime();
+                    mNewsSourceListener.onNewsAvailable();
                     return;
                 }
 

@@ -196,8 +196,8 @@ public class StockListPlacer {
                     @Override
                     public int compare(Stock stock1, Stock stock2) {
                         return compareValue(
-                                stock1.getDiffDirection() * stock1.getDiff(),
-                                stock2.getDiffDirection() * stock2.getDiff());
+                                stock1.getDiffDirection() * stock1.getDiffPercentageDouble(),
+                                stock2.getDiffDirection() * stock2.getDiffPercentageDouble());
                     }
                 };
             case ACTUAL_WIN_ID:
@@ -205,8 +205,8 @@ public class StockListPlacer {
                     @Override
                     public int compare(Stock stock1, Stock stock2) {
                         return compareValue(
-                                stock2.getDiffDirection() * stock2.getDiff(),
-                                stock1.getDiffDirection() * stock1.getDiff());
+                                stock2.getDiffDirection() * stock2.getDiffPercentageDouble(),
+                                stock1.getDiffDirection() * stock1.getDiffPercentageDouble());
                     }
                 };
             case SELF_CHOICES_ID:

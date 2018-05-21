@@ -50,9 +50,17 @@
     <string name="title_action_bar_setting">設定</string>
 
     <string name="title_company_name">公司名稱</string>
-    <string name="title_company_code">公司代碼</string>
-    <string name="title_company_trend">公司趨勢</string>
+    <string name="title_company_code">公司代號</string>
+    <string name="title_company_name_and_code">公司名稱/代號</string>
+    <string name="title_company_price">股價</string>
+    <string name="title_company_price_diff_num">股價漲跌數字</string>
+    <string name="title_company_price_diff_percentage">股價漲跌百分比</string>
     <string name="title_company_confidence">公司信心指數</string>
+    <string name="title_company_predict">台股的兩大消息面\n新聞面/鄉民面</string>
+    <string name="title_company_predict_news_title">新聞</string>
+    <string name="title_company_predict_people_title">鄉民</string>
+    <string name="title_company_predict_our_title">大鳥</string>
+
     <string name="title_up">漲</string>
     <string name="title_down">跌</string>
     <string name="title_percent">%</string>

@@ -51,6 +51,7 @@
 
     <string name="title_company_name">公司名稱</string>
     <string name="title_company_code">公司代號</string>
+    <string name="title_company_name_code_format">%s (%s)</string>
     <string name="title_company_name_and_code">公司名稱/代號</string>
     <string name="title_company_price">股價</string>
     <string name="title_company_price_diff_num">股價漲跌數字</string>
@@ -87,6 +88,7 @@
     <string name="ops_something_wrong">暫時沒有資料</string>
     <string name="add_first_stock">快來新增第一筆自選股</string>
     <string name="no_notification">暫無通知</string>
+    <string name="no_data">暫無資料</string>
 
     <string name="preference_icon">設定圖示</string>
     <string name="preference_switch">開關</string>

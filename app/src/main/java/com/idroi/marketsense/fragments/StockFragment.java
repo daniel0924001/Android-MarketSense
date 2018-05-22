@@ -20,6 +20,8 @@ import android.widget.Toast;
 import com.ethanhua.skeleton.Skeleton;
 import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.facebook.login.widget.LoginButton;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.LineChart;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.NewsWebView;
 import com.idroi.marketsense.R;
@@ -27,6 +29,8 @@ import com.idroi.marketsense.RichEditorActivity;
 import com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
+import com.idroi.marketsense.common.MarketSenseError;
+import com.idroi.marketsense.common.YahooStxChartCrawler;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
 import com.idroi.marketsense.data.PostEvent;
@@ -51,7 +55,7 @@ public class StockFragment extends Fragment {
     public final static String FALL_BUNDLE = "FALL_BUNDLE";
     private final static String STOCK_REAL_TIME_URL_PREFIX = "https://so.cnyes.com/JavascriptGraphic/chartstudy.aspx?country=tw&market=twreal&divwidth=%d&divheight=%d&code=%s";
 
-    private NewsWebView mStockPriceRealTimeWebView;
+    private YahooStxChartCrawler mYahooStxChartCrawler;
     private ViewSkeletonScreen mSkeletonScreen;
     private String mStockId;
 
@@ -77,14 +81,10 @@ public class StockFragment extends Fragment {
         final View view = inflater.inflate(R.layout.stock_fragment, container, false);
 
         setInformation();
-        initRealTimeWebView(view);
+        initStockChart(view);
+//        initRealTimeWebView(view);
         initButton(view);
         initComments(view);
-
-        mSkeletonScreen = Skeleton.bind(mStockPriceRealTimeWebView)
-                .shimmer(false)
-                .load(R.layout.skeleton_webview)
-                .show();
 
         return view;
     }
@@ -153,26 +153,33 @@ public class StockFragment extends Fragment {
         }
     }
 
-    private void initRealTimeWebView(View view) {
-        mStockPriceRealTimeWebView = view.findViewById(R.id.stock_real_time_webview);
-        mStockPriceRealTimeWebView.setVerticalScrollBarEnabled(true);
-        mStockPriceRealTimeWebView.setHorizontalFadingEdgeEnabled(true);
-
-        mStockPriceRealTimeWebView.setWebViewClient(new WebViewClient() {
+    private void initStockChart(View view) {
+        LineChart lineChart = view.findViewById(R.id.stock_chart_price);
+        String name = ClientData.getInstance().getNameFromCode(mStockId);
+        BarChart barChart = view.findViewById(R.id.stock_chart_volume);
+        mYahooStxChartCrawler =
+                new YahooStxChartCrawler(getActivity(), name, mStockId, lineChart, barChart);
+        mYahooStxChartCrawler.setYahooStxChartListener(new YahooStxChartCrawler.YahooStxChartListener() {
             @Override
-            public void onPageFinished(WebView view, String url) {
+            public void onStxChartDataLoad() {
+                mYahooStxChartCrawler.renderStockChartData();
                 mSkeletonScreen.hide();
-                super.onPageFinished(view, url);
+                MSLog.e("onStxChartDataLoad");
+            }
+
+            @Override
+            public void onStxChartDataFail(MarketSenseError marketSenseError) {
+                mYahooStxChartCrawler.renderStockChartData();
+                mSkeletonScreen.hide();
+                MSLog.e("onStxChartDataFail: " + marketSenseError.toString());
             }
         });
+        mYahooStxChartCrawler.loadStockChartData();
 
-        String url =
-                getStockPriceURL(mStockId);
-        MSLog.i("Load the real time price of " + mStockId + ": " + url);
-        mStockPriceRealTimeWebView.getSettings().setLoadWithOverviewMode(false);
-        mStockPriceRealTimeWebView.getSettings().setUseWideViewPort(false);
-
-        mStockPriceRealTimeWebView.loadUrl(url);
+        mSkeletonScreen = Skeleton.bind(lineChart)
+                .shimmer(false)
+                .load(R.layout.skeleton_webview)
+                .show();
     }
 
     private String getStockPriceURL(String code) {
@@ -307,10 +314,6 @@ public class StockFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        if(mStockPriceRealTimeWebView != null) {
-            mStockPriceRealTimeWebView.destroy();
-            mStockPriceRealTimeWebView = null;
-        }
         UserProfile userProfile = ClientData.getInstance(getActivity()).getUserProfile();
         userProfile.deleteUserProfileChangeListener(mUserProfileChangeListener);
         super.onDestroy();

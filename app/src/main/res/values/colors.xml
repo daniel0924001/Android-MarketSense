@@ -18,4 +18,7 @@
     <color name="colorTrendUp">#f11b1b</color>
     <color name="colorTrendDown">#0ede11</color>
     <color name="colorTrendFlat">#4a4a4a</color>
+
+    <color name="color_volume_line">#e7f11b1b</color>
+    <color name="color_price_line">#e73b76ec</color>
 </resources>

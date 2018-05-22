@@ -142,7 +142,7 @@ public class MarketSenseNewsFetcher {
             }
         });
 
-        mTimeoutHandler.postDelayed(mTimeoutRunnable, 3000);
+        mTimeoutHandler.postDelayed(mTimeoutRunnable, 5000);
         Networking.getRequestQueue(context).add(mNewsRequest);
     }
 

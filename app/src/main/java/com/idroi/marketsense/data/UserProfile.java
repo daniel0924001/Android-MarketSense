@@ -22,6 +22,7 @@ import java.util.Iterator;
 
 import static com.idroi.marketsense.data.Event.EVENT_TARGET_NEWS;
 import static com.idroi.marketsense.data.Event.EVENT_TARGET_STOCK;
+import static com.idroi.marketsense.data.Event.EVENT_VOTING;
 
 /**
  * Created by daniel.hsieh on 2018/5/8.
@@ -194,8 +195,9 @@ public class UserProfile {
         if(mEventsArrayList != null) {
             for (int i = 0; i < mEventsArrayList.size(); i++) {
                 Event event = mEventsArrayList.get(i);
-                if(event.getEventTarget().equals(EVENT_TARGET_STOCK)
-                        && event.getEventContent().equals(code)) {
+                if(event.getEvent().equals(EVENT_VOTING) &&
+                        event.getEventTarget().equals(EVENT_TARGET_STOCK) &&
+                        event.getEventContent().equals(code)) {
                     return event.getEventCreatedTs();
                 }
             }
@@ -219,8 +221,9 @@ public class UserProfile {
         if(mEventsArrayList != null) {
             for (int i = 0; i < mEventsArrayList.size(); i++) {
                 Event event = mEventsArrayList.get(i);
-                if(event.getEventTarget().equals(EVENT_TARGET_STOCK)
-                        && event.getEventContent().equals(code)) {
+                if(event.getEvent().equals(EVENT_VOTING) &&
+                        event.getEventTarget().equals(EVENT_TARGET_STOCK) &&
+                        event.getEventContent().equals(code)) {
                     return true;
                 }
             }
@@ -232,8 +235,10 @@ public class UserProfile {
         if(mEventsArrayList != null) {
             for (int i = 0; i < mEventsArrayList.size(); i++) {
                 Event event = mEventsArrayList.get(i);
-                if(event.getEventTarget().equals(EVENT_TARGET_NEWS)
-                        && event.getEventContent().equals(newsId)) {
+                MSLog.e(event.toString());
+                if(event.getEvent().equals(EVENT_VOTING) &&
+                        event.getEventTarget().equals(EVENT_TARGET_NEWS) &&
+                        event.getEventContent().equals(newsId)) {
                     return true;
                 }
             }

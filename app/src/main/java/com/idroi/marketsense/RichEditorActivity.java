@@ -158,6 +158,7 @@ public class RichEditorActivity extends AppCompatActivity {
 
     private void setRichEditor() {
         mEditor = (RichEditor) findViewById(R.id.rich_editor);
+        mEditor.loadCSS("file:///android_asset/img.css");
         mEditor.setEditorHeight(200);
         mEditor.setEditorFontSize(22);
         mEditor.setEditorFontColor(getResources().getColor(R.color.marketsense_text_black));
@@ -352,31 +353,33 @@ public class RichEditorActivity extends AppCompatActivity {
             @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                mEditor.focusEditor();
-                final View alertView = LayoutInflater.from(RichEditorActivity.this)
-                        .inflate(R.layout.alertdialog_single_input, null);
-                if(mImageAlertDialog != null) {
-                    mImageAlertDialog.dismiss();
-                    mImageAlertDialog = null;
+                if(motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    mEditor.focusEditor();
+                    final View alertView = LayoutInflater.from(RichEditorActivity.this)
+                            .inflate(R.layout.alertdialog_single_input, null);
+                    if (mImageAlertDialog != null) {
+                        mImageAlertDialog.dismiss();
+                        mImageAlertDialog = null;
+                    }
+                    final EditText editText = alertView.findViewById(R.id.alert_dialog_input);
+                    editText.setText(HTTP);
+                    mImageAlertDialog = new AlertDialog.Builder(RichEditorActivity.this)
+                            .setTitle(R.string.insert_image_url)
+                            .setView(alertView)
+                            .setPositiveButton(R.string.insert_ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    mEditor.insertImage(editText.getText().toString(),
+                                            getResources().getString(R.string.image_alt));
+                                    mImageAlertDialog.dismiss();
+                                }
+                            }).setNegativeButton(R.string.insert_cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    mImageAlertDialog.dismiss();
+                                }
+                            }).show();
                 }
-                final EditText editText = alertView.findViewById(R.id.alert_dialog_input);
-                editText.setText(HTTP);
-                mImageAlertDialog = new AlertDialog.Builder(RichEditorActivity.this)
-                        .setTitle(R.string.insert_image_url)
-                        .setView(alertView)
-                        .setPositiveButton(R.string.insert_ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                mEditor.insertImage(editText.getText().toString(),
-                                        getResources().getString(R.string.image_alt));
-                                mImageAlertDialog.dismiss();
-                            }
-                        }).setNegativeButton(R.string.insert_cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                mImageAlertDialog.dismiss();
-                            }
-                        }).show();
                 return changeBtnBackgroundColorImmediately(view, motionEvent);
             }
         });
@@ -385,33 +388,35 @@ public class RichEditorActivity extends AppCompatActivity {
             @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                mEditor.focusEditor();
-                final View alertView = LayoutInflater.from(RichEditorActivity.this)
-                        .inflate(R.layout.alertdialog_two_inputs, null);
-                if(mUrlAlertDialog != null) {
-                    mUrlAlertDialog.dismiss();
-                    mUrlAlertDialog = null;
+                if(motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    mEditor.focusEditor();
+                    final View alertView = LayoutInflater.from(RichEditorActivity.this)
+                            .inflate(R.layout.alertdialog_two_inputs, null);
+                    if (mUrlAlertDialog != null) {
+                        mUrlAlertDialog.dismiss();
+                        mUrlAlertDialog = null;
+                    }
+                    final EditText editTextUrl = alertView.findViewById(R.id.alert_dialog_input_2);
+                    editTextUrl.setText(HTTP);
+                    mUrlAlertDialog = new AlertDialog.Builder(RichEditorActivity.this)
+                            .setTitle(R.string.insert_hyperlink)
+                            .setView(alertView)
+                            .setPositiveButton(R.string.insert_ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    EditText editTextTitle = alertView.findViewById(R.id.alert_dialog_input_1);
+                                    mEditor.insertLink(
+                                            editTextUrl.getText().toString(),
+                                            editTextTitle.getText().toString());
+                                    mUrlAlertDialog.dismiss();
+                                }
+                            }).setNegativeButton(R.string.insert_cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    mUrlAlertDialog.dismiss();
+                                }
+                            }).show();
                 }
-                final EditText editTextUrl = alertView.findViewById(R.id.alert_dialog_input_2);
-                editTextUrl.setText(HTTP);
-                mUrlAlertDialog = new AlertDialog.Builder(RichEditorActivity.this)
-                        .setTitle(R.string.insert_hyperlink)
-                        .setView(alertView)
-                        .setPositiveButton(R.string.insert_ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                EditText editTextTitle = alertView.findViewById(R.id.alert_dialog_input_1);
-                                mEditor.insertLink(
-                                        editTextUrl.getText().toString(),
-                                        editTextTitle.getText().toString());
-                                mUrlAlertDialog.dismiss();
-                            }
-                        }).setNegativeButton(R.string.insert_cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                mUrlAlertDialog.dismiss();
-                            }
-                        }).show();
                 return changeBtnBackgroundColorImmediately(view, motionEvent);
             }
         });

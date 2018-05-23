@@ -54,8 +54,10 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
 
         // chinese characters can not be decoded.
         // https://blog.csdn.net/top_code/article/details/9163597
+        // we have a /assets/img.css file.
+        String htmlData = "<link rel=\"stylesheet\" type=\"text/css\" href=\"img.css\" />" + content.getCommentHtml();
         commentViewHolder.commentBodyView.
-                loadDataWithBaseURL(null, content.getCommentHtml(), "text/html", "UTF-8", null);
+                loadDataWithBaseURL("file:///android_asset/", htmlData, "text/html", "UTF-8", null);
 
         setViewVisibility(commentViewHolder, View.VISIBLE);
     }

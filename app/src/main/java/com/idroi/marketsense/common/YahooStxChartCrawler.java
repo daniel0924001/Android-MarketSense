@@ -149,6 +149,7 @@ public class YahooStxChartCrawler {
 
         BarDataSet barDataSet = new BarDataSet(yVolume, null);
         barDataSet.setColor(mContext.getResources().getColor(R.color.color_volume_line));
+        barDataSet.setDrawValues(false);
         barDataSet.setAxisDependency(YAxis.AxisDependency.RIGHT);
         BarData barData = new BarData(barDataSet);
 

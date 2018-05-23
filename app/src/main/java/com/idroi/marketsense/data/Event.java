@@ -21,6 +21,7 @@ public class Event {
     private static final String EVENT_TARGET = "event_target";
     private static final String EVENT_CREATED_TS = "created_ts";
 
+    public static final String EVENT_VOTING = "voting";
     public static final String EVENT_TARGET_STOCK = "stock";
     public static final String EVENT_TARGET_NEWS = "news";
 

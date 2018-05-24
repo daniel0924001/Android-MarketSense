@@ -2,6 +2,8 @@ package com.idroi.marketsense.datasource;
 
 import android.content.Context;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.android.volley.Cache;
 import com.android.volley.Request;
@@ -69,7 +71,7 @@ public class MarketSenseNewsFetcher {
         };
     }
 
-    void makeRequest(String url, boolean shouldReadFromCache) {
+    void makeRequest(@NonNull String networkUrl, @Nullable String cacheUrl, boolean shouldReadFromCache) {
         final Context context = getContextOrDestroy();
         if(context == null) {
             return;
@@ -80,26 +82,31 @@ public class MarketSenseNewsFetcher {
             return;
         }
 
-        requestNews(url, shouldReadFromCache);
+        requestNews(networkUrl, cacheUrl, shouldReadFromCache);
     }
 
-    private void requestNews(String url, boolean shouldReadFromCache) {
+    private void requestNews(@NonNull String networkUrl, @Nullable String cacheUrl, boolean shouldReadFromCache) {
         final Context context = getContextOrDestroy();
         if(context == null) {
             return;
         }
 
-        MSLog.i("Loading news...: " + url);
+        MSLog.i("Loading news...: " + networkUrl);
+
+        if(cacheUrl == null) {
+            MSLog.d("cacheUrl is null, so we set networkUrl to cacheUrl");
+            cacheUrl = networkUrl;
+        }
 
         if(shouldReadFromCache) {
-            MSLog.i("Loading news...(cache): " + url);
+            MSLog.i("Loading news...(cache): " + cacheUrl);
             Cache cache = Networking.getRequestQueue(context).getCache();
-            Cache.Entry entry = cache.get(url);
+            Cache.Entry entry = cache.get(cacheUrl);
             if(entry != null) {
                 try {
 
                     ArrayList<News> newsArrayList = null;
-                    if(url.contains(PARAM_KEYWORD_ARRAY)) {
+                    if(cacheUrl.contains(PARAM_KEYWORD_ARRAY)) {
                         newsArrayList = NewsRequest.multipleNewsParseResponse(entry.data);
                     } else {
                         newsArrayList = NewsRequest.newsParseResponse(entry.data);
@@ -107,8 +114,6 @@ public class MarketSenseNewsFetcher {
 
                     MSLog.i("Loading news list...(cache hit): " + new String(entry.data));
                     mMarketSenseNewsNetworkListener.onNewsLoad(newsArrayList, true);
-                    // if it is cached, we do not need to do network query.
-                    return;
                 } catch (JSONException e) {
                     MSLog.e("Loading news list...(cache failed JSONException)");
                 }
@@ -118,7 +123,7 @@ public class MarketSenseNewsFetcher {
         }
 
 
-        mNewsRequest = new NewsRequest(Request.Method.GET, url, null, new Response.Listener<ArrayList<News>>() {
+        mNewsRequest = new NewsRequest(Request.Method.GET, networkUrl, null, new Response.Listener<ArrayList<News>>() {
             @Override
             public void onResponse(ArrayList<News> response) {
                 MSLog.i("News Request success: " + response.size());

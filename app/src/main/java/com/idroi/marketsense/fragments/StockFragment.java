@@ -164,7 +164,6 @@ public class StockFragment extends Fragment {
             public void onStxChartDataLoad() {
                 mYahooStxChartCrawler.renderStockChartData();
                 mSkeletonScreen.hide();
-                MSLog.e("onStxChartDataLoad");
             }
 
             @Override

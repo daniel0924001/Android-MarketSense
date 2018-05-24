@@ -1,6 +1,7 @@
 package com.idroi.marketsense.adapter;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
@@ -12,6 +13,8 @@ import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.datasource.NewsSource;
 import com.idroi.marketsense.datasource.NewsStreamPlacer;
+
+import java.util.Locale;
 
 /**
  * Created by daniel.hsieh on 2018/4/18.
@@ -61,10 +64,10 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
     private static final int[] RETRY_TIME_ARRAY_MILLISECONDS = new int[]{1000, 3000, 5000, 25000, 60000, MAXIMUM_RETRY_TIME_MILLISECONDS};
     private int mCurrentRetries = 0;
 
-    public NewsRecyclerAdapter(final Activity activity) {
+    public NewsRecyclerAdapter(final Activity activity, int taskId, Bundle bundle) {
         mActivity = activity;
         mHandler = new Handler();
-        mNewsStreamPlacer = new NewsStreamPlacer(activity);
+        mNewsStreamPlacer = new NewsStreamPlacer(activity, taskId, bundle);
 
         mNewsRenderer = new NewsRenderer();
         mNewsFirstRowRenderer = new NewsFirstRowRenderer();
@@ -95,6 +98,7 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
                     public void run() {
                         int size = mNewsStreamPlacer.clearNews();
                         notifyItemRangeRemoved(0, size);
+                        MSLog.d(String.format(Locale.US, "clear %d data since there are some network data", size));
                     }
                 });
 
@@ -157,8 +161,8 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
         mNewsAvailableListener = listener;
     }
 
-    public void loadNews(String url) {
-        mNewsStreamPlacer.loadNews(url);
+    public void loadNews(String networkUrl, String cacheUrl) {
+        mNewsStreamPlacer.loadNews(networkUrl, cacheUrl);
     }
 
     public void expand(int number) {

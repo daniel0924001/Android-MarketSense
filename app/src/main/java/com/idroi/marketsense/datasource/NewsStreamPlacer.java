@@ -1,6 +1,7 @@
 package com.idroi.marketsense.datasource;
 
 import android.app.Activity;
+import android.os.Bundle;
 
 import java.util.ArrayList;
 
@@ -20,10 +21,10 @@ public class NewsStreamPlacer {
     private Activity mActivity;
 
 
-    public NewsStreamPlacer(Activity activity) {
+    public NewsStreamPlacer(Activity activity, int taskId, Bundle bundle) {
         mActivity = activity;
         mNewsArrayList = new ArrayList<News>();
-        mNewsSource = new NewsSource(mActivity);
+        mNewsSource = new NewsSource(mActivity, taskId, bundle);
     }
 
     public void setNewsSourceListener(NewsSource.NewsSourceListener listener) {
@@ -39,8 +40,8 @@ public class NewsStreamPlacer {
         return 0;
     }
 
-    public void loadNews(String url) {
-        mNewsSource.loadNews(mActivity, url);
+    public void loadNews(String networkUrl, String cacheUrl) {
+        mNewsSource.loadNews(mActivity, networkUrl, cacheUrl);
     }
 
     public void expandNews(final int number, final NewsRecyclerAdapter.NewsExpandListener listener) {

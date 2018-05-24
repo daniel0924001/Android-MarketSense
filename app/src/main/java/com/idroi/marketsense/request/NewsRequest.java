@@ -1,5 +1,8 @@
 package com.idroi.marketsense.request;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -21,7 +24,10 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
+
+import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_REQUEST_NAME;
 
 /**
  * Created by daniel.hsieh on 2018/4/22.
@@ -55,7 +61,7 @@ public class NewsRequest extends Request<ArrayList<News>> {
             ArrayList<News> newsArrayList = null;
 
             // there are two formats
-            if(mUrl.contains(PARAM_KEYWORD_ARRAY)) {
+            if (mUrl.contains(PARAM_KEYWORD_ARRAY)) {
                 newsArrayList = multipleNewsParseResponse(response.data);
             } else {
                 newsArrayList = newsParseResponse(response.data);
@@ -113,7 +119,7 @@ public class NewsRequest extends Request<ArrayList<News>> {
         ArrayList<News> newsArrayList = new ArrayList<>();
         JSONObject multipleNewsJsonObject = getMultipleNewsResult(new JSONObject(new String(data)));
 
-        if(multipleNewsJsonObject != null) {
+        if (multipleNewsJsonObject != null) {
             Iterator<String> iterator = multipleNewsJsonObject.keys();
             while (iterator.hasNext()) {
                 String key = iterator.next();
@@ -136,65 +142,115 @@ public class NewsRequest extends Request<ArrayList<News>> {
 
     private static JSONObject getMultipleNewsResult(JSONObject jsonResponse) {
 
-        if(jsonResponse.optBoolean(PARAM_CODE) && jsonResponse.opt(PARAM_RESULT) != null) {
+        if (jsonResponse.optBoolean(PARAM_CODE) && jsonResponse.opt(PARAM_RESULT) != null) {
             return jsonResponse.optJSONObject(PARAM_RESULT);
         }
 
         return null;
     }
 
-    private static final String API_URL = "http://apiv2.infohubapp.com/v1/stock/news?";
-    private static final String PARAM_LIMIT = "&limit=";
     public static final String PARAM_STATUS = "&status=";
     public static final String PARAM_LEVEL = "&level=";
-    private static final String PARAM_RANDOM = "&random=";
     private static final String PARAM_TIMESTAMP = "&timestamp=";
-    private static final String PARAM_MAGIC_NUM = "&magic_number=";
 
     private static final String API_KEYWORD_URL = "http://apiv2.infohubapp.com/v1/stock/search?";
-    private static final String PARAM_KEYWORD = "&keyword=";
     public static final String PARAM_KEYWORD_ARRAY = "&keywords[]=";
 
     public static final String PARAM_STATUS_RISING = "r";
     public static final String PARAM_STATUS_FALLING = "f";
 
-    public static String queryNewsURL(String status,
-                                      int level) {
-        return API_URL + PARAM_LIMIT + 300 +
-                PARAM_STATUS + status +
-                PARAM_LEVEL + level +
-                PARAM_RANDOM + "0" +
-                PARAM_TIMESTAMP + (System.currentTimeMillis() / (300 * 1000));
+    public static final String API_QUERY_NEWS_URL =
+            "http://apiv2.infohubapp.com/v1/stock/news?limit=%d&status=%s&level=%d&random=0";
+    public static final String API_QUERY_KEYWORD_NEWS_URL =
+            "http://apiv2.infohubapp.com/v1/stock/search?keyword=%s";
+
+    private static final int REFRESH_TIME = 10;
+
+    // start of query news
+    public static String queryNewsUrlPrefix(String status, int level) {
+        return String.format(Locale.US, API_QUERY_NEWS_URL, 300, status, level);
     }
 
-    public static String queryKeywordNewsURL(String keyword) {
+    public static String queryNewsUrl(Context context, String status,
+                                      int level,
+                                      boolean isNetworkUrl) {
+        String urlPrefix = queryNewsUrlPrefix(status, level);
+        if (isNetworkUrl || context == null) {
+            return urlPrefix +
+                    PARAM_TIMESTAMP + (System.currentTimeMillis() / (REFRESH_TIME * 1000));
+        } else {
+            SharedPreferences sharedPreferences =
+                    context.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE);
+            return sharedPreferences.getString(urlPrefix, urlPrefix +
+                    PARAM_TIMESTAMP + (System.currentTimeMillis() / (REFRESH_TIME * 1000)));
+        }
+    }
 
-        return API_KEYWORD_URL + PARAM_KEYWORD + keyword +
-                PARAM_TIMESTAMP + System.currentTimeMillis() / (300 * 1000);
+    // start of query keyword news
+    public static String queryKeywordNewsUrlPrefix(String keyword) {
+        return String.format(Locale.US, API_QUERY_KEYWORD_NEWS_URL, keyword);
+    }
+
+    public static String queryKeywordNewsUrl(Context context, String keyword, boolean isNetworkUrl) {
+        String urlPrefix = queryKeywordNewsUrlPrefix(keyword);
+        if (isNetworkUrl || context == null) {
+            return urlPrefix +
+                    PARAM_TIMESTAMP + System.currentTimeMillis() / (REFRESH_TIME * 1000);
+        } else {
+            SharedPreferences sharedPreferences =
+                    context.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE);
+            return sharedPreferences.getString(urlPrefix, urlPrefix +
+                    PARAM_TIMESTAMP + System.currentTimeMillis() / (REFRESH_TIME * 1000));
+        }
     }
 
 
-    @Nullable
-    public static String queryKeywordArrayNewsURL() {
+    // start of query keyword array news
+    public static String queryKeywordArrayNewsUrlPrefix() {
+        StringBuilder stringBuilder = queryKeywordArrayNewsPrefix();
+        if(stringBuilder == null) {
+            return null;
+        } else {
+            return stringBuilder.toString();
+        }
+    }
+
+    private static StringBuilder queryKeywordArrayNewsPrefix() {
         StringBuilder url = new StringBuilder(API_KEYWORD_URL);
         ArrayList<String> favoriteStocks =
                 ClientData.getInstance().getUserProfile().getFavoriteStocks();
 
-        if(favoriteStocks.size() == 0) {
+        if (favoriteStocks.size() == 0) {
             // user maybe logout
             return null;
         }
 
-        for(int i = 0; i < favoriteStocks.size(); i++) {
+        for (int i = 0; i < favoriteStocks.size(); i++) {
             url.append(PARAM_KEYWORD_ARRAY)
                     .append(ClientData.getInstance().getNameFromCode(favoriteStocks.get(i)));
         }
-        url.append(PARAM_TIMESTAMP).append(System.currentTimeMillis() / (300 * 1000));
-        return url.toString();
+        return url;
     }
 
-    public static String appendMagicString(String url, int magic) {
-        url = url + PARAM_MAGIC_NUM + magic;
-        return url;
+    @Nullable
+    public static String queryKeywordArrayNewsUrl(Context context, boolean isNetworkUrl) {
+
+        StringBuilder url = queryKeywordArrayNewsPrefix();
+        if(url == null) {
+            return null;
+        }
+
+        // prefix
+        String urlPrefix = url.toString();
+        // prefix + timestamp
+        url.append(PARAM_TIMESTAMP).append(System.currentTimeMillis() / (REFRESH_TIME * 1000));
+
+        if(isNetworkUrl || context == null) {
+            return url.toString();
+        } else {
+            SharedPreferences sharedPreferences =
+                    context.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE);
+            return sharedPreferences.getString(urlPrefix, url.toString());
+        }
     }
 }

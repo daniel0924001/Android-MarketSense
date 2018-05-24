@@ -1,6 +1,7 @@
 package com.idroi.marketsense.fragments;
 
-import android.content.pm.PackageManager;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -19,10 +20,12 @@ import com.idroi.marketsense.NewsWebViewActivity;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.adapter.NewsRecyclerAdapter;
 import com.idroi.marketsense.common.ClientData;
+import com.idroi.marketsense.common.SharedPreferencesCompat;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.NewsRequest;
 
+import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_REQUEST_NAME;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 import static com.idroi.marketsense.request.NewsRequest.PARAM_LEVEL;
 import static com.idroi.marketsense.request.NewsRequest.PARAM_STATUS;
@@ -60,6 +63,7 @@ public class NewsFragment extends Fragment {
     private NewsRecyclerAdapter mNewsRecyclerAdapter;
     private RecyclerViewSkeletonScreen mSkeletonScreen;
 
+    private String mNetworkUrl;
     private int mTaskId;
     private UserProfile.UserProfileChangeListener mUserProfileChangeListener;
 
@@ -81,7 +85,7 @@ public class NewsFragment extends Fragment {
             mTaskId = GENERAL_TASK_ID; // default
         }
 
-        mNewsRecyclerAdapter = new NewsRecyclerAdapter(getActivity());
+        mNewsRecyclerAdapter = new NewsRecyclerAdapter(getActivity(), mTaskId, getArguments());
         mRecyclerView.setAdapter(mNewsRecyclerAdapter);
 
         mSkeletonScreen = Skeleton.bind(mRecyclerView)
@@ -108,7 +112,8 @@ public class NewsFragment extends Fragment {
                         if(url == null) {
                             mNewsRecyclerAdapter.clearNews();
                         } else {
-                            mNewsRecyclerAdapter.loadNews(generateURL());
+                            mNetworkUrl = generateURL(true);
+                            mNewsRecyclerAdapter.loadNews(mNetworkUrl, generateURL(false));
                         }
                     }
                 }
@@ -137,7 +142,8 @@ public class NewsFragment extends Fragment {
 
         String url = generateURL();
         if(url != null) {
-            mNewsRecyclerAdapter.loadNews(generateURL());
+            mNetworkUrl = generateURL(true);
+            mNewsRecyclerAdapter.loadNews(mNetworkUrl, generateURL(false));
         } else {
             setVisibilityForEmptyData(true);
         }
@@ -174,19 +180,28 @@ public class NewsFragment extends Fragment {
     }
 
     public String generateURL() {
+        return generateURL(true);
+    }
+
+    public String generateURL(boolean isNetworkUrl) {
         if(getArguments() == null) {
             return null;
         }
 
         switch (mTaskId) {
             case GENERAL_TASK_ID:
-                return NewsRequest.queryNewsURL(
+                return NewsRequest.queryNewsUrl(
+                        getContext(),
                         getArguments().getString(PARAM_STATUS),
-                        getArguments().getInt(PARAM_LEVEL));
+                        getArguments().getInt(PARAM_LEVEL),
+                        isNetworkUrl);
             case KEYWORD_TASK_ID:
-                return NewsRequest.queryKeywordNewsURL(getArguments().getString(KEYWORD_NAME));
+                return NewsRequest.queryKeywordNewsUrl(
+                        getContext(),
+                        getArguments().getString(KEYWORD_NAME),
+                        isNetworkUrl);
             case KEYWORD_ARRAY_TASK_ID:
-                return NewsRequest.queryKeywordArrayNewsURL();
+                return NewsRequest.queryKeywordArrayNewsUrl(getContext(), isNetworkUrl);
             default:
                 return null;
         }

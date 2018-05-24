@@ -1,6 +1,10 @@
 package com.idroi.marketsense.datasource;
 
+import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.os.Handler;
 import android.widget.Toast;
 
@@ -12,8 +16,17 @@ import java.util.Comparator;
 
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.MarketSenseError;
+import com.idroi.marketsense.common.SharedPreferencesCompat;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.request.NewsRequest;
+
+import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_REQUEST_NAME;
+import static com.idroi.marketsense.fragments.NewsFragment.GENERAL_TASK_ID;
+import static com.idroi.marketsense.fragments.NewsFragment.KEYWORD_ARRAY_TASK_ID;
+import static com.idroi.marketsense.fragments.NewsFragment.KEYWORD_NAME;
+import static com.idroi.marketsense.fragments.NewsFragment.KEYWORD_TASK_ID;
+import static com.idroi.marketsense.request.NewsRequest.PARAM_LEVEL;
+import static com.idroi.marketsense.request.NewsRequest.PARAM_STATUS;
 
 /**
  * Created by daniel.hsieh on 2018/4/18.
@@ -46,13 +59,18 @@ public class NewsSource {
     private boolean mFirstTimeNewsAvailable;
     private NewsSourceListener mNewsSourceListener;
 
-    private String mUrl;
+    private String mNetworkUrl, mCacheUrl;
     private int mSequenceNumber;
     private boolean mShouldReadFromCache;
     private boolean mHasShowNoMore = false;
 
-    NewsSource(Activity activity) {
+    private int mTaskId;
+    private Bundle mBundle;
+
+    NewsSource(Activity activity, int taskId, Bundle bundle) {
         mActivity = new WeakReference<Activity>(activity);
+        mTaskId = taskId;
+        mBundle = bundle;
         mNewsCache = new ArrayList<News>();
         mReplenishCacheHandler = new Handler();
         mReplenishCacheRunnable = new Runnable() {
@@ -110,7 +128,12 @@ public class NewsSource {
                     mFirstTimeNewsAvailable = true;
                     if(mNewsSourceListener != null) {
                         mNewsSourceListener.onNewsAvailable();
+                        mIsCache = isCache;
                     }
+                }
+
+                if(!isCache) {
+                    writeToSharedPreference();
                 }
 
                 // we only query one time
@@ -138,7 +161,7 @@ public class NewsSource {
 
                 mRetryInFlight = true;
                 MSLog.w("Wait for " + getRetryTime() + " milliseconds. (Do nothing in this version)");
-                if(!mFirstTimeNewsAvailable) {
+                if(mIsCache || !mFirstTimeNewsAvailable) {
                     mReplenishCacheHandler.postDelayed(mReplenishCacheRunnable, getRetryTime());
                 }
                 updateRetryTime();
@@ -190,8 +213,9 @@ public class NewsSource {
         mCurrentRetries = 0;
     }
 
-    public void loadNews(Activity activity, String url) {
-        mUrl = url;
+    public void loadNews(Activity activity, String networkUrl, String cacheUrl) {
+        mNetworkUrl = networkUrl;
+        mCacheUrl = cacheUrl;
         loadNews(new MarketSenseNewsFetcher(activity, mMarketSenseNewsNetworkListener));
     }
 
@@ -218,7 +242,7 @@ public class NewsSource {
         if(!mRequestInFlight && mNewsFetcher != null && mNewsCache.size() < DEFAULT_CACHE_LIMIT) {
             mRequestInFlight = true;
 //            mNewsFetcher.makeRequest(NewsRequest.appendMagicString(mUrl, mSequenceNumber), mShouldReadFromCache);
-            mNewsFetcher.makeRequest(mUrl, mShouldReadFromCache);
+            mNewsFetcher.makeRequest(mNetworkUrl, mCacheUrl, mShouldReadFromCache);
         }
     }
 
@@ -229,5 +253,38 @@ public class NewsSource {
                 return news2.getSourceDateInt() - news1.getSourceDateInt();
             }
         };
+    }
+
+    public void writeToSharedPreference() {
+        Activity activity = mActivity.get();
+        if(activity == null) {
+            return;
+        }
+
+        if(mBundle == null) {
+            return;
+        }
+
+        String key = null;
+        SharedPreferences.Editor editor =
+                activity.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE).edit();
+        switch (mTaskId) {
+            case GENERAL_TASK_ID:
+                key = NewsRequest.queryNewsUrlPrefix(mBundle.getString(PARAM_STATUS), mBundle.getInt(PARAM_LEVEL));
+                editor.putString(key, mNetworkUrl);
+                MSLog.d("News network query success, so we save this network url to cache: " + key + ", " + mNetworkUrl);
+                break;
+            case KEYWORD_TASK_ID:
+                key = NewsRequest.queryKeywordNewsUrlPrefix(mBundle.getString(KEYWORD_NAME));
+                editor.putString(key, mNetworkUrl);
+                MSLog.d("Keyword news network query success, so we save this network url to cache: " + key + ", " + mNetworkUrl);
+                break;
+            case KEYWORD_ARRAY_TASK_ID:
+                key = NewsRequest.queryKeywordArrayNewsUrlPrefix();
+                editor.putString(key, mNetworkUrl);
+                MSLog.d("Keyword array news network query success, so we save this network url to cache: " + key + ", " + mNetworkUrl);
+                break;
+        }
+        SharedPreferencesCompat.apply(editor);
     }
 }

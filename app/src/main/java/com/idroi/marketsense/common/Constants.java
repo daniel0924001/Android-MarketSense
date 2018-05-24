@@ -8,6 +8,8 @@ import com.idroi.marketsense.data.Stock;
 
 public class Constants {
 
+    public static final String SHARED_PREFERENCE_REQUEST_NAME = "com.idroi.marketsense.request";
+
     public static final String HTTP = "http://";
     public static final String FACEBOOK_CONSTANTS = "Facebook";
     public static final String GOOGLE_PLUS_CONSTANTS = "GooglePlus";

@@ -78,8 +78,8 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
         mOnItemClickListener = listener;
     }
 
-    public void loadStockList(String url) {
-        mStockListPlacer.loadStockList(url);
+    public void loadStockList(String networkUrl, String cacheUrl) {
+        mStockListPlacer.loadStockList(networkUrl, cacheUrl);
     }
 
     @Override

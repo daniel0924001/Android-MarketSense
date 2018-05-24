@@ -1,7 +1,10 @@
 package com.idroi.marketsense.datasource;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.android.volley.Cache;
 import com.android.volley.Request;
@@ -10,6 +13,7 @@ import com.android.volley.VolleyError;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.common.MarketSenseNetworkError;
+import com.idroi.marketsense.common.SharedPreferencesCompat;
 import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.request.StockRequest;
 import com.idroi.marketsense.util.MarketSenseUtils;
@@ -18,6 +22,8 @@ import org.json.JSONException;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+
+import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_REQUEST_NAME;
 
 /**
  * Created by daniel.hsieh on 2018/4/23.
@@ -66,7 +72,7 @@ public class MarketSenseStockFetcher {
         };
     }
 
-    void makeRequest(String url) {
+    void makeRequest(@NonNull String networkUrl, @Nullable String cacheUrl) {
         final Context context = getContextOrDestroy();
         if(context == null) {
             return;
@@ -77,20 +83,25 @@ public class MarketSenseStockFetcher {
             return;
         }
 
-        requestStock(url);
+        requestStock(networkUrl, cacheUrl);
     }
 
-    private void requestStock(String url) {
+    private void requestStock(@NonNull final String networkUrl, @Nullable String cacheUrl) {
         final Context context = getContextOrDestroy();
         if(context == null) {
             return;
         }
 
-        MSLog.i("Loading stock list...: " + url);
+        MSLog.i("Loading stock list...: " + networkUrl);
 
-        MSLog.i("Loading stock list...(cache): " + url);
+        if(cacheUrl == null) {
+            MSLog.d("cacheUrl is null, so we set networkUrl to cacheUrl");
+            cacheUrl = networkUrl;
+        }
+
+        MSLog.i("Loading stock list...(cache): " + cacheUrl);
         final Cache cache = Networking.getRequestQueue(context).getCache();
-        Cache.Entry entry = cache.get(url);
+        Cache.Entry entry = cache.get(cacheUrl);
         if(entry != null) {
             try {
                 ArrayList<Stock> stockArrayList = StockRequest.stockParseResponse(entry.data);
@@ -103,11 +114,17 @@ public class MarketSenseStockFetcher {
             MSLog.i("Loading stock list...(cache miss)");
         }
 
-        mStockRequest = new StockRequest(Request.Method.GET, url, null, new Response.Listener<ArrayList<Stock>>() {
+        mStockRequest = new StockRequest(Request.Method.GET, networkUrl, null, new Response.Listener<ArrayList<Stock>>() {
             @Override
             public void onResponse(ArrayList<Stock> response) {
                 mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
                 mMarketSenseStockNetworkListener.onStockListLoad(response);
+
+                SharedPreferences.Editor editor =
+                        context.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE).edit();
+                editor.putString(StockRequest.API_URL, networkUrl);
+                SharedPreferencesCompat.apply(editor);
+                MSLog.d("Stock price network query success, so we save this network url to cache: " + networkUrl);
             }
         }, new Response.ErrorListener() {
             @Override

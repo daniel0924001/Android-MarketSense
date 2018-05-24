@@ -101,8 +101,8 @@ public class StockListFragment extends Fragment {
                 @Override
                 public void onUserProfileChange(int notifyId) {
                     if(notifyId == NOTIFY_ID_FAVORITE_LIST) {
-                        MSLog.d("onUserProfileChange in StockListFragment: " + generateURL());
-                        mStockListRecyclerAdapter.loadStockList(generateURL());
+                        MSLog.d("onUserProfileChange in StockListFragment: " + generateNetworkURL());
+                        mStockListRecyclerAdapter.loadStockList(generateNetworkURL(), generateCacheUrl());
                     }
                 }
             };
@@ -134,7 +134,7 @@ public class StockListFragment extends Fragment {
                 setVisibilityForEmptyData(true);
             }
         });
-        mStockListRecyclerAdapter.loadStockList(generateURL());
+        mStockListRecyclerAdapter.loadStockList(generateNetworkURL(), generateCacheUrl());
 
         mStockListRecyclerAdapter.setOnItemClickListener(new StockListRecyclerAdapter.OnItemClickListener() {
             @Override
@@ -149,8 +149,12 @@ public class StockListFragment extends Fragment {
         });
     }
 
-    public String generateURL() {
-        return StockRequest.queryStockList();
+    public String generateNetworkURL() {
+        return StockRequest.queryStockList(getContext(), true);
+    }
+
+    public String generateCacheUrl() {
+        return StockRequest.queryStockList(getContext(), false);
     }
 
     @Override

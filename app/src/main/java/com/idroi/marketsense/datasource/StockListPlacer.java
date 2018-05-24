@@ -40,7 +40,7 @@ public class StockListPlacer {
 
     private Activity mActivity;
     private MarketSenseStockFetcher mMarketSenseStockFetcher;
-    private String mUrl;
+    private String mNetworkUrl, mCacheUrl;
     private int mTask;
 
     public StockListPlacer(Activity activity, int taskId) {
@@ -91,7 +91,7 @@ public class StockListPlacer {
             public void onStockListFail(MarketSenseError marketSenseError) {
                 increaseRetryTime();
                 if(isRetry()) {
-                    mMarketSenseStockFetcher.makeRequest(mUrl);
+                    mMarketSenseStockFetcher.makeRequest(mNetworkUrl, mCacheUrl);
                 } else {
                     generateDefaultStockList();
                     if(mStockListListener != null) {
@@ -126,15 +126,16 @@ public class StockListPlacer {
         mStockListListener = listener;
     }
 
-    public void loadStockList(String url) {
-        mUrl = url;
+    public void loadStockList(String networkUrl, String cacheUrl) {
+        mNetworkUrl = networkUrl;
+        mCacheUrl = cacheUrl;
         loadStockList(new MarketSenseStockFetcher(mActivity, mMarketSenseStockNetworkListener));
     }
 
     private void loadStockList(MarketSenseStockFetcher stockFetcher) {
         clear();
         mMarketSenseStockFetcher = stockFetcher;
-        mMarketSenseStockFetcher.makeRequest(mUrl);
+        mMarketSenseStockFetcher.makeRequest(mNetworkUrl, mCacheUrl);
     }
 
     public void clear() {

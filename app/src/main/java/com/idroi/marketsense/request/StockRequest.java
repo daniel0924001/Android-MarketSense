@@ -1,5 +1,8 @@
 package com.idroi.marketsense.request;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
@@ -16,6 +19,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Map;
+
+import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_REQUEST_NAME;
 
 /**
  * Created by daniel.hsieh on 2018/4/23.
@@ -87,9 +92,15 @@ public class StockRequest extends Request<ArrayList<Stock>> {
         return null;
     }
 
-    private static final String API_URL = "http://apiv2.infohubapp.com/v1/stock/prices";
+    public static final String API_URL = "http://apiv2.infohubapp.com/v1/stock/prices";
 
-    public static String queryStockList() {
-        return API_URL + "?timestamp=" + System.currentTimeMillis() / (30 * 1000);
+    public static String queryStockList(Context context, boolean isNetworkUrl) {
+        if(isNetworkUrl) {
+            return API_URL + "?timestamp=" + System.currentTimeMillis() / (30 * 1000);
+        } else {
+            SharedPreferences sharedPreferences =
+                    context.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE);
+            return sharedPreferences.getString(API_URL, API_URL + "?timestamp=" + System.currentTimeMillis() / (30 * 1000));
+        }
     }
 }

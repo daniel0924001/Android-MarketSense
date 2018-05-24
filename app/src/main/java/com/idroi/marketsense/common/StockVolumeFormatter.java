@@ -20,4 +20,8 @@ public class StockVolumeFormatter implements IAxisValueFormatter {
         }
         return mPriceFormat.format(value);
     }
+
+    public String getMarkerFormattedValue(float value) {
+        return "量: " + mPriceFormat.format(value);
+    }
 }

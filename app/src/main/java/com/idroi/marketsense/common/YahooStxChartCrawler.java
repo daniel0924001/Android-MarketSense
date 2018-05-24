@@ -1,7 +1,6 @@
 package com.idroi.marketsense.common;
 
 import android.content.Context;
-import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Handler;
@@ -21,7 +20,8 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.data.StockTickData;
@@ -117,8 +117,40 @@ public class YahooStxChartCrawler {
         setDescription();
         setXAxis();
         setYAxis();
+        setTouchMarker();
 
         mPriceLineChart.invalidate();
+    }
+
+    private void setTouchMarker() {
+        StockChartMarkerView lineChartMarker = new StockChartMarkerView(mContext, R.layout.stock_price_chart_marker);
+        StockChartMarkerView barChartMarker = new StockChartMarkerView(mContext, R.layout.stock_price_chart_marker);
+        mPriceLineChart.setTouchEnabled(true);
+        mPriceLineChart.setMarker(lineChartMarker);
+        mVolumeBarChart.setTouchEnabled(true);
+        mVolumeBarChart.setMarker(barChartMarker);
+        mPriceLineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                mVolumeBarChart.highlightValue(null);
+            }
+
+            @Override
+            public void onNothingSelected() {
+                mPriceLineChart.highlightValue(null);
+            }
+        });
+        mVolumeBarChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                mPriceLineChart.highlightValue(null);
+            }
+
+            @Override
+            public void onNothingSelected() {
+                mVolumeBarChart.highlightValue(null);
+            }
+        });
     }
 
     private void setData() {
@@ -132,6 +164,9 @@ public class YahooStxChartCrawler {
             yPrices.add(entry);
             BarEntry volume = new BarEntry(stockTickData.getMinute(), stockTickData.getVolume());
             yVolume.add(volume);
+
+            entry.setData(stockTickData);
+            volume.setData(stockTickData);
         }
 
         LineDataSet lineDataSet = new LineDataSet(yPrices, null);
@@ -156,7 +191,6 @@ public class YahooStxChartCrawler {
         mVolumeBarChart.setData(barData);
         mVolumeBarChart.setBackgroundColor(mContext.getResources().getColor(R.color.marketsense_text_white));
         mVolumeBarChart.getLegend().setEnabled(false);
-
     }
 
     private void setDescription() {

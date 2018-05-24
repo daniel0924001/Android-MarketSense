@@ -23,4 +23,8 @@ public class StockPriceFormatter implements IAxisValueFormatter {
     public String getFormattedValue(float value, AxisBase axis) {
         return mPriceFormat.format(value);
     }
+
+    public String getMarkerFormattedValue(float value) {
+        return "價: " + getFormattedValue(value, null);
+    }
 }

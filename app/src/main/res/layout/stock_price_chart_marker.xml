@@ -1,6 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/color_price_line"
+    android:padding="3dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/marker_chart_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/marketsense_text_white"
+        android:textSize="12sp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/marker_chart_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/marketsense_text_white"
+        android:textSize="12sp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        app:layout_constraintTop_toBottomOf="@id/marker_chart_time"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/marker_chart_volume"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/marketsense_text_white"
+        android:textSize="12sp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        app:layout_constraintTop_toBottomOf="@id/marker_chart_price"
+        app:layout_constraintStart_toStartOf="parent"
+        />
 
 </android.support.constraint.ConstraintLayout>

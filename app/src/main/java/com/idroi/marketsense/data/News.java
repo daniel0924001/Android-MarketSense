@@ -29,17 +29,21 @@ public class News {
 
     private static final String ID = "id";
     private static final String TITLE = "title";
+    private static final String DESCRIPTION = "description";
     private static final String SOURCE_NAME = "source_name";
     private static final String PAGE_LINK = "page_link";
     private static final String ORIGIN_LINK = "link";
     private static final String IMAGE_URL_ARRAY = "image_url_array";
+    private static final String IMAGE_URL = "image_url";
     private static final String SOURCE_DATE_INT = "source_date_int";
+    private static final String SOURCE_DATE_STR = "source_date_str";
     private static final String PREDICTION = "prediction";
     private static final String RAISE = "raise";
     private static final String FALL = "fall";
 
     private String mId;
     private String mTitle;
+    private String mDescription;
     private String mSourceName;
     private String mUrlImage;
     private String mUrlNewsPage;
@@ -62,6 +66,10 @@ public class News {
 
     public void setTitle(String title) {
         mTitle = title;
+    }
+
+    public void setDescription(String description) {
+        mDescription = description;
     }
 
     public void setSourceName(String sourceName) {
@@ -113,6 +121,10 @@ public class News {
         return mTitle;
     }
 
+    public String getDescription() {
+        return mDescription;
+    }
+
     public String getUrlImage() {
         return mUrlImage;
     }
@@ -161,7 +173,7 @@ public class News {
         return mNextNews;
     }
 
-    public static News JsonObjectToNews(JSONObject jsonObject) {
+    public static News jsonObjectToNews(JSONObject jsonObject) {
         News news = new News();
         Iterator<String> iterator = jsonObject.keys();
         while(iterator.hasNext()) {
@@ -173,6 +185,9 @@ public class News {
                         break;
                     case TITLE:
                         news.setTitle(jsonObject.optString(key));
+                        break;
+                    case DESCRIPTION:
+                        news.setDescription(jsonObject.optString(key));
                         break;
                     case SOURCE_NAME:
                         news.setSourceName(jsonObject.optString(key));
@@ -189,10 +204,17 @@ public class News {
                             news.setUrlImage(imageArray.optString(0));
                         }
                         break;
+                    case IMAGE_URL:
+                        news.setUrlImage(jsonObject.optString(key));
+                        break;
                     case SOURCE_DATE_INT:
                         news.setDate(DateConverter.convertToDate(jsonObject.optInt(key)));
                         news.setSourceDateInt(jsonObject.optInt(key));
                         break;
+                    case SOURCE_DATE_STR:
+                        int source_date_int = Integer.parseInt(jsonObject.optString(key));
+                        news.setDate(DateConverter.convertToDate(source_date_int));
+                        news.setSourceDateInt(source_date_int);
                     case PREDICTION:
                         news.setLevel(jsonObject.optInt(key));
                         break;

@@ -37,6 +37,7 @@ import com.idroi.marketsense.adapter.PredictScreenSlidePagerAdapter;
 import com.idroi.marketsense.adapter.NewsScreenSlidePagerAdapter;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
+import com.idroi.marketsense.common.FrescoHelper;
 import com.idroi.marketsense.common.MarketSenseCommonNavigator;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
@@ -52,19 +53,6 @@ import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 
 public class MainActivity extends AppCompatActivity {
-
-    public static final int MAX_IMAGE_SIZE = ByteConstants.MB;
-
-    final MemoryCacheParams mBitmapCacheParams = new MemoryCacheParams(
-            10 * ByteConstants.MB,
-            Integer.MAX_VALUE,
-            3 * ByteConstants.MB,
-            Integer.MAX_VALUE,
-            MAX_IMAGE_SIZE);
-
-    public static final int MAX_DISK_CACHE_VERY_LOW_SIZE = 10 * ByteConstants.MB;
-    public static final int MAX_DISK_CACHE_LOW_SIZE = 30 * ByteConstants.MB;
-    public static final int MAX_DISK_CACHE_SIZE = 100 * ByteConstants.MB;
 
     private ViewPager mViewPager;
     private MagicIndicator mMagicIndicator;
@@ -151,33 +139,19 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        Supplier<MemoryCacheParams> mSupplierMemoryCacheParams = new Supplier<MemoryCacheParams>() {
-            @Override
-            public MemoryCacheParams get() {
-                return mBitmapCacheParams;
-            }
-        };
-
-        DiskCacheConfig diskCacheConfig = DiskCacheConfig.newBuilder(this)
-                .setMaxCacheSize(MAX_DISK_CACHE_SIZE)
-                .setMaxCacheSizeOnLowDiskSpace(MAX_DISK_CACHE_LOW_SIZE)
-                .setMaxCacheSizeOnVeryLowDiskSpace(MAX_DISK_CACHE_VERY_LOW_SIZE)
-                .build();
-        ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
-                .setBitmapMemoryCacheParamsSupplier(mSupplierMemoryCacheParams)
-                .setMainDiskCacheConfig(diskCacheConfig)
-                .setDownsampleEnabled(true)
-                .setBitmapsConfig(Bitmap.Config.RGB_565)
-                .build();
-
-        // Fresco
-        Fresco.initialize(getApplicationContext(), config);
+        FrescoHelper.initialize(getApplicationContext());
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         setActionBar();
         setViewPager();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+
+        super.onNewIntent(intent);
     }
 
     @Override

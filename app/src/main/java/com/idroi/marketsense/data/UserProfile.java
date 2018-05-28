@@ -235,7 +235,6 @@ public class UserProfile {
         if(mEventsArrayList != null) {
             for (int i = 0; i < mEventsArrayList.size(); i++) {
                 Event event = mEventsArrayList.get(i);
-                MSLog.e(event.toString());
                 if(event.getEvent().equals(EVENT_VOTING) &&
                         event.getEventTarget().equals(EVENT_TARGET_NEWS) &&
                         event.getEventContent().equals(newsId)) {

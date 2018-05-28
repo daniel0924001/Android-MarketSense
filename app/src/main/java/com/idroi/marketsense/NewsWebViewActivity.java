@@ -41,6 +41,7 @@ import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.common.FrescoImageHelper;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
+import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.SingleNewsRequest;
@@ -54,7 +55,6 @@ import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_HTML;
 import static com.idroi.marketsense.RichEditorActivity.sEditorRequestCode;
 import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_NEWS_COMMENT_CLICK;
-import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_STOCK_COMMENT_CLICK;
 
 /**
  * Created by daniel.hsieh on 2018/4/25.
@@ -571,6 +571,13 @@ public class NewsWebViewActivity extends AppCompatActivity {
         MSLog.i("Loading web page (middle): " + mPageLink);
         mNewsWebViewMiddle.loadUrl(mPageLink);
         mHandler.postDelayed(mLoadOriginalWebViewRunnable, sPostDelayMilliSeconds);
+    }
+
+    public static Intent generateNewsWebViewActivityIntent(Context context, News news) {
+        return generateNewsWebViewActivityIntent(context, news.getId(),
+                news.getTitle(), news.getUrlImage(), news.getDate(),
+                news.getPageLink(), news.getOriginLink(),
+                news.getVoteRaiseNum(), news.getVoteFallNum());
     }
 
     public static Intent generateNewsWebViewActivityIntent(

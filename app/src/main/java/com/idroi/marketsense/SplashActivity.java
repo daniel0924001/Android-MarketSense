@@ -1,18 +1,19 @@
 package com.idroi.marketsense;
 
 import android.content.Intent;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
-import android.view.Display;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
+
+import static com.idroi.marketsense.notification.NotificationHelper.NEWS_GENERAL_ALL;
 
 /**
  * Created by daniel.hsieh on 2018/4/26.
@@ -23,6 +24,8 @@ public class SplashActivity extends AppCompatActivity{
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MSLog.i("Enter SplashActivity");
+
+        FirebaseMessaging.getInstance().subscribeToTopic(NEWS_GENERAL_ALL);
 
         MSLog.i("Initialize ClientData");
         ClientData clientData = ClientData.getInstance(this);

@@ -2,10 +2,7 @@ package com.idroi.marketsense.request;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
@@ -88,7 +85,7 @@ public class NewsRequest extends Request<ArrayList<News>> {
         if (newsJsonArray != null) {
             ArrayList<News> newsArrayList = new ArrayList<>();
             for (int i = 0; i < newsJsonArray.length(); i++) {
-                News news = News.JsonObjectToNews(newsJsonArray.getJSONObject(i));
+                News news = News.jsonObjectToNews(newsJsonArray.getJSONObject(i));
                 if (news != null) {
                     newsArrayList.add(news);
                 }
@@ -127,7 +124,7 @@ public class NewsRequest extends Request<ArrayList<News>> {
                 if (newsJsonArray != null) {
                     MSLog.d("stock name: " + key + ", size: " + newsJsonArray.length());
                     for (int i = 0; i < newsJsonArray.length(); i++) {
-                        News news = News.JsonObjectToNews(newsJsonArray.getJSONObject(i));
+                        News news = News.jsonObjectToNews(newsJsonArray.getJSONObject(i));
                         if (news != null) {
                             newsArrayList.add(news);
                         }

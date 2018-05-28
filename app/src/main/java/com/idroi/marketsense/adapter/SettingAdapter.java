@@ -1,6 +1,8 @@
 package com.idroi.marketsense.adapter;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +14,9 @@ import com.idroi.marketsense.R;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
+
+import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_USER_SETTING;
+import static com.idroi.marketsense.common.Constants.USER_SETTING_NOTIFICATION_KEY;
 
 /**
  * Created by daniel.hsieh on 2018/4/30.
@@ -104,8 +109,17 @@ public class SettingAdapter extends BaseAdapter {
             settingViewHolder.titleView.setText(getItem(position).toString());
 
             if (position == 1) {
+                boolean isNotificationSetting = true;
+                Activity activity = mActivity.get();
+                if(activity != null) {
+                    SharedPreferences sharedPreferences =
+                            activity.getSharedPreferences(SHARED_PREFERENCE_USER_SETTING, Context.MODE_PRIVATE);
+                    isNotificationSetting = sharedPreferences.getBoolean(USER_SETTING_NOTIFICATION_KEY, true);
+                }
+
                 settingViewHolder.switchView.setVisibility(View.VISIBLE);
                 settingViewHolder.gotoView.setVisibility(View.GONE);
+                settingViewHolder.switchView.setChecked(isNotificationSetting);
                 settingViewHolder.switchView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {

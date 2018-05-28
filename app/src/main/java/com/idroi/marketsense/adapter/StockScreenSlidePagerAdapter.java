@@ -15,6 +15,7 @@ import static com.idroi.marketsense.fragments.NewsFragment.TASK_NAME;
 import static com.idroi.marketsense.fragments.StockFragment.FALL_BUNDLE;
 import static com.idroi.marketsense.fragments.StockFragment.RAISE_BUNDLE;
 import static com.idroi.marketsense.fragments.StockFragment.STOCK_CODE;
+import static com.idroi.marketsense.fragments.StockFragment.STOCK_NAME;
 
 /**
  * Created by daniel.hsieh on 2018/4/24.
@@ -44,6 +45,7 @@ public class StockScreenSlidePagerAdapter extends BaseScreenSlidePagerAdapter {
             StockFragment stockFragment = new StockFragment();
             Bundle bundle = new Bundle();
             bundle.putString(STOCK_CODE, mCode);
+            bundle.putString(STOCK_NAME, mStockName);
             bundle.putInt(RAISE_BUNDLE, mRaiseNum);
             bundle.putInt(FALL_BUNDLE, mFallNum);
             stockFragment.setArguments(bundle);

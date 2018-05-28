@@ -1,8 +1,10 @@
 package com.idroi.marketsense;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -34,6 +36,7 @@ import com.idroi.marketsense.adapter.SettingAdapter;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.common.MarketSenseRendererHelper;
+import com.idroi.marketsense.common.SharedPreferencesCompat;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
 
@@ -45,6 +48,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
+import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_REQUEST_NAME;
+import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_USER_SETTING;
+import static com.idroi.marketsense.common.Constants.USER_SETTING_NOTIFICATION_KEY;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 
 /**
@@ -242,6 +248,11 @@ public class SettingActivity extends AppCompatActivity {
 
             @Override
             public void onSwitchClick(boolean isChecked) {
+                MSLog.d("user set notification to: " + isChecked);
+                SharedPreferences.Editor editor =
+                        SettingActivity.this.getSharedPreferences(SHARED_PREFERENCE_USER_SETTING, Context.MODE_PRIVATE).edit();
+                editor.putBoolean(USER_SETTING_NOTIFICATION_KEY, isChecked);
+                SharedPreferencesCompat.apply(editor);
             }
         });
         mListView.setAdapter(mSettingAdapter);

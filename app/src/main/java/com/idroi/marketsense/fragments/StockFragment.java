@@ -51,6 +51,7 @@ import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_STOCK_COMMENT_CLI
 public class StockFragment extends Fragment {
 
     public final static String STOCK_CODE = "STOCK_CODE";
+    public final static String STOCK_NAME = "STOCK_NAME";
     public final static String RAISE_BUNDLE = "RAISE_BUNDLE";
     public final static String FALL_BUNDLE = "FALL_BUNDLE";
     private final static String STOCK_REAL_TIME_URL_PREFIX = "https://so.cnyes.com/JavascriptGraphic/chartstudy.aspx?country=tw&market=twreal&divwidth=%d&divheight=%d&code=%s";
@@ -58,6 +59,7 @@ public class StockFragment extends Fragment {
     private YahooStxChartCrawler mYahooStxChartCrawler;
     private ViewSkeletonScreen mSkeletonScreen;
     private String mStockId;
+    private String mStockName;
 
     private RecyclerView mCommentRecyclerView;
     private CommentsRecyclerViewAdapter mCommentsRecyclerViewAdapter;
@@ -148,6 +150,7 @@ public class StockFragment extends Fragment {
         Bundle bundle = getArguments();
         if(bundle != null) {
             mStockId = bundle.getString(STOCK_CODE);
+            mStockName = bundle.getString(STOCK_NAME);
             mVoteRaiseNum = bundle.getInt(RAISE_BUNDLE, 0);
             mVoteFallNum = bundle.getInt(FALL_BUNDLE, 0);
         }
@@ -155,10 +158,9 @@ public class StockFragment extends Fragment {
 
     private void initStockChart(View view) {
         LineChart lineChart = view.findViewById(R.id.stock_chart_price);
-        String name = ClientData.getInstance().getNameFromCode(mStockId);
         BarChart barChart = view.findViewById(R.id.stock_chart_volume);
         mYahooStxChartCrawler =
-                new YahooStxChartCrawler(getActivity(), name, mStockId, lineChart, barChart);
+                new YahooStxChartCrawler(getActivity(), mStockName, mStockId, lineChart, barChart);
         mYahooStxChartCrawler.setYahooStxChartListener(new YahooStxChartCrawler.YahooStxChartListener() {
             @Override
             public void onStxChartDataLoad() {

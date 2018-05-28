@@ -44,7 +44,7 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
 
         MarketSenseRendererHelper.addTextView(commentViewHolder.userNameView, content.getUserName());
         MarketSenseRendererHelper.addTextView(commentViewHolder.createTimeView, content.getDateString());
-        if(content.getAvatarUrl() != null) {
+        if(content.getAvatarUrl() != null && !content.getAvatarUrl().isEmpty()) {
             FrescoImageHelper.loadImageView(content.getAvatarUrl(),
                     commentViewHolder.avatarView, FrescoImageHelper.ICON_IMAGE_RATIO);
         } else {

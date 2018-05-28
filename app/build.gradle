@@ -9,7 +9,7 @@ android {
         versionCode 1
         versionName "1.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        vectorDrawables.useSupportLibrary= true
+        vectorDrawables.useSupportLibrary = true
 
         project.ext.set("archivesBaseName", "MarketSense_ver_" + versionName + "-" + getJenkinsBuildNumber())
     }
@@ -77,7 +77,12 @@ dependencies {
     implementation 'com.facebook.android:facebook-android-sdk:[4,5)'
 
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
+
+    implementation 'com.google.firebase:firebase-core:15.0.2'
+    implementation 'com.google.firebase:firebase-messaging:15.0.2'
 }
+
+apply plugin: 'com.google.gms.google-services'
 
 static def getJenkinsBuildNumber() {
     def number = System.getenv("BUILD_NUMBER") as Integer ?: 0

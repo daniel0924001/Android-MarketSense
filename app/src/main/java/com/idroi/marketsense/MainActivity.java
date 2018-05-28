@@ -135,10 +135,6 @@ public class MainActivity extends AppCompatActivity {
         MSLog.i("Enter MainActivity");
         setContentView(R.layout.activity_main);
 
-        if(savedInstanceState != null) {
-            return;
-        }
-
         FrescoHelper.initialize(getApplicationContext());
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);

@@ -84,10 +84,6 @@ public class StockActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stock);
 
-        if(savedInstanceState != null) {
-            return;
-        }
-
         initFBLogin();
         setInformation();
         setActionBar();

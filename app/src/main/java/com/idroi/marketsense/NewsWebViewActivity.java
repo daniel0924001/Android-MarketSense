@@ -127,10 +127,6 @@ public class NewsWebViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news_webview);
 
-        if(savedInstanceState != null) {
-            return;
-        }
-
         initFBLogin();
         setInformation();
         setActionBar();

@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -412,6 +413,10 @@ public class MainActivity extends AppCompatActivity {
         UserProfile userProfile = ClientData.getInstance(this).getUserProfile();
         userProfile.addFavoriteStock(code);
         userProfile.notifyUserProfile(NOTIFY_ID_FAVORITE_LIST);
+
+        String format = getResources().getString(R.string.title_add_complete);
+        String name = ClientData.getInstance(this).getNameFromCode(code);
+        Toast.makeText(this, String.format(format, name, code), Toast.LENGTH_SHORT).show();
     }
 
     // fb login part when the user click fab

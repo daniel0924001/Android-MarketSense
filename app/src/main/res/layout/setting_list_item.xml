@@ -30,7 +30,7 @@
         android:layout_marginBottom="20dp"
         android:text="@string/title_action_bar_setting"
         android:textColor="@color/marketsense_text_black"
-        android:textSize="22sp"
+        android:textSize="16sp"
         android:fontFamily="Roboto-Regular"
         android:textStyle="normal"
         android:lineSpacingExtra="4dp"

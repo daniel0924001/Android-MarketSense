@@ -24,4 +24,5 @@
 
     <color name="color_volume_line">#e7f11b1b</color>
     <color name="color_price_line">#e73b76ec</color>
+    <color name="color_yellow">#E9C46A</color>
 </resources>

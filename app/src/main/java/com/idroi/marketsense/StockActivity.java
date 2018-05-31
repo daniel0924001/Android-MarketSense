@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -33,6 +34,7 @@ import net.lucode.hackware.magicindicator.ViewPagerHelper;
 import org.json.JSONObject;
 
 import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_STOCK_COMMENT_CLICK;
 
 /**
@@ -53,6 +55,8 @@ public class StockActivity extends AppCompatActivity {
     private int mRaiseNum, mFallNum;
 
     private CallbackManager mFBCallbackManager;
+    private UserProfile mUserProfile;
+    private boolean mIsFavorite;
 
     private ViewPager.OnPageChangeListener mOnPageChangeListener
             = new ViewPager.OnPageChangeListener() {
@@ -84,6 +88,8 @@ public class StockActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stock);
 
+        mUserProfile = ClientData.getInstance(this).getUserProfile();
+
         initFBLogin();
         setInformation();
         setActionBar();
@@ -107,6 +113,8 @@ public class StockActivity extends AppCompatActivity {
         mCode = getIntent().getStringExtra(EXTRA_CODE);
         mRaiseNum = getIntent().getIntExtra(EXTRA_RAISE_NUM, 0);
         mFallNum = getIntent().getIntExtra(EXTRA_FALL_NUM, 0);
+
+        mIsFavorite = mUserProfile.isFavoriteStock(mCode);
     }
 
     private void setActionBar() {
@@ -133,6 +141,22 @@ public class StockActivity extends AppCompatActivity {
                 textView.setText(title);
             }
 
+            final ImageView addFavorite = view.findViewById(R.id.action_bar_notification);
+            if(addFavorite != null) {
+                addFavorite.setVisibility(View.VISIBLE);
+                if(mIsFavorite) {
+                    addFavorite.setImageResource(R.drawable.ic_star_yellow_24px);
+                } else {
+                    addFavorite.setImageResource(R.drawable.ic_star_border_white_24px);
+                }
+                addFavorite.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        changeFavorite(addFavorite);
+                    }
+                });
+            }
+
             actionBar.setDisplayShowHomeEnabled(false);
             actionBar.setDisplayShowTitleEnabled(false);
             actionBar.setCustomView(view,
@@ -141,6 +165,22 @@ public class StockActivity extends AppCompatActivity {
                             ActionBar.LayoutParams.MATCH_PARENT));
             actionBar.setDisplayShowCustomEnabled(true);
         }
+    }
+
+    private void changeFavorite(final ImageView imageView) {
+        if(mIsFavorite) {
+            mUserProfile.deleteFavoriteStock(mCode);
+            String format = getResources().getString(R.string.title_delete_complete);
+            Toast.makeText(this, String.format(format, mStockName, mCode), Toast.LENGTH_SHORT).show();
+            imageView.setImageResource(R.drawable.ic_star_border_white_24px);
+        } else {
+            mUserProfile.addFavoriteStock(mCode);
+            String format = getResources().getString(R.string.title_add_complete);
+            Toast.makeText(this, String.format(format, mStockName, mCode), Toast.LENGTH_SHORT).show();
+            imageView.setImageResource(R.drawable.ic_star_yellow_24px);
+        }
+        mIsFavorite = mUserProfile.isFavoriteStock(mCode);
+        mUserProfile.notifyUserProfile(NOTIFY_ID_FAVORITE_LIST);
     }
 
     private void setViewPager() {
@@ -219,8 +259,7 @@ public class StockActivity extends AppCompatActivity {
                 String userEmail = FBHelper.fetchFbData(data, UserProfile.FB_USER_EMAIL_KEY);
                 PostEvent.sendRegister(StockActivity.this, userId, userName, FACEBOOK_CONSTANTS,
                         UserProfile.generatePassword(userId, FACEBOOK_CONSTANTS), userEmail, avatarLink);
-                UserProfile userProfile = ClientData.getInstance(StockActivity.this).getUserProfile();
-                userProfile.notifyUserProfile(NOTIFY_ID_STOCK_COMMENT_CLICK);
+                mUserProfile.notifyUserProfile(NOTIFY_ID_STOCK_COMMENT_CLICK);
             }
         }, true);
     }

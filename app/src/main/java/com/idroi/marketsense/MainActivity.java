@@ -2,7 +2,6 @@ package com.idroi.marketsense;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -18,18 +17,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.crashlytics.android.Crashlytics;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.cache.disk.DiskCacheConfig;
-import com.facebook.common.internal.Supplier;
-import com.facebook.common.util.ByteConstants;
-import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.facebook.imagepipeline.cache.MemoryCacheParams;
-import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
@@ -65,8 +57,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView mActionTitleBar;
     private int mLastSelectedItemId = -1;
 
-    public final static int sSearchRequestCode = 1;
+    public final static int sSearchAndAddRequestCode = 1;
     public final static int sSettingRequestCode = 2;
+    public final static int sSearchAndOpenRequestCode = 3;
     private SimpleDraweeView mAvatarImageView;
 
     // fb login part when the user click fab
@@ -123,8 +116,8 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View view) {
             if(FBHelper.checkFBLogin()) {
                 Intent intent = new Intent(MainActivity.this, SearchAndResponseActivity.class);
-                startActivityForResult(intent, sSearchRequestCode);
-                overridePendingTransition(R.anim.enter, R.anim.stop);
+                startActivityForResult(intent, sSearchAndAddRequestCode);
+                overridePendingTransition(0, 0);
             } else {
                 initFBLogin();
                 showLoginAlertDialog();
@@ -221,15 +214,15 @@ public class MainActivity extends AppCompatActivity {
                 setAvatarImage();
             }
 
-            ImageView notificationView = view.findViewById(R.id.action_bar_search);
-            if(notificationView != null) {
-                notificationView.setVisibility(View.VISIBLE);
-                notificationView.setOnClickListener(new View.OnClickListener() {
+            ImageView searchAndOpenView = view.findViewById(R.id.action_bar_search);
+            if(searchAndOpenView != null) {
+                searchAndOpenView.setVisibility(View.VISIBLE);
+                searchAndOpenView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
-                        startActivity(intent);
-                        overridePendingTransition(R.anim.enter, R.anim.stop);
+                        Intent intent = new Intent(MainActivity.this, SearchAndResponseActivity.class);
+                        startActivityForResult(intent, sSearchAndOpenRequestCode);
+                        overridePendingTransition(0, 0);
                     }
                 });
             }
@@ -379,12 +372,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == sSearchRequestCode) {
+        if(requestCode == sSearchAndAddRequestCode) {
             if(resultCode == RESULT_OK) {
                 String name = data.getStringExtra(EXTRA_SELECTED_COMPANY_NAME_KEY);
                 String code = data.getStringExtra(EXTRA_SELECTED_COMPANY_CODE_KEY);
                 MSLog.d("select favorite stock name: " + name + ", code: " + code);
                 addFavoriteStock(code);
+            }
+        } else if (requestCode == sSearchAndOpenRequestCode) {
+            if(resultCode == RESULT_OK) {
+                String name = data.getStringExtra(EXTRA_SELECTED_COMPANY_NAME_KEY);
+                String code = data.getStringExtra(EXTRA_SELECTED_COMPANY_CODE_KEY);
+                MSLog.d("try to open name: " + name + ", code: " + code);
+                startActivity(StockActivity.generateStockActivityIntent(
+                        this, name, code, 0, 0));
             }
         } else if(requestCode == sSettingRequestCode) {
             setAvatarImage();

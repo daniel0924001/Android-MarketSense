@@ -7,12 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.common.MarketSenseRendererHelper;
 import com.idroi.marketsense.data.Stock;
 
-import java.util.Locale;
 import java.util.WeakHashMap;
 
 /**
@@ -51,34 +49,20 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
         MarketSenseRendererHelper.addTextView(stockViewHolder.codeView, content.getCode());
 
         MarketSenseRendererHelper.addTextView(stockViewHolder.priceView, content.getPrice());
-        MarketSenseRendererHelper.addTextView(stockViewHolder.diffNumberView, content.getDiffNumber());
-        MarketSenseRendererHelper.addTextView(stockViewHolder.diffPercentageView, content.getDiffPercentage());
+        MarketSenseRendererHelper.addTextView(stockViewHolder.diffView, content.getDiffPercentage());
 
-        MarketSenseRendererHelper.addTextView(stockViewHolder.predictNewsScore, content.getPredictNewsString());
-        stockViewHolder.predictNewsStars.setRating(content.getPredictNewsScore());
+        MarketSenseRendererHelper.addTextView(stockViewHolder.predictNewsText,
+                context.getResources().getString(content.getPredictNewsStringId()));
 
-        MarketSenseRendererHelper.addTextView(stockViewHolder.predictPeopleScore, content.getPredictPeopleString());
-        stockViewHolder.predictPeopleStars.setRating(content.getPredictPeopleScore());
-
-//        MarketSenseRendererHelper.addTextView(stockViewHolder.predictOurScore, content.getPredictOurString());
-//        stockViewHolder.predictOurStars.setRating(content.getPredictOurScore());
+        MarketSenseRendererHelper.addTextView(stockViewHolder.predictPeopleText,
+                context.getResources().getString(content.getPredictPeopleStringId()));
 
         setColor(context, stockViewHolder, content);
     }
 
     private void setColor(Context context, StockViewHolder stockViewHolder, Stock content) {
-
         int colorResourceId = context.getResources().getColor(content.getDiffColorResourceId());
-        stockViewHolder.priceView.setTextColor(colorResourceId);
-        stockViewHolder.diffPercentageView.setTextColor(colorResourceId);
-        stockViewHolder.diffNumberView.setTextColor(colorResourceId);
-
-        colorResourceId = context.getResources().getColor(content.getNewsColorResourceId());
-        stockViewHolder.predictNewsScore.setTextColor(colorResourceId);
-        colorResourceId = context.getResources().getColor(content.getPeopleColorResourceId());
-        stockViewHolder.predictPeopleScore.setTextColor(colorResourceId);
-//        colorResourceId = context.getResources().getColor(content.getOurColorResourceId());
-//        stockViewHolder.predictOurScore.setTextColor(colorResourceId);
+        stockViewHolder.diffView.setTextColor(colorResourceId);
     }
 
     private void setViewVisibility(final StockViewHolder stockViewHolder, final int visibility) {

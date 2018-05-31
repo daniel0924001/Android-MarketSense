@@ -14,8 +14,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -33,6 +36,7 @@ import com.facebook.login.widget.LoginButton;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.adapter.BaseScreenSlidePagerAdapter;
 import com.idroi.marketsense.adapter.ChoiceScreenSlidePagerAdapter;
+import com.idroi.marketsense.adapter.ChoicesNewsScreenSlidePagerAdapter;
 import com.idroi.marketsense.adapter.PredictScreenSlidePagerAdapter;
 import com.idroi.marketsense.adapter.NewsScreenSlidePagerAdapter;
 import com.idroi.marketsense.common.ClientData;
@@ -54,8 +58,11 @@ import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ViewPager mViewPager;
+    private SwipeableViewPager mViewPager;
     private MagicIndicator mMagicIndicator;
+    private FloatingActionButton mFab;
+    private Button mLeftButton, mRightButton;
+    private TextView mActionTitleBar;
     private int mLastSelectedItemId = -1;
 
     public final static int sSearchRequestCode = 1;
@@ -94,23 +101,19 @@ public class MainActivity extends AppCompatActivity {
             = new ViewPager.OnPageChangeListener() {
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            if(mMagicIndicator != null) {
-                mMagicIndicator.onPageScrolled(position, positionOffset, positionOffsetPixels);
-            }
         }
 
         @Override
         public void onPageSelected(int position) {
-            if(mMagicIndicator != null) {
-                mMagicIndicator.onPageSelected(position);
+            if(position == 0) {
+                setFab(false);
+            } else if(position == 1) {
+                setFab(true);
             }
         }
 
         @Override
         public void onPageScrollStateChanged(int state) {
-            if(mMagicIndicator != null) {
-                mMagicIndicator.onPageScrollStateChanged(state);
-            }
         }
     };
 
@@ -139,6 +142,8 @@ public class MainActivity extends AppCompatActivity {
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        mFab = findViewById(R.id.fab_add);
 
         setActionBar();
         setViewPager();
@@ -194,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(actionBar != null) {
             View view = LayoutInflater.from(actionBar.getThemedContext())
-                    .inflate(R.layout.main_action_bar, null);
+                    .inflate(R.layout.action_bar_middle_button, null);
             actionBar.setDisplayShowHomeEnabled(false);
             actionBar.setDisplayShowTitleEnabled(false);
             actionBar.setCustomView(view,
@@ -216,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
                 setAvatarImage();
             }
 
-            ImageView notificationView = view.findViewById(R.id.action_bar_notification);
+            ImageView notificationView = view.findViewById(R.id.action_bar_search);
             if(notificationView != null) {
                 notificationView.setVisibility(View.VISIBLE);
                 notificationView.setOnClickListener(new View.OnClickListener() {
@@ -228,19 +233,81 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
+
+            mActionTitleBar = view.findViewById(R.id.action_bar_name);
+            mLeftButton = view.findViewById(R.id.btn_left);
+            mRightButton = view.findViewById(R.id.btn_right);
         }
     }
 
     private void setFab(boolean show) {
-        final FloatingActionButton fab = findViewById(R.id.fab_add);
-        if(fab != null) {
+        if(mFab != null) {
             if (show) {
-                fab.setVisibility(View.VISIBLE);
-                fab.setOnClickListener(mOnFabClickListener);
+                mFab.setVisibility(View.VISIBLE);
+                mFab.setOnClickListener(mOnFabClickListener);
             } else {
-                fab.setVisibility(View.GONE);
-                fab.setOnClickListener(null);
+                mFab.setVisibility(View.GONE);
+                mFab.setOnClickListener(null);
             }
+        }
+    }
+
+    private void setActionBarTwoButton(boolean clickable, final boolean switchable) {
+
+        if(switchable && !clickable) {
+            throw new IllegalStateException();
+        }
+
+        if(mLeftButton != null && mRightButton != null) {
+            if(clickable) {
+                mLeftButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mRightButton.setTextColor(getResources().getColor(R.color.text_white));
+                        mRightButton.setBackground(getDrawable(R.drawable.btn_oval_right_black));
+                        mLeftButton.setTextColor(getResources().getColor(R.color.text_black));
+                        mLeftButton.setBackground(getDrawable(R.drawable.btn_oval_left_white));
+                        if(switchable) {
+                            mViewPager.setCurrentItem(0, false);
+                        } else {
+                            setViewPager(R.id.navigation_news);
+                        }
+                    }
+                });
+
+                mRightButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mRightButton.setTextColor(getResources().getColor(R.color.text_black));
+                        mRightButton.setBackground(getDrawable(R.drawable.btn_oval_right_white));
+                        mLeftButton.setTextColor(getResources().getColor(R.color.text_white));
+                        mLeftButton.setBackground(getDrawable(R.drawable.btn_oval_left_black));
+                        if(switchable) {
+                            mViewPager.setCurrentItem(1, false);
+                        } else {
+                            setViewPager(SELF_CHOICE_NEWS_SLIDE_PAGER);
+                        }
+                    }
+                });
+                mLeftButton.setVisibility(View.VISIBLE);
+                mRightButton.setVisibility(View.VISIBLE);
+                mActionTitleBar.setVisibility(View.GONE);
+            } else {
+                mLeftButton.setOnClickListener(null);
+                mRightButton.setOnClickListener(null);
+                mLeftButton.setVisibility(View.GONE);
+                mRightButton.setVisibility(View.GONE);
+                mActionTitleBar.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    private void initActionBarTwoButton() {
+        if(mLeftButton != null && mRightButton != null) {
+            mRightButton.setTextColor(getResources().getColor(R.color.text_white));
+            mRightButton.setBackground(getDrawable(R.drawable.btn_oval_right_black));
+            mLeftButton.setTextColor(getResources().getColor(R.color.text_black));
+            mLeftButton.setBackground(getDrawable(R.drawable.btn_oval_left_white));
         }
     }
 
@@ -248,28 +315,52 @@ public class MainActivity extends AppCompatActivity {
         setViewPager(R.id.navigation_predict);
     }
 
+    private static final int SELF_CHOICE_NEWS_SLIDE_PAGER = 1;
+
     private void setViewPager(int itemId) {
 
         clearViewPager();
 
         // Initialize the ViewPager and set an adapter
         mViewPager = findViewById(R.id.pager);
+        mMagicIndicator = findViewById(R.id.tabs);
+
         BaseScreenSlidePagerAdapter baseScreenSlidePagerAdapter = null;
         switch (itemId) {
             case R.id.navigation_predict:
                 baseScreenSlidePagerAdapter =
                         new PredictScreenSlidePagerAdapter(this, getSupportFragmentManager());
                 setFab(false);
+                mViewPager.setSwipeable(false);
+                mMagicIndicator.setVisibility(View.GONE);
+                mViewPager.addOnPageChangeListener(mOnPageChangeListener);
+                setActionBarTwoButton(true, true);
+                initActionBarTwoButton();
                 break;
             case R.id.navigation_news:
                 baseScreenSlidePagerAdapter =
                         new NewsScreenSlidePagerAdapter(this, getSupportFragmentManager());
                 setFab(false);
+                mViewPager.setSwipeable(true);
+                mMagicIndicator.setVisibility(View.VISIBLE);
+                setActionBarTwoButton(true, false);
+                initActionBarTwoButton();
+                break;
+            case SELF_CHOICE_NEWS_SLIDE_PAGER:
+                baseScreenSlidePagerAdapter =
+                        new ChoicesNewsScreenSlidePagerAdapter(this, getSupportFragmentManager());
+                setFab(false);
+                mViewPager.setSwipeable(false);
+                mMagicIndicator.setVisibility(View.GONE);
+                setActionBarTwoButton(true, false);
                 break;
             case R.id.navigation_choices:
                 baseScreenSlidePagerAdapter =
                         new ChoiceScreenSlidePagerAdapter(this, getSupportFragmentManager());
                 setFab(true);
+                mViewPager.setSwipeable(true);
+                mMagicIndicator.setVisibility(View.VISIBLE);
+                setActionBarTwoButton(false, false);
                 break;
             default:
                 // invalid category
@@ -277,12 +368,9 @@ public class MainActivity extends AppCompatActivity {
         }
         mViewPager.setAdapter(baseScreenSlidePagerAdapter);
 
-        mMagicIndicator = (MagicIndicator) findViewById(R.id.tabs);
         MarketSenseCommonNavigator commonNavigator =
                 new MarketSenseCommonNavigator(this, mViewPager,
                         baseScreenSlidePagerAdapter.getTitles());
-
-        mViewPager.addOnPageChangeListener(mOnPageChangeListener);
 
         mMagicIndicator.setNavigator(commonNavigator);
         ViewPagerHelper.bind(mMagicIndicator, mViewPager);

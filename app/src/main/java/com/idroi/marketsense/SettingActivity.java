@@ -289,7 +289,12 @@ public class SettingActivity extends AppCompatActivity {
             return;
         }
         int id = mStringIds[position];
+        String title = getResources().getString(id);
         switch (id) {
+            case R.string.preference_feedback:
+                startActivity(WebViewActivity.generateWebViewActivityIntent(
+                        this, id, title, "https://docs.google.com/forms/d/e/1FAIpQLSfT0nDlt-Ra052pzXeG7nSjwkStnChRhyTOD5M5flRkukLWoQ/viewform"));
+                break;
             case R.string.preference_about:
                 MSLog.e("this is about");
                 break;

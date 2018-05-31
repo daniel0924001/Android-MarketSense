@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#DB564B</color>
+    <color name="colorPrimary">#393939</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="text_black">#393939</color>
+    <color name="text_white">#ffffff</color>
 
     <color name="marketsense_text_black">#4a4a4a</color>
     <color name="marketsense_text_gray">#898989</color>
@@ -15,8 +18,8 @@
 
     <color name="marketsense_rich_edit_black_background">#4a4a4a</color>
 
-    <color name="colorTrendUp">#f11b1b</color>
-    <color name="colorTrendDown">#0ede11</color>
+    <color name="colorTrendUp">#f20061</color>
+    <color name="colorTrendDown">#00be9f</color>
     <color name="colorTrendFlat">#4a4a4a</color>
 
     <color name="color_volume_line">#e7f11b1b</color>

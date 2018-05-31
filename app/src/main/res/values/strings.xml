@@ -20,10 +20,10 @@
     <string name="title_news_lose_predict">預測跌最多股票</string>
     <string name="title_news_win_today">今日漲最多股票</string>
     <string name="title_news_lose_today">今日跌最多股票</string>
-    <string name="title_news_best_optimistic">重點利多新聞</string>
-    <string name="title_news_best_pessimistic">重點利空新聞</string>
-    <string name="title_news_optimistic">利多新聞</string>
-    <string name="title_news_pessimistic">利空新聞</string>
+    <string name="title_news_best_optimistic">重點利多</string>
+    <string name="title_news_best_pessimistic">重點利空</string>
+    <string name="title_news_optimistic">利多</string>
+    <string name="title_news_pessimistic">利空</string>
     <string name="title_news_read_original">閱讀完整報導</string>
     <string name="title_news_read_middle">返回新聞節錄</string>
 
@@ -48,6 +48,8 @@
 
     <string name="title_action_bar_search">搜尋</string>
     <string name="title_action_bar_setting">設定</string>
+    <string name="title_action_bar_market">市場</string>
+    <string name="title_action_bar_choice">自選</string>
 
     <string name="title_company_name">公司名稱</string>
     <string name="title_company_code">公司代號</string>
@@ -57,10 +59,21 @@
     <string name="title_company_price_diff_num">股價漲跌數字</string>
     <string name="title_company_price_diff_percentage">股價漲跌百分比</string>
     <string name="title_company_confidence">公司信心指數</string>
-    <string name="title_company_predict">台股的兩大消息面\n新聞面/鄉民面</string>
-    <string name="title_company_predict_news_title">新聞</string>
-    <string name="title_company_predict_people_title">鄉民</string>
-    <string name="title_company_predict_our_title">大鳥</string>
+
+    <string name="title_company_fluctuation">漲跌幅度</string>
+    <string name="title_company_predict_news_title">新聞預測</string>
+    <string name="title_company_predict_people_title">鄉民預測</string>
+    <string name="title_company_predict_our_title">大鳥預測</string>
+
+    <string name="title_level_up_highest">最看漲！</string>
+    <string name="title_level_up_high">非常看漲</string>
+    <string name="title_level_up_low">看漲</string>
+
+    <string name="title_level_flat">持平</string>
+
+    <string name="title_level_down_highest">最看跌！</string>
+    <string name="title_level_down_high">非常看跌</string>
+    <string name="title_level_down_low">看跌</string>
 
     <string name="title_up">漲</string>
     <string name="title_down">跌</string>

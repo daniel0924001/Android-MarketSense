@@ -93,7 +93,6 @@ public class StockListPlacer {
                 if(isRetry()) {
                     mMarketSenseStockFetcher.makeRequest(mNetworkUrl, mCacheUrl);
                 } else {
-                    generateDefaultStockList();
                     if(mStockListListener != null) {
                         mStockListListener.onStockListLoaded();
                     }
@@ -149,13 +148,13 @@ public class StockListPlacer {
         }
     }
 
-    private void generateDefaultStockList() {
-        MSLog.e("Stock generate default stock list");
-        if(mStockArrayList == null) {
-            mStockArrayList = new ArrayList<Stock>();
-        }
-        mStockArrayList.addAll(Arrays.asList(Constants.HOT_STOCKS_KEYWORDS));
-    }
+//    private void generateDefaultStockList() {
+//        MSLog.e("Stock generate default stock list");
+//        if(mStockArrayList == null) {
+//            mStockArrayList = new ArrayList<Stock>();
+//        }
+//        mStockArrayList.addAll(Arrays.asList(Constants.HOT_STOCKS_KEYWORDS));
+//    }
 
     public int getItemCount() {
         if(mStockArrayList != null) {

@@ -39,6 +39,10 @@
             android:label="@string/activity_news_web_name">
         </activity>
 
+        <activity android:name=".WebViewActivity"
+            android:label="@string/activity_news_web_name">
+        </activity>
+
         <activity android:name=".NotificationActivity"
             android:label="@string/activity_news_notification">
         </activity>

@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.R;
+import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.common.SharedPreferencesCompat;
 import com.idroi.marketsense.util.DateUtils;
 
@@ -81,7 +82,9 @@ public class UserProfile {
                 }
             };
             mEventsArrayList = new ArrayList<>();
-            initUserData(context);
+            if(FBHelper.checkFBLogin()) {
+                initUserData(context);
+            }
         }
     }
 
@@ -192,15 +195,22 @@ public class UserProfile {
     }
 
     public String getVoteForStockEventCreatedTimestamp(String code) {
+        long max = -1;
+        String result = null;
         if(mEventsArrayList != null) {
             for (int i = 0; i < mEventsArrayList.size(); i++) {
                 Event event = mEventsArrayList.get(i);
                 if(event.getEvent().equals(EVENT_VOTING) &&
                         event.getEventTarget().equals(EVENT_TARGET_STOCK) &&
                         event.getEventContent().equals(code)) {
-                    return event.getEventCreatedTs();
+                    long temp = Long.valueOf(event.getEventCreatedTs());
+                    if(temp > max) {
+                        max = temp;
+                        result = event.getEventCreatedTs();
+                    }
                 }
             }
+            return result;
         }
         return null;
     }

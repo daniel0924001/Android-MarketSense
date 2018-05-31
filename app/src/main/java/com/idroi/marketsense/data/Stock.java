@@ -25,6 +25,11 @@ public class Stock {
     private static final String RAISE = "raise";
     private static final String FALL = "fall";
 
+    public static final int LEVEL_HIGHEST = 2;
+    public static final int LEVEL_HIGH = 1;
+    public static final int LEVEL_LOW = 0;
+    public static final int LEVEL_INVALID = -1;
+
     public static final int TREND_UP = 1;
     public static final int TREND_DOWN = -1;
     public static final int TREND_FLAT = 0;
@@ -140,46 +145,6 @@ public class Stock {
         }
     }
 
-    public int getNewsColorResourceId() {
-        switch (mConfidenceDirection) {
-            case TREND_UP:
-                return R.color.colorTrendUp;
-            case TREND_FLAT:
-                return R.color.colorTrendFlat;
-            case TREND_DOWN:
-                return R.color.colorTrendDown;
-            default:
-                return R.color.colorTrendFlat;
-        }
-    }
-
-    public int getPeopleColorResourceId() {
-        switch (mVotingDirection) {
-            case TREND_UP:
-                return R.color.colorTrendUp;
-            case TREND_FLAT:
-                return R.color.colorTrendFlat;
-            case TREND_DOWN:
-                return R.color.colorTrendDown;
-            default:
-                return R.color.colorTrendFlat;
-        }
-    }
-
-    public int getOurColorResourceId() {
-        switch (mVotingDirection) {
-            case TREND_UP:
-                return R.color.colorTrendUp;
-            case TREND_FLAT:
-                return R.color.colorTrendFlat;
-            case TREND_DOWN:
-                return R.color.colorTrendDown;
-            default:
-                return R.color.colorTrendFlat;
-        }
-    }
-
-
     public double getDiffPercentageDouble() {
         return mDiffPercentage;
     }
@@ -198,7 +163,16 @@ public class Stock {
     }
 
     public String getDiffPercentage() {
-        return String.format(Locale.US, "(%.2f%%)", mDiffPercentage);
+        switch (mDiffDirection) {
+            case TREND_UP:
+                return String.format(Locale.US, "+ %.2f%%", mDiffPercentage);
+            case TREND_FLAT:
+                return String.format(Locale.US, "%.2f%%", mDiffPercentage);
+            case TREND_DOWN:
+                return String.format(Locale.US, "- %.2f%%", mDiffPercentage);
+            default:
+                return String.format(Locale.US, "%.2f%%", mDiffPercentage);
+        }
     }
 
     public String getPrice() {
@@ -221,59 +195,65 @@ public class Stock {
         return mFallNum;
     }
 
-    public String getPredictNewsString() {
-        float score = getPredictNewsScore();
-        switch (mConfidenceDirection) {
-            case TREND_UP:
-                return String.format(Locale.US, "▲ %.1f", score);
-            case TREND_FLAT:
-                return String.format(Locale.US, "%.1f", score);
-            case TREND_DOWN:
-                return String.format(Locale.US, "▼ %.1f", score);
-            default:
-                return String.format(Locale.US, "%.1f", score);
+    private static int getPredictClass(double value) {
+        if(value >= 0 && value < 33) {
+            return LEVEL_LOW;
+        } else if(value >= 33 && value < 66) {
+            return LEVEL_HIGH;
+        } else if(value >= 66 && value <= 100) {
+            return LEVEL_HIGHEST;
+        } else {
+            MSLog.e("invalid value: " + value);
+            return LEVEL_INVALID;
         }
+    }
+
+    private static int getPredictText(int level, int direction) {
+        if(direction == TREND_UP) {
+            if(level == LEVEL_HIGHEST) {
+                return R.string.title_level_up_highest;
+            } else if(level == LEVEL_HIGH) {
+                return R.string.title_level_up_high;
+            } else {
+                return R.string.title_level_up_low;
+            }
+        } else if(direction == TREND_DOWN) {
+            if(level == LEVEL_HIGHEST) {
+                return R.string.title_level_down_highest;
+            } else if(level == LEVEL_HIGH) {
+                return R.string.title_level_down_high;
+            } else {
+                return R.string.title_level_down_low;
+            }
+        } else {
+            return R.string.title_level_flat;
+        }
+    }
+
+    public int getPredictNewsLevel() {
+        return getPredictClass(mConfidence);
+    }
+
+    public int getPredictNewsStringId() {
+        return getPredictText(getPredictNewsLevel(), mConfidenceDirection);
     }
 
     public float getPredictNewsScore() {
         return (float) mConfidence * 3 / 100;
     }
 
-    public String getPredictPeopleString() {
-        float score = getPredictPeopleScore();
-        switch (mVotingDirection) {
-            case TREND_UP:
-                return String.format(Locale.US, "▲ %.1f", score);
-            case TREND_FLAT:
-                return String.format(Locale.US, "%.1f", score);
-            case TREND_DOWN:
-                return String.format(Locale.US, "▼ %.1f", score);
-            default:
-                return String.format(Locale.US, "%.1f", score);
-        }
+    public int getPredictPeopleStringId() {
+        return getPredictText(getPredictPeopleLevel(), mVotingDirection);
+    }
+
+    public int getPredictPeopleLevel() {
+        return getPredictClass(mVoting);
     }
 
     public float getPredictPeopleScore() {
         return (float) mVoting * 3 / 100;
     }
 
-    public String getPredictOurString() {
-        float score = getPredictOurScore();
-        switch (mVotingDirection) {
-            case TREND_UP:
-                return String.format(Locale.US, "▲ %.1f", score);
-            case TREND_FLAT:
-                return String.format(Locale.US, "%.1f", score);
-            case TREND_DOWN:
-                return String.format(Locale.US, "▼ %.1f", score);
-            default:
-                return String.format(Locale.US, "%.1f", score);
-        }
-    }
-
-    public float getPredictOurScore() {
-        return (float) mVoting * 3 / 100;
-    }
 
     @Nullable
     public static Stock jsonObjectToStock(JSONObject jsonObject, boolean removeNan) {

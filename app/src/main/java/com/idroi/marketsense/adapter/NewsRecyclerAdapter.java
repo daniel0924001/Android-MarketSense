@@ -93,12 +93,25 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
 
             @Override
             public void onNotifyRemove() {
+                final int size = mNewsStreamPlacer.clearNews();
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        int size = mNewsStreamPlacer.clearNews();
-                        notifyItemRangeRemoved(0, size);
+                        if(mInitLayoutType == NEWS_MULTIPLE_LAYOUT) {
+                            if(size >= 4) {
+                                notifyItemRangeRemoved(0, size - 1);
+                            }
+                        } else {
+                            notifyItemRangeRemoved(0, size);
+                        }
+//                        notifyDataSetChanged();
                         MSLog.d(String.format(Locale.US, "clear %d data since there are some network data", size));
+                        new Handler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                expand(13);
+                            }
+                        });
                     }
                 });
 
@@ -111,7 +124,15 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        notifyItemRangeInserted(start, amount);
+                        if(mInitLayoutType == NEWS_MULTIPLE_LAYOUT) {
+                            if(start >= 4) {
+                                notifyItemRangeInserted(start - 1, amount);
+                            } else {
+                                notifyItemRangeInserted(start, amount - 1);
+                            }
+                        } else {
+                            notifyItemRangeInserted(start, amount);
+                        }
                     }
                 });
                 resetRetryTime();

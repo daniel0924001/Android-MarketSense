@@ -59,6 +59,7 @@ public class UserEventsAndCodesRequest extends Request<Void> {
     }
 
     private static boolean setUserEventAndCodes(JSONObject jsonResponse) {
+        MSLog.d("user preference: " + jsonResponse);
         if(jsonResponse.optBoolean(PARAM_STATUS) &&
                 jsonResponse.optJSONObject(PARAM_RESULT) != null &&
                 jsonResponse.optJSONObject(PARAM_RESULT).optJSONArray(PARAM_STOCK_CODES) != null) {

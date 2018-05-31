@@ -94,8 +94,6 @@ public class NewsSource {
                      // isCache = false;  recent data is from network
                      // we have to clear cache data if the data is from network
                     mNewsCache.clear();
-                    mNewsSourceListener.onNotifyRemove();
-                    mIsCache = false;
                 }
 
                 boolean moreFlag = false;
@@ -123,12 +121,22 @@ public class NewsSource {
                     MSLog.i("Add " + counter + " news.");
                 }
 
+                if(mIsCache && !isCache) {
+                    // mIsCache = true;  last data is from cache
+                    // isCache = false;  recent data is from network
+                    // we have to clear cache data if the data is from network
+                    mNewsSourceListener.onNotifyRemove();
+                    mIsCache = false;
+                }
+
                 if(!mFirstTimeNewsAvailable) {
                     mShouldReadFromCache = false;
                     mFirstTimeNewsAvailable = true;
                     if(mNewsSourceListener != null) {
                         mNewsSourceListener.onNewsAvailable();
-                        mIsCache = isCache;
+                        if(!mIsCache) {
+                            mIsCache = isCache;
+                        }
                     }
                 }
 

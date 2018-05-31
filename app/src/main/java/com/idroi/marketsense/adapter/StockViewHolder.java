@@ -1,9 +1,6 @@
 package com.idroi.marketsense.adapter;
 
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.idroi.marketsense.Logging.MSLog;
@@ -21,15 +18,10 @@ public class StockViewHolder {
     TextView codeView;
 
     TextView priceView;
-    TextView diffNumberView;
-    TextView diffPercentageView;
+    TextView diffView;
 
-    TextView predictNewsScore;
-    RatingBar predictNewsStars;
-    TextView predictPeopleScore;
-    RatingBar predictPeopleStars;
-//    TextView predictOurScore;
-//    RatingBar predictOurStars;
+    TextView predictNewsText;
+    TextView predictPeopleText;
 
     static final StockViewHolder EMPTY_VIEW_HOLDER = new StockViewHolder();
 
@@ -42,14 +34,9 @@ public class StockViewHolder {
             stockViewHolder.nameView = view.findViewById(R.id.marketsense_stock_name_tv);
             stockViewHolder.codeView = view.findViewById(R.id.marketsense_stock_code_tv);
             stockViewHolder.priceView = view.findViewById(R.id.marketsense_stock_price_tv);
-            stockViewHolder.diffNumberView = view.findViewById(R.id.marketsense_stock_diff_num_tv);
-            stockViewHolder.diffPercentageView = view.findViewById(R.id.marketsense_stock_diff_percentage_tv);
-            stockViewHolder.predictNewsScore = view.findViewById(R.id.predict_news_description);
-            stockViewHolder.predictNewsStars = view.findViewById(R.id.predict_news_stars);
-            stockViewHolder.predictPeopleScore = view.findViewById(R.id.predict_people_description);
-            stockViewHolder.predictPeopleStars = view.findViewById(R.id.predict_people_stars);
-//            stockViewHolder.predictOurScore = view.findViewById(R.id.predict_our_description);
-//            stockViewHolder.predictOurStars = view.findViewById(R.id.predict_our_stars);
+            stockViewHolder.diffView = view.findViewById(R.id.marketsense_stock_diff_tv);
+            stockViewHolder.predictNewsText = view.findViewById(R.id.predict_news_description);
+            stockViewHolder.predictPeopleText = view.findViewById(R.id.predict_people_description);
             return stockViewHolder;
         } catch (ClassCastException exception) {
             MSLog.e(exception.toString());

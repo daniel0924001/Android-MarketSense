@@ -62,7 +62,6 @@ public class NewsSource {
     private String mNetworkUrl, mCacheUrl;
     private int mSequenceNumber;
     private boolean mShouldReadFromCache;
-    private boolean mHasShowNoMore = false;
 
     private int mTaskId;
     private Bundle mBundle;
@@ -84,19 +83,11 @@ public class NewsSource {
         mMarketSenseNewsNetworkListener = new MarketSenseNewsFetcher.MarketSenseNewsNetworkListener() {
             @Override
             public void onNewsLoad(ArrayList<News> newsArray, boolean isCache) {
+                MSLog.d("[news request]: loaded mIsCache (" + mIsCache + "), isCache (" + isCache + ").");
 
                 if(mIsCache && isCache) {
                     return;
                 }
-
-                if(mIsCache && !isCache) {
-                     // mIsCache = true;  last data is from cache
-                     // isCache = false;  recent data is from network
-                     // we have to clear cache data if the data is from network
-                    mNewsCache.clear();
-                }
-
-                boolean moreFlag = false;
 
                 if(mNewsFetcher == null || mActivity.get() == null) {
                     return;
@@ -106,30 +97,20 @@ public class NewsSource {
                 mSequenceNumber++;
                 resetRetryTime();
 
-                int counter = 0;
-                if(newsArray != null) {
-                    Comparator<News> comparator = genComparator();
-                    Collections.sort(newsArray, comparator);
-                    for (int i = 0; i < newsArray.size(); i++) {
-                        if (!mNewsCache.contains(newsArray.get(i))) {
-                            counter++;
-                            mNewsCache.add(newsArray.get(i));
-                            moreFlag = true;
-                            mHasShowNoMore = false;
-                        }
-                    }
-                    MSLog.i("Add " + counter + " news.");
-                }
-
-                if(mIsCache && !isCache) {
-                    // mIsCache = true;  last data is from cache
-                    // isCache = false;  recent data is from network
-                    // we have to clear cache data if the data is from network
-                    mNewsSourceListener.onNotifyRemove();
-                    mIsCache = false;
-                }
-
                 if(!mFirstTimeNewsAvailable) {
+                    int counter = 0;
+                    if(newsArray != null) {
+                        Comparator<News> comparator = genComparator();
+                        Collections.sort(newsArray, comparator);
+                        for (int i = 0; i < newsArray.size(); i++) {
+                            if (!mNewsCache.contains(newsArray.get(i))) {
+                                counter++;
+                                mNewsCache.add(newsArray.get(i));
+                            }
+                        }
+                        MSLog.d("[news request]: add " + counter + " news.");
+                    }
+
                     mShouldReadFromCache = false;
                     mFirstTimeNewsAvailable = true;
                     if(mNewsSourceListener != null) {
@@ -141,17 +122,9 @@ public class NewsSource {
                 }
 
                 if(!isCache) {
+                    MSLog.d("[news request]: write to shared preference.");
                     writeToSharedPreference();
                 }
-
-                // we only query one time
-//                if(moreFlag) {
-//                    replenishCache();
-//                } else if(mActivity.get() != null && !mHasShowNoMore) {
-//                    mHasShowNoMore = true;
-//                    MSLog.w("no more data, maybe duplicate");
-//                    Toast.makeText(mActivity.get(), "暫時沒有新聞資料，請稍候...", Toast.LENGTH_SHORT).show();
-//                }
             }
 
             @Override

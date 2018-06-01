@@ -170,11 +170,13 @@ public class StockActivity extends AppCompatActivity {
     private void changeFavorite(final ImageView imageView) {
         if(mIsFavorite) {
             mUserProfile.deleteFavoriteStock(mCode);
+            PostEvent.sendFavoriteStocksDelete(this, mCode);
             String format = getResources().getString(R.string.title_delete_complete);
             Toast.makeText(this, String.format(format, mStockName, mCode), Toast.LENGTH_SHORT).show();
             imageView.setImageResource(R.drawable.ic_star_border_white_24px);
         } else {
             mUserProfile.addFavoriteStock(mCode);
+            PostEvent.sendFavoriteStocksAdd(this, mCode);
             String format = getResources().getString(R.string.title_add_complete);
             Toast.makeText(this, String.format(format, mStockName, mCode), Toast.LENGTH_SHORT).show();
             imageView.setImageResource(R.drawable.ic_star_yellow_24px);

@@ -31,6 +31,9 @@ public class StockRequest extends Request<ArrayList<Stock>> {
     private static final String PARAM_STATUS = "status";
     private static final String PARAM_RESULT = "result";
 
+    private static final long STOCK_REQUEST_SOFT_TTL = 30 * 1000;
+    private static final long STOCK_REQUEST_TTL = 10 * 60 * 1000;
+
     private final Map<String, String> mHeader;
     private final Response.Listener<ArrayList<Stock>> mListener;
 
@@ -96,7 +99,7 @@ public class StockRequest extends Request<ArrayList<Stock>> {
 
     public static String queryStockList(Context context, boolean isNetworkUrl) {
         if(isNetworkUrl) {
-            return API_URL + "?timestamp=" + System.currentTimeMillis() / (30 * 1000);
+            return API_URL + "?timestamp=" + System.currentTimeMillis() / (STOCK_REQUEST_SOFT_TTL);
         } else {
             SharedPreferences sharedPreferences =
                     context.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE);

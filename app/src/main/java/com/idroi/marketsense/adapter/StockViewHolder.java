@@ -1,6 +1,7 @@
 package com.idroi.marketsense.adapter;
 
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.idroi.marketsense.Logging.MSLog;
@@ -23,6 +24,9 @@ public class StockViewHolder {
     TextView predictNewsText;
     TextView predictPeopleText;
 
+    ImageView predictNewsImageView;
+    ImageView predictPeopleImageView;
+
     static final StockViewHolder EMPTY_VIEW_HOLDER = new StockViewHolder();
 
     private StockViewHolder() {}
@@ -37,6 +41,8 @@ public class StockViewHolder {
             stockViewHolder.diffView = view.findViewById(R.id.marketsense_stock_diff_tv);
             stockViewHolder.predictNewsText = view.findViewById(R.id.predict_news_description);
             stockViewHolder.predictPeopleText = view.findViewById(R.id.predict_people_description);
+            stockViewHolder.predictNewsImageView = view.findViewById(R.id.predict_news_icon);
+            stockViewHolder.predictPeopleImageView = view.findViewById(R.id.predict_people_icon);
             return stockViewHolder;
         } catch (ClassCastException exception) {
             MSLog.e(exception.toString());

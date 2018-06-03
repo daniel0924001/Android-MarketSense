@@ -29,6 +29,7 @@ public class ClientData {
 
     private Context mContext;
     private ArrayList<Stock> mAllStocksListInfo;
+    private ArrayList<Stock> mAllStockPriceList;
 
     private int mScreenWidth, mScreenHeight;
     private int mScreenWidthPixels, mScreenHeightPixels;
@@ -95,6 +96,10 @@ public class ClientData {
         mAllStocksListInfo = stocksListInfo;
     }
 
+    public void setAllStockPriceList(ArrayList<Stock> stockPriceList) {
+        mAllStockPriceList = stockPriceList;
+    }
+
     public void setUserToken(String token) {
         mUserToken = token;
     }
@@ -121,6 +126,18 @@ public class ClientData {
 
     public int getScreenHeightPixels() {
         return mScreenHeightPixels;
+    }
+
+    public Stock getPriceFromCode(String code) {
+        if(mAllStockPriceList != null) {
+            for (int i = 0; i < mAllStockPriceList.size(); i++) {
+                Stock stock = mAllStockPriceList.get(i);
+                if(stock.getCode().equals(code)) {
+                    return stock;
+                }
+            }
+        }
+        return null;
     }
 
     public ArrayList<Stock> getAllStocksListInfo() {

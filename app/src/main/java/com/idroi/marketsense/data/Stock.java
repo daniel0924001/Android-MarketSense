@@ -1,6 +1,8 @@
 package com.idroi.marketsense.data;
 
+import android.content.Context;
 import android.support.annotation.Nullable;
+import android.widget.ImageView;
 
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.R;
@@ -152,11 +154,11 @@ public class Stock {
     public String getDiffNumber() {
         switch (mDiffDirection) {
             case TREND_UP:
-                return String.format(Locale.US, "▲ %.2f", mDiffNumber);
+                return String.format(Locale.US, "+ %.2f", mDiffNumber);
             case TREND_FLAT:
                 return String.format(Locale.US, "%.2f", mDiffNumber);
             case TREND_DOWN:
-                return String.format(Locale.US, "▼ %.2f", mDiffNumber);
+                return String.format(Locale.US, "- %.2f", mDiffNumber);
             default:
                 return String.format(Locale.US, "%.2f", mDiffNumber);
         }
@@ -252,6 +254,39 @@ public class Stock {
 
     public float getPredictPeopleScore() {
         return (float) mVoting * 3 / 100;
+    }
+
+    public int getPredictPeopleDirection() {
+        return mVotingDirection;
+    }
+
+    public void setVotingIcon(Context context, ImageView imageView) {
+        int level = getPredictPeopleLevel();
+        if(mVotingDirection == TREND_UP || mVotingDirection == TREND_FLAT) {
+            imageView.setBackground(context.getDrawable(R.drawable.btn_round_red));
+            if(level == LEVEL_HIGHEST || level == LEVEL_HIGH) {
+                imageView.setImageDrawable(context.getDrawable(R.mipmap.ic_arrow_up_l));
+            } else {
+                imageView.setImageDrawable(context.getDrawable(R.mipmap.ic_arrow_up_s));
+            }
+        } else {
+            imageView.setBackground(context.getDrawable(R.drawable.btn_round_green));
+            if(level == LEVEL_HIGHEST || level == LEVEL_HIGH) {
+                imageView.setImageDrawable(context.getDrawable(R.mipmap.ic_arrow_down_l));
+            } else {
+                imageView.setImageDrawable(context.getDrawable(R.mipmap.ic_arrow_down_s));
+            }
+        }
+    }
+
+    public void setPredictionIcon(Context context, ImageView imageView) {
+        if(mConfidenceDirection == TREND_UP || mConfidenceDirection == TREND_FLAT) {
+            imageView.setBackground(context.getDrawable(R.drawable.btn_round_red));
+            imageView.setImageDrawable(context.getDrawable(R.mipmap.ic_arrow_up_l));
+        } else {
+            imageView.setBackground(context.getDrawable(R.drawable.btn_round_green));
+            imageView.setImageDrawable(context.getDrawable(R.mipmap.ic_arrow_down_l));
+        }
     }
 
 

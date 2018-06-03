@@ -27,6 +27,14 @@ import static com.idroi.marketsense.fragments.StockListFragment.SELF_CHOICES_ID;
 
 public class StockListPlacer {
 
+    public final static int SORT_BY_NAME = 1;
+    public final static int SORT_BY_DIFF = 2;
+    public final static int SORT_BY_PEOPLE = 3;
+    public final static int SORT_BY_NEWS = 4;
+
+    public final static int SORT_UPWARD = 1;
+    public final static int SORT_DOWNWARD = 2;
+
     public interface StockListListener {
         void onStockListLoaded();
     }
@@ -42,9 +50,13 @@ public class StockListPlacer {
     private MarketSenseStockFetcher mMarketSenseStockFetcher;
     private String mNetworkUrl, mCacheUrl;
     private int mTask;
+    private int mSortedField;
+    private int mSortedDirection;
 
-    public StockListPlacer(Activity activity, int taskId) {
+    public StockListPlacer(Activity activity, int taskId, int field, int direction) {
         mActivity = activity;
+        mSortedField = field;
+        mSortedDirection = direction;
 
         mMarketSenseStockNetworkListener = new MarketSenseStockFetcher.MarketSenseStockNetworkListener() {
             @Override
@@ -69,6 +81,8 @@ public class StockListPlacer {
                     }
                 } else {
                     mStockArrayList = new ArrayList<>(stockArrayList);
+                    ClientData.getInstance(mActivity).setAllStockPriceList(mStockArrayList);
+                    MSLog.d("set all stock price");
 
                     // There are four fragments in PredictionScreenSlidePagerAdapter
                     // 1st: sort by prediction confidence in descending
@@ -76,11 +90,10 @@ public class StockListPlacer {
                     // 3rd: sort by stock difference in descending
                     // 4th: sort by stock difference in ascending
                     // 5th: filter by user favorite stock array
-                    Comparator<Stock> comparator = genComparator(mTask);
-                    if (comparator != null) {
-                        Collections.sort(mStockArrayList, comparator);
-                    }
                 }
+
+                Comparator<Stock> comparator = genComparator(mSortedField, mSortedDirection);
+                Collections.sort(mStockArrayList, comparator);
 
                 if(mStockListListener != null) {
                     mStockListListener.onStockListLoaded();
@@ -137,6 +150,21 @@ public class StockListPlacer {
         mMarketSenseStockFetcher.makeRequest(mNetworkUrl, mCacheUrl);
     }
 
+    public void sortByTask(int field, int direction) {
+        mSortedField = field;
+        mSortedDirection = direction;
+        // There are four fragments in PredictionScreenSlidePagerAdapter
+        // 1st: sort by prediction confidence in descending
+        // 2nd: sort by prediction confidence in ascending
+        // 3rd: sort by stock difference in descending
+        // 4th: sort by stock difference in ascending
+        // 5th: filter by user favorite stock array
+        if(mStockArrayList != null) {
+            Comparator<Stock> comparator = genComparator(mSortedField, mSortedDirection);
+            Collections.sort(mStockArrayList, comparator);
+        }
+    }
+
     public void clear() {
         if(mStockArrayList != null) {
             mStockArrayList.clear();
@@ -169,6 +197,41 @@ public class StockListPlacer {
             return null;
         }
         return mStockArrayList.get(position);
+    }
+
+    private Comparator<Stock> genComparator(final int field, final int direction) {
+        return new Comparator<Stock>() {
+            @Override
+            public int compare(Stock s1, Stock s2) {
+                Stock stock1, stock2;
+                if(direction == SORT_UPWARD) {
+                    stock1 = s1;
+                    stock2 = s2;
+                } else if(direction == SORT_DOWNWARD) {
+                    stock1 = s2;
+                    stock2 = s1;
+                } else {
+                    return 0;
+                }
+
+                switch (field) {
+                    case SORT_BY_NAME:
+                        int res = String.CASE_INSENSITIVE_ORDER.compare(stock1.getCode(), stock2.getCode());
+                        return (res != 0) ? res : stock1.getCode().compareTo(stock2.getCode());
+                    case SORT_BY_DIFF:
+                        return compareValue(stock1.getDiffDirection() * stock1.getDiffPercentageDouble(),
+                                stock2.getDiffDirection() * stock2.getDiffPercentageDouble());
+                    case SORT_BY_PEOPLE:
+                        return compareValue(stock1.getPredictPeopleDirection() * stock1.getPredictPeopleScore(),
+                                stock2.getPredictPeopleDirection() * stock2.getPredictPeopleScore());
+                    case SORT_BY_NEWS:
+                        return compareValue(stock1.getConfidenceDirection() * stock1.getConfidence(),
+                                stock2.getConfidenceDirection() * stock2.getConfidence());
+                }
+
+                return 0;
+            }
+        };
     }
 
     private Comparator<Stock> genComparator(int taskId) {

@@ -103,4 +103,8 @@ public class NewsStreamPlacer {
         return mNewsArrayList.get(position);
     }
 
+    public int getNewsTotalCount() {
+        return mNewsSource.getNewsTotalCount();
+    }
+
 }

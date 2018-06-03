@@ -53,9 +53,11 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
 
         MarketSenseRendererHelper.addTextView(stockViewHolder.predictNewsText,
                 context.getResources().getString(content.getPredictNewsStringId()));
+        content.setVotingIcon(context, stockViewHolder.predictPeopleImageView);
 
         MarketSenseRendererHelper.addTextView(stockViewHolder.predictPeopleText,
                 context.getResources().getString(content.getPredictPeopleStringId()));
+        content.setPredictionIcon(context, stockViewHolder.predictNewsImageView);
 
         setColor(context, stockViewHolder, content);
     }

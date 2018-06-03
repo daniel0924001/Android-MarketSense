@@ -4,15 +4,15 @@
         <shape
             android:shape="rectangle">
             <!-- Set the border color of your layout here -->
-            <stroke android:width="0dp" android:color="@color/border_gray" />
-            <solid android:color="@color/border_gray" />
+            <stroke android:width="0dp" android:color="@color/border_dark_gray" />
+            <solid android:color="@color/border_dark_gray" />
 
         </shape>
     </item>
 
     <!-- This is for border bottom but
     you can change this according to your need -->
-    <item android:bottom="8dp" >
+    <item android:bottom="2dp" >
         <shape
             android:shape="rectangle">
             <!-- Set the background color of your layout here -->

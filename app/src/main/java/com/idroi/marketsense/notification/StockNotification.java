@@ -63,7 +63,9 @@ public class StockNotification extends BaseNotificationHandler {
     @Override
     protected PendingIntent generatePendingIntent(Context context, Map<String, String> data) {
 
-        Intent intent = StockActivity.generateStockActivityIntent(context, mStock.getName(), mStock.getCode(), 0, 0);
+        Intent intent = StockActivity.generateStockActivityIntent(
+                context, mStock.getName(), mStock.getCode(), 0, 0,
+                mStock.getPrice(), mStock.getDiffNumber(), mStock.getDiffPercentage());
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         // if top activity isn't MarketSense main activity, then it will create new one when user clicks back

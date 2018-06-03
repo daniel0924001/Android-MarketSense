@@ -44,9 +44,9 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
     private int mTaskId;
     private AlertDialog mDeleteCodeAlertDialog;
 
-    public StockListRecyclerAdapter(final Activity activity, int taskId) {
+    public StockListRecyclerAdapter(final Activity activity, int taskId, int field, int direction) {
         mActivity = activity;
-        mStockListPlacer = new StockListPlacer(activity, taskId);
+        mStockListPlacer = new StockListPlacer(activity, taskId, field, direction);
         mStockListRenderer = new StockListRenderer();
         mTaskId = taskId;
         mHandler = new Handler();
@@ -68,6 +68,11 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
                 });
             }
         });
+    }
+
+    public void sortByTask(int field, int direction) {
+        mStockListPlacer.sortByTask(field, direction);
+        notifyItemRangeChanged(0, getItemCount());
     }
 
     public void setStockListAvailableListener(StockListAvailableListener listener) {

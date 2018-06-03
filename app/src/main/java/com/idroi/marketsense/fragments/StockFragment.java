@@ -53,8 +53,6 @@ public class StockFragment extends Fragment {
     public final static String FALL_BUNDLE = "FALL_BUNDLE";
     private final static String STOCK_REAL_TIME_URL_PREFIX = "https://so.cnyes.com/JavascriptGraphic/chartstudy.aspx?country=tw&market=twreal&divwidth=%d&divheight=%d&code=%s";
 
-    private YahooStxChartCrawler mYahooStxChartCrawler;
-    private ViewSkeletonScreen mSkeletonScreen;
     private String mStockId;
     private String mStockName;
 
@@ -80,7 +78,6 @@ public class StockFragment extends Fragment {
         final View view = inflater.inflate(R.layout.stock_fragment, container, false);
 
         setInformation();
-        initStockChart(view);
 //        initRealTimeWebView(view);
         initButton(view);
         initComments(view);
@@ -151,33 +148,6 @@ public class StockFragment extends Fragment {
             mVoteRaiseNum = bundle.getInt(RAISE_BUNDLE, 0);
             mVoteFallNum = bundle.getInt(FALL_BUNDLE, 0);
         }
-    }
-
-    private void initStockChart(View view) {
-        LineChart lineChart = view.findViewById(R.id.stock_chart_price);
-        BarChart barChart = view.findViewById(R.id.stock_chart_volume);
-        mYahooStxChartCrawler =
-                new YahooStxChartCrawler(getActivity(), mStockName, mStockId, lineChart, barChart);
-        mYahooStxChartCrawler.setYahooStxChartListener(new YahooStxChartCrawler.YahooStxChartListener() {
-            @Override
-            public void onStxChartDataLoad() {
-                mYahooStxChartCrawler.renderStockChartData();
-                mSkeletonScreen.hide();
-            }
-
-            @Override
-            public void onStxChartDataFail(MarketSenseError marketSenseError) {
-                mYahooStxChartCrawler.renderStockChartData();
-                mSkeletonScreen.hide();
-                MSLog.e("onStxChartDataFail: " + marketSenseError.toString());
-            }
-        });
-        mYahooStxChartCrawler.loadStockChartData();
-
-        mSkeletonScreen = Skeleton.bind(lineChart)
-                .shimmer(false)
-                .load(R.layout.skeleton_webview)
-                .show();
     }
 
     private String getStockPriceURL(String code) {

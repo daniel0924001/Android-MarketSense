@@ -37,6 +37,7 @@ import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.common.FrescoHelper;
 import com.idroi.marketsense.common.MarketSenseCommonNavigator;
 import com.idroi.marketsense.data.PostEvent;
+import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.UserProfile;
 
 import net.lucode.hackware.magicindicator.MagicIndicator;
@@ -382,11 +383,13 @@ public class MainActivity extends AppCompatActivity {
             }
         } else if (requestCode == sSearchAndOpenRequestCode) {
             if(resultCode == RESULT_OK) {
-                String name = data.getStringExtra(EXTRA_SELECTED_COMPANY_NAME_KEY);
+//                String name = data.getStringExtra(EXTRA_SELECTED_COMPANY_NAME_KEY);
                 String code = data.getStringExtra(EXTRA_SELECTED_COMPANY_CODE_KEY);
-                MSLog.d("try to open name: " + name + ", code: " + code);
+                Stock stock = ClientData.getInstance(this).getPriceFromCode(code);
+                MSLog.d("try to open name: " + stock.getName() + ", code: " + stock.getCode());
                 startActivity(StockActivity.generateStockActivityIntent(
-                        this, name, code, 0, 0));
+                        this, stock.getName(), stock.getCode(), stock.getRaiseNum(), stock.getFallNum(),
+                        stock.getPrice(), stock.getDiffNumber(), stock.getDiffPercentage()));
             }
         } else if(requestCode == sSettingRequestCode) {
             setAvatarImage();

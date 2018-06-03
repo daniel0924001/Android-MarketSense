@@ -101,11 +101,13 @@
 
         <ImageView
             android:id="@+id/predict_people_icon"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_centerVertical="true"
             android:layout_marginBottom="8dp"
-            app:srcCompat="@drawable/ic_trending_up_red_24px"
+            android:background="@drawable/btn_round_red"
+            android:src="@mipmap/ic_arrow_up_l"
+            android:padding="8dp"
             android:contentDescription="@string/title_company_predict_people_title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -147,11 +149,13 @@
 
         <ImageView
             android:id="@+id/predict_news_icon"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_centerVertical="true"
             android:layout_marginBottom="8dp"
-            app:srcCompat="@drawable/ic_trending_up_red_24px"
+            android:background="@drawable/btn_round_red"
+            android:src="@mipmap/ic_arrow_up_l"
+            android:padding="8dp"
             android:contentDescription="@string/title_company_predict_news_title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

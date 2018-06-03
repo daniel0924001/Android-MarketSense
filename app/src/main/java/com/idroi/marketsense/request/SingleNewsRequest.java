@@ -29,6 +29,8 @@ public class SingleNewsRequest extends Request<CommentAndVote> {
     private static final String PARAM_EVENT = "event";
     private static final String PARAM_RAISE_NUMBER = "raise";
     private static final String PARAM_FALL_NUMBER = "fall";
+    private static final String PARAM_PRED = "prediction";
+    private static final String PARAM_VOTING = "voting";
 
     final static int NEWS_COMMENT_ID = 1;
     final static int STOCK_COMMENT_ID = 2;
@@ -93,6 +95,8 @@ public class SingleNewsRequest extends Request<CommentAndVote> {
         if(jsonResponse.optBoolean(PARAM_STATUS) && jsonResponse.optJSONObject(PARAM_RESULT) != null) {
             commentAndVote.setRaiseNumber(jsonResponse.optJSONObject(PARAM_RESULT).optInt(PARAM_RAISE_NUMBER));
             commentAndVote.setFallNumber(jsonResponse.optJSONObject(PARAM_RESULT).optInt(PARAM_FALL_NUMBER));
+            commentAndVote.setPrediction(jsonResponse.optJSONObject(PARAM_RESULT).optInt(PARAM_PRED));
+            commentAndVote.setVoting(jsonResponse.optJSONObject(PARAM_RESULT).optInt(PARAM_VOTING));
             if(jsonResponse.optJSONObject(PARAM_RESULT).optJSONArray(PARAM_COMMENTS) != null) {
                 return jsonResponse.optJSONObject(PARAM_RESULT).optJSONArray(PARAM_COMMENTS);
             } else {

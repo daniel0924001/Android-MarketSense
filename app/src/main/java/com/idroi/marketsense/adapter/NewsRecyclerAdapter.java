@@ -44,8 +44,8 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
         ITEM_ELSE
     }
 
-    private static final int NEWS_SINGLE_LAYOUT = 1;
-    private static final int NEWS_MULTIPLE_LAYOUT = 2;
+    public static final int NEWS_SINGLE_LAYOUT = 1;
+    public static final int NEWS_MULTIPLE_LAYOUT = 2;
     private int mInitLayoutType;
 
     private Activity mActivity;
@@ -159,6 +159,10 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
             }
         };
         mInitLayoutType = -1;
+    }
+
+    public void setNewsLayoutType(int type) {
+        mInitLayoutType = type;
     }
 
     private int getRetryTime() {
@@ -296,6 +300,10 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
         } else {
             return mNewsStreamPlacer.getItemCount();
         }
+    }
+
+    public int getNewsTotalCount() {
+        return mNewsStreamPlacer.getNewsTotalCount();
     }
 
     public void clearNews() {

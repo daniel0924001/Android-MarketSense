@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,9 +24,15 @@ import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.StockRequest;
 
-import org.w3c.dom.Text;
+import java.util.HashMap;
 
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
+import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_DIFF;
+import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_NAME;
+import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_NEWS;
+import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_PEOPLE;
+import static com.idroi.marketsense.datasource.StockListPlacer.SORT_DOWNWARD;
+import static com.idroi.marketsense.datasource.StockListPlacer.SORT_UPWARD;
 
 /**
  * Created by daniel.hsieh on 2018/4/23.
@@ -62,7 +69,14 @@ public class StockListFragment extends Fragment {
     private TextView mNoDataTextView;
     private StockListRecyclerAdapter mStockListRecyclerAdapter;
     private RecyclerViewSkeletonScreen mSkeletonScreen;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private int mTaskId;
+
+    private TextView mSortedByName, mSortedByDiff, mSortedByPeople, mSortedByNews;
+    private TextView[] mSortedViews;
+    private HashMap<View, String> mSortedTexts;
+    private View mLastSortedView;
+    private int mSortedDirection;
 
     private UserProfile.UserProfileChangeListener mUserProfileChangeListener;
 
@@ -85,7 +99,7 @@ public class StockListFragment extends Fragment {
         }
         mNoDataTextView = view.findViewById(R.id.no_stock_tv);
 
-        mStockListRecyclerAdapter = new StockListRecyclerAdapter(getActivity(), mTaskId);
+        mStockListRecyclerAdapter = new StockListRecyclerAdapter(getActivity(), mTaskId, SORT_BY_NAME, SORT_UPWARD);
         mRecyclerView.setAdapter(mStockListRecyclerAdapter);
 
         mSkeletonScreen = Skeleton.bind(mRecyclerView)
@@ -123,6 +137,9 @@ public class StockListFragment extends Fragment {
                 if(mSkeletonScreen != null) {
                     mSkeletonScreen.hide();
                 }
+                if(mSwipeRefreshLayout != null) {
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
                 setVisibilityForEmptyData(false);
             }
 
@@ -130,6 +147,9 @@ public class StockListFragment extends Fragment {
             public void onStockListEmpty() {
                 if(mSkeletonScreen != null) {
                     mSkeletonScreen.hide();
+                }
+                if(mSwipeRefreshLayout != null) {
+                    mSwipeRefreshLayout.setRefreshing(false);
                 }
                 setVisibilityForEmptyData(true);
             }
@@ -141,12 +161,98 @@ public class StockListFragment extends Fragment {
             public void onItemClick(Stock stock) {
                 startActivity(StockActivity.generateStockActivityIntent(
                         getContext(), stock.getName(), stock.getCode(),
-                        stock.getRaiseNum(), stock.getFallNum()));
+                        stock.getRaiseNum(), stock.getFallNum(),
+                        stock.getPrice(), stock.getDiffNumber(), stock.getDiffPercentage()));
                 if(getActivity() != null) {
                     getActivity().overridePendingTransition(R.anim.enter, R.anim.stop);
                 }
             }
         });
+
+        mSwipeRefreshLayout = view.findViewById(R.id.swipe_to_refresh);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mStockListRecyclerAdapter.loadStockList(generateNetworkURL(), generateCacheUrl());
+            }
+        });
+
+        setSortBlock(view);
+    }
+
+    private void setSortBlock(View view) {
+        mSortedByName = view.findViewById(R.id.title_name);
+        mSortedByDiff = view .findViewById(R.id.title_diff);
+        mSortedByPeople = view.findViewById(R.id.title_people);
+        mSortedByNews = view.findViewById(R.id.title_news);
+
+        mSortedViews = new TextView[] {mSortedByName, mSortedByDiff, mSortedByPeople, mSortedByNews};
+        mSortedTexts = new HashMap<>();
+        mSortedTexts.put(mSortedByName, getString(R.string.title_company_name));
+        mSortedTexts.put(mSortedByDiff, getString(R.string.title_company_fluctuation));
+        mSortedTexts.put(mSortedByPeople, getString(R.string.title_company_predict_people_title));
+        mSortedTexts.put(mSortedByNews, getString(R.string.title_company_predict_news_title));
+
+        mLastSortedView = null;
+        mSortedDirection = SORT_UPWARD;
+
+        mSortedByName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeSortedBlockLayout(SORT_BY_NAME, view);
+            }
+        });
+
+        mSortedByDiff.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeSortedBlockLayout(SORT_BY_DIFF, view);
+            }
+        });
+
+        mSortedByPeople.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeSortedBlockLayout(SORT_BY_PEOPLE, view);
+            }
+        });
+
+        mSortedByNews.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeSortedBlockLayout(SORT_BY_NEWS, view);
+            }
+        });
+        changeSortedBlockLayout(SORT_BY_NAME, mSortedByName);
+    }
+
+    private void changeSortedBlockLayout(int field, View view) {
+        if(view != mLastSortedView) {
+            mLastSortedView = view;
+            if(field != SORT_BY_NAME) {
+                mSortedDirection = SORT_DOWNWARD;
+            } else {
+                mSortedDirection = SORT_UPWARD;
+            }
+        } else {
+            mSortedDirection = (mSortedDirection == SORT_UPWARD ? SORT_DOWNWARD : SORT_UPWARD);
+        }
+        mStockListRecyclerAdapter.sortByTask(field, mSortedDirection);
+
+        for (TextView textView : mSortedViews) {
+            String initString = mSortedTexts.get(view);
+            if (textView != view) {
+                textView.setText(String.format("%s ↕", initString));
+                textView.setTextColor(getResources().getColor(R.color.text_gray));
+            } else {
+                if(mSortedDirection == SORT_UPWARD) {
+                    textView.setText(String.format("%s ↑", initString));
+                } else {
+                    textView.setText(String.format("%s ↓", initString));
+                }
+                textView.setTextColor(getResources().getColor(R.color.text_black));
+            }
+        }
     }
 
     public String generateNetworkURL() {

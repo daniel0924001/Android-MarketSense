@@ -1,16 +1,13 @@
 package com.idroi.marketsense.datasource;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -43,6 +40,7 @@ public class NewsSource {
 
     private final ArrayList<News> mNewsCache;
     private boolean mIsCache = false;
+    private int mNewsTotalCount;
 
     private MarketSenseNewsFetcher mNewsFetcher;
     private MarketSenseNewsFetcher.MarketSenseNewsNetworkListener mMarketSenseNewsNetworkListener;
@@ -109,6 +107,7 @@ public class NewsSource {
                             }
                         }
                         MSLog.d("[news request]: add " + counter + " news.");
+                        mNewsTotalCount += counter;
                     }
 
                     mShouldReadFromCache = false;
@@ -149,10 +148,12 @@ public class NewsSource {
             }
         };
 
+        mIsCache = false;
         mRequestInFlight = false;
         mFirstTimeNewsAvailable = false;
         mShouldReadFromCache = true;
         mSequenceNumber = 0;
+        mNewsTotalCount = 0;
         resetRetryTime();
     }
 
@@ -212,10 +213,12 @@ public class NewsSource {
             mNewsFetcher.destroy();
             mNewsFetcher = null;
         }
+        mIsCache = false;
         mRequestInFlight = false;
         mFirstTimeNewsAvailable = false;
         mShouldReadFromCache = true;
         mSequenceNumber = 0;
+        mNewsTotalCount = 0;
         mReplenishCacheHandler.removeCallbacks(mReplenishCacheRunnable);
     }
 
@@ -267,5 +270,9 @@ public class NewsSource {
                 break;
         }
         SharedPreferencesCompat.apply(editor);
+    }
+
+    public int getNewsTotalCount() {
+        return mNewsTotalCount;
     }
 }

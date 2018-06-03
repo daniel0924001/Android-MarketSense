@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -62,6 +63,7 @@ public class NewsFragment extends Fragment {
     private TextView mNoDataTextView;
     private NewsRecyclerAdapter mNewsRecyclerAdapter;
     private RecyclerViewSkeletonScreen mSkeletonScreen;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     private String mNetworkUrl;
     private int mTaskId;
@@ -128,6 +130,9 @@ public class NewsFragment extends Fragment {
                 if(mSkeletonScreen != null) {
                     mSkeletonScreen.hide();
                 }
+                if(mSwipeRefreshLayout != null) {
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
                 setVisibilityForEmptyData(false);
             }
 
@@ -136,7 +141,19 @@ public class NewsFragment extends Fragment {
                 if(mSkeletonScreen != null) {
                     mSkeletonScreen.hide();
                 }
+                if(mSwipeRefreshLayout != null) {
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
                 setVisibilityForEmptyData(true);
+            }
+        });
+
+        mSwipeRefreshLayout = view.findViewById(R.id.swipe_to_refresh);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mNetworkUrl = generateURL(true);
+                mNewsRecyclerAdapter.loadNews(mNetworkUrl, generateURL(false));
             }
         });
 

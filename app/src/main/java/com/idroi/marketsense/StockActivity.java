@@ -1,13 +1,14 @@
 package com.idroi.marketsense;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,6 +27,7 @@ import com.facebook.FacebookException;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.idroi.marketsense.Logging.MSLog;
@@ -35,6 +37,7 @@ import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.common.YahooStxChartCrawler;
+import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.PostEvent;
@@ -44,10 +47,12 @@ import com.idroi.marketsense.request.SingleNewsRequest;
 
 import org.json.JSONObject;
 
+import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_HTML;
+import static com.idroi.marketsense.RichEditorActivity.sEditorRequestCode;
 import static com.idroi.marketsense.adapter.NewsRecyclerAdapter.NEWS_SINGLE_LAYOUT;
 import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
-import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_STOCK_COMMENT_CLICK;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_USER_HAS_LOGIN;
 import static com.idroi.marketsense.fragments.NewsFragment.KEYWORD_NAME;
 import static com.idroi.marketsense.fragments.NewsFragment.KEYWORD_TASK_ID;
 
@@ -64,6 +69,9 @@ public class StockActivity extends AppCompatActivity {
     public final static String EXTRA_DIFF_NUM = "com.idroi.marketsense.StockActivity.extra_diff_num";
     public final static String EXTRA_DIFF_PERCENTAGE = "com.idroi.marketsense.StockActivity.extra_diff_percentage";
 
+    public final static int CLICK_NOTHING_BEFORE_LOGIN = 0;
+    public final static int CLICK_STAR_BEFORE_LOGIN = 1;
+    public final static int CLICK_COMMENT_BEFORE_LOGIN = 2;
 
     private YahooStxChartCrawler mYahooStxChartCrawler;
     private ViewSkeletonScreen mSkeletonScreen;
@@ -83,6 +91,12 @@ public class StockActivity extends AppCompatActivity {
     private NewsRecyclerAdapter mNewsRecyclerAdapter;
 
     private int mVoteRaiseNum, mVoteFallNum;
+
+    private UserProfile.UserProfileChangeListener mUserProfileChangeListener;
+    private int mLastClickedButton;
+    private AlertDialog mLoginAlertDialog;
+    private LoginButton mFBLoginBtn;
+    private ImageView mAddFavorite;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -108,7 +122,18 @@ public class StockActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         mNewsRecyclerAdapter.destroy();
+        mUserProfile.deleteUserProfileChangeListener(mUserProfileChangeListener);
         super.onDestroy();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if(mLoginAlertDialog != null) {
+            mLoginAlertDialog.dismiss();
+            mLoginAlertDialog = null;
+        }
     }
 
     private void setSocialButtons() {
@@ -124,6 +149,78 @@ public class StockActivity extends AppCompatActivity {
                 nestedScrollView.scrollTo(0, 0);
             }
         });
+
+        Button buttonWriteComment = findViewById(R.id.btn_write_comment);
+        buttonWriteComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(FBHelper.checkFBLogin()) {
+                    startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
+                            StockActivity.this, RichEditorActivity.TYPE.STOCK, mCode),
+                            sEditorRequestCode);
+                    overridePendingTransition(R.anim.enter, R.anim.stop);
+                } else {
+                    showLoginAlertDialog(CLICK_COMMENT_BEFORE_LOGIN);
+                }
+            }
+        });
+
+        Button buttonWriteFirst = findViewById(R.id.btn_send_first);
+        buttonWriteFirst.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(FBHelper.checkFBLogin()) {
+                    startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
+                            StockActivity.this, RichEditorActivity.TYPE.STOCK, mCode),
+                            sEditorRequestCode);
+                    overridePendingTransition(R.anim.enter, R.anim.stop);
+                } else {
+                    showLoginAlertDialog(CLICK_COMMENT_BEFORE_LOGIN);
+                }
+            }
+        });
+
+        mUserProfileChangeListener = new UserProfile.UserProfileChangeListener() {
+            @Override
+            public void onUserProfileChange(int notifyId) {
+                if(notifyId == NOTIFY_USER_HAS_LOGIN && FBHelper.checkFBLogin()) {
+                    switch (mLastClickedButton) {
+                        case CLICK_COMMENT_BEFORE_LOGIN:
+                            startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
+                                    StockActivity.this, RichEditorActivity.TYPE.STOCK, mCode),
+                                    sEditorRequestCode);
+                            overridePendingTransition(R.anim.enter, R.anim.stop);
+                            return;
+                        case CLICK_STAR_BEFORE_LOGIN:
+                            changeFavorite(mAddFavorite);
+                    }
+                }
+            }
+        };
+        mUserProfile.addUserProfileChangeListener(mUserProfileChangeListener);
+    }
+
+    private void showLoginAlertDialog(int lastButton) {
+        mLastClickedButton = lastButton;
+
+        if(mLoginAlertDialog != null) {
+            mLoginAlertDialog.dismiss();
+            mLoginAlertDialog = null;
+        }
+
+        final View alertView = LayoutInflater.from(this)
+                .inflate(R.layout.alertdialog_login, null);
+        mLoginAlertDialog = new AlertDialog.Builder(this)
+                .setView(alertView).create();
+        mLoginAlertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                mFBLoginBtn = alertView.findViewById(R.id.login_button);
+                mFBLoginBtn.setReadPermissions("email");
+                mFBLoginBtn.setReadPermissions("public_profile");
+            }
+        });
+        mLoginAlertDialog.show();
     }
 
     private void setSelector() {
@@ -364,18 +461,22 @@ public class StockActivity extends AppCompatActivity {
                 textView.setText(title);
             }
 
-            final ImageView addFavorite = view.findViewById(R.id.action_bar_notification);
-            if(addFavorite != null) {
-                addFavorite.setVisibility(View.VISIBLE);
+            mAddFavorite = view.findViewById(R.id.action_bar_notification);
+            if(mAddFavorite != null) {
+                mAddFavorite.setVisibility(View.VISIBLE);
                 if(mIsFavorite) {
-                    addFavorite.setImageResource(R.drawable.ic_star_yellow_24px);
+                    mAddFavorite.setImageResource(R.drawable.ic_star_yellow_24px);
                 } else {
-                    addFavorite.setImageResource(R.drawable.ic_star_border_white_24px);
+                    mAddFavorite.setImageResource(R.drawable.ic_star_border_white_24px);
                 }
-                addFavorite.setOnClickListener(new View.OnClickListener() {
+                mAddFavorite.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        changeFavorite(addFavorite);
+                        if(FBHelper.checkFBLogin()) {
+                            changeFavorite(mAddFavorite);
+                        } else {
+                            showLoginAlertDialog(CLICK_STAR_BEFORE_LOGIN);
+                        }
                     }
                 });
             }
@@ -457,7 +558,7 @@ public class StockActivity extends AppCompatActivity {
                 String userEmail = FBHelper.fetchFbData(data, UserProfile.FB_USER_EMAIL_KEY);
                 PostEvent.sendRegister(StockActivity.this, userId, userName, FACEBOOK_CONSTANTS,
                         UserProfile.generatePassword(userId, FACEBOOK_CONSTANTS), userEmail, avatarLink);
-                mUserProfile.notifyUserProfile(NOTIFY_ID_STOCK_COMMENT_CLICK);
+                mUserProfile.notifyUserProfile(NOTIFY_USER_HAS_LOGIN);
             }
         }, true);
     }
@@ -465,6 +566,17 @@ public class StockActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == sEditorRequestCode) {
+            if(resultCode == RESULT_OK) {
+                String html = data.getStringExtra(EXTRA_RES_HTML);
+                Comment comment = new Comment();
+                comment.setCommentHtml(html);
+                mCommentsRecyclerViewAdapter.addOneComment(comment);
+                showCommentBlock();
+                MSLog.d("user send a comment on code: " + mCode);
+                MSLog.d("user send a comment of html: " + html);
+            }
+        }
         mFBCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 }

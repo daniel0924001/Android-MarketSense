@@ -75,6 +75,7 @@ public class NewsFragment extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         final View view = inflater.inflate(R.layout.news_fragment, container, false);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.news_recycler_view);
+        mSwipeRefreshLayout = view.findViewById(R.id.swipe_to_refresh);
         mNoDataImageView = view.findViewById(R.id.no_news_iv);
         if(mTaskId == KEYWORD_ARRAY_TASK_ID) {
             mNoDataImageView.setImageResource(R.drawable.baseline_playlist_add_24px);
@@ -148,7 +149,6 @@ public class NewsFragment extends Fragment {
             }
         });
 
-        mSwipeRefreshLayout = view.findViewById(R.id.swipe_to_refresh);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -237,7 +237,7 @@ public class NewsFragment extends Fragment {
 
     private void setVisibilityForEmptyData(boolean isEmpty) {
         if(isEmpty) {
-            mRecyclerView.setVisibility(View.GONE);
+            mSwipeRefreshLayout.setVisibility(View.GONE);
             mNoDataTextView.setVisibility(View.VISIBLE);
             mNoDataImageView.setVisibility(View.VISIBLE);
             if(isSelfNoneChoices()) {
@@ -248,7 +248,7 @@ public class NewsFragment extends Fragment {
                 mNoDataImageView.setImageResource(R.drawable.baseline_sentiment_dissatisfied_24px);
             }
         } else {
-            mRecyclerView.setVisibility(View.VISIBLE);
+            mSwipeRefreshLayout.setVisibility(View.VISIBLE);
             mNoDataTextView.setVisibility(View.GONE);
             mNoDataImageView.setVisibility(View.GONE);
         }

@@ -20,6 +20,7 @@ import com.idroi.marketsense.R;
 import com.idroi.marketsense.StockActivity;
 import com.idroi.marketsense.adapter.StockListRecyclerAdapter;
 import com.idroi.marketsense.common.ClientData;
+import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.StockRequest;
@@ -27,6 +28,7 @@ import com.idroi.marketsense.request.StockRequest;
 import java.util.HashMap;
 
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_USER_HAS_LOGIN;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_DIFF;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_NAME;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_NEWS;
@@ -92,6 +94,7 @@ public class StockListFragment extends Fragment {
         }
 
         final View view = inflater.inflate(R.layout.stock_list_fragment, container, false);
+        mSwipeRefreshLayout = view.findViewById(R.id.swipe_to_refresh);
         mRecyclerView = view.findViewById(R.id.stock_recycler_view);
         mNoDataImageView = view.findViewById(R.id.no_stock_iv);
         if(mTaskId == SELF_CHOICES_ID) {
@@ -169,7 +172,6 @@ public class StockListFragment extends Fragment {
             }
         });
 
-        mSwipeRefreshLayout = view.findViewById(R.id.swipe_to_refresh);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -275,7 +277,7 @@ public class StockListFragment extends Fragment {
 
     private void setVisibilityForEmptyData(boolean isEmpty) {
         if(isEmpty) {
-            mRecyclerView.setVisibility(View.GONE);
+            mSwipeRefreshLayout.setVisibility(View.GONE);
             mNoDataTextView.setVisibility(View.VISIBLE);
             mNoDataImageView.setVisibility(View.VISIBLE);
             if(isSelfNoneChoices()) {
@@ -286,7 +288,7 @@ public class StockListFragment extends Fragment {
                 mNoDataImageView.setImageResource(R.drawable.baseline_sentiment_dissatisfied_24px);
             }
         } else {
-            mRecyclerView.setVisibility(View.VISIBLE);
+            mSwipeRefreshLayout.setVisibility(View.VISIBLE);
             mNoDataTextView.setVisibility(View.GONE);
             mNoDataImageView.setVisibility(View.GONE);
         }

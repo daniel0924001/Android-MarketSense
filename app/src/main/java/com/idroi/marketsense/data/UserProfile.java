@@ -2,7 +2,6 @@ package com.idroi.marketsense.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.idroi.marketsense.Logging.MSLog;
@@ -35,6 +34,7 @@ public class UserProfile {
     public static final int NOTIFY_ID_STOCK_COMMENT_CLICK = 2;
     public static final int NOTIFY_ID_NEWS_COMMENT_CLICK = 3;
     public static final int NOTIFY_USER_HAS_LOGIN = 4;
+    public static final int NOTIFY_ID_EVENT_LIST = 5;
 
     public interface UserProfileChangeListener {
         void onUserProfileChange(int notifyId);
@@ -189,15 +189,21 @@ public class UserProfile {
     /* end of favorite stock list */
 
     /* event */
+    public void clearEvents() {
+        if(mEventsArrayList != null) {
+            mEventsArrayList.clear();
+        }
+    }
+
     public void addEvent(Event event) {
         if(mEventsArrayList != null) {
             mEventsArrayList.add(event);
         }
     }
 
-    public String getVoteForStockEventCreatedTimestamp(String code) {
+    public Event getRecentVoteForStockEvent(String code) {
         long max = -1;
-        String result = null;
+        Event result = null;
         if(mEventsArrayList != null) {
             for (int i = 0; i < mEventsArrayList.size(); i++) {
                 Event event = mEventsArrayList.get(i);
@@ -207,7 +213,7 @@ public class UserProfile {
                     long temp = Long.valueOf(event.getEventCreatedTs());
                     if(temp > max) {
                         max = temp;
-                        result = event.getEventCreatedTs();
+                        result = event;
                     }
                 }
             }
@@ -217,7 +223,12 @@ public class UserProfile {
     }
 
     public boolean canVoteAgain(String code) {
-        String timestamp = getVoteForStockEventCreatedTimestamp(code);
+        Event event = getRecentVoteForStockEvent(code);
+        if(event == null) {
+            return true;
+        }
+
+        String timestamp = event.getEventCreatedTs();
         if(timestamp != null) {
             Date thatDate = new Date(Long.parseLong(timestamp) * 1000);
             Timestamp todayTs = new Timestamp(System.currentTimeMillis());

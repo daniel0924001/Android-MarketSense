@@ -98,11 +98,13 @@
                     app:layout_constraintStart_toEndOf="@id/vote_up_btn"
                     app:layout_constraintEnd_toEndOf="parent"/>
 
-                <Button
+                <TextView
                     android:id="@+id/vote_result_btn"
                     android:layout_width="0dp"
                     android:layout_height="32dp"
                     android:layout_marginTop="24dp"
+                    android:text="@string/title_you_look_good"
+                    android:gravity="center"
                     android:background="@drawable/btn_oval_small_corner_gray"
                     android:visibility="gone"
                     app:layout_constraintTop_toBottomOf="@id/stock_diff_tv"

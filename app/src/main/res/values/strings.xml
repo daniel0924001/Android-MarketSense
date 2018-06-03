@@ -92,8 +92,8 @@
     <string name="title_unavailable_score">0.0</string>
     <string name="title_unavailable_score_double">+0.0 (+0.0)</string>
     <string name="title_max_score"> / 5</string>
-    <string name="title_you_look_good">你 看漲 這支股票</string>
-    <string name="title_you_look_bad">你 看跌 這支股票</string>
+    <string name="title_you_look_good">你 <![CDATA[<font color="#EF476F">看漲</font>]]> 這支股票</string>
+    <string name="title_you_look_bad">你 <![CDATA[<font color="#00BE9F">看跌</font>]]> 這支股票</string>
     <string name="title_publish_comment">發表評論</string>
 
     <string name="title_up">漲</string>
@@ -114,6 +114,7 @@
     <string name="title_comment_colon">評論:</string>
     <string name="title_action_seven">快來表達你對這支股票一週內的想法吧！</string>
     <string name="title_welcome_tomorrow">歡迎您明日再來表達您的看法唷！</string>
+    <string name="title_welcome_but_you_have_voted">歡迎回來，今日你已經於稍早時表達過看法了！</string>
     <string name="title_comment_create">發佈</string>
     <string name="title_leave_rich_editor">
         看起來你只編輯到一半，你確定要離開編輯頁面嗎？假如是，請在「點擊返回一次」。</string>

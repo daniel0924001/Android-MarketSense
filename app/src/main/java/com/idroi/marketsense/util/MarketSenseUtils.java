@@ -4,11 +4,14 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.text.Html;
+import android.widget.TextView;
 
 import static android.Manifest.permission.ACCESS_NETWORK_STATE;
 import static android.Manifest.permission.INTERNET;
@@ -61,5 +64,13 @@ public class MarketSenseUtils {
 
         return ContextCompat.checkSelfPermission(context, permission) ==
                 PackageManager.PERMISSION_GRANTED;
+    }
+
+    public static void setHtmlColorText(TextView tv, String string) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            tv.setText(Html.fromHtml(string, Html.FROM_HTML_MODE_LEGACY), TextView.BufferType.SPANNABLE);
+        } else {
+            tv.setText(Html.fromHtml(string), TextView.BufferType.SPANNABLE);
+        }
     }
 }

@@ -9,12 +9,14 @@ import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.common.MarketSenseNetworkError;
 import com.idroi.marketsense.data.Event;
+import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.util.MarketSenseUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_EVENT_LIST;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 
 /**
@@ -64,8 +66,9 @@ public class UserEventsAndCodesRequest extends Request<Void> {
                 jsonResponse.optJSONObject(PARAM_RESULT) != null &&
                 jsonResponse.optJSONObject(PARAM_RESULT).optJSONArray(PARAM_STOCK_CODES) != null) {
 
-            final ClientData clientData = ClientData.getInstance();
-            clientData.getUserProfile().clearFavoriteStock();
+            final UserProfile userProfile = ClientData.getInstance().getUserProfile();
+            userProfile.clearFavoriteStock();
+            userProfile.clearEvents();
 
             // favorite stock list
             JSONArray codesJsonArray = jsonResponse.optJSONObject(PARAM_RESULT).optJSONArray(PARAM_STOCK_CODES);
@@ -74,7 +77,7 @@ public class UserEventsAndCodesRequest extends Request<Void> {
                     String code = codesJsonArray.optJSONObject(i).optString(PARAM_STOCK_CODE);
                     if(code != null) {
                         MSLog.d("add favorite code: " + code);
-                        clientData.getUserProfile().addFavoriteStock(code);
+                        userProfile.addFavoriteStock(code);
                     }
                 }
             }
@@ -82,7 +85,7 @@ public class UserEventsAndCodesRequest extends Request<Void> {
             MarketSenseUtils.postOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    clientData.getUserProfile().notifyUserProfile(NOTIFY_ID_FAVORITE_LIST);
+                    userProfile.notifyUserProfile(NOTIFY_ID_FAVORITE_LIST);
                 }
             });
 
@@ -92,9 +95,17 @@ public class UserEventsAndCodesRequest extends Request<Void> {
                 if(eventsJsonArray.optJSONObject(i) != null) {
                     Event event = Event.JsonObjectToEvent(eventsJsonArray.optJSONObject(i));
 //                    MSLog.d("event: " + event.toString());
-                    clientData.getUserProfile().addEvent(event);
+                    userProfile.addEvent(event);
                 }
             }
+
+            MarketSenseUtils.postOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    userProfile.notifyUserProfile(NOTIFY_ID_EVENT_LIST);
+                }
+            });
+
             return true;
         }
         return false;

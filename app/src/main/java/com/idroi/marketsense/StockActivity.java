@@ -39,11 +39,13 @@ import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.common.YahooStxChartCrawler;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
+import com.idroi.marketsense.data.Event;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.NewsRequest;
 import com.idroi.marketsense.request.SingleNewsRequest;
+import com.idroi.marketsense.util.MarketSenseUtils;
 
 import org.json.JSONObject;
 
@@ -51,6 +53,7 @@ import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_HTML;
 import static com.idroi.marketsense.RichEditorActivity.sEditorRequestCode;
 import static com.idroi.marketsense.adapter.NewsRecyclerAdapter.NEWS_SINGLE_LAYOUT;
 import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_EVENT_LIST;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_USER_HAS_LOGIN;
 import static com.idroi.marketsense.fragments.NewsFragment.KEYWORD_NAME;
@@ -72,14 +75,18 @@ public class StockActivity extends AppCompatActivity {
     public final static int CLICK_NOTHING_BEFORE_LOGIN = 0;
     public final static int CLICK_STAR_BEFORE_LOGIN = 1;
     public final static int CLICK_COMMENT_BEFORE_LOGIN = 2;
+    public final static int CLICK_VOTE_BEFORE_LOGIN = 3;
+
+    private static final float CONST_ENABLE_ALPHA = 1.0f;
+    private static final float CONST_DISABLE_ALPHA = 0.7f;
 
     private YahooStxChartCrawler mYahooStxChartCrawler;
     private ViewSkeletonScreen mSkeletonScreen;
     private String mStockName;
     private String mCode;
     private String mPrice, mDiffNum, mDiffPercentage;
-    private int mRaiseNum, mFallNum;
-    private Button mButtonRaise, mButtonFall, mButtonResult;
+    private Button mButtonRaise, mButtonFall;
+    private TextView mResultTextView;
 
     private CallbackManager mFBCallbackManager;
     private UserProfile mUserProfile;
@@ -109,7 +116,7 @@ public class StockActivity extends AppCompatActivity {
         setInformation();
         setActionBar();
         initStockChart();
-        setSocialButtons();
+        initSocialButtons();
         setSelector();
     }
 
@@ -136,10 +143,47 @@ public class StockActivity extends AppCompatActivity {
         }
     }
 
-    private void setSocialButtons() {
+    private void doVoteAction(boolean isGood) {
+        Toast.makeText(this, R.string.title_welcome_tomorrow, Toast.LENGTH_SHORT).show();
+        if(isGood) {
+            PostEvent.sendStockVote(this, mCode, PostEvent.EventVars.VOTE_RAISE, 1);
+            mVoteRaiseNum += 1;
+        } else {
+            PostEvent.sendStockVote(this, mCode, PostEvent.EventVars.VOTE_FALL, 1);
+            mVoteFallNum += 1;
+        }
+        setVoteButtons();
+    }
+
+    private void setVoteButtons() {
+        MSLog.d("canVoteAgain: " + mCode + ", " + mUserProfile.canVoteAgain(mCode));
+        if(!mUserProfile.canVoteAgain(mCode)) {
+            mButtonRaise.setVisibility(View.INVISIBLE);
+            mButtonFall.setVisibility(View.INVISIBLE);
+            mResultTextView.setVisibility(View.VISIBLE);
+
+            Event event = mUserProfile.getRecentVoteForStockEvent(mCode);
+            if(event.getEventType().equals(PostEvent.EventVars.VOTE_RAISE.getEventVar())) {
+                MarketSenseUtils.setHtmlColorText(mResultTextView, getString(R.string.title_you_look_good));
+            } else {
+                MarketSenseUtils.setHtmlColorText(mResultTextView, getString(R.string.title_you_look_bad));
+            }
+        } else {
+            mButtonRaise.setVisibility(View.VISIBLE);
+            mButtonFall.setVisibility(View.VISIBLE);
+            mResultTextView.setVisibility(View.GONE);
+            mButtonRaise.setEnabled(true);
+            mButtonFall.setEnabled(true);
+            mButtonRaise.setAlpha(CONST_ENABLE_ALPHA);
+            mButtonFall.setAlpha(CONST_ENABLE_ALPHA);
+        }
+    }
+
+    private void initSocialButtons() {
         mButtonRaise = findViewById(R.id.vote_up_btn);
         mButtonFall = findViewById(R.id.vote_down_btn);
-        mButtonResult = findViewById(R.id.vote_result_btn);
+        mResultTextView = findViewById(R.id.vote_result_btn);
+        setVoteButtons();
 
         final NestedScrollView nestedScrollView = findViewById(R.id.body_scroll_view);
         Button buttonGoUp = findViewById(R.id.btn_go_up);
@@ -147,6 +191,28 @@ public class StockActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 nestedScrollView.scrollTo(0, 0);
+            }
+        });
+
+        mButtonRaise.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(FBHelper.checkFBLogin()) {
+                    doVoteAction(true);
+                } else {
+                    showLoginAlertDialog(CLICK_VOTE_BEFORE_LOGIN);
+                }
+            }
+        });
+
+        mButtonFall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(FBHelper.checkFBLogin()) {
+                    doVoteAction(false);
+                } else {
+                    showLoginAlertDialog(CLICK_VOTE_BEFORE_LOGIN);
+                }
             }
         });
 
@@ -165,7 +231,7 @@ public class StockActivity extends AppCompatActivity {
             }
         });
 
-        Button buttonWriteFirst = findViewById(R.id.btn_send_first);
+        final Button buttonWriteFirst = findViewById(R.id.btn_send_first);
         buttonWriteFirst.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -177,6 +243,8 @@ public class StockActivity extends AppCompatActivity {
                 } else {
                     showLoginAlertDialog(CLICK_COMMENT_BEFORE_LOGIN);
                 }
+                // Google the bug: NestedScrollView parameter must be a descendant of this view
+                buttonWriteFirst.clearFocus();
             }
         });
 
@@ -184,6 +252,11 @@ public class StockActivity extends AppCompatActivity {
             @Override
             public void onUserProfileChange(int notifyId) {
                 if(notifyId == NOTIFY_USER_HAS_LOGIN && FBHelper.checkFBLogin()) {
+                    mButtonRaise.setClickable(false);
+                    mButtonFall.setClickable(false);
+                    mButtonRaise.setAlpha(CONST_DISABLE_ALPHA);
+                    mButtonFall.setAlpha(CONST_DISABLE_ALPHA);
+
                     switch (mLastClickedButton) {
                         case CLICK_COMMENT_BEFORE_LOGIN:
                             startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
@@ -193,6 +266,18 @@ public class StockActivity extends AppCompatActivity {
                             return;
                         case CLICK_STAR_BEFORE_LOGIN:
                             changeFavorite(mAddFavorite);
+                    }
+                } else if(notifyId == NOTIFY_ID_EVENT_LIST) {
+                    if(mLastClickedButton == CLICK_VOTE_BEFORE_LOGIN && !mUserProfile.canVoteAgain(mCode)) {
+                        Toast.makeText(StockActivity.this, R.string.title_welcome_but_you_have_voted, Toast.LENGTH_SHORT).show();
+                    }
+                    setVoteButtons();
+                } else if(notifyId == NOTIFY_ID_FAVORITE_LIST) {
+                    mIsFavorite = mUserProfile.isFavoriteStock(mCode);
+                    if(mIsFavorite) {
+                        mAddFavorite.setImageResource(R.drawable.ic_star_yellow_24px);
+                    } else {
+                        mAddFavorite.setImageResource(R.drawable.ic_star_border_white_24px);
                     }
                 }
             }
@@ -353,7 +438,6 @@ public class StockActivity extends AppCompatActivity {
                 }
                 mVoteRaiseNum = commentAndVote.getRaiseNumber();
                 mVoteFallNum = commentAndVote.getFallNumber();
-//                setButtonStatus();
                 MSLog.d("raise number: " + commentAndVote.getRaiseNumber());
                 MSLog.d("fall number: " + commentAndVote.getFallNumber());
                 setSocialInformation(commentAndVote);
@@ -427,8 +511,8 @@ public class StockActivity extends AppCompatActivity {
     private void setInformation() {
         mStockName = getIntent().getStringExtra(Intent.EXTRA_TITLE);
         mCode = getIntent().getStringExtra(EXTRA_CODE);
-        mRaiseNum = getIntent().getIntExtra(EXTRA_RAISE_NUM, 0);
-        mFallNum = getIntent().getIntExtra(EXTRA_FALL_NUM, 0);
+        mVoteRaiseNum = getIntent().getIntExtra(EXTRA_RAISE_NUM, 0);
+        mVoteFallNum = getIntent().getIntExtra(EXTRA_FALL_NUM, 0);
 
         mIsFavorite = mUserProfile.isFavoriteStock(mCode);
 

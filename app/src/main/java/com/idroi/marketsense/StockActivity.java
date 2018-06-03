@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
+import android.support.constraint.Guideline;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -48,6 +49,8 @@ import com.idroi.marketsense.request.SingleNewsRequest;
 import com.idroi.marketsense.util.MarketSenseUtils;
 
 import org.json.JSONObject;
+
+import java.text.DecimalFormat;
 
 import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_HTML;
 import static com.idroi.marketsense.RichEditorActivity.sEditorRequestCode;
@@ -104,6 +107,7 @@ public class StockActivity extends AppCompatActivity {
     private AlertDialog mLoginAlertDialog;
     private LoginButton mFBLoginBtn;
     private ImageView mAddFavorite;
+    private ConstraintLayout mSelectorComment, mSelectorNews;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -168,6 +172,8 @@ public class StockActivity extends AppCompatActivity {
             } else {
                 MarketSenseUtils.setHtmlColorText(mResultTextView, getString(R.string.title_you_look_bad));
             }
+
+            showVoteResult();
         } else {
             mButtonRaise.setVisibility(View.VISIBLE);
             mButtonFall.setVisibility(View.VISIBLE);
@@ -177,6 +183,24 @@ public class StockActivity extends AppCompatActivity {
             mButtonRaise.setAlpha(CONST_ENABLE_ALPHA);
             mButtonFall.setAlpha(CONST_ENABLE_ALPHA);
         }
+    }
+
+    private void showVoteResult() {
+        setVoteResult();
+
+        ConstraintLayout emptyLayout = findViewById(R.id.vote_result_empty_block);
+        ConstraintLayout resultLayout = findViewById(R.id.vote_result_block);
+
+        emptyLayout.setVisibility(View.GONE);
+        resultLayout.setVisibility(View.VISIBLE);
+
+        ConstraintLayout.LayoutParams paramsComment = (ConstraintLayout.LayoutParams) mSelectorComment.getLayoutParams();
+        paramsComment.topToBottom = R.id.vote_result_block;
+        mSelectorComment.setLayoutParams(paramsComment);
+
+        ConstraintLayout.LayoutParams paramsNews = (ConstraintLayout.LayoutParams) mSelectorNews.getLayoutParams();
+        paramsNews.topToBottom = R.id.vote_result_block;
+        mSelectorNews.setLayoutParams(paramsNews);
     }
 
     private void initSocialButtons() {
@@ -317,24 +341,24 @@ public class StockActivity extends AppCompatActivity {
     private void initSelector() {
         final ConstraintLayout commentBlock = findViewById(R.id.marketsense_stock_comment);
         final ConstraintLayout newsBlock = findViewById(R.id.marketsense_stock_news);
-        final ConstraintLayout selectorComment = findViewById(R.id.selector_comment_block);
-        final ConstraintLayout selectorNews = findViewById(R.id.selector_news_block);
-        selectorComment.setOnClickListener(new View.OnClickListener() {
+        mSelectorComment = findViewById(R.id.selector_comment_block);
+        mSelectorNews = findViewById(R.id.selector_news_block);
+        mSelectorComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 commentBlock.setVisibility(View.VISIBLE);
                 newsBlock.setVisibility(View.GONE);
-                selectorComment.setBackground(getDrawable(R.drawable.border_selector_selected));
-                selectorNews.setBackground(getDrawable(R.drawable.border_selector));
+                mSelectorComment.setBackground(getDrawable(R.drawable.border_selector_selected));
+                mSelectorNews.setBackground(getDrawable(R.drawable.border_selector));
             }
         });
-        selectorNews.setOnClickListener(new View.OnClickListener() {
+        mSelectorNews.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 commentBlock.setVisibility(View.GONE);
                 newsBlock.setVisibility(View.VISIBLE);
-                selectorComment.setBackground(getDrawable(R.drawable.border_selector));
-                selectorNews.setBackground(getDrawable(R.drawable.border_selector_selected));
+                mSelectorComment.setBackground(getDrawable(R.drawable.border_selector));
+                mSelectorNews.setBackground(getDrawable(R.drawable.border_selector_selected));
             }
         });
     }
@@ -438,8 +462,8 @@ public class StockActivity extends AppCompatActivity {
                 }
                 mVoteRaiseNum = commentAndVote.getRaiseNumber();
                 mVoteFallNum = commentAndVote.getFallNumber();
-                MSLog.d("raise number: " + commentAndVote.getRaiseNumber());
-                MSLog.d("fall number: " + commentAndVote.getFallNumber());
+                MSLog.d("update stock raise vote number: " + commentAndVote.getRaiseNumber());
+                MSLog.d("update stock fall vote number: " + commentAndVote.getFallNumber());
                 setSocialInformation(commentAndVote);
             }
         });
@@ -472,6 +496,33 @@ public class StockActivity extends AppCompatActivity {
         ImageView newsImageView = findViewById(R.id.news_score_iv);
         commentAndVote.setVotingIcon(this, peopleImageView);
         commentAndVote.setPredictionIcon(this, newsImageView);
+        setVoteResult();
+    }
+
+    private void setVoteResult() {
+        DecimalFormat decimalFormat = new DecimalFormat("#,###,###");
+
+        TextView totalPeopleTextView = findViewById(R.id.vote_result_people_number);
+        String totalNumberString =
+                decimalFormat.format(mVoteRaiseNum + mVoteFallNum) +
+                        getResources().getString(R.string.title_vote_people_number);
+        totalPeopleTextView.setText(totalNumberString);
+        TextView goodPeopleTextView = findViewById(R.id.vote_result_vote_good_number);
+        TextView badPeopleTextView = findViewById(R.id.vote_result_vote_bad_number);
+        goodPeopleTextView.setText(decimalFormat.format(mVoteRaiseNum));
+        badPeopleTextView.setText(decimalFormat.format(mVoteFallNum));
+
+        Guideline guideLine = findViewById(R.id.vote_percentage_guideline);
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) guideLine.getLayoutParams();
+        float goodPercentage = (float) mVoteRaiseNum / (mVoteRaiseNum + mVoteFallNum);
+        params.guidePercent = goodPercentage;
+        guideLine.setLayoutParams(params);
+
+        DecimalFormat percentFormat = new DecimalFormat("#%");
+        TextView goodPercentageTextView = findViewById(R.id.vote_look_good_percentage);
+        TextView badPercentageTextView = findViewById(R.id.vote_look_bad_percentage);
+        goodPercentageTextView.setText(percentFormat.format(goodPercentage));
+        badPercentageTextView.setText(percentFormat.format(1 - goodPercentage));
     }
 
     private void initStockChart() {

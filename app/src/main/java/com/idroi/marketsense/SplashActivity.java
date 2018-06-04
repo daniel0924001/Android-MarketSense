@@ -35,15 +35,6 @@ public class SplashActivity extends AppCompatActivity{
         clientData.setScreenSizeInPixels(metrics.widthPixels, metrics.heightPixels);
         clientData.setScreenSize(width, height);
 
-        if(FBHelper.checkFBLogin()) {
-            String id = clientData.getUserProfile().getUserId();
-            String password = UserProfile.generatePassword(
-                    clientData.getUserProfile().getUserId(),
-                    clientData.getUserProfile().getUserType());
-            String email = clientData.getUserProfile().getUserEmail();
-            PostEvent.sendLogin(this, id, password, email);
-        }
-
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
 

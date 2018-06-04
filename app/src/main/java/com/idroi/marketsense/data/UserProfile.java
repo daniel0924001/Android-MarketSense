@@ -293,6 +293,9 @@ public class UserProfile {
                 context.getResources().getString(R.string.default_user_avatar_link));
         MSLog.d(String.format("init user data from share preference: %s %s %s %s",
                 mUserId, mUserName, mUserEmail, mUserAvatarLink));
+
+        String password = UserProfile.generatePassword(mUserId,mUserType);
+        PostEvent.sendLogin(context, mUserId, password, mUserEmail);
     }
 
     static UserProfile jsonObjectToUserProfile(JSONObject jsonObject) {

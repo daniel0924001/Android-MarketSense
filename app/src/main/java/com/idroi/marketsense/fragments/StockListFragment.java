@@ -242,7 +242,7 @@ public class StockListFragment extends Fragment {
         mStockListRecyclerAdapter.sortByTask(field, mSortedDirection);
 
         for (TextView textView : mSortedViews) {
-            String initString = mSortedTexts.get(view);
+            String initString = mSortedTexts.get(textView);
             if (textView != view) {
                 textView.setText(String.format("%s ↕", initString));
                 textView.setTextColor(getResources().getColor(R.color.text_gray));

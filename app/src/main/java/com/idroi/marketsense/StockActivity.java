@@ -120,8 +120,8 @@ public class StockActivity extends AppCompatActivity {
         setInformation();
         setActionBar();
         initStockChart();
-        initSocialButtons();
         setSelector();
+        initSocialButtons();
     }
 
     @Override

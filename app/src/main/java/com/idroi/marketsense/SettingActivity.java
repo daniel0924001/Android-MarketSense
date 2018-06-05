@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -34,6 +35,7 @@ import com.facebook.login.widget.LoginButton;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.adapter.SettingAdapter;
 import com.idroi.marketsense.common.ClientData;
+import com.idroi.marketsense.common.Constants;
 import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.common.MarketSenseRendererHelper;
 import com.idroi.marketsense.common.SharedPreferencesCompat;
@@ -62,24 +64,22 @@ public class SettingActivity extends AppCompatActivity {
     private int[] mStringIds = {
             R.string.preference_notification, // fake
             R.string.preference_notification,
-            R.string.preference_category,
             R.string.preference_share,
-            R.string.preference_line,
             R.string.preference_feedback,
             R.string.preference_star,
-            R.string.preference_copyright,
-            R.string.preference_about
+            R.string.preference_privacy_statement,
+            R.string.preference_term_of_service,
+            R.string.preference_disclaimer
     };
 
     private Integer[] mDrawableIds = {
             R.drawable.setting_notification, // fake
             R.drawable.setting_notification,
-            R.drawable.setting_category,
             R.drawable.setting_share,
-            R.mipmap.line_logo,
             R.drawable.setting_feedback,
             R.drawable.setting_star,
-            R.drawable.setting_copyright,
+            R.drawable.setting_about,
+            R.drawable.setting_about,
             R.drawable.setting_about,
     };
 
@@ -210,9 +210,6 @@ public class SettingActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        MSLog.d("requestCode: " + requestCode);
-        MSLog.d("resultCode: " + resultCode);
-        MSLog.d("Intent: " + data);
         mFBCallbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -296,11 +293,20 @@ public class SettingActivity extends AppCompatActivity {
                 startActivity(WebViewActivity.generateWebViewActivityIntent(
                         this, id, title, "https://docs.google.com/forms/d/e/1FAIpQLSfT0nDlt-Ra052pzXeG7nSjwkStnChRhyTOD5M5flRkukLWoQ/viewform"));
                 break;
-            case R.string.preference_about:
-                MSLog.e("this is about");
+            case R.string.preference_privacy_statement:
+                startActivity(WebViewActivity.generateWebViewActivityIntent(
+                        this, id, title, "http://www.infohubapp.com/marketsense/documents/privacy-statement.html"));
+                break;
+            case R.string.preference_term_of_service:
+                startActivity(WebViewActivity.generateWebViewActivityIntent(
+                        this, id, title, "http://www.infohubapp.com/marketsense/documents/term-of-service.html"));
+                break;
+            case R.string.preference_disclaimer:
+                startActivity(WebViewActivity.generateWebViewActivityIntent(
+                        this, id, title, "http://www.infohubapp.com/marketsense/documents/disclaimer.html"));
                 break;
             default:
-                MSLog.e("this is not about");
+                Toast.makeText(this, R.string.preference_sorry, Toast.LENGTH_SHORT).show();
         }
     }
 

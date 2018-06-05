@@ -22,10 +22,10 @@ public class NewsScreenSlidePagerAdapter extends BaseScreenSlidePagerAdapter {
 
     public NewsScreenSlidePagerAdapter(Context context, FragmentManager fm) {
         super(context, fm, new String[]{
-                context.getResources().getString(R.string.title_news_best_optimistic),
-                context.getResources().getString(R.string.title_news_best_pessimistic),
-                context.getResources().getString(R.string.title_news_optimistic),
-                context.getResources().getString(R.string.title_news_pessimistic)
+                context.getResources().getString(R.string.title_focus_news),
+                context.getResources().getString(R.string.title_recent_news),
+                context.getResources().getString(R.string.title_good_news),
+                context.getResources().getString(R.string.title_bad_news)
         });
     }
 

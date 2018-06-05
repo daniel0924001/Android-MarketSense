@@ -20,12 +20,13 @@
     <string name="title_news_lose_predict">預測跌最多股票</string>
     <string name="title_news_win_today">今日漲最多股票</string>
     <string name="title_news_lose_today">今日跌最多股票</string>
-    <string name="title_news_best_optimistic">重點利多</string>
-    <string name="title_news_best_pessimistic">重點利空</string>
-    <string name="title_news_optimistic">利多</string>
-    <string name="title_news_pessimistic">利空</string>
     <string name="title_news_read_original">閱讀完整報導</string>
     <string name="title_news_read_middle">返回新聞節錄</string>
+
+    <string name="title_focus_news">熱門焦點</string>
+    <string name="title_recent_news">台股動態</string>
+    <string name="title_good_news">利多新聞</string>
+    <string name="title_bad_news">利空新聞</string>
 
     <string name="title_choices_list">自選列表</string>
     <string name="title_choices_news">自選新聞</string>
@@ -141,6 +142,10 @@
     <string name="preference_feedback_and_start">意見與評價</string>
     <string name="preference_feedback">意見回饋</string>
     <string name="preference_star">評價 APP</string>
+    <string name="preference_privacy_statement">隱私權暨個人資料保護聲明</string>
+    <string name="preference_term_of_service">服務條款</string>
+    <string name="preference_disclaimer">免責聲明</string>
+    <string name="preference_sorry">不好意思，功能尚未開放</string>
 
     <string name="hello">Hello, 市覺使用者</string>
     <string name="login">登入</string>

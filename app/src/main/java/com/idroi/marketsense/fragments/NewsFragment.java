@@ -26,6 +26,7 @@ import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.NewsRequest;
 
+import static com.idroi.marketsense.adapter.NewsRecyclerAdapter.NEWS_SINGLE_LAYOUT;
 import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_REQUEST_NAME;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 import static com.idroi.marketsense.request.NewsRequest.PARAM_LEVEL;
@@ -89,6 +90,7 @@ public class NewsFragment extends Fragment {
         }
 
         mNewsRecyclerAdapter = new NewsRecyclerAdapter(getActivity(), mTaskId, getArguments());
+        mNewsRecyclerAdapter.setNewsLayoutType(NEWS_SINGLE_LAYOUT);
         mRecyclerView.setAdapter(mNewsRecyclerAdapter);
 
         mSkeletonScreen = Skeleton.bind(mRecyclerView)

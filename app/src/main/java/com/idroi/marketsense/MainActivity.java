@@ -366,6 +366,7 @@ public class MainActivity extends AppCompatActivity {
         MarketSenseCommonNavigator commonNavigator =
                 new MarketSenseCommonNavigator(this, mViewPager,
                         baseScreenSlidePagerAdapter.getTitles());
+        mMagicIndicator.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
 
         mMagicIndicator.setNavigator(commonNavigator);
         ViewPagerHelper.bind(mMagicIndicator, mViewPager);

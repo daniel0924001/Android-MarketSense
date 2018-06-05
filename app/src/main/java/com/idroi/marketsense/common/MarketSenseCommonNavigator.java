@@ -1,10 +1,8 @@
 package com.idroi.marketsense.common;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.v4.view.ViewPager;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.TextView;
 
@@ -15,7 +13,6 @@ import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.CommonNav
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.IPagerIndicator;
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.IPagerTitleView;
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.indicators.LinePagerIndicator;
-import net.lucode.hackware.magicindicator.buildins.commonnavigator.titles.ColorTransitionPagerTitleView;
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.titles.CommonPagerTitleView;
 
 /**
@@ -43,19 +40,20 @@ public class MarketSenseCommonNavigator extends CommonNavigator{
                 CommonPagerTitleView commonPagerTitleView = new CommonPagerTitleView(context);
                 commonPagerTitleView.setContentView(R.layout.simple_pager_title_layout);
 
-                final TextView textview = (TextView) commonPagerTitleView.findViewById(R.id.title_text);
+                final TextView textview = commonPagerTitleView.findViewById(R.id.title_text);
                 textview.setText(mTitles[index]);
-                textview.setTextColor(Color.parseColor("#4a4a4a"));
 
                 commonPagerTitleView.setOnPagerTitleChangeListener(new CommonPagerTitleView.OnPagerTitleChangeListener() {
                     @Override
                     public void onSelected(int i, int i1) {
-                        textview.setTypeface(Typeface.DEFAULT_BOLD, Typeface.BOLD);
+//                        textview.setTypeface(Typeface.DEFAULT_BOLD, Typeface.BOLD);
+                        textview.setTextColor(getResources().getColor(R.color.text_white));
                     }
 
                     @Override
                     public void onDeselected(int i, int i1) {
-                        textview.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
+//                        textview.setTypeface(Typeface.DEFAULT, Typeface.NORMAL);
+                        textview.setTextColor(getResources().getColor(R.color.text_gray));
                     }
 
                     @Override
@@ -81,7 +79,7 @@ public class MarketSenseCommonNavigator extends CommonNavigator{
             public IPagerIndicator getIndicator(Context context) {
                 LinePagerIndicator indicator = new LinePagerIndicator(context);
                 indicator.setMode(LinePagerIndicator.MODE_WRAP_CONTENT);
-                indicator.setColors(Color.parseColor("#F74343"));
+                indicator.setColors(context.getResources().getColor(R.color.colorAccent));
                 return indicator;
             }
         };

@@ -16,6 +16,11 @@
     <string name="title_no_comment">暫無評論</string>
     <string name="title_send_first">立馬搶頭香</string>
 
+    <string name="title_news_title">新聞標題</string>
+    <string name="title_news_date">新聞時間</string>
+    <string name="title_news_good">利多</string>
+    <string name="title_news_bad">利空</string>
+
     <string name="title_news_win_predict">預測漲最多股票</string>
     <string name="title_news_lose_predict">預測跌最多股票</string>
     <string name="title_news_win_today">今日漲最多股票</string>
@@ -65,6 +70,7 @@
     <string name="title_company_price_diff_percentage">股價漲跌百分比</string>
     <string name="title_company_confidence">公司信心指數</string>
 
+    <string name="title_sort_by">排序依：</string>
     <string name="title_company_fluctuation">漲跌幅度</string>
     <string name="title_company_predict_news_title">新聞預測</string>
     <string name="title_company_predict_people_title">鄉民預測</string>

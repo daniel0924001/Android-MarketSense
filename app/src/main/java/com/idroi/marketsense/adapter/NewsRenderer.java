@@ -51,29 +51,42 @@ public class NewsRenderer implements MarketSenseRenderer<News>{
         MarketSenseRendererHelper.addTextView(newsViewHolder.titleView, content.getTitle());
         MarketSenseRendererHelper.addTextView(newsViewHolder.dateView, content.getDate());
 
-        if(content.getImportant()) {
-            if(content.isOptimistic()) {
-                newsViewHolder.dateView.setBackgroundColor(context.getResources().getColor(R.color.colorTrendUp));
-                newsViewHolder.alarmImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_notifications_red_24px));
-                newsViewHolder.dateView.setBackgroundColor(context.getResources().getColor(R.color.colorTrendUp));
-            } else {
-                newsViewHolder.dateView.setBackgroundColor(context.getResources().getColor(R.color.colorTrendDown));
-                newsViewHolder.alarmImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_notifications_green_24px));
-                newsViewHolder.dateView.setBackgroundColor(context.getResources().getColor(R.color.colorTrendDown));
-            }
-            newsViewHolder.dateView.setTextColor(context.getResources().getColor(R.color.marketsense_text_white));
-            newsViewHolder.alarmImageView.setVisibility(View.VISIBLE);
+        // fire text
+        if(content.isOptimistic()) {
+            newsViewHolder.fireTextView.setText(R.string.title_news_good);
+            newsViewHolder.fireTextView.setTextColor(context.getResources().getColor(R.color.colorTrendUp));
+            newsViewHolder.fireTextView.setVisibility(View.VISIBLE);
+        } else if(content.isPessimistic()) {
+            newsViewHolder.fireTextView.setText(R.string.title_news_bad);
+            newsViewHolder.fireTextView.setTextColor(context.getResources().getColor(R.color.colorTrendDown));
+            newsViewHolder.fireTextView.setVisibility(View.VISIBLE);
         } else {
-            newsViewHolder.dateView.setBackgroundColor(context.getResources().getColor(R.color.marketsense_text_white));
-            newsViewHolder.dateView.setTextColor(context.getResources().getColor(R.color.marketsense_text_gray));
-            newsViewHolder.alarmImageView.setVisibility(View.GONE);
+            newsViewHolder.fireTextView.setVisibility(View.GONE);
         }
-        if(!TextUtils.isEmpty(content.getUrlImage())) {
-            FrescoImageHelper.loadImageView(content.getUrlImage(),
-                    newsViewHolder.mainImageView, FrescoImageHelper.MAIN_IMAGE_RATIO);
-            newsViewHolder.mainImageView.setVisibility(View.VISIBLE);
-        } else {
-            newsViewHolder.mainImageView.setVisibility(View.GONE);
+
+        // fire image
+        newsViewHolder.fireImageView.setVisibility(View.VISIBLE);
+        switch (content.getLevel()) {
+            case 3:
+                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_red3);
+                break;
+            case 2:
+                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_red2);
+                break;
+            case 1:
+                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_red1);
+                break;
+            case -1:
+                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_green1);
+                break;
+            case -2:
+                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_green2);
+                break;
+            case -3:
+                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_green3);
+                break;
+            default:
+                newsViewHolder.fireImageView.setVisibility(View.GONE);
         }
     }
 

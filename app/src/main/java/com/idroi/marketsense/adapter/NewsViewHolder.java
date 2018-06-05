@@ -17,8 +17,8 @@ public class NewsViewHolder {
     View mainView;
     TextView titleView;
     TextView dateView;
-    SimpleDraweeView mainImageView;
-    ImageView alarmImageView;
+    TextView fireTextView;
+    ImageView fireImageView;
 
     static final NewsViewHolder EMPTY_VIEW_HOLDER = new NewsViewHolder();
 
@@ -29,9 +29,9 @@ public class NewsViewHolder {
         newsViewHolder.mainView = view;
         try {
             newsViewHolder.titleView = view.findViewById(R.id.marketsense_news_title_tv);
-            newsViewHolder.mainImageView = view.findViewById(R.id.marketsense_news_image_iv);
             newsViewHolder.dateView = view.findViewById(R.id.marketsense_news_date_tv);
-            newsViewHolder.alarmImageView = view.findViewById(R.id.marketsense_news_alarm);
+            newsViewHolder.fireTextView = view.findViewById(R.id.marketsense_news_fire_tv);
+            newsViewHolder.fireImageView = view.findViewById(R.id.marketsense_news_fire_iv);
             return newsViewHolder;
         } catch (ClassCastException exception) {
             MSLog.e(exception.toString());

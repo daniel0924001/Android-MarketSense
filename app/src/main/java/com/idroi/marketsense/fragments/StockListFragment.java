@@ -1,5 +1,6 @@
 package com.idroi.marketsense.fragments;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -74,7 +75,7 @@ public class StockListFragment extends Fragment {
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private int mTaskId;
 
-    private TextView mSortedByName, mSortedByDiff, mSortedByPeople, mSortedByNews;
+    private TextView mSortedByDiff, mSortedByPeople, mSortedByNews;
     private TextView[] mSortedViews;
     private HashMap<View, String> mSortedTexts;
     private View mLastSortedView;
@@ -102,7 +103,7 @@ public class StockListFragment extends Fragment {
         }
         mNoDataTextView = view.findViewById(R.id.no_stock_tv);
 
-        mStockListRecyclerAdapter = new StockListRecyclerAdapter(getActivity(), mTaskId, SORT_BY_NAME, SORT_UPWARD);
+        mStockListRecyclerAdapter = new StockListRecyclerAdapter(getActivity(), mTaskId, SORT_BY_DIFF, SORT_DOWNWARD);
         mRecyclerView.setAdapter(mStockListRecyclerAdapter);
 
         mSkeletonScreen = Skeleton.bind(mRecyclerView)
@@ -183,27 +184,18 @@ public class StockListFragment extends Fragment {
     }
 
     private void setSortBlock(View view) {
-        mSortedByName = view.findViewById(R.id.title_name);
         mSortedByDiff = view .findViewById(R.id.title_diff);
         mSortedByPeople = view.findViewById(R.id.title_people);
         mSortedByNews = view.findViewById(R.id.title_news);
 
-        mSortedViews = new TextView[] {mSortedByName, mSortedByDiff, mSortedByPeople, mSortedByNews};
+        mSortedViews = new TextView[] {mSortedByDiff, mSortedByPeople, mSortedByNews};
         mSortedTexts = new HashMap<>();
-        mSortedTexts.put(mSortedByName, getString(R.string.title_company_name));
         mSortedTexts.put(mSortedByDiff, getString(R.string.title_company_fluctuation));
         mSortedTexts.put(mSortedByPeople, getString(R.string.title_company_predict_people_title));
         mSortedTexts.put(mSortedByNews, getString(R.string.title_company_predict_news_title));
 
         mLastSortedView = null;
         mSortedDirection = SORT_UPWARD;
-
-        mSortedByName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                changeSortedBlockLayout(SORT_BY_NAME, view);
-            }
-        });
 
         mSortedByDiff.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -225,7 +217,7 @@ public class StockListFragment extends Fragment {
                 changeSortedBlockLayout(SORT_BY_NEWS, view);
             }
         });
-        changeSortedBlockLayout(SORT_BY_NAME, mSortedByName);
+        changeSortedBlockLayout(SORT_BY_DIFF, mSortedByDiff);
     }
 
     private void changeSortedBlockLayout(int field, View view) {
@@ -244,15 +236,17 @@ public class StockListFragment extends Fragment {
         for (TextView textView : mSortedViews) {
             String initString = mSortedTexts.get(textView);
             if (textView != view) {
-                textView.setText(String.format("%s ↕", initString));
+                // others
+                textView.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_sorting_off, 0, 0, 0);
                 textView.setTextColor(getResources().getColor(R.color.text_gray));
             } else {
+                // sorted one
                 if(mSortedDirection == SORT_UPWARD) {
-                    textView.setText(String.format("%s ↑", initString));
+                    textView.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_sorting_on_up, 0, 0, 0);
                 } else {
-                    textView.setText(String.format("%s ↓", initString));
+                    textView.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_sorting_on_down, 0, 0, 0);
                 }
-                textView.setTextColor(getResources().getColor(R.color.text_black));
+                textView.setTextColor(getResources().getColor(R.color.colorPrimary));
             }
         }
     }

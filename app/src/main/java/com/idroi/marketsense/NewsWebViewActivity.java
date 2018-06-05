@@ -473,15 +473,16 @@ public class NewsWebViewActivity extends AppCompatActivity {
             mNewsWebViewMiddleDateTextView.setText(mSourceDate);
         }
         mNewsWebViewMiddleImageView = findViewById(R.id.marketsense_webview_activity_image);
-        if(mNewsWebViewMiddleImageView != null && mImageUrl != null) {
+        if(mNewsWebViewMiddleImageView != null && !mImageUrl.isEmpty()) {
             FrescoImageHelper.loadImageView(mImageUrl,
                     mNewsWebViewMiddleImageView, FrescoImageHelper.MAIN_IMAGE_RATIO);
             mImageMask.setVisibility(View.VISIBLE);
-        }
-
-        if(mImageUrl == null) {
-            mNewsWebViewMiddleDateTextView.setTextColor(getResources().getColor(R.color.marketsense_text_black));
-            mNewsWebViewMiddleTitleTextView.setTextColor(getResources().getColor(R.color.marketsense_text_black));
+            mNewsWebViewMiddleTitleTextView.setTextColor(getResources().getColor(R.color.text_white));
+            mNewsWebViewMiddleDateTextView.setTextColor(getResources().getColor(R.color.text_white));
+        } else {
+            mImageMask.setVisibility(View.GONE);
+            mNewsWebViewMiddleTitleTextView.setTextColor(getResources().getColor(R.color.text_black));
+            mNewsWebViewMiddleDateTextView.setTextColor(getResources().getColor(R.color.text_black));
         }
     }
 

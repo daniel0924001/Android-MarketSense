@@ -17,7 +17,7 @@ import com.idroi.marketsense.request.UserEventsAndCodesRequest;
 import org.json.JSONException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * Created by daniel.hsieh on 2018/5/3.
@@ -29,7 +29,7 @@ public class ClientData {
 
     private Context mContext;
     private ArrayList<Stock> mAllStocksListInfo;
-    private ArrayList<Stock> mAllStockPriceList;
+    private HashMap<String, Stock> mRealTimePricesHashMap;
 
     private int mScreenWidth, mScreenHeight;
     private int mScreenWidthPixels, mScreenHeightPixels;
@@ -96,8 +96,8 @@ public class ClientData {
         mAllStocksListInfo = stocksListInfo;
     }
 
-    public void setAllStockPriceList(ArrayList<Stock> stockPriceList) {
-        mAllStockPriceList = stockPriceList;
+    public void setAllStockPriceHashMap(HashMap<String, Stock> stocksHashMap) {
+        mRealTimePricesHashMap = stocksHashMap;
     }
 
     public void setUserToken(String token) {
@@ -129,15 +129,7 @@ public class ClientData {
     }
 
     public Stock getPriceFromCode(String code) {
-        if(mAllStockPriceList != null) {
-            for (int i = 0; i < mAllStockPriceList.size(); i++) {
-                Stock stock = mAllStockPriceList.get(i);
-                if(stock.getCode().equals(code)) {
-                    return stock;
-                }
-            }
-        }
-        return null;
+        return mRealTimePricesHashMap.get(code);
     }
 
     public ArrayList<Stock> getAllStocksListInfo() {

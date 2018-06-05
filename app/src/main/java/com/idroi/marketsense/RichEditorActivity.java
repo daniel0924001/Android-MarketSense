@@ -147,7 +147,8 @@ public class RichEditorActivity extends AppCompatActivity {
                     getResources().getColor(R.color.colorTrendUp));
             mLastPressView = view;
             view.performClick();
-        } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+        } else if (motionEvent.getAction() == MotionEvent.ACTION_UP ||
+                motionEvent.getAction() == MotionEvent.ACTION_CANCEL) {
             // Released
             view.setBackgroundColor(
                     getResources().getColor(R.color.marketsense_rich_edit_black_background));

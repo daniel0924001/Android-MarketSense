@@ -32,7 +32,7 @@ import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_REQUEST_N
 public class MarketSenseStockFetcher {
 
     public interface MarketSenseStockNetworkListener {
-        void onStockListLoad(final ArrayList<Stock> stockArrayList);
+        void onStockListLoad(final ArrayList<Stock> stockArrayList, boolean isAutoRefresh);
         void onStockListFail(final MarketSenseError marketSenseError);
     }
 
@@ -41,7 +41,7 @@ public class MarketSenseStockFetcher {
 
     private static final MarketSenseStockNetworkListener EMPTY_NETWORK_LISTENER = new MarketSenseStockNetworkListener() {
         @Override
-        public void onStockListLoad(ArrayList<Stock> newsArray) {
+        public void onStockListLoad(ArrayList<Stock> newsArray, boolean isAutoRefresh) {
 
         }
 
@@ -74,6 +74,10 @@ public class MarketSenseStockFetcher {
     }
 
     void makeRequest(@NonNull String networkUrl, @Nullable String cacheUrl) {
+        makeRequest(networkUrl, cacheUrl, false);
+    }
+
+    void makeRequest(@NonNull String networkUrl, @Nullable String cacheUrl, boolean isAutoRefresh) {
         final Context context = getContextOrDestroy();
         if(context == null) {
             return;
@@ -84,10 +88,10 @@ public class MarketSenseStockFetcher {
             return;
         }
 
-        requestStock(networkUrl, cacheUrl);
+        requestStock(networkUrl, cacheUrl, isAutoRefresh);
     }
 
-    private void requestStock(@NonNull final String networkUrl, @Nullable String cacheUrl) {
+    private void requestStock(@NonNull final String networkUrl, @Nullable String cacheUrl, final boolean isAutoRefresh) {
         final Context context = getContextOrDestroy();
         if(context == null) {
             return;
@@ -107,7 +111,7 @@ public class MarketSenseStockFetcher {
             try {
                 ArrayList<Stock> stockArrayList = StockRequest.stockParseResponse(entry.data);
                 MSLog.i("Loading stock list...(cache hit): " + new String(entry.data));
-                mMarketSenseStockNetworkListener.onStockListLoad(stockArrayList);
+                mMarketSenseStockNetworkListener.onStockListLoad(stockArrayList, isAutoRefresh);
             } catch (JSONException e) {
                 MSLog.e("Loading stock list...(cache failed JSONException)");
             }
@@ -119,7 +123,7 @@ public class MarketSenseStockFetcher {
             @Override
             public void onResponse(ArrayList<Stock> response) {
                 mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
-                mMarketSenseStockNetworkListener.onStockListLoad(response);
+                mMarketSenseStockNetworkListener.onStockListLoad(response, isAutoRefresh);
 
                 SharedPreferences.Editor editor =
                         context.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE).edit();

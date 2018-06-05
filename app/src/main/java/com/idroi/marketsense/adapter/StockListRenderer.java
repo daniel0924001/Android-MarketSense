@@ -20,9 +20,12 @@ import java.util.WeakHashMap;
 public class StockListRenderer implements MarketSenseRenderer<Stock>{
 
     @NonNull private final WeakHashMap<View, StockViewHolder> mViewHolderMap;
+    private final int[] mBarRedResourceId, mBarGreenResourceId;
 
     StockListRenderer() {
         mViewHolderMap = new WeakHashMap<>();
+        mBarRedResourceId = new int[] {R.mipmap.ic_bar1_red, R.mipmap.ic_bar2_red, R.mipmap.ic_bar3_red};
+        mBarGreenResourceId = new int[] {R.mipmap.ic_bar1_green, R.mipmap.ic_bar2_green, R.mipmap.ic_bar3_green};
     }
 
     @Override
@@ -49,15 +52,33 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
         MarketSenseRendererHelper.addTextView(stockViewHolder.codeView, content.getCode());
 
         MarketSenseRendererHelper.addTextView(stockViewHolder.priceView, content.getPrice());
-        MarketSenseRendererHelper.addTextView(stockViewHolder.diffView, content.getDiffPercentage());
+        String format = context.getResources().getString(R.string.title_company_name_code_format);
+        MarketSenseRendererHelper.addTextView(stockViewHolder.diffView, String.format(format, content.getDiffNumber(), content.getDiffPercentage()));
 
-        MarketSenseRendererHelper.addTextView(stockViewHolder.predictNewsText,
-                context.getResources().getString(content.getPredictNewsStringId()));
-        content.setVotingIcon(context, stockViewHolder.predictPeopleImageView);
+        int peopleLevel = content.getPredictPeopleLevel();
+        int newsLevel = content.getPredictNewsLevel();
 
-        MarketSenseRendererHelper.addTextView(stockViewHolder.predictPeopleText,
-                context.getResources().getString(content.getPredictPeopleStringId()));
-        content.setPredictionIcon(context, stockViewHolder.predictNewsImageView);
+        if(content.getPredictPeopleDirection() == Stock.TREND_UP) {
+            stockViewHolder.predictPeopleText.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_red_s, 0, 0, 0);
+            stockViewHolder.predictPeopleImageView.setImageResource(mBarRedResourceId[peopleLevel]);
+        } else if(content.getPredictPeopleDirection() == Stock.TREND_DOWN) {
+            stockViewHolder.predictPeopleText.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_green_s, 0, 0, 0);
+            stockViewHolder.predictPeopleImageView.setImageResource(mBarGreenResourceId[peopleLevel]);
+        } else {
+            stockViewHolder.predictPeopleText.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_red_s, 0, 0, 0);
+            stockViewHolder.predictPeopleImageView.setImageResource(R.mipmap.ic_bar1_red);
+        }
+
+        if(content.getConfidenceDirection() == Stock.TREND_UP) {
+            stockViewHolder.predictNewsText.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_red_s, 0, 0, 0);
+            stockViewHolder.predictNewsImageView.setImageResource(mBarRedResourceId[newsLevel]);
+        } else if(content.getConfidenceDirection() == Stock.TREND_DOWN) {
+            stockViewHolder.predictNewsText.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_green_s, 0, 0, 0);
+            stockViewHolder.predictNewsImageView.setImageResource(mBarGreenResourceId[newsLevel]);
+        } else {
+            stockViewHolder.predictNewsText.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_red_s, 0, 0, 0);
+            stockViewHolder.predictNewsImageView.setImageResource(R.mipmap.ic_bar1_red);
+        }
 
         setColor(context, stockViewHolder, content);
     }

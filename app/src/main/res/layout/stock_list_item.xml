@@ -11,173 +11,120 @@
         android:id="@+id/marketsense_stock_name_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
         android:fontFamily="Roboto-Regular"
-        android:lineSpacingExtra="4dp"
         android:text="@string/title_company_name"
-        android:textColor="@color/marketsense_text_black"
+        android:textColor="@color/colorPrimary"
         android:textSize="16sp"
         android:textStyle="normal"
-        app:layout_constraintBottom_toTopOf="@id/marketsense_stock_code_tv"
-        app:layout_constraintEnd_toEndOf="@id/guideline_1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/marketsense_stock_code_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:fontFamily="Roboto-Regular"
-        android:lineSpacingExtra="4dp"
         android:text="@string/title_company_code"
-        android:textColor="@color/marketsense_text_gray"
-        android:textSize="12sp"
+        android:textColor="@color/colorPrimary"
+        android:textSize="16sp"
         android:textStyle="normal"
-        app:layout_constraintEnd_toEndOf="@id/guideline_1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/marketsense_stock_name_tv" />
+        app:layout_constraintTop_toTopOf="@id/marketsense_stock_name_tv"
+        app:layout_constraintStart_toEndOf="@id/marketsense_stock_name_tv" />
+
+    <TextView
+        android:id="@+id/marketsense_stock_price_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="26dp"
+        android:fontFamily="Roboto-Regular"
+        android:text="@string/title_company_price"
+        android:textColor="@color/marketsense_text_black"
+        android:textSize="14sp"
+        android:textStyle="normal"
+        app:layout_constraintStart_toStartOf="@id/marketsense_stock_name_tv"
+        app:layout_constraintTop_toBottomOf="@id/marketsense_stock_name_tv"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/marketsense_stock_diff_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:fontFamily="Roboto-Regular"
+        android:text="@string/title_company_price_diff_percentage"
+        android:textColor="@color/marketsense_text_black"
+        android:textSize="14sp"
+        android:textStyle="normal"
+        app:layout_constraintTop_toTopOf="@id/marketsense_stock_price_tv"
+        app:layout_constraintStart_toEndOf="@id/marketsense_stock_price_tv" />
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline_1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.25" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline_1_1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.3125" />
-
+        app:layout_constraintGuide_percent="0.55" />
 
     <TextView
-        android:id="@+id/marketsense_stock_price_tv"
+        android:id="@+id/marketsense_stock_people_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
+        android:drawableStart="@mipmap/ic_arrow_red_s"
+        android:drawablePadding="8dp"
+        android:layout_marginBottom="13dp"
         android:fontFamily="Roboto-Regular"
-        android:lineSpacingExtra="4dp"
-        android:text="@string/title_company_price"
+        android:text="@string/title_people"
         android:textColor="@color/marketsense_text_black"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:textStyle="normal"
-        app:layout_constraintBottom_toTopOf="@id/marketsense_stock_diff_tv"
-        app:layout_constraintStart_toEndOf="@id/guideline_1_1"
+        android:letterSpacing="0.04"
+        app:layout_constraintStart_toStartOf="@id/guideline_1"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/marketsense_stock_news_tv"
         app:layout_constraintVertical_chainStyle="packed"/>
 
     <TextView
-        android:id="@+id/marketsense_stock_diff_tv"
+        android:id="@+id/marketsense_stock_news_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:drawableStart="@mipmap/ic_arrow_green_s"
+        android:drawablePadding="8dp"
         android:fontFamily="Roboto-Regular"
-        android:lineSpacingExtra="4dp"
-        android:text="@string/title_company_price_diff_percentage"
+        android:text="@string/title_news"
         android:textColor="@color/marketsense_text_black"
-        android:textSize="12sp"
+        android:textSize="14sp"
         android:textStyle="normal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/guideline_1_1"
-        app:layout_constraintTop_toBottomOf="@id/marketsense_stock_price_tv" />
+        android:letterSpacing="0.04"
+        app:layout_constraintStart_toStartOf="@id/guideline_1"
+        app:layout_constraintTop_toBottomOf="@id/marketsense_stock_people_tv"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline_2"
+    <ImageView
+        android:id="@+id/marketsense_stock_people_iv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5" />
-
-    <android.support.constraint.ConstraintLayout
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintEnd_toEndOf="@id/guideline_3"
-        app:layout_constraintStart_toStartOf="@id/guideline_2"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <ImageView
-            android:id="@+id/predict_people_icon"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_centerVertical="true"
-            android:layout_marginBottom="8dp"
-            android:background="@drawable/btn_round_red"
-            android:src="@mipmap/ic_arrow_up_l"
-            android:padding="8dp"
-            android:contentDescription="@string/title_company_predict_people_title"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/predict_people_description"
-            app:layout_constraintVertical_chainStyle="packed"/>
-
-        <TextView
-            android:id="@+id/predict_people_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="Roboto-Regular"
-            android:textColor="@color/marketsense_text_black"
-            android:letterSpacing="0.04"
-            android:textSize="12sp"
-            android:textStyle="normal"
-            android:gravity="center_horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/predict_people_icon"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-
-    </android.support.constraint.ConstraintLayout>
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline_3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.75"/>
-
-    <android.support.constraint.ConstraintLayout
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:src="@mipmap/ic_bar3_red"
+        android:contentDescription="@string/title_company_predict_people_title"
+        app:layout_constraintTop_toTopOf="@id/marketsense_stock_people_tv"
+        app:layout_constraintBottom_toBottomOf="@id/marketsense_stock_people_tv"
+        app:layout_constraintStart_toEndOf="@id/marketsense_stock_people_tv"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/guideline_3"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        />
 
-        <ImageView
-            android:id="@+id/predict_news_icon"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_centerVertical="true"
-            android:layout_marginBottom="8dp"
-            android:background="@drawable/btn_round_red"
-            android:src="@mipmap/ic_arrow_up_l"
-            android:padding="8dp"
-            android:contentDescription="@string/title_company_predict_news_title"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/predict_news_description"
-            app:layout_constraintVertical_chainStyle="packed"/>
-
-        <TextView
-            android:id="@+id/predict_news_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="Roboto-Regular"
-            android:textColor="@color/marketsense_text_black"
-            android:letterSpacing="0.04"
-            android:textSize="12sp"
-            android:textStyle="normal"
-            android:gravity="center_horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/predict_news_icon"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-
-    </android.support.constraint.ConstraintLayout>
+    <ImageView
+        android:id="@+id/marketsense_stock_news_iv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_bar3_green"
+        android:contentDescription="@string/title_company_predict_news_title"
+        app:layout_constraintTop_toTopOf="@id/marketsense_stock_news_tv"
+        app:layout_constraintBottom_toBottomOf="@id/marketsense_stock_news_tv"
+        app:layout_constraintStart_toEndOf="@id/marketsense_stock_news_tv"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
 
 </android.support.constraint.ConstraintLayout>

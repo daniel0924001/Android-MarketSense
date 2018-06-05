@@ -39,10 +39,12 @@ public class StockViewHolder {
             stockViewHolder.codeView = view.findViewById(R.id.marketsense_stock_code_tv);
             stockViewHolder.priceView = view.findViewById(R.id.marketsense_stock_price_tv);
             stockViewHolder.diffView = view.findViewById(R.id.marketsense_stock_diff_tv);
-            stockViewHolder.predictNewsText = view.findViewById(R.id.predict_news_description);
-            stockViewHolder.predictPeopleText = view.findViewById(R.id.predict_people_description);
-            stockViewHolder.predictNewsImageView = view.findViewById(R.id.predict_news_icon);
-            stockViewHolder.predictPeopleImageView = view.findViewById(R.id.predict_people_icon);
+
+            stockViewHolder.predictNewsText = view.findViewById(R.id.marketsense_stock_news_tv);
+            stockViewHolder.predictPeopleText = view.findViewById(R.id.marketsense_stock_people_tv);
+            stockViewHolder.predictNewsImageView = view.findViewById(R.id.marketsense_stock_news_iv);
+            stockViewHolder.predictPeopleImageView = view.findViewById(R.id.marketsense_stock_people_iv);
+
             return stockViewHolder;
         } catch (ClassCastException exception) {
             MSLog.e(exception.toString());

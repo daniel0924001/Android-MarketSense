@@ -30,7 +30,7 @@ public class Stock {
     public static final int LEVEL_HIGHEST = 2;
     public static final int LEVEL_HIGH = 1;
     public static final int LEVEL_LOW = 0;
-    public static final int LEVEL_INVALID = -1;
+    public static final int LEVEL_INVALID = 0;
 
     public static final int TREND_UP = 1;
     public static final int TREND_DOWN = -1;
@@ -210,42 +210,12 @@ public class Stock {
         }
     }
 
-    private static int getPredictText(int level, int direction) {
-        if(direction == TREND_UP) {
-            if(level == LEVEL_HIGHEST) {
-                return R.string.title_level_up_highest;
-            } else if(level == LEVEL_HIGH) {
-                return R.string.title_level_up_high;
-            } else {
-                return R.string.title_level_up_low;
-            }
-        } else if(direction == TREND_DOWN) {
-            if(level == LEVEL_HIGHEST) {
-                return R.string.title_level_down_highest;
-            } else if(level == LEVEL_HIGH) {
-                return R.string.title_level_down_high;
-            } else {
-                return R.string.title_level_down_low;
-            }
-        } else {
-            return R.string.title_level_flat;
-        }
-    }
-
     public int getPredictNewsLevel() {
         return getPredictClass(mConfidence);
     }
 
-    public int getPredictNewsStringId() {
-        return getPredictText(getPredictNewsLevel(), mConfidenceDirection);
-    }
-
     public float getPredictNewsScore() {
         return (float) mConfidence * 3 / 100;
-    }
-
-    public int getPredictPeopleStringId() {
-        return getPredictText(getPredictPeopleLevel(), mVotingDirection);
     }
 
     public int getPredictPeopleLevel() {
@@ -259,36 +229,6 @@ public class Stock {
     public int getPredictPeopleDirection() {
         return mVotingDirection;
     }
-
-    public void setVotingIcon(Context context, ImageView imageView) {
-        int level = getPredictPeopleLevel();
-        if(mVotingDirection == TREND_UP || mVotingDirection == TREND_FLAT) {
-            imageView.setBackground(context.getDrawable(R.drawable.btn_round_red));
-            if(level == LEVEL_HIGHEST || level == LEVEL_HIGH) {
-                imageView.setImageDrawable(context.getDrawable(R.mipmap.ic_arrow_up_l));
-            } else {
-                imageView.setImageDrawable(context.getDrawable(R.mipmap.ic_arrow_up_s));
-            }
-        } else {
-            imageView.setBackground(context.getDrawable(R.drawable.btn_round_green));
-            if(level == LEVEL_HIGHEST || level == LEVEL_HIGH) {
-                imageView.setImageDrawable(context.getDrawable(R.mipmap.ic_arrow_down_l));
-            } else {
-                imageView.setImageDrawable(context.getDrawable(R.mipmap.ic_arrow_down_s));
-            }
-        }
-    }
-
-    public void setPredictionIcon(Context context, ImageView imageView) {
-        if(mConfidenceDirection == TREND_UP || mConfidenceDirection == TREND_FLAT) {
-            imageView.setBackground(context.getDrawable(R.drawable.btn_round_red));
-            imageView.setImageDrawable(context.getDrawable(R.mipmap.ic_arrow_up_l));
-        } else {
-            imageView.setBackground(context.getDrawable(R.drawable.btn_round_green));
-            imageView.setImageDrawable(context.getDrawable(R.mipmap.ic_arrow_down_l));
-        }
-    }
-
 
     @Nullable
     public static Stock jsonObjectToStock(JSONObject jsonObject, boolean removeNan) {

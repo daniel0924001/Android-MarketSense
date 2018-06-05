@@ -80,6 +80,9 @@
     <string name="title_level_up_high">非常看漲</string>
     <string name="title_level_up_low">看漲</string>
 
+    <string name="title_news">新聞</string>
+    <string name="title_people">鄉民</string>
+
     <string name="title_level_flat">持平</string>
 
     <string name="title_level_down_highest">最看跌！</string>

@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.idroi.marketsense.common.FrescoHelper;
 
 /**
  * Created by daniel.hsieh on 2018/4/27.
@@ -19,6 +20,7 @@ public class NotificationActivity extends AppCompatActivity{
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FrescoHelper.initialize(getApplicationContext());
         setContentView(R.layout.activity_notification);
 
         setActionBar();

@@ -4,10 +4,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.common.SharedPreferencesCompat;
+import com.idroi.marketsense.notification.NotificationHelper;
 import com.idroi.marketsense.util.DateUtils;
 
 import org.json.JSONObject;
@@ -155,12 +157,18 @@ public class UserProfile {
     }
 
     public void addFavoriteStock(String code) {
+        // subscribe FCM topic
+        MSLog.d("subscribeToTopic: " + NotificationHelper.getTopicForStockCode(code));
+        FirebaseMessaging.getInstance().subscribeToTopic(NotificationHelper.getTopicForStockCode(code));
         if(mFavoriteStocks != null) {
             mFavoriteStocks.add(code);
         }
     }
 
     public void deleteFavoriteStock(String code) {
+        // un-subscribe FCM topic
+        MSLog.d("unsubscribeFromTopic: " + NotificationHelper.getTopicForStockCode(code));
+        FirebaseMessaging.getInstance().unsubscribeFromTopic(NotificationHelper.getTopicForStockCode(code));
         if(mFavoriteStocks != null) {
             mFavoriteStocks.remove(code);
         }

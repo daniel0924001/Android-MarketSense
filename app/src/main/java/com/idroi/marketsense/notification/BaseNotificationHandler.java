@@ -58,8 +58,12 @@ public abstract class BaseNotificationHandler {
 
     abstract protected PendingIntent generatePendingIntent(Context context, Map<String, String> data);
 
+    abstract protected String getChannelId(Context context);
+
+    abstract protected String getChannelTitle(Context context);
+
     private void sendNotification(Context context, PendingIntent pendingIntent, String title, String text) {
-        String channelId = context.getString(R.string.default_notification_channel_id);
+        String channelId = getChannelId(context);
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(context, channelId)
                         .setSmallIcon(R.drawable.ic_trending_up_red_24px)
@@ -67,7 +71,8 @@ public abstract class BaseNotificationHandler {
                         .setContentText(text)
                         .setAutoCancel(true)
                         .setColor(context.getResources().getColor(R.color.colorPrimary))
-                        .setContentIntent(pendingIntent);
+                        .setContentIntent(pendingIntent)
+                        .setOnlyAlertOnce(true);
 
         NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -80,7 +85,7 @@ public abstract class BaseNotificationHandler {
         // Since android Oreo notification channel is needed.
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(channelId,
-                    context.getString(R.string.default_notification_channel_title),
+                    getChannelTitle(context),
                     NotificationManager.IMPORTANCE_DEFAULT);
             notificationManager.createNotificationChannel(channel);
             notificationBuilder.setChannelId(channelId);

@@ -23,7 +23,7 @@ public class MarketSenseFirebaseMessagingService extends FirebaseMessagingServic
 
         SharedPreferences sharedPreferences =
                 this.getSharedPreferences(SHARED_PREFERENCE_USER_SETTING, Context.MODE_PRIVATE);
-        boolean isNotificationEnable = sharedPreferences.getBoolean(USER_SETTING_NOTIFICATION_KEY, false);
+        boolean isNotificationEnable = sharedPreferences.getBoolean(USER_SETTING_NOTIFICATION_KEY, true);
         MSLog.d("receive notification and the user's notification setting is: " + isNotificationEnable);
         if(!isNotificationEnable) {
             return;

@@ -3,9 +3,11 @@ package com.idroi.marketsense.notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
 
 import com.idroi.marketsense.MainActivity;
 import com.idroi.marketsense.NewsWebViewActivity;
+import com.idroi.marketsense.R;
 import com.idroi.marketsense.data.News;
 
 import org.json.JSONObject;
@@ -57,6 +59,16 @@ public class NewsNotification extends BaseNotificationHandler {
         } else {
             return "";
         }
+    }
+
+    @Override
+    protected String getChannelId(Context context) {
+        return context.getString(R.string.notification_channel_news_id);
+    }
+
+    @Override
+    protected String getChannelTitle(Context context) {
+        return context.getString(R.string.notification_channel_news_title);
     }
 
     @Override

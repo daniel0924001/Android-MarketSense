@@ -38,6 +38,7 @@ import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
+import com.idroi.marketsense.common.FrescoHelper;
 import com.idroi.marketsense.common.FrescoImageHelper;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
@@ -125,6 +126,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FrescoHelper.initialize(getApplicationContext());
         setContentView(R.layout.activity_news_webview);
 
         initFBLogin();
@@ -473,7 +475,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
             mNewsWebViewMiddleDateTextView.setText(mSourceDate);
         }
         mNewsWebViewMiddleImageView = findViewById(R.id.marketsense_webview_activity_image);
-        if(mNewsWebViewMiddleImageView != null && !mImageUrl.isEmpty()) {
+        if(mNewsWebViewMiddleImageView != null && (!mImageUrl.isEmpty() || mImageUrl.equals("None"))) {
             FrescoImageHelper.loadImageView(mImageUrl,
                     mNewsWebViewMiddleImageView, FrescoImageHelper.MAIN_IMAGE_RATIO);
             mImageMask.setVisibility(View.VISIBLE);

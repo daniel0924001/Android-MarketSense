@@ -36,6 +36,7 @@ import com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter;
 import com.idroi.marketsense.adapter.NewsRecyclerAdapter;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
+import com.idroi.marketsense.common.FrescoHelper;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.common.YahooStxChartCrawler;
 import com.idroi.marketsense.data.Comment;
@@ -112,6 +113,7 @@ public class StockActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FrescoHelper.initialize(getApplicationContext());
         setContentView(R.layout.activity_stock);
 
         mUserProfile = ClientData.getInstance(this).getUserProfile();

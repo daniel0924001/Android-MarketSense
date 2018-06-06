@@ -19,6 +19,7 @@ import com.ethanhua.skeleton.Skeleton;
 import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.common.FrescoHelper;
 
 /**
  * Created by daniel.hsieh on 2018/5/28.
@@ -38,6 +39,7 @@ public class WebViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FrescoHelper.initialize(getApplicationContext());
         setContentView(R.layout.activity_webview);
 
         setInformation();

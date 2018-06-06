@@ -131,9 +131,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MSLog.i("Enter MainActivity");
-        setContentView(R.layout.activity_main);
-
         FrescoHelper.initialize(getApplicationContext());
+        setContentView(R.layout.activity_main);
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);

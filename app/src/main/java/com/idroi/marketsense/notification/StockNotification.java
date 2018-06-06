@@ -1,10 +1,13 @@
 package com.idroi.marketsense.notification;
 
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
 
 import com.idroi.marketsense.MainActivity;
+import com.idroi.marketsense.R;
 import com.idroi.marketsense.StockActivity;
 import com.idroi.marketsense.data.Stock;
 
@@ -58,6 +61,16 @@ public class StockNotification extends BaseNotificationHandler {
     @Override
     protected String getImageUrl() {
         return "";
+    }
+
+    @Override
+    protected String getChannelId(Context context) {
+        return context.getString(R.string.notification_channel_stock_price_id);
+    }
+
+    @Override
+    protected String getChannelTitle(Context context) {
+        return context.getString(R.string.notification_channel_stock_price_title);
     }
 
     @Override

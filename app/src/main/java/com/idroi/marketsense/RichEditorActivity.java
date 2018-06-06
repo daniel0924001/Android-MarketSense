@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.common.FrescoHelper;
 import com.idroi.marketsense.data.PostEvent;
 
 import jp.wasabeef.richeditor.RichEditor;
@@ -67,6 +68,7 @@ public class RichEditorActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FrescoHelper.initialize(getApplicationContext());
         setContentView(R.layout.activity_rich_editor);
 
         setActionBar();

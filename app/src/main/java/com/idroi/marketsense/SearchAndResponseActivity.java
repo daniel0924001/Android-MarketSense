@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.idroi.marketsense.adapter.StockListRecyclerViewAdapter;
 import com.idroi.marketsense.common.ClientData;
+import com.idroi.marketsense.common.FrescoHelper;
 import com.idroi.marketsense.data.Stock;
 
 import java.util.ArrayList;
@@ -47,6 +48,7 @@ public class SearchAndResponseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FrescoHelper.initialize(getApplicationContext());
         setContentView(R.layout.activity_search);
 
         ClientData.getInstance(this);

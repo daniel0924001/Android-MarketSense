@@ -186,6 +186,9 @@
     <string name="facebook_app_id">188627345285880</string>
     <string name="fb_login_protocol_scheme">fb188627345285880</string>
 
-    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
-    <string name="default_notification_channel_title">MarketSense default channel</string>
+    <string name="notification_channel_news_id" translatable="false">fcm_news_channel</string>
+    <string name="notification_channel_news_title">市覺焦點新聞通知</string>
+
+    <string name="notification_channel_stock_price_id" translatable="false">fcm_stock_price_channel</string>
+    <string name="notification_channel_stock_price_title">市覺股價通知</string>
 </resources>

@@ -381,9 +381,6 @@ public class PostEvent {
     }
 
     public static void sendFavoriteStocksAdd(Context context, String code) {
-        // subscribe FCM topic
-        MSLog.d("subscribeToTopic: " + NotificationHelper.getTopicForStockCode(code));
-        FirebaseMessaging.getInstance().subscribeToTopic(NotificationHelper.getTopicForStockCode(code));
         ClientData clientData = ClientData.getInstance(context);
         new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.FAVORITE_STOCK_ADD)
                 .setStockCode(code)
@@ -391,9 +388,6 @@ public class PostEvent {
     }
 
     public static void sendFavoriteStocksDelete(Context context, String code) {
-        // un-subscribe FCM topic
-        MSLog.d("unsubscribeFromTopic: " + NotificationHelper.getTopicForStockCode(code));
-        FirebaseMessaging.getInstance().unsubscribeFromTopic(NotificationHelper.getTopicForStockCode(code));
         ClientData clientData = ClientData.getInstance(context);
         new PostEvent(Request.Method.DELETE, clientData.getUserProfile().getUserId(), PostEventType.FAVORITE_STOCK_DELETE)
                 .setStockCode(code)

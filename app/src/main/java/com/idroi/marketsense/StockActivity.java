@@ -89,6 +89,7 @@ public class StockActivity extends AppCompatActivity {
     private String mStockName;
     private String mCode;
     private String mPrice, mDiffNum, mDiffPercentage;
+    private ConstraintLayout mVoteTopBlock;
     private Button mButtonRaise, mButtonFall;
     private TextView mResultTextView;
 
@@ -164,8 +165,7 @@ public class StockActivity extends AppCompatActivity {
     private void setVoteButtons() {
         MSLog.d("canVoteAgain: " + mCode + ", " + mUserProfile.canVoteAgain(mCode));
         if(!mUserProfile.canVoteAgain(mCode)) {
-            mButtonRaise.setVisibility(View.INVISIBLE);
-            mButtonFall.setVisibility(View.INVISIBLE);
+            mVoteTopBlock.setVisibility(View.GONE);
             mResultTextView.setVisibility(View.VISIBLE);
 
             Event event = mUserProfile.getRecentVoteForStockEvent(mCode);
@@ -177,9 +177,8 @@ public class StockActivity extends AppCompatActivity {
 
             showVoteResult();
         } else {
-            mButtonRaise.setVisibility(View.VISIBLE);
-            mButtonFall.setVisibility(View.VISIBLE);
-            mResultTextView.setVisibility(View.GONE);
+            mVoteTopBlock.setVisibility(View.VISIBLE);
+            mResultTextView.setVisibility(View.INVISIBLE);
             mButtonRaise.setEnabled(true);
             mButtonFall.setEnabled(true);
             mButtonRaise.setAlpha(CONST_ENABLE_ALPHA);
@@ -206,6 +205,7 @@ public class StockActivity extends AppCompatActivity {
     }
 
     private void initSocialButtons() {
+        mVoteTopBlock = findViewById(R.id.the_most_top_block);
         mButtonRaise = findViewById(R.id.vote_up_btn);
         mButtonFall = findViewById(R.id.vote_down_btn);
         mResultTextView = findViewById(R.id.vote_result_btn);
@@ -278,6 +278,7 @@ public class StockActivity extends AppCompatActivity {
             @Override
             public void onUserProfileChange(int notifyId) {
                 if(notifyId == NOTIFY_USER_HAS_LOGIN && FBHelper.checkFBLogin()) {
+                    mVoteTopBlock.setVisibility(View.VISIBLE);
                     mButtonRaise.setClickable(false);
                     mButtonFall.setClickable(false);
                     mButtonRaise.setAlpha(CONST_DISABLE_ALPHA);

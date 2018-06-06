@@ -2,6 +2,7 @@ package com.idroi.marketsense.data;
 
 import android.content.Context;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -14,6 +15,9 @@ import com.idroi.marketsense.datasource.Networking;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by daniel.hsieh on 2018/5/7.
@@ -65,7 +69,7 @@ public class PostEvent {
     private static final String LOGIN_POST_URL = "http://apiv2.infohubapp.com/v1/stock/user/login";
     private static final String REGISTER_POST_URL = "http://apiv2.infohubapp.com/v1/stock/user/register";
     private static final String FAVORITE_STOCKS_POST_URL = "http://apiv2.infohubapp.com/v1/stock/user/stock_code";
-    private static final String FAVORITE_STOCKS_DELETE_URL = "http://apiv2.infohubapp.com/v1/stock/user/stock_code/%s/%s";
+    private static final String FAVORITE_STOCKS_DELETE_URL = "http://apiv2.infohubapp.com/v1/stock/user/stock_code/%s";
 
 
     private static final String POST_FIELD_USER_ID = "user_id";
@@ -249,7 +253,7 @@ public class PostEvent {
                     postUrl = FAVORITE_STOCKS_POST_URL;
                     break;
                 case POST_TYPE_DELETE_FAVORITE:
-                    postUrl = String.format(FAVORITE_STOCKS_DELETE_URL, mStockCode, mUserToken);
+                    postUrl = String.format(FAVORITE_STOCKS_DELETE_URL, mStockCode);
                     break;
                 default:
                     MSLog.e("Unknown post type");
@@ -283,7 +287,19 @@ public class PostEvent {
                                 MSLog.e("Event Post Request error: " + new String(error.networkResponse.data), error);
                             }
                         }
-                    });
+                    }){
+
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    HashMap<String, String> headers = new HashMap<String, String>();
+                    headers.put("Content-Type", "application/json");
+                    if(mUserToken != null && !mUserToken.isEmpty()) {
+                        headers.put("User-Token", mUserToken);
+                    }
+                    return headers;
+                }
+            };
             jsonObjectRequest.setShouldCache(false);
             Networking.getRequestQueue(context).add(jsonObjectRequest);
         } catch (JSONException e) {
@@ -322,6 +338,7 @@ public class PostEvent {
                 .setEventValueInteger(value)
                 .setEventType(type.getEventVar())
                 .setEventTarget(STOCK_CONST)
+                .setUserToken(clientData.getUserToken())
                 .send(context);
         Event event = postEvent.convertToEvent();
         userProfile.addEvent(event);
@@ -335,6 +352,7 @@ public class PostEvent {
                 .setEventValueInteger(value)
                 .setEventType(type.getEventVar())
                 .setEventTarget(NEWS_CONST)
+                .setUserToken(clientData.getUserToken())
                 .send(context);
         Event event = postEvent.convertToEvent();
         userProfile.addEvent(event);
@@ -347,6 +365,7 @@ public class PostEvent {
                 .setEventValueString(html)
                 .setEventType("normal")
                 .setEventTarget(STOCK_CONST)
+                .setUserToken(clientData.getUserToken())
                 .send(context);
     }
 
@@ -357,6 +376,7 @@ public class PostEvent {
                 .setEventValueString(html)
                 .setEventType("normal")
                 .setEventTarget(NEWS_CONST)
+                .setUserToken(clientData.getUserToken())
                 .send(context);
     }
 

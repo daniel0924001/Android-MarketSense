@@ -154,11 +154,11 @@ public class Stock {
     public String getDiffNumber() {
         switch (mDiffDirection) {
             case TREND_UP:
-                return String.format(Locale.US, "+ %.2f", mDiffNumber);
+                return String.format(Locale.US, "+%.2f", mDiffNumber);
             case TREND_FLAT:
                 return String.format(Locale.US, "%.2f", mDiffNumber);
             case TREND_DOWN:
-                return String.format(Locale.US, "- %.2f", mDiffNumber);
+                return String.format(Locale.US, "-%.2f", mDiffNumber);
             default:
                 return String.format(Locale.US, "%.2f", mDiffNumber);
         }
@@ -167,11 +167,11 @@ public class Stock {
     public String getDiffPercentage() {
         switch (mDiffDirection) {
             case TREND_UP:
-                return String.format(Locale.US, "+ %.2f%%", mDiffPercentage);
+                return String.format(Locale.US, "+%.2f%%", mDiffPercentage);
             case TREND_FLAT:
                 return String.format(Locale.US, "%.2f%%", mDiffPercentage);
             case TREND_DOWN:
-                return String.format(Locale.US, "- %.2f%%", mDiffPercentage);
+                return String.format(Locale.US, "-%.2f%%", mDiffPercentage);
             default:
                 return String.format(Locale.US, "%.2f%%", mDiffPercentage);
         }

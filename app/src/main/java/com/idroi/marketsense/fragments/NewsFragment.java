@@ -1,9 +1,8 @@
 package com.idroi.marketsense.fragments;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,13 +20,11 @@ import com.idroi.marketsense.NewsWebViewActivity;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.adapter.NewsRecyclerAdapter;
 import com.idroi.marketsense.common.ClientData;
-import com.idroi.marketsense.common.SharedPreferencesCompat;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.NewsRequest;
 
 import static com.idroi.marketsense.adapter.NewsRecyclerAdapter.NEWS_SINGLE_LAYOUT;
-import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_REQUEST_NAME;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 import static com.idroi.marketsense.request.NewsRequest.PARAM_LEVEL;
 import static com.idroi.marketsense.request.NewsRequest.PARAM_STATUS;
@@ -70,6 +67,8 @@ public class NewsFragment extends Fragment {
     private int mTaskId;
     private UserProfile.UserProfileChangeListener mUserProfileChangeListener;
 
+    private ConstraintLayout mNoDataRefreshLayout;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -78,6 +77,7 @@ public class NewsFragment extends Fragment {
         mRecyclerView = (RecyclerView) view.findViewById(R.id.news_recycler_view);
         mSwipeRefreshLayout = view.findViewById(R.id.swipe_to_refresh);
         mNoDataImageView = view.findViewById(R.id.no_news_iv);
+        mNoDataRefreshLayout = view.findViewById(R.id.no_data_block);
         if(mTaskId == KEYWORD_ARRAY_TASK_ID) {
             mNoDataImageView.setImageResource(R.drawable.baseline_playlist_add_24px);
         }
@@ -97,6 +97,7 @@ public class NewsFragment extends Fragment {
                 .adapter(mNewsRecyclerAdapter)
                 .load(R.layout.layout_default_item_skeleton)
                 .shimmer(false).show();
+        MSLog.e("mSkeletonScreen.show");
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         return view;
@@ -130,7 +131,9 @@ public class NewsFragment extends Fragment {
         mNewsRecyclerAdapter.setNewsAvailableListener(new NewsRecyclerAdapter.NewsAvailableListener() {
             @Override
             public void onNewsAvailable() {
+                MSLog.e("onNewsAvailable");
                 if(mSkeletonScreen != null) {
+                    MSLog.e("mSkeletonScreen.hide");
                     mSkeletonScreen.hide();
                 }
                 if(mSwipeRefreshLayout != null) {
@@ -141,7 +144,9 @@ public class NewsFragment extends Fragment {
 
             @Override
             public void onNewsEmpty() {
+                MSLog.e("onNewsEmpty");
                 if(mSkeletonScreen != null) {
+                    MSLog.e("mSkeletonScreen.hide");
                     mSkeletonScreen.hide();
                 }
                 if(mSwipeRefreshLayout != null) {
@@ -155,6 +160,7 @@ public class NewsFragment extends Fragment {
             @Override
             public void onRefresh() {
                 mNetworkUrl = generateURL(true);
+                MSLog.e("loadNews 1");
                 mNewsRecyclerAdapter.loadNews(mNetworkUrl, generateURL(false));
             }
         });
@@ -162,6 +168,7 @@ public class NewsFragment extends Fragment {
         String url = generateURL();
         if(url != null) {
             mNetworkUrl = generateURL(true);
+            MSLog.e("loadNews 2");
             mNewsRecyclerAdapter.loadNews(mNetworkUrl, generateURL(false));
         } else {
             setVisibilityForEmptyData(true);
@@ -194,6 +201,18 @@ public class NewsFragment extends Fragment {
                         news.getPageLink(), news.getOriginLink(),
                         news.getVoteRaiseNum(), news.getVoteFallNum()));
                 getActivity().overridePendingTransition(R.anim.enter, R.anim.stop);
+            }
+        });
+
+        mNoDataRefreshLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mNetworkUrl = generateURL(true);
+                if(mSkeletonScreen != null) {
+                    mSkeletonScreen.show();
+                }
+                setVisibilityForEmptyData(false);
+                mNewsRecyclerAdapter.loadNews(mNetworkUrl, generateURL(false));
             }
         });
     }
@@ -240,8 +259,7 @@ public class NewsFragment extends Fragment {
     private void setVisibilityForEmptyData(boolean isEmpty) {
         if(isEmpty) {
             mSwipeRefreshLayout.setVisibility(View.GONE);
-            mNoDataTextView.setVisibility(View.VISIBLE);
-            mNoDataImageView.setVisibility(View.VISIBLE);
+            mNoDataRefreshLayout.setVisibility(View.VISIBLE);
             if(isSelfNoneChoices()) {
                 mNoDataTextView.setText(R.string.add_first_stock);
                 mNoDataImageView.setImageResource(R.drawable.baseline_playlist_add_24px);
@@ -251,8 +269,7 @@ public class NewsFragment extends Fragment {
             }
         } else {
             mSwipeRefreshLayout.setVisibility(View.VISIBLE);
-            mNoDataTextView.setVisibility(View.GONE);
-            mNoDataImageView.setVisibility(View.GONE);
+            mNoDataRefreshLayout.setVisibility(View.GONE);
         }
     }
 

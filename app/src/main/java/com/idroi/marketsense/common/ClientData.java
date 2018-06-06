@@ -200,6 +200,7 @@ public class ClientData {
                     MSLog.e("Stocks List Request error: " + new String(error.networkResponse.data), error);
                 }
                 if(mLoadAllStockListRetryCounter > 0) {
+                    mLoadAllStockListRetryCounter--;
                     loadAllStocksListTask(false);
                 } else {
                     mLoadAllStockListRetryCounter = DEFAULT_RETRY_TIME;

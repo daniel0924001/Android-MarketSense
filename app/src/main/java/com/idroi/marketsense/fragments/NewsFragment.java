@@ -97,7 +97,6 @@ public class NewsFragment extends Fragment {
                 .adapter(mNewsRecyclerAdapter)
                 .load(R.layout.layout_default_item_skeleton)
                 .shimmer(false).show();
-        MSLog.e("mSkeletonScreen.show");
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         return view;
@@ -131,9 +130,7 @@ public class NewsFragment extends Fragment {
         mNewsRecyclerAdapter.setNewsAvailableListener(new NewsRecyclerAdapter.NewsAvailableListener() {
             @Override
             public void onNewsAvailable() {
-                MSLog.e("onNewsAvailable");
                 if(mSkeletonScreen != null) {
-                    MSLog.e("mSkeletonScreen.hide");
                     mSkeletonScreen.hide();
                 }
                 if(mSwipeRefreshLayout != null) {
@@ -144,9 +141,7 @@ public class NewsFragment extends Fragment {
 
             @Override
             public void onNewsEmpty() {
-                MSLog.e("onNewsEmpty");
                 if(mSkeletonScreen != null) {
-                    MSLog.e("mSkeletonScreen.hide");
                     mSkeletonScreen.hide();
                 }
                 if(mSwipeRefreshLayout != null) {
@@ -160,7 +155,6 @@ public class NewsFragment extends Fragment {
             @Override
             public void onRefresh() {
                 mNetworkUrl = generateURL(true);
-                MSLog.e("loadNews 1");
                 mNewsRecyclerAdapter.loadNews(mNetworkUrl, generateURL(false));
             }
         });
@@ -168,7 +162,6 @@ public class NewsFragment extends Fragment {
         String url = generateURL();
         if(url != null) {
             mNetworkUrl = generateURL(true);
-            MSLog.e("loadNews 2");
             mNewsRecyclerAdapter.loadNews(mNetworkUrl, generateURL(false));
         } else {
             setVisibilityForEmptyData(true);

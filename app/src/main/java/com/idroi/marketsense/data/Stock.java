@@ -198,11 +198,11 @@ public class Stock {
     }
 
     public int getPredictNewsLevel() {
-        if(mConfidence >= 0 && mConfidence < 1) {
+        if(mConfidence >= 0 && mConfidence <= 1) {
             return LEVEL_LOW;
-        } else if(mConfidence >= 1 && mConfidence < 2) {
+        } else if(mConfidence > 1 && mConfidence <= 2) {
             return LEVEL_HIGH;
-        } else if(mConfidence >= 2) {
+        } else if(mConfidence > 2) {
             return LEVEL_HIGHEST;
         } else {
             MSLog.e("invalid value: " + mConfidence);
@@ -215,11 +215,11 @@ public class Stock {
     }
 
     public int getPredictPeopleLevel() {
-        if(mVoting >= 0 && mVoting < 1) {
+        if(mVoting >= 0 && mVoting <= 1) {
             return LEVEL_LOW;
-        } else if(mVoting >= 1 && mVoting < 2) {
+        } else if(mVoting > 1 && mVoting <= 2) {
             return LEVEL_HIGH;
-        } else if(mVoting >= 2) {
+        } else if(mVoting > 2) {
             return LEVEL_HIGHEST;
         } else {
             MSLog.e("invalid value: " + mVoting);

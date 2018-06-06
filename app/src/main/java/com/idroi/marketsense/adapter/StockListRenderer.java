@@ -65,8 +65,8 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
             stockViewHolder.predictPeopleText.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_green_s, 0, 0, 0);
             stockViewHolder.predictPeopleImageView.setImageResource(mBarGreenResourceId[peopleLevel]);
         } else {
-            stockViewHolder.predictPeopleText.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_red_s, 0, 0, 0);
-            stockViewHolder.predictPeopleImageView.setImageResource(R.mipmap.ic_bar1_red);
+            stockViewHolder.predictPeopleText.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_none, 0, 0, 0);
+            stockViewHolder.predictPeopleImageView.setImageResource(R.mipmap.ic_bar0);
         }
 
         if(content.getConfidenceDirection() == Stock.TREND_UP) {
@@ -76,8 +76,8 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
             stockViewHolder.predictNewsText.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_green_s, 0, 0, 0);
             stockViewHolder.predictNewsImageView.setImageResource(mBarGreenResourceId[newsLevel]);
         } else {
-            stockViewHolder.predictNewsText.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_red_s, 0, 0, 0);
-            stockViewHolder.predictNewsImageView.setImageResource(R.mipmap.ic_bar1_red);
+            stockViewHolder.predictNewsText.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_none, 0, 0, 0);
+            stockViewHolder.predictNewsImageView.setImageResource(R.mipmap.ic_bar0);
         }
 
         setColor(context, stockViewHolder, content);

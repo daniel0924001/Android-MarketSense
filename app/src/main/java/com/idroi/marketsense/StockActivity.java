@@ -485,12 +485,14 @@ public class StockActivity extends AppCompatActivity {
         peopleJoin.setText(String.format(format, commentAndVote.getCommentSize()));
 
         TextView peopleScore = findViewById(R.id.people_score);
+        TextView peopleMaxScore = findViewById(R.id.people_score_max_const);
         TextView newsScore = findViewById(R.id.news_score);
+        TextView newsMaxScore = findViewById(R.id.news_score_max_const);
         TextView peopleAttitude = findViewById(R.id.people_attitude);
         TextView newsAttitude = findViewById(R.id.news_attitude);
 
-        peopleScore.setText(commentAndVote.getVotingScore());
-        newsScore.setText(commentAndVote.getPredictionScore());
+        commentAndVote.setVotingText(peopleScore, peopleMaxScore);
+        commentAndVote.setPredictionText(newsScore, newsMaxScore);
         peopleAttitude.setText(commentAndVote.getVotingAttitude(this));
         newsAttitude.setText(commentAndVote.getPredictionAttitude(this));
 

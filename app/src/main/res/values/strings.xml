@@ -90,11 +90,12 @@
     <string name="title_level_down_low">看跌</string>
 
     <string name="title_news_look_good">新聞看漲</string>
-    <string name="title_news_look_flat">新聞持平</string>
+    <string name="title_news_look_flat">新聞無定論</string>
     <string name="title_news_look_bad">新聞看跌</string>
     <string name="title_people_look_good">鄉民看漲</string>
-    <string name="title_people_look_flat">鄉民持平</string>
+    <string name="title_people_look_flat">鄉民討論中</string>
     <string name="title_people_look_bad">鄉民看跌</string>
+    <string name="title_no_prediction">無預測</string>
     <string name="title_news_join">%d則相關新聞報導</string>
     <string name="title_people_join">%d位鄉民參與評論</string>
     <string name="title_vote_to_see">查看投票結果，請先進行投票</string>

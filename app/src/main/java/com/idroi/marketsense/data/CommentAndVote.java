@@ -1,7 +1,9 @@
 package com.idroi.marketsense.data;
 
 import android.content.Context;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.idroi.marketsense.R;
 
@@ -54,8 +56,14 @@ public class CommentAndVote {
         return mFallNumber;
     }
 
-    public String getVotingScore() {
-        return String.format(Locale.US, "%.1f",((float) mVoting * 5 / 3));
+    public void setVotingText(TextView scoreTextView, TextView maxTextView) {
+        if(mVoting == 0) {
+            scoreTextView.setText(R.string.title_no_prediction);
+            maxTextView.setVisibility(View.INVISIBLE);
+        } else {
+            scoreTextView.setText(String.format(Locale.US, "%.1f", ((float) mVoting * 5 / 3)));
+            maxTextView.setVisibility(View.VISIBLE);
+        }
     }
 
     public String getVotingAttitude(Context context) {
@@ -69,17 +77,31 @@ public class CommentAndVote {
     }
 
     public void setVotingIcon(Context context, ImageView imageView) {
-        if(mVoting >= 0) {
+        float scale = context.getResources().getDisplayMetrics().density;
+        int padding = (int) (8 * scale + 0.5f); // 8dp
+        if(mVoting > 0) {
             imageView.setBackground(context.getDrawable(R.drawable.btn_round_red));
             imageView.setImageDrawable(context.getDrawable(R.mipmap.ic_arrow_up_l));
-        } else {
+            imageView.setPadding(padding, padding, padding, padding);
+        } else if(mVoting < 0) {
             imageView.setBackground(context.getDrawable(R.drawable.btn_round_green));
             imageView.setImageDrawable(context.getDrawable(R.mipmap.ic_arrow_down_l));
+            imageView.setPadding(padding, padding, padding, padding);
+        } else {
+            imageView.setBackground(context.getDrawable(R.drawable.btn_round_theme_color));
+            imageView.setImageDrawable(context.getDrawable(R.mipmap.ic_0score));
+            imageView.setPadding(0, 0, 0, 0);
         }
     }
 
-    public String getPredictionScore() {
-        return String.format(Locale.US, "%.1f",((float) mPrediction * 5 / 3));
+    public void setPredictionText(TextView scoreTextView, TextView maxTextView) {
+        if(mPrediction == 0) {
+            scoreTextView.setText(R.string.title_no_prediction);
+            maxTextView.setVisibility(View.INVISIBLE);
+        } else {
+            scoreTextView.setText(String.format(Locale.US, "%.1f", ((float) mPrediction * 5 / 3)));
+            maxTextView.setVisibility(View.VISIBLE);
+        }
     }
 
     public String getPredictionAttitude(Context context) {
@@ -93,12 +115,20 @@ public class CommentAndVote {
     }
 
     public void setPredictionIcon(Context context, ImageView imageView) {
-        if(mPrediction >= 0) {
+        float scale = context.getResources().getDisplayMetrics().density;
+        int padding = (int) (8 * scale + 0.5f); // 8dp
+        if(mPrediction > 0) {
             imageView.setBackground(context.getDrawable(R.drawable.btn_round_red));
             imageView.setImageDrawable(context.getDrawable(R.mipmap.ic_arrow_up_l));
-        } else {
+            imageView.setPadding(padding, padding, padding, padding);
+        } else if(mPrediction < 0) {
             imageView.setBackground(context.getDrawable(R.drawable.btn_round_green));
             imageView.setImageDrawable(context.getDrawable(R.mipmap.ic_arrow_down_l));
+            imageView.setPadding(padding, padding, padding, padding);
+        } else {
+            imageView.setBackground(context.getDrawable(R.drawable.btn_round_theme_color));
+            imageView.setImageDrawable(context.getDrawable(R.mipmap.ic_0score));
+            imageView.setPadding(0, 0, 0, 0);
         }
     }
 

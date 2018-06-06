@@ -111,6 +111,7 @@
     <string name="title_vote_people_number">人參與投票</string>
     <string name="title_vote_look_good_number">看漲票數</string>
     <string name="title_vote_look_bad_number">看跌票數</string>
+    <string name="title_look_more_information">點此查看更多資訊</string>
 
     <string name="title_up">漲</string>
     <string name="title_down">跌</string>
@@ -126,6 +127,7 @@
     <string name="title_predict_up">看多:</string>
     <string name="title_predict_down">看空:</string>
     <string name="title_vote">投票</string>
+    <string name="title_go_top">TOP</string>
     <string name="title_comment">評論</string>
     <string name="title_comment_colon">評論:</string>
     <string name="title_action_seven">快來表達你對這支股票一週內的想法吧！</string>

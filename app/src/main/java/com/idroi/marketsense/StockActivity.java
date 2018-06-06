@@ -536,6 +536,14 @@ public class StockActivity extends AppCompatActivity {
         priceTextView.setText(mPrice);
         String format = getResources().getString(R.string.title_diff_format);
         diffTextView.setText(String.format(format, mDiffNum, mDiffPercentage));
+        Button moreButton = findViewById(R.id.more_information_btn);
+        moreButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // TODO
+                MSLog.e("look more!!!");
+            }
+        });
 
         LineChart lineChart = findViewById(R.id.stock_chart_price);
         BarChart barChart = findViewById(R.id.stock_chart_volume);

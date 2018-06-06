@@ -43,7 +43,7 @@ public class SearchAndResponseActivity extends AppCompatActivity {
     private RecyclerView mResultRecyclerView;
     StockListRecyclerViewAdapter mAdapter;
 
-    private final ArrayList<Stock> mAllStocks = ClientData.getInstance(this).getAllStocksListInfo();
+    private  ArrayList<Stock> mAllStocks = ClientData.getInstance(this).getAllStocksListInfo();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -172,8 +172,13 @@ public class SearchAndResponseActivity extends AppCompatActivity {
             mSearchView.clearFocus();
             mSearchView.setText("");
         }
-        setResultNumber(mAllStocks.size());
-        mAdapter.filterList(mAllStocks);
+        if(mAllStocks != null) {
+            setResultNumber(mAllStocks.size());
+            mAdapter.filterList(mAllStocks);
+        } else {
+            setResultNumber(0);
+            mAdapter.filterList(new ArrayList<Stock>());
+        }
         hideSoftKeyboard();
     }
 

@@ -105,9 +105,8 @@ public class StockListPlacer {
                         // 3rd: sort by stock difference in descending
                         // 4th: sort by stock difference in ascending
                         // 5th: filter by user favorite stock array
+                        updateRealTimeStockPrices(mStockArrayList);
                     }
-
-                    updateRealTimeStockPrices(mStockArrayList);
 
                     Comparator<Stock> comparator = genComparator(mSortedField, mSortedDirection);
                     Collections.sort(mStockArrayList, comparator);

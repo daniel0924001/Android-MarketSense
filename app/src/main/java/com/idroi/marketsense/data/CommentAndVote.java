@@ -5,8 +5,8 @@ import android.widget.ImageView;
 
 import com.idroi.marketsense.R;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * Created by daniel.hsieh on 2018/5/10.
@@ -55,7 +55,7 @@ public class CommentAndVote {
     }
 
     public String getVotingScore() {
-        return String.valueOf(mVoting);
+        return String.format(Locale.US, "%.1f",((float) mVoting * 5 / 3));
     }
 
     public String getVotingAttitude(Context context) {
@@ -79,7 +79,7 @@ public class CommentAndVote {
     }
 
     public String getPredictionScore() {
-        return String.valueOf(mPrediction);
+        return String.format(Locale.US, "%.1f",((float) mPrediction * 5 / 3));
     }
 
     public String getPredictionAttitude(Context context) {

@@ -197,21 +197,17 @@ public class Stock {
         return mFallNum;
     }
 
-    private static int getPredictClass(double value) {
-        if(value >= 0 && value < 33) {
+    public int getPredictNewsLevel() {
+        if(mConfidence >= 0 && mConfidence < 1) {
             return LEVEL_LOW;
-        } else if(value >= 33 && value < 66) {
+        } else if(mConfidence >= 1 && mConfidence < 2) {
             return LEVEL_HIGH;
-        } else if(value >= 66 && value <= 100) {
+        } else if(mConfidence >= 2) {
             return LEVEL_HIGHEST;
         } else {
-            MSLog.e("invalid value: " + value);
+            MSLog.e("invalid value: " + mConfidence);
             return LEVEL_INVALID;
         }
-    }
-
-    public int getPredictNewsLevel() {
-        return getPredictClass(mConfidence);
     }
 
     public float getPredictNewsScore() {
@@ -219,7 +215,16 @@ public class Stock {
     }
 
     public int getPredictPeopleLevel() {
-        return getPredictClass(mVoting);
+        if(mVoting >= 0 && mVoting < 1) {
+            return LEVEL_LOW;
+        } else if(mVoting >= 1 && mVoting < 2) {
+            return LEVEL_HIGH;
+        } else if(mVoting >= 2) {
+            return LEVEL_HIGHEST;
+        } else {
+            MSLog.e("invalid value: " + mVoting);
+            return LEVEL_INVALID;
+        }
     }
 
     public float getPredictPeopleScore() {

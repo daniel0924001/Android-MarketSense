@@ -39,6 +39,7 @@ import com.idroi.marketsense.common.MarketSenseCommonNavigator;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.UserProfile;
+import com.idroi.marketsense.util.MarketSenseUtils;
 
 import net.lucode.hackware.magicindicator.MagicIndicator;
 import net.lucode.hackware.magicindicator.ViewPagerHelper;
@@ -386,6 +387,12 @@ public class MainActivity extends AppCompatActivity {
 //                String name = data.getStringExtra(EXTRA_SELECTED_COMPANY_NAME_KEY);
                 String code = data.getStringExtra(EXTRA_SELECTED_COMPANY_CODE_KEY);
                 Stock stock = ClientData.getInstance(this).getPriceFromCode(code);
+
+                if(stock == null || !MarketSenseUtils.isNetworkAvailable(this)) {
+                    Toast.makeText(this, R.string.title_can_not_open_stock_page, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 MSLog.d("try to open name: " + stock.getName() + ", code: " + stock.getCode());
                 startActivity(StockActivity.generateStockActivityIntent(
                         this, stock.getName(), stock.getCode(), stock.getRaiseNum(), stock.getFallNum(),

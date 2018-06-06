@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -83,6 +84,8 @@ public class StockListFragment extends Fragment {
 
     private UserProfile.UserProfileChangeListener mUserProfileChangeListener;
 
+    private ConstraintLayout mNoDataRefreshLayout;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -97,6 +100,7 @@ public class StockListFragment extends Fragment {
         final View view = inflater.inflate(R.layout.stock_list_fragment, container, false);
         mSwipeRefreshLayout = view.findViewById(R.id.swipe_to_refresh);
         mRecyclerView = view.findViewById(R.id.stock_recycler_view);
+        mNoDataRefreshLayout = view.findViewById(R.id.no_data_block);
         mNoDataImageView = view.findViewById(R.id.no_stock_iv);
         if(mTaskId == SELF_CHOICES_ID) {
             mNoDataImageView.setImageResource(R.drawable.baseline_playlist_add_24px);
@@ -176,6 +180,17 @@ public class StockListFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                mStockListRecyclerAdapter.loadStockList(generateNetworkURL(), generateCacheUrl());
+            }
+        });
+
+        mNoDataRefreshLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mSkeletonScreen != null) {
+                    mSkeletonScreen.show();
+                }
+                setVisibilityForEmptyData(false);
                 mStockListRecyclerAdapter.loadStockList(generateNetworkURL(), generateCacheUrl());
             }
         });
@@ -272,8 +287,7 @@ public class StockListFragment extends Fragment {
     private void setVisibilityForEmptyData(boolean isEmpty) {
         if(isEmpty) {
             mSwipeRefreshLayout.setVisibility(View.GONE);
-            mNoDataTextView.setVisibility(View.VISIBLE);
-            mNoDataImageView.setVisibility(View.VISIBLE);
+            mNoDataRefreshLayout.setVisibility(View.VISIBLE);
             if(isSelfNoneChoices()) {
                 mNoDataTextView.setText(R.string.add_first_stock);
                 mNoDataImageView.setImageResource(R.drawable.baseline_playlist_add_24px);
@@ -283,8 +297,7 @@ public class StockListFragment extends Fragment {
             }
         } else {
             mSwipeRefreshLayout.setVisibility(View.VISIBLE);
-            mNoDataTextView.setVisibility(View.GONE);
-            mNoDataImageView.setVisibility(View.GONE);
+            mNoDataRefreshLayout.setVisibility(View.GONE);
         }
     }
 

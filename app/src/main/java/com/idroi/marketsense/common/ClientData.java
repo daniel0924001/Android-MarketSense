@@ -93,10 +93,17 @@ public class ClientData {
     }
 
     private void setAllStocksListInfo(ArrayList<Stock> stocksListInfo) {
-        mAllStocksListInfo = stocksListInfo;
+        if(stocksListInfo != null) {
+            MSLog.d("set all stock list success: " + stocksListInfo.size());
+            mAllStocksListInfo = stocksListInfo;
+        } else {
+            MSLog.e("Stock list is null.");
+            mAllStocksListInfo = null;
+        }
     }
 
     public void setAllStockPriceHashMap(HashMap<String, Stock> stocksHashMap) {
+        MSLog.d("set real time stock price success: " + stocksHashMap.size());
         mRealTimePricesHashMap = stocksHashMap;
     }
 
@@ -129,7 +136,12 @@ public class ClientData {
     }
 
     public Stock getPriceFromCode(String code) {
-        return mRealTimePricesHashMap.get(code);
+        if(mRealTimePricesHashMap != null) {
+            return mRealTimePricesHashMap.get(code);
+        } else {
+            MSLog.e("mRealTimePricesHashMap is null");
+            return null;
+        }
     }
 
     public ArrayList<Stock> getAllStocksListInfo() {

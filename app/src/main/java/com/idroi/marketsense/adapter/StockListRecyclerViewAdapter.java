@@ -38,7 +38,11 @@ public class StockListRecyclerViewAdapter extends RecyclerView.Adapter {
 
     public StockListRecyclerViewAdapter(Context context, List<Stock> stockList) {
         mContext = context;
-        mStockList = new ArrayList<>(stockList);
+        if(stockList != null) {
+            mStockList = new ArrayList<>(stockList);
+        } else {
+            mStockList = new ArrayList<>();
+        }
         mStockSearchResultRenderer = new StockSearchResultRenderer();
     }
 

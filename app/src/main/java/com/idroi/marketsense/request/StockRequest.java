@@ -53,7 +53,7 @@ public class StockRequest extends Request<ArrayList<Stock>> {
 
         try {
             ArrayList<Stock> stockArrayList = stockParseResponse(response.data);
-            if(stockArrayList != null) {
+            if(stockArrayList != null && stockArrayList.size() != 0) {
                 MSLog.i("Stock Request success: " + new String(response.data));
                 return Response.success(stockArrayList, HttpHeaderParser.parseCacheHeaders(response));
             } else {

@@ -52,6 +52,7 @@ import com.idroi.marketsense.util.MarketSenseUtils;
 import org.json.JSONObject;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_HTML;
 import static com.idroi.marketsense.RichEditorActivity.sEditorRequestCode;
@@ -413,7 +414,11 @@ public class StockActivity extends AppCompatActivity {
             return;
         }
         String cacheUrl = NewsRequest.queryKeywordNewsUrl(this, mStockName, false);
-        mNewsRecyclerAdapter.loadNews(networkUrl, cacheUrl);
+        ArrayList<String> networkUrls = new ArrayList<>();
+        ArrayList<String> cacheUrls = new ArrayList<>();
+        networkUrls.add(networkUrl);
+        cacheUrls.add(cacheUrl);
+        mNewsRecyclerAdapter.loadNews(networkUrls, cacheUrls);
 
         mNewsRecyclerAdapter.setOnItemClickListener(new NewsRecyclerAdapter.OnItemClickListener() {
             @Override

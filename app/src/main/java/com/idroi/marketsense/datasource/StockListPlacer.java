@@ -97,6 +97,7 @@ public class StockListPlacer {
                         }
                     } else {
                         mStockArrayList = new ArrayList<>(stockArrayList);
+                        mRealTimePricesHashMap = new HashMap<>();
                         MSLog.d("set all stock price");
 
                         // There are four fragments in PredictionScreenSlidePagerAdapter
@@ -202,7 +203,6 @@ public class StockListPlacer {
 
     private void loadStockList(MarketSenseStockFetcher stockFetcher) {
         clear();
-        mRealTimePricesHashMap = new HashMap<>();
         mMarketSenseStockFetcher = stockFetcher;
         mMarketSenseStockFetcher.makeRequest(mNetworkUrl, mCacheUrl);
     }
@@ -255,7 +255,7 @@ public class StockListPlacer {
     }
 
     private Stock getRealTimeStock(String code) {
-        return mRealTimePricesHashMap.get(code);
+        return ClientData.getInstance(mActivity).getPriceFromCode(code);
     }
 
     private Comparator<Stock> genComparator(final int field, final int direction) {

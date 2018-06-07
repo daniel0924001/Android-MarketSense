@@ -24,8 +24,11 @@ import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.NewsRequest;
 
+import java.util.ArrayList;
+
 import static com.idroi.marketsense.adapter.NewsRecyclerAdapter.NEWS_SINGLE_LAYOUT;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
+import static com.idroi.marketsense.request.NewsRequest.PARAM_GTS;
 import static com.idroi.marketsense.request.NewsRequest.PARAM_LEVEL;
 import static com.idroi.marketsense.request.NewsRequest.PARAM_STATUS;
 
@@ -63,7 +66,6 @@ public class NewsFragment extends Fragment {
     private RecyclerViewSkeletonScreen mSkeletonScreen;
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
-    private String mNetworkUrl;
     private int mTaskId;
     private UserProfile.UserProfileChangeListener mUserProfileChangeListener;
 
@@ -112,13 +114,12 @@ public class NewsFragment extends Fragment {
                 @Override
                 public void onUserProfileChange(int notifyId) {
                     if(notifyId == NOTIFY_ID_FAVORITE_LIST) {
-                        String url = generateURL();
-                        MSLog.d("onUserProfileChange in NewsFragment: " + url);
-                        if(url == null) {
+                        ArrayList<String> urls = generateURL(true);
+                        MSLog.d("onUserProfileChange in NewsFragment");
+                        if(urls == null) {
                             mNewsRecyclerAdapter.clearNews();
                         } else {
-                            mNetworkUrl = generateURL(true);
-                            mNewsRecyclerAdapter.loadNews(mNetworkUrl, generateURL(false));
+                            mNewsRecyclerAdapter.loadNews(urls, generateURL(false));
                         }
                     }
                 }
@@ -154,15 +155,13 @@ public class NewsFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mNetworkUrl = generateURL(true);
-                mNewsRecyclerAdapter.loadNews(mNetworkUrl, generateURL(false));
+                mNewsRecyclerAdapter.loadNews(generateURL(true), generateURL(false));
             }
         });
 
-        String url = generateURL();
-        if(url != null) {
-            mNetworkUrl = generateURL(true);
-            mNewsRecyclerAdapter.loadNews(mNetworkUrl, generateURL(false));
+        ArrayList<String> urls = generateURL(true);
+        if(urls != null) {
+            mNewsRecyclerAdapter.loadNews(urls, generateURL(false));
         } else {
             setVisibilityForEmptyData(true);
         }
@@ -200,42 +199,58 @@ public class NewsFragment extends Fragment {
         mNoDataRefreshLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mNetworkUrl = generateURL(true);
                 if(mSkeletonScreen != null) {
                     mSkeletonScreen.show();
                 }
                 setVisibilityForEmptyData(false);
-                mNewsRecyclerAdapter.loadNews(mNetworkUrl, generateURL(false));
+                mNewsRecyclerAdapter.loadNews(generateURL(true), generateURL(false));
             }
         });
     }
 
-    public String generateURL() {
-        return generateURL(true);
-    }
-
-    public String generateURL(boolean isNetworkUrl) {
+    public ArrayList<String> generateURL(boolean isNetworkUrl) {
         if(getArguments() == null) {
             return null;
         }
 
+        ArrayList<String> results = new ArrayList<>();
         switch (mTaskId) {
             case GENERAL_TASK_ID:
-                return NewsRequest.queryNewsUrl(
-                        getContext(),
-                        getArguments().getString(PARAM_STATUS),
-                        getArguments().getInt(PARAM_LEVEL),
-                        isNetworkUrl);
+                ArrayList<String> statusArrayList = getArguments().getStringArrayList(PARAM_STATUS);
+                ArrayList<Integer> levelArrayList = getArguments().getIntegerArrayList(PARAM_LEVEL);
+                String gts = getArguments().getString(PARAM_GTS);
+                if(statusArrayList == null || levelArrayList == null || statusArrayList.size() != levelArrayList.size()) {
+                    MSLog.e("size of statusArrayList and levelArrayList is not equal.");
+                    return null;
+                }
+
+                for(int i = 0; i < statusArrayList.size(); i++) {
+                    String temp = NewsRequest.queryNewsUrl(
+                            getContext(),
+                            statusArrayList.get(i),
+                            levelArrayList.get(i),
+                            isNetworkUrl,
+                            gts);
+                    results.add(temp);
+                }
+                break;
             case KEYWORD_TASK_ID:
-                return NewsRequest.queryKeywordNewsUrl(
+                results.add(NewsRequest.queryKeywordNewsUrl(
                         getContext(),
                         getArguments().getString(KEYWORD_NAME),
-                        isNetworkUrl);
+                        isNetworkUrl));
+                break;
             case KEYWORD_ARRAY_TASK_ID:
-                return NewsRequest.queryKeywordArrayNewsUrl(getContext(), isNetworkUrl);
+                String keywordsUrl = NewsRequest.queryKeywordArrayNewsUrl(getContext(), isNetworkUrl);
+                if(keywordsUrl == null) {
+                    return null;
+                }
+                results.add(keywordsUrl);
+                break;
             default:
                 return null;
         }
+        return results;
     }
 
     @Override

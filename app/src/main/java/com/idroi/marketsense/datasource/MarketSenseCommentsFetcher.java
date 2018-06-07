@@ -57,7 +57,7 @@ public class MarketSenseCommentsFetcher {
                     mSingleNewsRequest.cancel();
                     mSingleNewsRequest = null;
                 }
-                mMarketSenseCommentsNetworkListener.onCommentsFail(MarketSenseError.NETWROK_CONNECTION_TIMEOUT);
+                mMarketSenseCommentsNetworkListener.onCommentsFail(MarketSenseError.NETWORK_CONNECTION_TIMEOUT);
             }
         };
     }

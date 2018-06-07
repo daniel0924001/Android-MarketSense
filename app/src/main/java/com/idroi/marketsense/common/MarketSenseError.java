@@ -11,7 +11,7 @@ public enum MarketSenseError {
     NETWORK_VOLLEY_ERROR(1002, "Volley error."),
     JSON_PARSED_ERROR(1003, "JSON response parsed error."),
     IMAGE_DOWNLOAD_FAILURE(1004, "Image download failure."),
-    NETWROK_CONNECTION_TIMEOUT(1005, "Network connection timeout"),
+    NETWORK_CONNECTION_TIMEOUT(1005, "Network connection timeout"),
     JSON_PARSED_NO_DATA(1006, "JSON response null");
 
     private final int mCode;

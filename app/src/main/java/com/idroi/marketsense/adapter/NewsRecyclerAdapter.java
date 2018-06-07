@@ -14,6 +14,7 @@ import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.datasource.NewsSource;
 import com.idroi.marketsense.datasource.NewsStreamPlacer;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -186,7 +187,7 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
         mNewsAvailableListener = listener;
     }
 
-    public void loadNews(String networkUrl, String cacheUrl) {
+    public void loadNews(ArrayList<String> networkUrl, ArrayList<String> cacheUrl) {
         mNewsStreamPlacer.loadNews(networkUrl, cacheUrl);
     }
 

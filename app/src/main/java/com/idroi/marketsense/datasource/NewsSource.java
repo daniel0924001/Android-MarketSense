@@ -22,6 +22,7 @@ import static com.idroi.marketsense.fragments.NewsFragment.GENERAL_TASK_ID;
 import static com.idroi.marketsense.fragments.NewsFragment.KEYWORD_ARRAY_TASK_ID;
 import static com.idroi.marketsense.fragments.NewsFragment.KEYWORD_NAME;
 import static com.idroi.marketsense.fragments.NewsFragment.KEYWORD_TASK_ID;
+import static com.idroi.marketsense.request.NewsRequest.PARAM_GTS;
 import static com.idroi.marketsense.request.NewsRequest.PARAM_LEVEL;
 import static com.idroi.marketsense.request.NewsRequest.PARAM_STATUS;
 
@@ -57,7 +58,7 @@ public class NewsSource {
     private boolean mFirstTimeNewsAvailable;
     private NewsSourceListener mNewsSourceListener;
 
-    private String mNetworkUrl, mCacheUrl;
+    private ArrayList<String> mNetworkUrl, mCacheUrl;
     private int mSequenceNumber;
     private boolean mShouldReadFromCache;
 
@@ -195,7 +196,7 @@ public class NewsSource {
         mCurrentRetries = 0;
     }
 
-    public void loadNews(Activity activity, String networkUrl, String cacheUrl) {
+    public void loadNews(Activity activity, ArrayList<String> networkUrl, ArrayList<String> cacheUrl) {
         mNetworkUrl = networkUrl;
         mCacheUrl = cacheUrl;
         loadNews(new MarketSenseNewsFetcher(activity, mMarketSenseNewsNetworkListener));
@@ -254,19 +255,34 @@ public class NewsSource {
                 activity.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE).edit();
         switch (mTaskId) {
             case GENERAL_TASK_ID:
-                key = NewsRequest.queryNewsUrlPrefix(mBundle.getString(PARAM_STATUS), mBundle.getInt(PARAM_LEVEL));
-                editor.putString(key, mNetworkUrl);
-                MSLog.d("News network query success, so we save this network url to cache: " + key + ", " + mNetworkUrl);
+                ArrayList<String> statusArrayList = mBundle.getStringArrayList(PARAM_STATUS);
+                ArrayList<Integer> levelArrayList = mBundle.getIntegerArrayList(PARAM_LEVEL);
+                String gts = mBundle.getString(PARAM_GTS);
+                if(statusArrayList == null || levelArrayList == null || mNetworkUrl == null ||
+                        statusArrayList.size() != levelArrayList.size() ||
+                        statusArrayList.size() != mNetworkUrl.size()) {
+                    MSLog.e("size of statusArrayList and levelArrayList and mNetworkUrl is not equal.");
+                    return;
+                }
+                for(int i = 0; i < statusArrayList.size(); i++) {
+                    key = NewsRequest.queryNewsUrlPrefix(statusArrayList.get(i), levelArrayList.get(i), gts);
+                    editor.putString(key, mNetworkUrl.get(i));
+                    MSLog.d("News network query success, so we save this network url to cache: " + key + ", " + mNetworkUrl.get(i));
+                }
                 break;
             case KEYWORD_TASK_ID:
                 key = NewsRequest.queryKeywordNewsUrlPrefix(mBundle.getString(KEYWORD_NAME));
-                editor.putString(key, mNetworkUrl);
-                MSLog.d("Keyword news network query success, so we save this network url to cache: " + key + ", " + mNetworkUrl);
+                if(mNetworkUrl != null && mNetworkUrl.size() > 0 && mNetworkUrl.get(0) != null) {
+                    editor.putString(key, mNetworkUrl.get(0));
+                    MSLog.d("Keyword news network query success, so we save this network url to cache: " + key + ", " + mNetworkUrl.get(0));
+                }
                 break;
             case KEYWORD_ARRAY_TASK_ID:
                 key = NewsRequest.queryKeywordArrayNewsUrlPrefix();
-                editor.putString(key, mNetworkUrl);
-                MSLog.d("Keyword array news network query success, so we save this network url to cache: " + key + ", " + mNetworkUrl);
+                if(mNetworkUrl != null && mNetworkUrl.size() > 0 && mNetworkUrl.get(0) != null) {
+                    editor.putString(key, mNetworkUrl.get(0));
+                    MSLog.d("Keyword array news network query success, so we save this network url to cache: " + key + ", " + mNetworkUrl.get(0));
+                }
                 break;
         }
         SharedPreferencesCompat.apply(editor);

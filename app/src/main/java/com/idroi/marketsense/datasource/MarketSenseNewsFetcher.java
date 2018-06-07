@@ -14,6 +14,8 @@ import org.json.JSONException;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.MarketSenseError;
@@ -52,26 +54,30 @@ public class MarketSenseNewsFetcher {
 
     private WeakReference<Context> mContext;
     private MarketSenseNewsNetworkListener mMarketSenseNewsNetworkListener;
-    private NewsRequest mNewsRequest;
+    private ArrayList<NewsRequest> mNewsRequests;
 
     MarketSenseNewsFetcher(Context context,
             MarketSenseNewsNetworkListener marketSenseNewsNetworkListener) {
         mContext = new WeakReference<Context>(context);
         mMarketSenseNewsNetworkListener = marketSenseNewsNetworkListener;
+        mNewsRequests = new ArrayList<>();
         mTimeoutHandler = new Handler();
         mTimeoutRunnable = new Runnable() {
             @Override
             public void run() {
-                if(mNewsRequest != null) {
-                    mNewsRequest.cancel();
-                    mNewsRequest = null;
+                for(NewsRequest newsRequest : mNewsRequests) {
+                    if (newsRequest != null) {
+                        newsRequest.cancel();
+                        newsRequest = null;
+                    }
                 }
-                mMarketSenseNewsNetworkListener.onNewsFail(MarketSenseError.NETWROK_CONNECTION_TIMEOUT);
+                mNewsRequests.clear();
+                mMarketSenseNewsNetworkListener.onNewsFail(MarketSenseError.NETWORK_CONNECTION_TIMEOUT);
             }
         };
     }
 
-    void makeRequest(@NonNull String networkUrl, @Nullable String cacheUrl, boolean shouldReadFromCache) {
+    void makeRequest(@NonNull ArrayList<String> networkUrl, @Nullable ArrayList<String> cacheUrl, boolean shouldReadFromCache) {
         final Context context = getContextOrDestroy();
         if(context == null) {
             return;
@@ -85,70 +91,89 @@ public class MarketSenseNewsFetcher {
         requestNews(networkUrl, cacheUrl, shouldReadFromCache);
     }
 
-    private void requestNews(@NonNull String networkUrl, @Nullable String cacheUrl, boolean shouldReadFromCache) {
+    private void requestNews(@NonNull ArrayList<String> networkUrls, @Nullable ArrayList<String> cacheUrls, boolean shouldReadFromCache) {
         final Context context = getContextOrDestroy();
         if(context == null) {
             return;
         }
 
-        MSLog.i("Loading news...: " + networkUrl);
+        MSLog.i("Loading news...");
 
-        if(cacheUrl == null) {
+        if(cacheUrls == null) {
             MSLog.d("cacheUrl is null, so we set networkUrl to cacheUrl");
-            cacheUrl = networkUrl;
+            cacheUrls = networkUrls;
         }
+
+        // These Atomics are only accessed on the main thread.
+        // We use Atomics here so we can change their values while keeping a reference for the inner class.
+        final AtomicInteger networkCounter = new AtomicInteger(networkUrls.size());
+        final AtomicBoolean networkAnyFailures = new AtomicBoolean(false);
+        int cacheCounter = cacheUrls.size();
 
         if(shouldReadFromCache) {
-            MSLog.i("Loading news...(cache): " + cacheUrl);
             Cache cache = Networking.getRequestQueue(context).getCache();
-            Cache.Entry entry = cache.get(cacheUrl);
-            if(entry != null) {
-                try {
+            ArrayList<News> newsArrayList = new ArrayList<>();
+            for(String cacheUrl : cacheUrls) {
+                MSLog.i("Loading news...(cache): " + cacheUrl);
+                Cache.Entry entry = cache.get(cacheUrl);
+                if (entry != null) {
+                    try {
 
-                    ArrayList<News> newsArrayList = null;
-                    if(cacheUrl.contains(PARAM_KEYWORD_ARRAY)) {
-                        newsArrayList = NewsRequest.multipleNewsParseResponse(entry.data);
-                    } else {
-                        newsArrayList = NewsRequest.newsParseResponse(entry.data);
+                        if (cacheUrl.contains(PARAM_KEYWORD_ARRAY)) {
+                            newsArrayList.addAll(NewsRequest.multipleNewsParseResponse(entry.data));
+                        } else {
+                            newsArrayList.addAll(NewsRequest.newsParseResponse(entry.data));
+                        }
+
+                        MSLog.i("Loading news list...(cache hit): " + new String(entry.data));
+
+                        cacheCounter--;
+                        if(cacheCounter == 0) {
+                            MSLog.i("Loading news list...(cache all hit)");
+                            mMarketSenseNewsNetworkListener.onNewsLoad(newsArrayList, true);
+                        }
+
+                    } catch (JSONException e) {
+                        MSLog.e("Loading news list...(cache failed JSONException)");
+                        break;
                     }
-
-                    MSLog.i("Loading news list...(cache hit): " + new String(entry.data));
-                    mMarketSenseNewsNetworkListener.onNewsLoad(newsArrayList, true);
-                } catch (JSONException e) {
-                    MSLog.e("Loading news list...(cache failed JSONException)");
+                } else {
+                    MSLog.i("Loading news...(cache miss)");
+                    break;
                 }
-            } else {
-                MSLog.i("Loading news...(cache miss)");
             }
         }
 
-
-        mNewsRequest = new NewsRequest(Request.Method.GET, networkUrl, null, new Response.Listener<ArrayList<News>>() {
+        final ArrayList<News> results = new ArrayList<>();
+        Response.Listener<ArrayList<News>> responseListener = new Response.Listener<ArrayList<News>>() {
             @Override
             public void onResponse(ArrayList<News> response) {
-                MSLog.i("News Request success: " + response.size());
-                mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
-                mMarketSenseNewsNetworkListener.onNewsLoad(response, false);
+                results.addAll(response);
+
+                final int count = networkCounter.decrementAndGet();
+                MSLog.i("News Request success and remain: " + count);
+
+                if(count == 0 && !networkAnyFailures.get()){
+                    mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
+                    mMarketSenseNewsNetworkListener.onNewsLoad(results, false);
+                }
             }
-        }, new Response.ErrorListener() {
+        };
+
+        Response.ErrorListener errorListener = new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                MSLog.e("News Request error: " + error.getMessage(), error);
-                if(error.networkResponse != null) {
-                    MSLog.e("News Request error: " + new String(error.networkResponse.data), error);
-                }
-                mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
-                if(error instanceof MarketSenseNetworkError) {
-                    MarketSenseNetworkError networkError = (MarketSenseNetworkError) error;
-                    mMarketSenseNewsNetworkListener.onNewsFail(networkError.getReason());
-                } else {
-                    mMarketSenseNewsNetworkListener.onNewsFail(MarketSenseError.NETWORK_VOLLEY_ERROR);
-                }
+                onError(networkCounter, networkAnyFailures, mMarketSenseNewsNetworkListener, error);
             }
-        });
+        };
+
+        for(String networkUrl : networkUrls) {
+            NewsRequest newsRequest = new NewsRequest(Request.Method.GET, networkUrl, null, responseListener, errorListener);
+            mNewsRequests.add(newsRequest);
+            Networking.getRequestQueue(context).add(newsRequest);
+        }
 
         mTimeoutHandler.postDelayed(mTimeoutRunnable, 5000);
-        Networking.getRequestQueue(context).add(mNewsRequest);
     }
 
     private Context getContextOrDestroy() {
@@ -164,13 +189,39 @@ public class MarketSenseNewsFetcher {
 
     void destroy() {
         mContext.clear();
-        if(mNewsRequest != null) {
-            mNewsRequest.cancel();
-            mNewsRequest = null;
+        for(NewsRequest newsRequest : mNewsRequests) {
+            if (newsRequest != null) {
+                newsRequest.cancel();
+                newsRequest = null;
+            }
         }
+        mNewsRequests.clear();
         mMarketSenseNewsNetworkListener = EMPTY_NETWORK_LISTENER;
         if(mTimeoutHandler != null) {
             mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
+        }
+    }
+
+    private void onError(final AtomicInteger imageCounter,
+                                final AtomicBoolean anyFailures,
+                                final MarketSenseNewsNetworkListener networkListener,
+                                final VolleyError error){
+
+        boolean anyPreviousErrors = anyFailures.getAndSet(true);
+        imageCounter.decrementAndGet();
+        if(!anyPreviousErrors){
+
+            MSLog.e("News Request error: " + error.getMessage(), error);
+            if(error.networkResponse != null) {
+                MSLog.e("News Request error: " + new String(error.networkResponse.data), error);
+            }
+            mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
+            if(error instanceof MarketSenseNetworkError) {
+                MarketSenseNetworkError networkError = (MarketSenseNetworkError) error;
+                mMarketSenseNewsNetworkListener.onNewsFail(networkError.getReason());
+            } else {
+                mMarketSenseNewsNetworkListener.onNewsFail(MarketSenseError.NETWORK_VOLLEY_ERROR);
+            }
         }
     }
 }

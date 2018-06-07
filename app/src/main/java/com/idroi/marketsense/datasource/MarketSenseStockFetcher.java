@@ -68,7 +68,7 @@ public class MarketSenseStockFetcher {
                     mStockRequest = null;
                 }
                 MSLog.w("Stock price request is timeout.");
-                mMarketSenseStockNetworkListener.onStockListFail(MarketSenseError.NETWROK_CONNECTION_TIMEOUT);
+                mMarketSenseStockNetworkListener.onStockListFail(MarketSenseError.NETWORK_CONNECTION_TIMEOUT);
             }
         };
     }

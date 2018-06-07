@@ -149,6 +149,7 @@ public class NewsRequest extends Request<ArrayList<News>> {
     public static final String PARAM_STATUS = "&status=";
     public static final String PARAM_LEVEL = "&level=";
     private static final String PARAM_TIMESTAMP = "&timestamp=";
+    public static final String PARAM_GTS = "&gts=";
 
     private static final String API_KEYWORD_URL = "http://apiv2.infohubapp.com/v1/stock/search?";
     public static final String PARAM_KEYWORD_ARRAY = "&keywords[]=";
@@ -157,21 +158,22 @@ public class NewsRequest extends Request<ArrayList<News>> {
     public static final String PARAM_STATUS_FALLING = "f";
 
     public static final String API_QUERY_NEWS_URL =
-            "http://apiv2.infohubapp.com/v1/stock/news?limit=%d&status=%s&level=%d&random=0";
+            "http://apiv2.infohubapp.com/v1/stock/news?limit=%d&status=%s&level=%d&random=0&gts=%s";
     public static final String API_QUERY_KEYWORD_NEWS_URL =
             "http://apiv2.infohubapp.com/v1/stock/search?keyword=%s";
 
     private static final int REFRESH_TIME = 10;
 
     // start of query news
-    public static String queryNewsUrlPrefix(String status, int level) {
-        return String.format(Locale.US, API_QUERY_NEWS_URL, 300, status, level);
+    public static String queryNewsUrlPrefix(String status, int level, String gts) {
+        return String.format(Locale.US, API_QUERY_NEWS_URL, 300, status, level, gts);
     }
 
     public static String queryNewsUrl(Context context, String status,
                                       int level,
-                                      boolean isNetworkUrl) {
-        String urlPrefix = queryNewsUrlPrefix(status, level);
+                                      boolean isNetworkUrl,
+                                      String gts) {
+        String urlPrefix = queryNewsUrlPrefix(status, level, gts);
         if (isNetworkUrl || context == null) {
             return urlPrefix +
                     PARAM_TIMESTAMP + (System.currentTimeMillis() / (REFRESH_TIME * 1000));

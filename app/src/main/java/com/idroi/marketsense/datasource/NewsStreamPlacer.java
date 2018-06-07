@@ -40,7 +40,7 @@ public class NewsStreamPlacer {
         return 0;
     }
 
-    public void loadNews(String networkUrl, String cacheUrl) {
+    public void loadNews(ArrayList<String> networkUrl, ArrayList<String> cacheUrl) {
         mNewsSource.loadNews(mActivity, networkUrl, cacheUrl);
     }
 

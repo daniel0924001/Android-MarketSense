@@ -232,7 +232,7 @@ public class StockListFragment extends Fragment {
                 changeSortedBlockLayout(SORT_BY_NEWS, view);
             }
         });
-        changeSortedBlockLayout(SORT_BY_DIFF, mSortedByDiff);
+        changeSortedBlockLayout(SORT_BY_NEWS, mSortedByNews);
     }
 
     private void changeSortedBlockLayout(int field, View view) {

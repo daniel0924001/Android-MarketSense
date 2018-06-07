@@ -15,8 +15,8 @@
         android:layout_marginTop="24dp"
         android:fontFamily="Roboto-Regular"
         android:text="@string/title_company_name"
-        android:textColor="@color/colorPrimary"
-        android:textSize="16sp"
+        android:textColor="@color/text_gray"
+        android:textSize="14sp"
         android:textStyle="normal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -28,8 +28,8 @@
         android:layout_marginStart="8dp"
         android:fontFamily="Roboto-Regular"
         android:text="@string/title_company_code"
-        android:textColor="@color/colorPrimary"
-        android:textSize="16sp"
+        android:textColor="@color/text_gray"
+        android:textSize="14sp"
         android:textStyle="normal"
         app:layout_constraintTop_toTopOf="@id/marketsense_stock_name_tv"
         app:layout_constraintStart_toEndOf="@id/marketsense_stock_name_tv" />
@@ -43,7 +43,7 @@
         android:fontFamily="Roboto-Regular"
         android:text="@string/title_company_price"
         android:textColor="@color/marketsense_text_black"
-        android:textSize="14sp"
+        android:textSize="20sp"
         android:textStyle="normal"
         app:layout_constraintStart_toStartOf="@id/marketsense_stock_name_tv"
         app:layout_constraintTop_toBottomOf="@id/marketsense_stock_name_tv"
@@ -60,7 +60,8 @@
         android:textSize="14sp"
         android:textStyle="normal"
         app:layout_constraintTop_toTopOf="@id/marketsense_stock_price_tv"
-        app:layout_constraintStart_toEndOf="@id/marketsense_stock_price_tv" />
+        app:layout_constraintStart_toEndOf="@id/marketsense_stock_price_tv"
+        app:layout_constraintBottom_toBottomOf="@id/marketsense_stock_price_tv"/>
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline_1"

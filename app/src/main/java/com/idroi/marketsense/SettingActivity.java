@@ -310,6 +310,7 @@ public class SettingActivity extends AppCompatActivity {
             default:
                 Toast.makeText(this, R.string.preference_sorry, Toast.LENGTH_SHORT).show();
         }
+        overridePendingTransition(R.anim.enter, R.anim.stop);
     }
 
     private void setActionBar() {

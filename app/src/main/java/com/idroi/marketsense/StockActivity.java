@@ -53,6 +53,7 @@ import org.json.JSONObject;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_HTML;
 import static com.idroi.marketsense.RichEditorActivity.sEditorRequestCode;
@@ -546,8 +547,12 @@ public class StockActivity extends AppCompatActivity {
         moreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO
-                MSLog.e("look more!!!");
+                startActivity(WebViewActivity.generateWebViewActivityIntent(
+                        StockActivity.this,
+                        0,
+                        mStockName + " " + mCode,
+                        String.format(Locale.US, "https://stock-ai.com/tw-Dly-8-%s.php", mCode)));
+                overridePendingTransition(R.anim.enter, R.anim.stop);
             }
         });
 

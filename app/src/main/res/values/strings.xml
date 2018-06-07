@@ -163,6 +163,7 @@
 
     <string name="hello">Hello, 市覺使用者</string>
     <string name="login">登入</string>
+    <string name="login_failed">登入失敗</string>
     <string name="logout">登出</string>
     <string name="login_facebook">以Facebook登入</string>
     <string name="login_google">以Google登入</string>

@@ -37,6 +37,7 @@ public class UserProfile {
     public static final int NOTIFY_ID_NEWS_COMMENT_CLICK = 3;
     public static final int NOTIFY_USER_HAS_LOGIN = 4;
     public static final int NOTIFY_ID_EVENT_LIST = 5;
+    public static final int NOTIFY_USER_LOGIN_FAILED = 6;
 
     public interface UserProfileChangeListener {
         void onUserProfileChange(int notifyId);
@@ -66,6 +67,8 @@ public class UserProfile {
     private String mUserName;
     private String mUserAvatarLink;
 
+    private boolean mLoginOnGoing, mHasLogin;
+
     private ArrayList<UserProfileChangeListener> mUserProfileChangeListeners;
 
     @Nullable private ArrayList<String> mFavoriteStocks;
@@ -77,6 +80,8 @@ public class UserProfile {
 
     public UserProfile(Context context, boolean initUserDataFromCache) {
         mUserProfileChangeListeners = new ArrayList<>();
+        mLoginOnGoing = false;
+        mHasLogin = false;
         if(initUserDataFromCache) {
             mFavoriteStocks = new ArrayList<String>(){
                 @Override
@@ -85,8 +90,9 @@ public class UserProfile {
                 }
             };
             mEventsArrayList = new ArrayList<>();
+
             if(FBHelper.checkFBLogin()) {
-                initUserData(context);
+                tryToLoginAndInitUserData(context);
             }
         }
     }
@@ -289,21 +295,44 @@ public class UserProfile {
         SharedPreferencesCompat.apply(editor);
     }
 
-    private void initUserData(Context context) {
-        SharedPreferences sharedPreferences =
-                context.getSharedPreferences(USER_PROFILE_SHARE_PREFERENCE, Context.MODE_PRIVATE);
-        mUserId = sharedPreferences.getString(SHARE_PREF_ID_KEY, null);
-        mUserName = sharedPreferences.getString(SHARE_PREF_NAME_KEY,
-                context.getResources().getString(R.string.default_user_name));
-        mUserEmail = sharedPreferences.getString(SHARE_PREF_EMAIL_KEY, null);
-        mUserType = sharedPreferences.getString(SHARE_PREF_USER_TYPE, null);
-        mUserAvatarLink = sharedPreferences.getString(SHARE_PREF_AVATAR_URL_KEY,
-                context.getResources().getString(R.string.default_user_avatar_link));
-        MSLog.d(String.format("init user data from share preference: %s %s %s %s",
-                mUserId, mUserName, mUserEmail, mUserAvatarLink));
+    public void tryToLoginAndInitUserData(final Context context) {
 
-        String password = UserProfile.generatePassword(mUserId,mUserType);
-        PostEvent.sendLogin(context, mUserId, password, mUserEmail);
+        if(mHasLogin) {
+            MSLog.i("[user login]: start to login but has login");
+            notifyUserProfile(NOTIFY_USER_HAS_LOGIN);
+            return;
+        }
+
+        if(!mLoginOnGoing) {
+            mLoginOnGoing = true;
+            MSLog.i("[user login]: start to login");
+            final SharedPreferences sharedPreferences =
+                    context.getSharedPreferences(USER_PROFILE_SHARE_PREFERENCE, Context.MODE_PRIVATE);
+            mUserId = sharedPreferences.getString(SHARE_PREF_ID_KEY, null);
+            mUserType = sharedPreferences.getString(SHARE_PREF_USER_TYPE, null);
+            String password = UserProfile.generatePassword(mUserId, mUserType);
+            PostEvent.sendLogin(context, mUserId, password, mUserEmail, new PostEvent.PostEventListener() {
+                @Override
+                public void onResponse(boolean isSuccessful) {
+                    MSLog.i("[user login]: end login and the result is: " + isSuccessful);
+                    mLoginOnGoing = false;
+                    mHasLogin = isSuccessful;
+
+                    if (mHasLogin) {
+                        mUserName = sharedPreferences.getString(SHARE_PREF_NAME_KEY,
+                                context.getResources().getString(R.string.default_user_name));
+                        mUserEmail = sharedPreferences.getString(SHARE_PREF_EMAIL_KEY, null);
+                        mUserAvatarLink = sharedPreferences.getString(SHARE_PREF_AVATAR_URL_KEY,
+                                context.getResources().getString(R.string.default_user_avatar_link));
+                        MSLog.d(String.format("init user data from share preference: %s %s %s %s",
+                                mUserId, mUserName, mUserEmail, mUserAvatarLink));
+                        notifyUserProfile(NOTIFY_USER_HAS_LOGIN);
+                    } else {
+                        notifyUserProfile(NOTIFY_USER_LOGIN_FAILED);
+                    }
+                }
+            });
+        }
     }
 
     static UserProfile jsonObjectToUserProfile(JSONObject jsonObject) {

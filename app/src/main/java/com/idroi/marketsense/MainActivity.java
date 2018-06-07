@@ -10,6 +10,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +27,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.adapter.BaseScreenSlidePagerAdapter;
 import com.idroi.marketsense.adapter.ChoiceScreenSlidePagerAdapter;
@@ -50,6 +52,9 @@ import static com.idroi.marketsense.SearchAndResponseActivity.EXTRA_SELECTED_COM
 import static com.idroi.marketsense.SearchAndResponseActivity.EXTRA_SELECTED_COMPANY_NAME_KEY;
 import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_USER_HAS_LOGIN;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_USER_LOGIN_FAILED;
+import static com.idroi.marketsense.notification.NotificationHelper.NEWS_GENERAL_ALL;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -69,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
     private AlertDialog mLoginAlertDialog;
     private LoginButton mFBLoginBtn;
     private CallbackManager mFBCallbackManager;
+
+    UserProfile.UserProfileChangeListener mUserProfileChangeListener;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -132,6 +139,33 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MSLog.i("Enter MainActivity");
+
+        FirebaseMessaging.getInstance().subscribeToTopic(NEWS_GENERAL_ALL);
+
+        MSLog.i("Initialize ClientData");
+        ClientData clientData = ClientData.getInstance(this);
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        int width = (int)Math.ceil((double)metrics.widthPixels/metrics.density);
+        int height = (int)Math.ceil((double)metrics.heightPixels/metrics.density);
+        clientData.setScreenSizeInPixels(metrics.widthPixels, metrics.heightPixels);
+        clientData.setScreenSize(width, height);
+
+        mUserProfileChangeListener = new UserProfile.UserProfileChangeListener() {
+            @Override
+            public void onUserProfileChange(int notifyId) {
+                if(notifyId == NOTIFY_USER_HAS_LOGIN) {
+                    MSLog.i("[user login]: notify user login success");
+                    internalSetAvatarImage(true);
+                } else if(notifyId == NOTIFY_USER_LOGIN_FAILED) {
+                    MSLog.e("[user login]: notify user login failed");
+                    internalSetAvatarImage(false);
+                    Toast.makeText(MainActivity.this, R.string.login_failed, Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+
+        clientData.getUserProfile().addUserProfileChangeListener(mUserProfileChangeListener);
+
         FrescoHelper.initialize(getApplicationContext());
         setContentView(R.layout.activity_main);
 
@@ -168,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        ClientData.getInstance(this).getUserProfile().deleteUserProfileChangeListener(mUserProfileChangeListener);
         MSLog.i("Exit MainActivity");
         super.onDestroy();
     }
@@ -175,17 +210,33 @@ public class MainActivity extends AppCompatActivity {
     private void setAvatarImage() {
         if(mAvatarImageView != null) {
             if (FBHelper.checkFBLogin()) {
-                mAvatarImageView.setImageURI(
-                        ClientData.getInstance(this).getUserProfile().getUserAvatarLink());
-                RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
-                roundingParams.setRoundAsCircle(true);
-                mAvatarImageView.getHierarchy().setRoundingParams(roundingParams);
+                UserProfile userProfile = ClientData.getInstance(this).getUserProfile();
+                if(userProfile != null) {
+                    MSLog.i("[user login]: fb is login so we try to login. it will notify NOTIFY_USER_HAS_LOGIN event when it successes");
+                    userProfile.tryToLoginAndInitUserData(this);
+                } else {
+                    MSLog.e("User profile is null in setAvatarImage.");
+                    internalSetAvatarImage(false);
+                }
             } else {
-                mAvatarImageView.setImageResource(R.drawable.ic_account_circle_white_24px);
-                RoundingParams roundingParams = RoundingParams.fromCornersRadius(0);
-                roundingParams.setRoundAsCircle(false);
-                mAvatarImageView.getHierarchy().setRoundingParams(roundingParams);
+                MSLog.i("[user login]: fb is not login so set avatar image to false");
+                internalSetAvatarImage(false);
             }
+        }
+    }
+
+    private void internalSetAvatarImage(boolean isLogin) {
+        if(isLogin) {
+            mAvatarImageView.setImageURI(
+                    ClientData.getInstance(this).getUserProfile().getUserAvatarLink());
+            RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
+            roundingParams.setRoundAsCircle(true);
+            mAvatarImageView.getHierarchy().setRoundingParams(roundingParams);
+        } else {
+            mAvatarImageView.setImageResource(R.drawable.ic_account_circle_white_24px);
+            RoundingParams roundingParams = RoundingParams.fromCornersRadius(0);
+            roundingParams.setRoundAsCircle(false);
+            mAvatarImageView.getHierarchy().setRoundingParams(roundingParams);
         }
     }
 

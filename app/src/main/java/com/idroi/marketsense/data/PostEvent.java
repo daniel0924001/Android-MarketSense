@@ -19,11 +19,17 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_USER_HAS_LOGIN;
+
 /**
  * Created by daniel.hsieh on 2018/5/7.
  */
 
 public class PostEvent {
+
+    public interface PostEventListener {
+        void onResponse(boolean isSuccessful);
+    }
 
     public enum PostEventType {
         REGISTER("register", POST_TYPE_REGISTER),
@@ -127,6 +133,8 @@ public class PostEvent {
     private String mStockCode;
     private String mUserToken;
 
+    private PostEventListener mListener;
+
     private PostEvent(String userId, PostEventType postEventType) {
         mMethod = Request.Method.POST;
         mUserId = userId;
@@ -203,6 +211,11 @@ public class PostEvent {
 
     private PostEvent setUserToken(String token) {
         mUserToken = token;
+        return this;
+    }
+
+    private PostEvent setPostEventListener(PostEventListener listener) {
+        mListener = listener;
         return this;
     }
 
@@ -313,20 +326,25 @@ public class PostEvent {
                 jsonObject.optString(RESPONSE_RESULT) != null &&
                 jsonObject.optString(RESPONSE_RESULT).equals(RESPONSE_DUPLICATE_REGISTER)) {
             // {"status":false,"result":"You have registered before!"}
-            sendLogin(null, mUserId, mUserPassword, mUserEmail);
+            sendLogin(null, mUserId, mUserPassword, mUserEmail, null);
         }
     }
 
     private void processLogin(JSONObject jsonObject) {
-        if(jsonObject.optBoolean(RESPONSE_STATUS, false)) {
+        boolean isSuccessful = jsonObject.optBoolean(RESPONSE_STATUS, false);
+        if(isSuccessful) {
             JSONObject result = jsonObject.optJSONObject(RESPONSE_RESULT);
             if(result != null) {
                 String token = result.optString(RESPONSE_USER_TOKEN);
                 MSLog.d("Login success with token: " + token);
-                ClientData.getInstance().setUserToken(token);
-
-                ClientData.getInstance().loadPreference();
+                ClientData clientData = ClientData.getInstance();
+                clientData.setUserToken(token);
+                clientData.loadPreference();
             }
+        }
+
+        if(mListener != null) {
+            mListener.onResponse(isSuccessful);
         }
     }
 
@@ -393,10 +411,11 @@ public class PostEvent {
     }
 
     public static void sendLogin(Context context, String userId,
-                                 String userPassword, String userEmail) {
+                                 String userPassword, String userEmail, PostEventListener listener) {
         new PostEvent(userId, PostEventType.LOGIN)
                 .setUserPassword(userPassword)
                 .setUserEmail(userEmail)
+                .setPostEventListener(listener)
                 .send(context);
     }
 

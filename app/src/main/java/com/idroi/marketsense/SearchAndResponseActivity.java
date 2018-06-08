@@ -60,6 +60,7 @@ public class SearchAndResponseActivity extends AppCompatActivity {
         final ActionBar actionBar = getSupportActionBar();
 
         if(actionBar != null) {
+            actionBar.setElevation(0);
             View view = LayoutInflater.from(actionBar.getThemedContext())
                     .inflate(R.layout.action_bar_search, null);
 

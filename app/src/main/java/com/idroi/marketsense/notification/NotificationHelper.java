@@ -13,6 +13,7 @@ import java.util.Map;
 public class NotificationHelper {
 
     public static final String NEWS_GENERAL_ALL = "news-general-all";
+    public static final String VOTING_GENERAL_ALL = "voting-general-all";
     public static final String STOCK_PRICE_SELECTED_SUFFIX = "-price-selected";
 
     public static void sendNotification(Context context, String from, Map<String, String> data) {
@@ -23,6 +24,8 @@ public class NotificationHelper {
             baseNotificationHandler = new NewsNotification(data);
         } else if(from.contains(STOCK_PRICE_SELECTED_SUFFIX)) {
             baseNotificationHandler = new StockNotification(data);
+        } else if(from.contains(VOTING_GENERAL_ALL)) {
+            baseNotificationHandler = new VotingGeneralNotification(data);
         }
 
         if(baseNotificationHandler != null) {

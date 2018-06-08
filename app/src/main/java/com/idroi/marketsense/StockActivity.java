@@ -586,9 +586,25 @@ public class StockActivity extends AppCompatActivity {
 
         TextView priceTextView = findViewById(R.id.stock_price_tv);
         TextView diffTextView = findViewById(R.id.stock_diff_tv);
-        priceTextView.setText(mPrice);
         String format = getResources().getString(R.string.title_diff_format);
+
+        priceTextView.setText(mPrice);
         diffTextView.setText(String.format(format, mDiffNum, mDiffPercentage));
+
+        try {
+            float diffPercentage = Float.valueOf(mDiffNum);
+            if(diffPercentage > 0) {
+                diffTextView.setTextColor(getResources().getColor(R.color.colorTrendUp));
+            } else if(diffPercentage < 0) {
+                diffTextView.setTextColor(getResources().getColor(R.color.colorTrendDown));
+            } else {
+                diffTextView.setTextColor(getResources().getColor(R.color.colorTrendFlat));
+            }
+        } catch (NumberFormatException e) {
+            diffTextView.setTextColor(getResources().getColor(R.color.colorTrendFlat));
+            MSLog.e("NumberFormatException: " + mDiffNum);
+        }
+
         Button moreButton = findViewById(R.id.more_information_btn);
         moreButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -642,6 +658,7 @@ public class StockActivity extends AppCompatActivity {
         final ActionBar actionBar = getSupportActionBar();
 
         if(actionBar != null) {
+            actionBar.setElevation(0);
             View view = LayoutInflater.from(actionBar.getThemedContext())
                     .inflate(R.layout.main_action_bar, null);
 

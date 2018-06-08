@@ -55,6 +55,7 @@ import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_USER_HAS_LOGIN;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_USER_LOGIN_FAILED;
 import static com.idroi.marketsense.notification.NotificationHelper.NEWS_GENERAL_ALL;
+import static com.idroi.marketsense.notification.NotificationHelper.VOTING_GENERAL_ALL;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -141,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
         MSLog.i("Enter MainActivity");
 
         FirebaseMessaging.getInstance().subscribeToTopic(NEWS_GENERAL_ALL);
+        FirebaseMessaging.getInstance().subscribeToTopic(VOTING_GENERAL_ALL);
 
         MSLog.i("Initialize ClientData");
         ClientData clientData = ClientData.getInstance(this);
@@ -244,6 +246,7 @@ public class MainActivity extends AppCompatActivity {
         final ActionBar actionBar = getSupportActionBar();
 
         if(actionBar != null) {
+            actionBar.setElevation(0);
             View view = LayoutInflater.from(actionBar.getThemedContext())
                     .inflate(R.layout.action_bar_middle_button, null);
             actionBar.setDisplayShowHomeEnabled(false);

@@ -244,8 +244,11 @@ public class UserProfile {
 
         String timestamp = event.getEventCreatedTs();
         if(timestamp != null) {
-            Date thatDate = new Date(Long.parseLong(timestamp) * 1000);
-            Timestamp todayTs = new Timestamp(System.currentTimeMillis());
+            // 8 am
+            long shift = 8 * 60 * 60 * 1000;
+
+            Date thatDate = new Date(Long.parseLong(timestamp) * 1000 - shift);
+            Timestamp todayTs = new Timestamp(System.currentTimeMillis() - shift);
             Date today = new Date(todayTs.getTime());
             return DateUtils.isAfterDay(today, thatDate);
         } else {

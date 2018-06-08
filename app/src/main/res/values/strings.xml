@@ -131,7 +131,7 @@
     <string name="title_comment">評論</string>
     <string name="title_comment_colon">評論:</string>
     <string name="title_action_seven">快來表達你對這支股票一週內的想法吧！</string>
-    <string name="title_welcome_tomorrow">歡迎您明日再來表達您的看法唷！</string>
+    <string name="title_welcome_tomorrow">歡迎您明日八點過後再來表達您的看法唷！</string>
     <string name="title_welcome_but_you_have_voted">歡迎回來，今日你已經於稍早時表達過看法了！</string>
     <string name="title_comment_create">發佈</string>
     <string name="title_leave_rich_editor">
@@ -197,4 +197,7 @@
 
     <string name="notification_channel_stock_price_id" translatable="false">fcm_stock_price_channel</string>
     <string name="notification_channel_stock_price_title">市覺股價通知</string>
+
+    <string name="notification_channel_voting_result_id" translatable="false">fcm_voting_result_channel</string>
+    <string name="notification_channel_voting_result_title">市覺投票通知</string>
 </resources>

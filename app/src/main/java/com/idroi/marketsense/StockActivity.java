@@ -15,6 +15,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.webkit.WebChromeClient;
+import android.webkit.WebResourceResponse;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -91,7 +95,11 @@ public class StockActivity extends AppCompatActivity {
     private String mStockName;
     private String mCode;
     private String mPrice, mDiffNum, mDiffPercentage;
-    private ConstraintLayout mVoteTopBlock;
+    private ConstraintLayout mVoteTopBlock, mBottomFixedBlock;
+
+    private NewsWebView mStockAIWebView;
+    private boolean mIsStockAIOpen = false;
+
     private Button mButtonRaise, mButtonFall;
     private TextView mResultTextView;
 
@@ -126,13 +134,20 @@ public class StockActivity extends AppCompatActivity {
         setActionBar();
         initStockChart();
         setSelector();
+        initStockAIWebView();
         initSocialButtons();
     }
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        overridePendingTransition(R.anim.stop, R.anim.right_to_left);
+        if(mIsStockAIOpen) {
+            mStockAIWebView.setVisibility(View.GONE);
+            mBottomFixedBlock.setVisibility(View.VISIBLE);
+            mIsStockAIOpen = false;
+        } else {
+            super.onBackPressed();
+            overridePendingTransition(R.anim.stop, R.anim.right_to_left);
+        }
     }
 
     @Override
@@ -206,11 +221,42 @@ public class StockActivity extends AppCompatActivity {
         mSelectorNews.setLayoutParams(paramsNews);
     }
 
+    private void initStockAIWebView() {
+        mStockAIWebView = findViewById(R.id.more_webview);
+        mStockAIWebView.setVerticalScrollBarEnabled(true);
+        mStockAIWebView.setHorizontalScrollBarEnabled(false);
+        mStockAIWebView.getSettings().setAppCachePath(getApplicationContext().getCacheDir().getAbsolutePath());
+        mStockAIWebView.getSettings().setAllowFileAccess(true);
+        mStockAIWebView.getSettings().setAppCacheEnabled(true);
+        mStockAIWebView.getSettings().setBlockNetworkImage(true);
+        mStockAIWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                MSLog.d("load stock ai page: " + url + " finished.");
+                super.onPageFinished(view, url);
+            }
+        });
+        mStockAIWebView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public void onProgressChanged(WebView view, int newProgress) {
+                if(newProgress > 90) {
+                    mStockAIWebView.getSettings().setBlockNetworkImage(false);
+                }
+                super.onProgressChanged(view, newProgress);
+            }
+        });
+        String stockAIUrl = String.format(Locale.US, "https://stock-ai.com/tw-Dly-8-%s.php", mCode);
+        MSLog.d("load stock ai page: " + stockAIUrl);
+        mStockAIWebView.loadUrl(stockAIUrl);
+    }
+
     private void initSocialButtons() {
         mVoteTopBlock = findViewById(R.id.the_most_top_block);
+        mBottomFixedBlock = findViewById(R.id.the_most_bottom_block);
         mButtonRaise = findViewById(R.id.vote_up_btn);
         mButtonFall = findViewById(R.id.vote_down_btn);
         mResultTextView = findViewById(R.id.vote_result_btn);
+
         setVoteButtons();
 
         final NestedScrollView nestedScrollView = findViewById(R.id.body_scroll_view);
@@ -547,12 +593,9 @@ public class StockActivity extends AppCompatActivity {
         moreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(WebViewActivity.generateWebViewActivityIntent(
-                        StockActivity.this,
-                        0,
-                        mStockName + " " + mCode,
-                        String.format(Locale.US, "https://stock-ai.com/tw-Dly-8-%s.php", mCode)));
-                overridePendingTransition(R.anim.enter, R.anim.stop);
+                mStockAIWebView.setVisibility(View.VISIBLE);
+                mBottomFixedBlock.setVisibility(View.GONE);
+                mIsStockAIOpen = true;
             }
         });
 

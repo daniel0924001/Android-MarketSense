@@ -92,7 +92,6 @@ public class StockListPlacer {
                     }
                 } else {
                     mStockArrayList = new ArrayList<>(stockArrayList);
-                    MSLog.d("set all stock price");
 
                     // There are four fragments in PredictionScreenSlidePagerAdapter
                     // 1st: sort by prediction confidence in descending
@@ -151,6 +150,7 @@ public class StockListPlacer {
                 ClientData.getInstance(mActivity).setRealTimeStockPriceHashMap(stock);
             }
         }
+        MSLog.i("refresh real time stock price");
     }
 
     private boolean isRetry() {

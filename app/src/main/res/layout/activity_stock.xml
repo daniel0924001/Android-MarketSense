@@ -689,42 +689,62 @@
     </android.support.constraint.ConstraintLayout>
 
     <!-- the most bottom part (fixed) -->
-    <Button
-        android:id="@+id/btn_write_comment"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:background="@drawable/btn_rectangle_white"
-        android:paddingStart="87dp"
-        android:paddingEnd="87dp"
-        android:text="@string/title_publish_comment"
-        android:textColor="@color/colorPrimary"
-        android:textSize="16sp"
-        android:drawableStart="@drawable/ic_comment_theme_color_24px"
-        android:drawablePadding="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/bottom_fixed_divider"/>
-
-    <android.support.constraint.Guideline
-        android:id="@+id/bottom_fixed_divider"
-        android:layout_width="wrap_content"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/the_most_bottom_block"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.85"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-    <Button
-        android:id="@+id/btn_go_up"
+        <Button
+            android:id="@+id/btn_write_comment"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:background="@drawable/btn_rectangle_white"
+            android:paddingStart="87dp"
+            android:paddingEnd="87dp"
+            android:text="@string/title_publish_comment"
+            android:textColor="@color/colorPrimary"
+            android:textSize="16sp"
+            android:drawableStart="@drawable/ic_comment_theme_color_24px"
+            android:drawablePadding="4dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/bottom_fixed_divider"/>
+
+        <android.support.constraint.Guideline
+            android:id="@+id/bottom_fixed_divider"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.85"/>
+
+        <Button
+            android:id="@+id/btn_go_up"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:background="@drawable/btn_rectangle_theme_color"
+            android:text="@string/title_go_top"
+            android:textColor="@color/text_white"
+            android:textSize="12sp"
+            android:gravity="center_horizontal|top"
+            android:paddingTop="5dp"
+            android:drawableTop="@drawable/ic_arrow_upward_white_24px"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/bottom_fixed_divider"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+    <com.idroi.marketsense.NewsWebView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/more_webview"
         android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:background="@drawable/btn_rectangle_theme_color"
-        android:text="@string/title_go_top"
-        android:textColor="@color/text_white"
-        android:textSize="12sp"
-        android:gravity="center_horizontal|top"
-        android:paddingTop="5dp"
-        android:drawableTop="@drawable/ic_arrow_upward_white_24px"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/bottom_fixed_divider"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone"/>
 
 </android.support.constraint.ConstraintLayout>

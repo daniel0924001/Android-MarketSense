@@ -78,6 +78,7 @@ public class ClientData {
     private ClientData(Context context) {
         mContext = context.getApplicationContext();
         mUserProfile = new UserProfile(context, true);
+        mRealTimePricesHashMap = new HashMap<>();
 
         loadAllStocksListTask(true);
     }
@@ -102,9 +103,8 @@ public class ClientData {
         }
     }
 
-    public void setAllStockPriceHashMap(HashMap<String, Stock> stocksHashMap) {
-        MSLog.d("set real time stock price success: " + stocksHashMap.size());
-        mRealTimePricesHashMap = stocksHashMap;
+    public void setRealTimeStockPriceHashMap(Stock stock) {
+        mRealTimePricesHashMap.put(stock.getCode(), stock);
     }
 
     public void setUserToken(String token) {

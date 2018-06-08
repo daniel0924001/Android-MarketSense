@@ -8,11 +8,11 @@ import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.UserProfile;
+import com.idroi.marketsense.request.StockRequest;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Objects;
 
 import static com.idroi.marketsense.fragments.StockListFragment.ACTUAL_LOSE_ID;
@@ -43,7 +43,6 @@ public class StockListPlacer {
     private int mCurrentRetries = 0;
 
     private ArrayList<Stock> mStockArrayList;
-    private HashMap<String, Stock> mRealTimePricesHashMap;
 
     private MarketSenseStockFetcher.MarketSenseStockNetworkListener mMarketSenseStockNetworkListener;
     private StockListListener mStockListListener;
@@ -57,7 +56,7 @@ public class StockListPlacer {
 
     private Handler mRefreshHandler;
     private Runnable mRefreshRunnable;
-    private static final int REFRESH_TIME = 5 * 60 * 1000;
+    private static final int REFRESH_TIME = 2 * 60 * 1000;
     private boolean mHasPostRefresh;
 
     public StockListPlacer(Activity activity, int taskId, int field, int direction) {
@@ -71,51 +70,44 @@ public class StockListPlacer {
             @Override
             public void onStockListLoad(ArrayList<Stock> stockArrayList, boolean isAutoRefresh) {
 
-                if(isAutoRefresh) {
+                if (mStockArrayList != null) {
+                    mStockArrayList.clear();
+                }
 
-                    updateRealTimeStockPrices(stockArrayList);
+                updateRealTimeStockPrices(stockArrayList);
 
-                } else {
+                if (mTask == SELF_CHOICES_ID) {
 
-                    if (mStockArrayList != null) {
-                        mStockArrayList.clear();
-                    }
+                    ArrayList<Stock> cloneStockArrayList = new ArrayList<>(stockArrayList);
 
-                    if (mTask == SELF_CHOICES_ID) {
-
-                        ArrayList<Stock> cloneStockArrayList = new ArrayList<>(stockArrayList);
-
-                        mStockArrayList = new ArrayList<>();
-                        UserProfile userProfile = ClientData.getInstance().getUserProfile();
-                        MSLog.d("favorite stocks: " + userProfile.getFavoriteStocksString());
-                        for (int i = 0; i < cloneStockArrayList.size(); i++) {
-                            Stock stock = cloneStockArrayList.get(i);
-                            String code = cloneStockArrayList.get(i).getCode();
-                            if (userProfile.isFavoriteStock(code)) {
-                                mStockArrayList.add(stock);
-                            }
+                    mStockArrayList = new ArrayList<>();
+                    UserProfile userProfile = ClientData.getInstance().getUserProfile();
+                    MSLog.d("favorite stocks: " + userProfile.getFavoriteStocksString());
+                    for (int i = 0; i < cloneStockArrayList.size(); i++) {
+                        Stock stock = cloneStockArrayList.get(i);
+                        String code = cloneStockArrayList.get(i).getCode();
+                        if (userProfile.isFavoriteStock(code)) {
+                            mStockArrayList.add(stock);
                         }
-                    } else {
-                        mStockArrayList = new ArrayList<>(stockArrayList);
-                        mRealTimePricesHashMap = new HashMap<>();
-                        MSLog.d("set all stock price");
-
-                        // There are four fragments in PredictionScreenSlidePagerAdapter
-                        // 1st: sort by prediction confidence in descending
-                        // 2nd: sort by prediction confidence in ascending
-                        // 3rd: sort by stock difference in descending
-                        // 4th: sort by stock difference in ascending
-                        // 5th: filter by user favorite stock array
-                        updateRealTimeStockPrices(mStockArrayList);
                     }
+                } else {
+                    mStockArrayList = new ArrayList<>(stockArrayList);
+                    MSLog.d("set all stock price");
 
-                    Comparator<Stock> comparator = genComparator(mSortedField, mSortedDirection);
-                    Collections.sort(mStockArrayList, comparator);
+                    // There are four fragments in PredictionScreenSlidePagerAdapter
+                    // 1st: sort by prediction confidence in descending
+                    // 2nd: sort by prediction confidence in ascending
+                    // 3rd: sort by stock difference in descending
+                    // 4th: sort by stock difference in ascending
+                    // 5th: filter by user favorite stock array
 
-                    if (mStockListListener != null) {
-                        mStockListListener.onStockListLoaded();
-                    }
+                }
 
+                Comparator<Stock> comparator = genComparator(mSortedField, mSortedDirection);
+                Collections.sort(mStockArrayList, comparator);
+
+                if (mStockListListener != null) {
+                    mStockListListener.onStockListLoaded();
                 }
 
                 if(!mHasPostRefresh) {
@@ -146,6 +138,7 @@ public class StockListPlacer {
                 mHasPostRefresh = false;
                 if(mMarketSenseStockFetcher != null) {
                     MSLog.d("[stock price refresh]");
+                    mNetworkUrl = StockRequest.queryStockList(mActivity, true);
                     mMarketSenseStockFetcher.makeRequest(mNetworkUrl, null, true);
                 }
             }
@@ -153,24 +146,11 @@ public class StockListPlacer {
     }
 
     private void updateRealTimeStockPrices(ArrayList<Stock> stockPrices) {
-        if(mRealTimePricesHashMap == null) {
-            return;
-        }
-
         if(stockPrices != null) {
             for (Stock stock : stockPrices) {
-                mRealTimePricesHashMap.put(stock.getCode(), stock);
-
-//                // TODO: only for debug
-//                if(mRealTimePricesHashMap.get(stock.getCode()) != null) {
-//                    Stock stock1 = mRealTimePricesHashMap.get(stock.getCode());
-//                    if(!Objects.equals(stock1.getPrice(), stock.getPrice())) {
-//                        MSLog.e("price different: " + stock1.getPrice() + ", " + stock.getPrice());
-//                    }
-//                }
+                ClientData.getInstance(mActivity).setRealTimeStockPriceHashMap(stock);
             }
         }
-        ClientData.getInstance(mActivity).setAllStockPriceHashMap(mRealTimePricesHashMap);
     }
 
     private boolean isRetry() {
@@ -226,10 +206,6 @@ public class StockListPlacer {
         if(mStockArrayList != null) {
             mStockArrayList.clear();
             mStockArrayList = null;
-        }
-        if(mRealTimePricesHashMap != null) {
-            mRealTimePricesHashMap.clear();
-            mRealTimePricesHashMap = null;
         }
         if(mMarketSenseStockFetcher != null) {
             mMarketSenseStockFetcher.destroy();

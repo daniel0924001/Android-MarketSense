@@ -48,6 +48,14 @@ public abstract class BaseNotificationHandler {
         sendNotification(context, pendingIntent, getTitle(), getText());
     }
 
+    protected int getImportanceScore() {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            return NotificationManager.IMPORTANCE_DEFAULT;
+        } else {
+            return 3;
+        }
+    }
+
     abstract protected String getTitle();
 
     abstract protected String getText();
@@ -72,6 +80,7 @@ public abstract class BaseNotificationHandler {
                         .setAutoCancel(true)
                         .setColor(context.getResources().getColor(R.color.colorPrimary))
                         .setContentIntent(pendingIntent)
+                        .setVibrate(new long[] {0})
                         .setOnlyAlertOnce(true);
 
         NotificationManager notificationManager =
@@ -86,7 +95,7 @@ public abstract class BaseNotificationHandler {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(channelId,
                     getChannelTitle(context),
-                    NotificationManager.IMPORTANCE_DEFAULT);
+                    getImportanceScore());
             notificationManager.createNotificationChannel(channel);
             notificationBuilder.setChannelId(channelId);
         }

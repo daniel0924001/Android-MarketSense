@@ -492,7 +492,7 @@ public class StockActivity extends AppCompatActivity {
             mNewsRecyclerView.setVisibility(View.GONE);
             noDataTextView.setVisibility(View.VISIBLE);
             noDataImageView.setVisibility(View.VISIBLE);
-            noDataTextView.setText(R.string.ops_something_wrong);
+            noDataTextView.setText(R.string.ops_something_wrong_with_no_refresh);
             noDataImageView.setImageResource(R.drawable.baseline_sentiment_dissatisfied_24px);
         } else {
             mNewsRecyclerView.setVisibility(View.VISIBLE);

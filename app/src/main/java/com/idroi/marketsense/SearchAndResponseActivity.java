@@ -131,6 +131,10 @@ public class SearchAndResponseActivity extends AppCompatActivity {
                 intent.putExtra(EXTRA_SELECTED_COMPANY_NAME_KEY, stock.getName());
                 intent.putExtra(EXTRA_SELECTED_COMPANY_CODE_KEY, stock.getCode());
                 setResult(RESULT_OK, intent);
+
+                mSearchView.clearFocus();
+                hideSoftKeyboard();
+
                 finish();
                 overridePendingTransition(0, 0);
             }

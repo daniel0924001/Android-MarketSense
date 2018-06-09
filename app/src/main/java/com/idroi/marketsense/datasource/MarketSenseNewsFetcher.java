@@ -91,9 +91,14 @@ public class MarketSenseNewsFetcher {
         requestNews(networkUrl, cacheUrl, shouldReadFromCache);
     }
 
-    private void requestNews(@NonNull ArrayList<String> networkUrls, @Nullable ArrayList<String> cacheUrls, boolean shouldReadFromCache) {
+    private void requestNews(ArrayList<String> networkUrls, @Nullable ArrayList<String> cacheUrls, boolean shouldReadFromCache) {
         final Context context = getContextOrDestroy();
         if(context == null) {
+            return;
+        }
+
+        if(networkUrls == null) {
+            MSLog.e("[ERROR]: networkUrls should not be null." );
             return;
         }
 

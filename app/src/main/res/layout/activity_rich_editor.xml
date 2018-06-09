@@ -326,6 +326,7 @@
         android:textColor="@color/marketsense_text_white"
         android:textSize="12sp"
         android:text="@string/title_comment_create"
+        android:stateListAnimator="@null"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>

@@ -51,6 +51,7 @@
         android:lineSpacingExtra="4dp"
         android:text="@string/login"
         android:background="@drawable/roundedbutton"
+        android:stateListAnimator="@null"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintRight_toRightOf="parent"

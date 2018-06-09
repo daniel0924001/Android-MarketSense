@@ -130,7 +130,6 @@ public class DateUtils {
         if (cal1 == null || cal2 == null) {
             throw new IllegalArgumentException("The dates must not be null");
         }
-        MSLog.e(cal1.toString() + " " + cal2.toString());
         if (cal1.get(Calendar.ERA) < cal2.get(Calendar.ERA)) return false;
         if (cal1.get(Calendar.ERA) > cal2.get(Calendar.ERA)) return true;
         if (cal1.get(Calendar.YEAR) < cal2.get(Calendar.YEAR)) return false;

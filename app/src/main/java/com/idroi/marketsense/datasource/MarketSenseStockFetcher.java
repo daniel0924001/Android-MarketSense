@@ -122,18 +122,28 @@ public class MarketSenseStockFetcher {
         mStockRequest = new StockRequest(Request.Method.GET, networkUrl, null, new Response.Listener<ArrayList<Stock>>() {
             @Override
             public void onResponse(ArrayList<Stock> response) {
-                mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
-                mMarketSenseStockNetworkListener.onStockListLoad(response, isAutoRefresh);
 
                 SharedPreferences.Editor editor =
                         context.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE).edit();
                 editor.putString(StockRequest.API_URL, networkUrl);
                 SharedPreferencesCompat.apply(editor);
                 MSLog.d("Stock price network query success, so we save this network url to cache: " + networkUrl);
+
+                final Context context = getContextOrDestroy();
+                if(context == null) {
+                    return;
+                }
+                mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
+                mMarketSenseStockNetworkListener.onStockListLoad(response, isAutoRefresh);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                final Context context = getContextOrDestroy();
+                if(context == null) {
+                    return;
+                }
+
                 MSLog.e("Stock Request error: " + error.getMessage(), error);
                 if(error.networkResponse != null) {
                     MSLog.e("Stock Request error: " + new String(error.networkResponse.data), error);

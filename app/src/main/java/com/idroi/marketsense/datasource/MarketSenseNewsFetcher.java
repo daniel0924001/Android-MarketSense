@@ -153,6 +153,12 @@ public class MarketSenseNewsFetcher {
         Response.Listener<ArrayList<News>> responseListener = new Response.Listener<ArrayList<News>>() {
             @Override
             public void onResponse(ArrayList<News> response) {
+                final Context context = getContextOrDestroy();
+                if(context == null) {
+                    results.clear();
+                    return;
+                }
+
                 results.addAll(response);
 
                 final int count = networkCounter.decrementAndGet();
@@ -168,6 +174,11 @@ public class MarketSenseNewsFetcher {
         Response.ErrorListener errorListener = new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                final Context context = getContextOrDestroy();
+                if(context == null) {
+                    results.clear();
+                    return;
+                }
                 onError(networkCounter, networkAnyFailures, mMarketSenseNewsNetworkListener, error);
             }
         };

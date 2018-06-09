@@ -29,6 +29,7 @@ import com.idroi.marketsense.data.StockTradeData;
 import com.idroi.marketsense.datasource.Networking;
 import com.idroi.marketsense.request.StockChartDataRequest;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -45,24 +46,36 @@ public class YahooStxChartCrawler {
         void onStxChartDataFail(final MarketSenseError marketSenseError);
     }
 
+    private static final YahooStxChartListener EMPTY_NETWORK_LISTENER = new YahooStxChartListener () {
+        @Override
+        public void onStxChartDataLoad() {
+
+        }
+
+        @Override
+        public void onStxChartDataFail(final MarketSenseError marketSenseError) {
+
+        }
+    };
+
     private LineChart mPriceLineChart;
     private BarChart mVolumeBarChart;
     private StockTradeData mStockTradeData;
     private StockChartDataRequest mStockChartDataRequest;
 
-    private Context mContext;
+    private WeakReference<Context> mContext;
     private String mCode;
     private String mName;
     private String mUrl;
     private YahooStxChartListener mYahooStxChartListener;
 
-    private int mCurrentRetryTime = 1;
+    private int mCurrentRetryTime = 0;
     private static final int MAX_RETRY_TIMES = 3;
     private Handler mHandler;
     private Runnable mRetryRunnable, mTimeoutRunnable;
 
     public YahooStxChartCrawler(Context context, String name, String code, LineChart lineChart, BarChart barChart) {
-        mContext = context;
+        mContext = new WeakReference<Context>(context);
         mCode = code;
         mName = name;
         mPriceLineChart = lineChart;
@@ -82,7 +95,10 @@ public class YahooStxChartCrawler {
                     mStockChartDataRequest = null;
                 }
                 if(isRetry()) {
-                    mHandler.post(mRetryRunnable);
+                    makeRequest(mUrl);
+                } else {
+                    resetRetryTime();
+                    mYahooStxChartListener.onStxChartDataFail(MarketSenseError.NETWORK_CONNECTION_TIMEOUT);
                 }
             }
         };
@@ -98,11 +114,16 @@ public class YahooStxChartCrawler {
     }
 
     public void renderStockChartData() {
+        final Context context = getContextOrDestroy();
+        if(context == null) {
+            return;
+        }
+
         if(mStockTradeData == null ||
                 mStockTradeData.getStockTickData() == null ||
                 mStockTradeData.getStockTickData().size() == 0) {
             MSLog.e("Stock trade data is not available.");
-            mPriceLineChart.setNoDataText(mContext.getResources().getString(R.string.no_data));
+            mPriceLineChart.setNoDataText(context.getResources().getString(R.string.no_data));
             Typeface typeface = Typeface.create("sans-serif", Typeface.NORMAL);
             mPriceLineChart.setNoDataTextTypeface(typeface);
             Paint paint = mPriceLineChart.getPaint(Chart.PAINT_INFO);
@@ -113,18 +134,18 @@ public class YahooStxChartCrawler {
             return;
         }
 
-        setData();
-        setDescription();
-        setXAxis();
-        setYAxis();
-        setTouchMarker();
+        setData(context);
+        setDescription(context);
+        setXAxis(context);
+        setYAxis(context);
+        setTouchMarker(context);
 
         mPriceLineChart.invalidate();
     }
 
-    private void setTouchMarker() {
-        StockChartMarkerView lineChartMarker = new StockChartMarkerView(mContext, R.layout.stock_price_chart_marker);
-        StockChartMarkerView barChartMarker = new StockChartMarkerView(mContext, R.layout.stock_price_chart_marker);
+    private void setTouchMarker(Context context) {
+        StockChartMarkerView lineChartMarker = new StockChartMarkerView(context, R.layout.stock_price_chart_marker);
+        StockChartMarkerView barChartMarker = new StockChartMarkerView(context, R.layout.stock_price_chart_marker);
         mPriceLineChart.setTouchEnabled(true);
         mPriceLineChart.setMarker(lineChartMarker);
         mVolumeBarChart.setTouchEnabled(true);
@@ -153,7 +174,7 @@ public class YahooStxChartCrawler {
         });
     }
 
-    private void setData() {
+    private void setData(Context context) {
         List<Entry> yPrices = new ArrayList<>();
         List<BarEntry> yVolume = new ArrayList<>();
 
@@ -170,7 +191,7 @@ public class YahooStxChartCrawler {
         }
 
         LineDataSet lineDataSet = new LineDataSet(yPrices, null);
-        lineDataSet.setColor(mContext.getResources().getColor(R.color.color_price_line));
+        lineDataSet.setColor(context.getResources().getColor(R.color.color_price_line));
         lineDataSet.setDrawValues(false);
         lineDataSet.setDrawCircles(false);
         lineDataSet.setDrawCircleHole(false);
@@ -179,37 +200,38 @@ public class YahooStxChartCrawler {
         LineData lineData = new LineData(lineDataSet);
 
         mPriceLineChart.setData(lineData);
-        mPriceLineChart.setBackgroundColor(mContext.getResources().getColor(R.color.marketsense_text_white));
+        mPriceLineChart.setBackgroundColor(context.getResources().getColor(R.color.marketsense_text_white));
         mPriceLineChart.getLegend().setEnabled(false);
 
         BarDataSet barDataSet = new BarDataSet(yVolume, null);
-        barDataSet.setColor(mContext.getResources().getColor(R.color.color_volume_line));
+        barDataSet.setColor(context.getResources().getColor(R.color.color_volume_line));
         barDataSet.setDrawValues(false);
         barDataSet.setAxisDependency(YAxis.AxisDependency.RIGHT);
         BarData barData = new BarData(barDataSet);
 
         mVolumeBarChart.setData(barData);
-        mVolumeBarChart.setBackgroundColor(mContext.getResources().getColor(R.color.marketsense_text_white));
+        mVolumeBarChart.setBackgroundColor(context.getResources().getColor(R.color.marketsense_text_white));
         mVolumeBarChart.getLegend().setEnabled(false);
     }
 
-    private void setDescription() {
+    private void setDescription(Context context) {
         Description description = mPriceLineChart.getDescription();
         description.setText(String.format(Locale.US,
-                mContext.getResources().getString(R.string.title_company_name_code_format),
+                context.getResources().getString(R.string.title_company_name_code_format),
                 mName, mCode));
         description.setTextSize(16);
-        description.setTextColor(mContext.getResources().getColor(R.color.marketsense_text_black));
+        description.setTextColor(context.getResources().getColor(R.color.marketsense_text_black));
         description.setEnabled(false);
 
         Description description1 = mVolumeBarChart.getDescription();
         description1.setEnabled(false);
     }
 
-    private void setXAxis() {
+    private void setXAxis(Context context) {
+
         XAxis xAxis = mPriceLineChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setTextColor(mContext.getResources().getColor(R.color.marketsense_text_black));
+        xAxis.setTextColor(context.getResources().getColor(R.color.marketsense_text_black));
         xAxis.setTextSize(10f);
         xAxis.setDrawAxisLine(false);
         xAxis.setDrawGridLines(true);
@@ -222,7 +244,7 @@ public class YahooStxChartCrawler {
 
         XAxis xAxisVolume = mVolumeBarChart.getXAxis();
         xAxisVolume.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxisVolume.setTextColor(mContext.getResources().getColor(R.color.marketsense_text_black));
+        xAxisVolume.setTextColor(context.getResources().getColor(R.color.marketsense_text_black));
         xAxisVolume.setTextSize(10f);
         xAxisVolume.setDrawAxisLine(false);
         xAxisVolume.setDrawGridLines(true);
@@ -233,9 +255,10 @@ public class YahooStxChartCrawler {
         xAxisVolume.setLabelCount(10, true);
     }
 
-    private void setYAxis() {
+    private void setYAxis(Context context) {
+
         YAxis yRightAxis = mPriceLineChart.getAxisRight();
-        yRightAxis.setTextColor(mContext.getResources().getColor(R.color.marketsense_text_black));
+        yRightAxis.setTextColor(context.getResources().getColor(R.color.marketsense_text_black));
         yRightAxis.setTextSize(10f);
         yRightAxis.setDrawAxisLine(false);
         yRightAxis.setDrawGridLines(true);
@@ -248,13 +271,13 @@ public class YahooStxChartCrawler {
         yRightAxis.setYOffset(-7);
 
         LimitLine limitLine = new LimitLine(mStockTradeData.getYesterdayPrice());
-        limitLine.setLineColor(mContext.getResources().getColor(R.color.marketsense_text_gray));
+        limitLine.setLineColor(context.getResources().getColor(R.color.marketsense_text_gray));
         limitLine.setLineWidth(0.8f);
         yRightAxis.addLimitLine(limitLine);
         yRightAxis.setDrawLimitLinesBehindData(true);
 
         YAxis yRightAxisVolume = mVolumeBarChart.getAxisRight();
-        yRightAxisVolume.setTextColor(mContext.getResources().getColor(R.color.colorTrendUp));
+        yRightAxisVolume.setTextColor(context.getResources().getColor(R.color.colorTrendUp));
         yRightAxisVolume.setTextSize(10f);
         yRightAxisVolume.setDrawAxisLine(false);
         yRightAxisVolume.setDrawGridLines(true);
@@ -272,6 +295,10 @@ public class YahooStxChartCrawler {
         yLeftAxisVolume.setEnabled(false);
     }
 
+    private void resetRetryTime() {
+        mCurrentRetryTime = 0;
+    }
+
     private boolean isRetry() {
         if(mCurrentRetryTime < MAX_RETRY_TIMES) {
             mCurrentRetryTime++;
@@ -281,10 +308,21 @@ public class YahooStxChartCrawler {
     }
 
     private void makeRequest(String url) {
+        final Context context = getContextOrDestroy();
+        if(context == null) {
+            return;
+        }
+
         mStockChartDataRequest = new StockChartDataRequest(url,
                 new Response.Listener<StockTradeData>() {
                     @Override
                     public void onResponse(StockTradeData response) {
+                        final Context context = getContextOrDestroy();
+                        if(context == null) {
+                            return;
+                        }
+                        resetRetryTime();
+
                         mHandler.removeCallbacks(mTimeoutRunnable);
                         mStockTradeData = response;
                         if(mYahooStxChartListener != null) {
@@ -295,6 +333,11 @@ public class YahooStxChartCrawler {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        final Context context = getContextOrDestroy();
+                        if(context == null) {
+                            return;
+                        }
+
                         MSLog.e("StockChartData Request error: " + error.getMessage(), error);
                         if(error.networkResponse != null) {
                             MSLog.e("StockChartData Request error: " + new String(error.networkResponse.data), error);
@@ -302,19 +345,44 @@ public class YahooStxChartCrawler {
                         mHandler.removeCallbacks(mTimeoutRunnable);
                         if(isRetry()) {
                             mHandler.post(mRetryRunnable);
-                        }
-
-                        if(mYahooStxChartListener != null) {
-                            if (error instanceof MarketSenseNetworkError) {
-                                MarketSenseNetworkError networkError = (MarketSenseNetworkError) error;
-                                mYahooStxChartListener.onStxChartDataFail(networkError.getReason());
-                            } else {
-                                mYahooStxChartListener.onStxChartDataFail(MarketSenseError.NETWORK_VOLLEY_ERROR);
+                        } else {
+                            resetRetryTime();
+                            if (mYahooStxChartListener != null) {
+                                if (error instanceof MarketSenseNetworkError) {
+                                    MarketSenseNetworkError networkError = (MarketSenseNetworkError) error;
+                                    mYahooStxChartListener.onStxChartDataFail(networkError.getReason());
+                                } else {
+                                    mYahooStxChartListener.onStxChartDataFail(MarketSenseError.NETWORK_VOLLEY_ERROR);
+                                }
                             }
                         }
                     }
                 });
-        mHandler.postDelayed(mTimeoutRunnable, 3000);
-        Networking.getRequestQueue(mContext).add(mStockChartDataRequest);
+        mHandler.postDelayed(mTimeoutRunnable, 5000);
+        Networking.getRequestQueue(context).add(mStockChartDataRequest);
+    }
+
+    private void destroy() {
+        mContext.clear();
+        if(mStockChartDataRequest != null) {
+            mStockChartDataRequest.cancel();
+            mStockChartDataRequest = null;
+        }
+        mYahooStxChartListener = EMPTY_NETWORK_LISTENER;
+        if(mHandler != null) {
+            mHandler.removeCallbacks(mRetryRunnable);
+            mHandler.removeCallbacks(mTimeoutRunnable);
+        }
+    }
+
+    private Context getContextOrDestroy() {
+        final Context context = mContext.get();
+        if (context == null) {
+            destroy();
+            MSLog.d("Weak reference to Context in YahooStxChartCrawler became null. " +
+                    "This instance of YahooStxChartCrawler is destroyed and " +
+                    "no more requests will be processed.");
+        }
+        return context;
     }
 }

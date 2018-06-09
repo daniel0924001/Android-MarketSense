@@ -40,6 +40,11 @@ public class CommentsPlacer {
         mMarketSenseCommentNetworkListener = new MarketSenseCommentsFetcher.MarketSenseCommentsNetworkListener() {
             @Override
             public void onCommentsLoad(CommentAndVote commentAndVote) {
+
+                if(mMarketSenseCommentsFetcher == null) {
+                    return;
+                }
+
                 if(mCommentArrayList != null) {
                     mCommentArrayList.clear();
                 }
@@ -58,6 +63,11 @@ public class CommentsPlacer {
 
             @Override
             public void onCommentsFail(MarketSenseError marketSenseError) {
+
+                if(mMarketSenseCommentsFetcher == null) {
+                    return;
+                }
+
                 increaseRetryTime();
                 if(isRetry()) {
                     mMarketSenseCommentsFetcher.makeRequest(mUrl);

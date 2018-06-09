@@ -223,6 +223,8 @@ public class NewsRequest extends Request<ArrayList<News>> {
             // user maybe logout
             return null;
         }
+        long now = System.currentTimeMillis() / 1000;
+        url.append(PARAM_GTS).append(now - 7 * 86400);
 
         for (int i = 0; i < favoriteStocks.size(); i++) {
             url.append(PARAM_KEYWORD_ARRAY)

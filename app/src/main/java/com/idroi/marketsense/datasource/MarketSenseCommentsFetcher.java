@@ -87,12 +87,22 @@ public class MarketSenseCommentsFetcher {
         mSingleNewsRequest = new SingleNewsRequest(Request.Method.GET, url, new Response.Listener<CommentAndVote>() {
             @Override
             public void onResponse(CommentAndVote response) {
+                final Context context = getContextOrDestroy();
+                if(context == null) {
+                    return;
+                }
+
                 mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
                 mMarketSenseCommentsNetworkListener.onCommentsLoad(response);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                final Context context = getContextOrDestroy();
+                if(context == null) {
+                    return;
+                }
+
                 MSLog.e("Comments Request error: " + error.getMessage(), error);
                 if(error.networkResponse != null) {
                     MSLog.e("Comments Request error: " + new String(error.networkResponse.data), error);

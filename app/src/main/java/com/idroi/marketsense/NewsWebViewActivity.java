@@ -22,6 +22,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -95,6 +96,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
     private SimpleDraweeView mNewsWebViewMiddleImageView;
     private CommentsRecyclerViewAdapter mCommentsRecyclerViewAdapter;
     private RecyclerView mCommentRecyclerView;
+    private ProgressBar mLoadingProgressBar, mLoadingProgressBarOriginal;
 
     private Button mReadOriginalButton, mReadMiddleButton,
             mMiddleRaiseBtn, mMiddleFallBtn, mMiddleCommentBtn, mMiddleSendFirstBtn,
@@ -108,6 +110,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
 
     public static final int sPostDelayMilliSeconds = 1200;
     private boolean mIsOriginalVisible = false;
+    private boolean mIsOriginalCompleted = false;
     private boolean mTryToLoadOtherWebViewFlag = false;
     private Handler mHandler = new Handler();
     private Runnable mLoadOriginalWebViewRunnable = new Runnable() {
@@ -350,6 +353,9 @@ public class NewsWebViewActivity extends AppCompatActivity {
             mNewsWebViewOriginal.setVisibility(View.GONE);
             mUpperBlock.setVisibility(View.VISIBLE);
             setOriginalBtnVisibility(View.GONE);
+            if(mLoadingProgressBarOriginal != null) {
+                mLoadingProgressBarOriginal.setVisibility(View.GONE);
+            }
         } else {
             // show original webview
             mIsOriginalVisible = true;
@@ -357,6 +363,9 @@ public class NewsWebViewActivity extends AppCompatActivity {
             mNewsWebViewOriginal.setVisibility(View.VISIBLE);
             mUpperBlock.setVisibility(View.GONE);
             setOriginalBtnVisibility(View.VISIBLE);
+            if(!mIsOriginalCompleted && mLoadingProgressBarOriginal != null) {
+                mLoadingProgressBarOriginal.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -505,6 +514,8 @@ public class NewsWebViewActivity extends AppCompatActivity {
         mNewsWebViewMiddle.getSettings().setAppCacheEnabled(true);
         mNewsWebViewMiddle.getSettings().setBlockNetworkImage(true);
 
+        mLoadingProgressBar = findViewById(R.id.loading_progress_bar_1);
+        mLoadingProgressBarOriginal = findViewById(R.id.loading_progress_bar_2);
         final ViewSkeletonScreen skeletonScreen =
                 Skeleton.bind(mNewsWebViewMiddle).shimmer(false)
                         .load(R.layout.skeleton_webview).show();
@@ -515,6 +526,9 @@ public class NewsWebViewActivity extends AppCompatActivity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
+                if(mLoadingProgressBar != null) {
+                    mLoadingProgressBar.setVisibility(View.GONE);
+                }
                 skeletonScreen.hide();
                 super.onPageFinished(view, url);
             }
@@ -552,6 +566,15 @@ public class NewsWebViewActivity extends AppCompatActivity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 return false;
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                mIsOriginalCompleted = true;
+                if(mLoadingProgressBarOriginal != null) {
+                    mLoadingProgressBarOriginal.setVisibility(View.GONE);
+                }
+                super.onPageFinished(view, url);
             }
         });
 

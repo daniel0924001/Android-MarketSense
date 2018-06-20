@@ -90,6 +90,16 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
 
+                <ProgressBar
+                    android:id="@+id/loading_progress_bar_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="true"
+                    app:layout_constraintTop_toTopOf="@id/stock_chart_price"
+                    app:layout_constraintBottom_toBottomOf="@id/stock_chart_volume"
+                    app:layout_constraintStart_toStartOf="@id/stock_chart_price"
+                    app:layout_constraintEnd_toEndOf="@id/stock_chart_price" />
+
                 <Button
                     android:id="@+id/more_information_btn"
                     android:layout_width="0dp"
@@ -748,6 +758,17 @@
         android:id="@+id/more_webview"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone"/>
+
+    <ProgressBar
+        android:id="@+id/loading_progress_bar_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

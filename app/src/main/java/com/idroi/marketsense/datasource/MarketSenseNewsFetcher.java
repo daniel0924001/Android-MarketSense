@@ -112,7 +112,7 @@ public class MarketSenseNewsFetcher {
         // These Atomics are only accessed on the main thread.
         // We use Atomics here so we can change their values while keeping a reference for the inner class.
         final AtomicInteger networkCounter = new AtomicInteger(networkUrls.size());
-        final AtomicBoolean networkAnyFailures = new AtomicBoolean(false);
+        final AtomicBoolean networkAnySuccesses = new AtomicBoolean(false);
         int cacheCounter = cacheUrls.size();
 
         if(shouldReadFromCache) {
@@ -162,9 +162,11 @@ public class MarketSenseNewsFetcher {
                 results.addAll(response);
 
                 final int count = networkCounter.decrementAndGet();
+                networkAnySuccesses.set(true);
                 MSLog.i("News Request success and remain: " + count);
 
-                if(count == 0 && !networkAnyFailures.get()){
+                if(count == 0 && networkAnySuccesses.get()){
+                    MSLog.i("News Request success");
                     mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
                     mMarketSenseNewsNetworkListener.onNewsLoad(results, false);
                 }
@@ -179,7 +181,7 @@ public class MarketSenseNewsFetcher {
                     results.clear();
                     return;
                 }
-                onError(networkCounter, networkAnyFailures, mMarketSenseNewsNetworkListener, error);
+                onError(networkCounter, networkAnySuccesses, results, error);
             }
         };
 
@@ -218,25 +220,30 @@ public class MarketSenseNewsFetcher {
         }
     }
 
-    private void onError(final AtomicInteger imageCounter,
-                                final AtomicBoolean anyFailures,
-                                final MarketSenseNewsNetworkListener networkListener,
+    private void onError(final AtomicInteger networkCounter,
+                                final AtomicBoolean anySuccesses,
+                                ArrayList<News> results,
                                 final VolleyError error){
 
-        boolean anyPreviousErrors = anyFailures.getAndSet(true);
-        imageCounter.decrementAndGet();
-        if(!anyPreviousErrors){
-
-            MSLog.e("News Request error: " + error.getMessage(), error);
-            if(error.networkResponse != null) {
-                MSLog.e("News Request error: " + new String(error.networkResponse.data), error);
-            }
-            mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
-            if(error instanceof MarketSenseNetworkError) {
-                MarketSenseNetworkError networkError = (MarketSenseNetworkError) error;
-                mMarketSenseNewsNetworkListener.onNewsFail(networkError.getReason());
+        final int count = networkCounter.decrementAndGet();
+        MSLog.i("News Request error and remain: " + count);
+        if(count == 0){
+            if(!anySuccesses.get()) {
+                MSLog.e("News Request error: " + error.getMessage(), error);
+                if (error.networkResponse != null) {
+                    MSLog.e("News Request error: " + new String(error.networkResponse.data), error);
+                }
+                mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
+                if (error instanceof MarketSenseNetworkError) {
+                    MarketSenseNetworkError networkError = (MarketSenseNetworkError) error;
+                    mMarketSenseNewsNetworkListener.onNewsFail(networkError.getReason());
+                } else {
+                    mMarketSenseNewsNetworkListener.onNewsFail(MarketSenseError.NETWORK_VOLLEY_ERROR);
+                }
             } else {
-                mMarketSenseNewsNetworkListener.onNewsFail(MarketSenseError.NETWORK_VOLLEY_ERROR);
+                MSLog.i("News Request success");
+                mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
+                mMarketSenseNewsNetworkListener.onNewsLoad(results, false);
             }
         }
     }

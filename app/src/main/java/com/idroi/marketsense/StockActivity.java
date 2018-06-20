@@ -16,11 +16,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -92,6 +92,8 @@ public class StockActivity extends AppCompatActivity {
 
     private YahooStxChartCrawler mYahooStxChartCrawler;
     private ViewSkeletonScreen mSkeletonScreen;
+    private ProgressBar mLoadingProgressBar, mLoadingProgressBarMore;
+    private boolean mIsMoreLoadFinished = false;
     private String mStockName;
     private String mCode;
     private String mPrice, mDiffNum, mDiffPercentage;
@@ -143,6 +145,9 @@ public class StockActivity extends AppCompatActivity {
         if(mIsStockAIOpen) {
             mStockAIWebView.setVisibility(View.GONE);
             mBottomFixedBlock.setVisibility(View.VISIBLE);
+            if(mLoadingProgressBarMore != null) {
+                mLoadingProgressBarMore.setVisibility(View.GONE);
+            }
             mIsStockAIOpen = false;
         } else {
             super.onBackPressed();
@@ -234,6 +239,10 @@ public class StockActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 MSLog.d("load stock ai page: " + url + " finished.");
+                mIsMoreLoadFinished = true;
+                if(mLoadingProgressBarMore != null) {
+                    mLoadingProgressBarMore.setVisibility(View.GONE);
+                }
                 super.onPageFinished(view, url);
             }
         });
@@ -585,6 +594,9 @@ public class StockActivity extends AppCompatActivity {
 
     private void initStockChart() {
 
+        mLoadingProgressBar = findViewById(R.id.loading_progress_bar_1);
+        mLoadingProgressBarMore = findViewById(R.id.loading_progress_bar_2);
+
         TextView priceTextView = findViewById(R.id.stock_price_tv);
         TextView diffTextView = findViewById(R.id.stock_diff_tv);
         String format = getResources().getString(R.string.title_diff_format);
@@ -613,6 +625,9 @@ public class StockActivity extends AppCompatActivity {
                 mStockAIWebView.setVisibility(View.VISIBLE);
                 mBottomFixedBlock.setVisibility(View.GONE);
                 mIsStockAIOpen = true;
+                if(mLoadingProgressBarMore != null && !mIsMoreLoadFinished) {
+                    mLoadingProgressBarMore.setVisibility(View.VISIBLE);
+                }
             }
         });
 
@@ -625,17 +640,22 @@ public class StockActivity extends AppCompatActivity {
             public void onStxChartDataLoad() {
                 mYahooStxChartCrawler.renderStockChartData();
                 mSkeletonScreen.hide();
+                if(mLoadingProgressBar != null) {
+                    mLoadingProgressBar.setVisibility(View.GONE);
+                }
             }
 
             @Override
             public void onStxChartDataFail(MarketSenseError marketSenseError) {
                 mYahooStxChartCrawler.renderStockChartData();
                 mSkeletonScreen.hide();
+                if(mLoadingProgressBar != null) {
+                    mLoadingProgressBar.setVisibility(View.GONE);
+                }
                 MSLog.e("onStxChartDataFail: " + marketSenseError.toString());
             }
         });
         mYahooStxChartCrawler.loadStockChartData();
-
         mSkeletonScreen = Skeleton.bind(lineChart)
                 .shimmer(false)
                 .load(R.layout.skeleton_webview)

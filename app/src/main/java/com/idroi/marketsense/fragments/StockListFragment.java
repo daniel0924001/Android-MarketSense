@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.ethanhua.skeleton.RecyclerViewSkeletonScreen;
@@ -73,6 +74,7 @@ public class StockListFragment extends Fragment {
     private TextView mNoDataTextView;
     private StockListRecyclerAdapter mStockListRecyclerAdapter;
     private RecyclerViewSkeletonScreen mSkeletonScreen;
+    private ProgressBar mLoadingProgressBar;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private int mTaskId;
 
@@ -110,6 +112,7 @@ public class StockListFragment extends Fragment {
         mStockListRecyclerAdapter = new StockListRecyclerAdapter(getActivity(), mTaskId, SORT_BY_DIFF, SORT_DOWNWARD);
         mRecyclerView.setAdapter(mStockListRecyclerAdapter);
 
+        mLoadingProgressBar = view.findViewById(R.id.loading_progress_bar);
         mSkeletonScreen = Skeleton.bind(mRecyclerView)
                 .adapter(mStockListRecyclerAdapter)
                 .load(R.layout.layout_default_item_skeleton)
@@ -145,6 +148,9 @@ public class StockListFragment extends Fragment {
                 if(mSkeletonScreen != null) {
                     mSkeletonScreen.hide();
                 }
+                if(mLoadingProgressBar != null) {
+                    mLoadingProgressBar.setVisibility(View.GONE);
+                }
                 if(mSwipeRefreshLayout != null) {
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
@@ -155,6 +161,9 @@ public class StockListFragment extends Fragment {
             public void onStockListEmpty() {
                 if(mSkeletonScreen != null) {
                     mSkeletonScreen.hide();
+                }
+                if(mLoadingProgressBar != null) {
+                    mLoadingProgressBar.setVisibility(View.GONE);
                 }
                 if(mSwipeRefreshLayout != null) {
                     mSwipeRefreshLayout.setRefreshing(false);

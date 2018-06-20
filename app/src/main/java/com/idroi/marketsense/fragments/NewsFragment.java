@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.ethanhua.skeleton.RecyclerViewSkeletonScreen;
@@ -65,6 +66,7 @@ public class NewsFragment extends Fragment {
     private NewsRecyclerAdapter mNewsRecyclerAdapter;
     private RecyclerViewSkeletonScreen mSkeletonScreen;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private ProgressBar mLoadingProgressBar;
 
     private int mTaskId;
     private UserProfile.UserProfileChangeListener mUserProfileChangeListener;
@@ -76,7 +78,7 @@ public class NewsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         final View view = inflater.inflate(R.layout.news_fragment, container, false);
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.news_recycler_view);
+        mRecyclerView = view.findViewById(R.id.news_recycler_view);
         mSwipeRefreshLayout = view.findViewById(R.id.swipe_to_refresh);
         mNoDataImageView = view.findViewById(R.id.no_news_iv);
         mNoDataRefreshLayout = view.findViewById(R.id.no_data_block);
@@ -95,9 +97,10 @@ public class NewsFragment extends Fragment {
         mNewsRecyclerAdapter.setNewsLayoutType(NEWS_SINGLE_LAYOUT);
         mRecyclerView.setAdapter(mNewsRecyclerAdapter);
 
+        mLoadingProgressBar = view.findViewById(R.id.loading_progress_bar);
         mSkeletonScreen = Skeleton.bind(mRecyclerView)
                 .adapter(mNewsRecyclerAdapter)
-                .load(R.layout.layout_default_item_skeleton)
+                .load(R.layout.skeleton_news_list)
                 .shimmer(false).show();
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -134,6 +137,9 @@ public class NewsFragment extends Fragment {
                 if(mSkeletonScreen != null) {
                     mSkeletonScreen.hide();
                 }
+                if(mLoadingProgressBar != null) {
+                    mLoadingProgressBar.setVisibility(View.GONE);
+                }
                 if(mSwipeRefreshLayout != null) {
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
@@ -144,6 +150,9 @@ public class NewsFragment extends Fragment {
             public void onNewsEmpty() {
                 if(mSkeletonScreen != null) {
                     mSkeletonScreen.hide();
+                }
+                if(mLoadingProgressBar != null) {
+                    mLoadingProgressBar.setVisibility(View.GONE);
                 }
                 if(mSwipeRefreshLayout != null) {
                     mSwipeRefreshLayout.setRefreshing(false);

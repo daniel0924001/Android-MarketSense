@@ -350,6 +350,6 @@ public class SettingActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        overridePendingTransition(R.anim.stop, R.anim.right_to_left);
+        overridePendingTransition(R.anim.stop, R.anim.left_to_right_leave);
     }
 }

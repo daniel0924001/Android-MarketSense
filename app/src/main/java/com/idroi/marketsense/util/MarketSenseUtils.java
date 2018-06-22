@@ -2,6 +2,7 @@ package com.idroi.marketsense.util;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -11,6 +12,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.TextView;
 
 import static android.Manifest.permission.ACCESS_NETWORK_STATE;
@@ -72,5 +76,26 @@ public class MarketSenseUtils {
         } else {
             tv.setText(Html.fromHtml(string), TextView.BufferType.SPANNABLE);
         }
+    }
+
+    /**
+     * Used to get deep child offset.
+     * <p/>
+     * 1. We need to scroll to child in scrollview, but the child may not the direct child to scrollview.
+     * 2. So to get correct child position to scroll, we need to iterate through all of its parent views till the main parent.
+     *
+     * @param mainParent        Main Top parent.
+     * @param parent            Parent.
+     * @param child             Child.
+     * @param accumulatedOffset Accumulated Offset.
+     */
+    public static void getDeepChildOffset(final ViewGroup mainParent, final ViewParent parent, final View child, final Point accumulatedOffset) {
+        ViewGroup parentGroup = (ViewGroup) parent;
+        accumulatedOffset.x += child.getLeft();
+        accumulatedOffset.y += child.getTop();
+        if (parentGroup.equals(mainParent)) {
+            return;
+        }
+        getDeepChildOffset(mainParent, parentGroup.getParent(), parentGroup, accumulatedOffset);
     }
 }

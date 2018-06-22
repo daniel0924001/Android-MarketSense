@@ -3,6 +3,7 @@ package com.idroi.marketsense;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -13,6 +14,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.WebChromeClient;
@@ -122,6 +124,7 @@ public class StockActivity extends AppCompatActivity {
     private LoginButton mFBLoginBtn;
     private ImageView mAddFavorite;
     private ConstraintLayout mSelectorComment, mSelectorNews;
+    private NestedScrollView mNestedScrollView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -151,6 +154,7 @@ public class StockActivity extends AppCompatActivity {
             mIsStockAIOpen = false;
         } else {
             super.onBackPressed();
+            mUserProfile.deleteUserProfileChangeListener(mUserProfileChangeListener);
             overridePendingTransition(R.anim.stop, R.anim.right_to_left);
         }
     }
@@ -269,12 +273,11 @@ public class StockActivity extends AppCompatActivity {
 
         setVoteButtons();
 
-        final NestedScrollView nestedScrollView = findViewById(R.id.body_scroll_view);
         Button buttonGoUp = findViewById(R.id.btn_go_up);
         buttonGoUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                nestedScrollView.scrollTo(0, 0);
+                mNestedScrollView.scrollTo(0, 0);
             }
         });
 
@@ -407,21 +410,71 @@ public class StockActivity extends AppCompatActivity {
         mSelectorComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                commentBlock.setVisibility(View.VISIBLE);
-                newsBlock.setVisibility(View.GONE);
-                mSelectorComment.setBackground(getDrawable(R.drawable.border_selector_selected));
-                mSelectorNews.setBackground(getDrawable(R.drawable.border_selector));
+                chooseBottomBlock(0, commentBlock, newsBlock);
             }
         });
         mSelectorNews.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                chooseBottomBlock(1, commentBlock, newsBlock);
+            }
+        });
+
+        final DisplayMetrics metrics = getResources().getDisplayMetrics();
+        mNestedScrollView = findViewById(R.id.body_scroll_view);
+        final ConstraintLayout voteInformationBlock = findViewById(R.id.stock_people_vote_information);
+        final ConstraintLayout newsInformationBlock = findViewById(R.id.stock_news_vote_information);
+        voteInformationBlock.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chooseBottomBlock(0, commentBlock, newsBlock);
+                mNestedScrollView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Point childOffset = new Point();
+                        MarketSenseUtils.getDeepChildOffset(mNestedScrollView, mSelectorComment.getParent(), mSelectorComment, childOffset);
+                        if(mUserProfile.canVoteAgain(mCode)) {
+                            childOffset.y = childOffset.y - (int)(56 * metrics.density);
+                        }
+                        mNestedScrollView.scrollTo(0, childOffset.y);
+                    }
+                });
+            }
+        });
+        newsInformationBlock.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chooseBottomBlock(1, commentBlock, newsBlock);
+                mNestedScrollView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Point childOffset = new Point();
+                        MarketSenseUtils.getDeepChildOffset(mNestedScrollView, mSelectorNews.getParent(), mSelectorNews, childOffset);
+                        if(mUserProfile.canVoteAgain(mCode)) {
+                            childOffset.y = childOffset.y - (int)(56 * metrics.density);
+                        }
+                        mNestedScrollView.scrollTo(0, childOffset.y);
+                    }
+                });
+            }
+        });
+    }
+
+    private void chooseBottomBlock(int position, ConstraintLayout commentBlock, ConstraintLayout newsBlock) {
+        switch (position) {
+            case 0:
+                commentBlock.setVisibility(View.VISIBLE);
+                newsBlock.setVisibility(View.GONE);
+                mSelectorComment.setBackground(getDrawable(R.drawable.border_selector_selected));
+                mSelectorNews.setBackground(getDrawable(R.drawable.border_selector));
+                break;
+            case 1:
                 commentBlock.setVisibility(View.GONE);
                 newsBlock.setVisibility(View.VISIBLE);
                 mSelectorComment.setBackground(getDrawable(R.drawable.border_selector));
                 mSelectorNews.setBackground(getDrawable(R.drawable.border_selector_selected));
-            }
-        });
+                break;
+        }
     }
 
     private void initNews() {
@@ -447,7 +500,6 @@ public class StockActivity extends AppCompatActivity {
                 int totalItemCount = layoutManager.getItemCount();
                 int pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
                 if (pastVisibleItems + visibleItemCount >= totalItemCount) {
-                    MSLog.e("expand 7");
                     mNewsRecyclerAdapter.expand(7);
                 }
             }

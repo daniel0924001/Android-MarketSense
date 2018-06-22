@@ -264,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(View view) {
                         Intent intent = new Intent(MainActivity.this, SettingActivity.class);
                         startActivityForResult(intent, sSettingRequestCode);
-                        overridePendingTransition(R.anim.enter, R.anim.stop);
+                        overridePendingTransition(R.anim.left_to_right, R.anim.stop);
                     }
                 });
                 setAvatarImage();

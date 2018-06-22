@@ -108,7 +108,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
     private CallbackManager mFBCallbackManager;
     private boolean mLastClickedButtonIsComment;
 
-    public static final int sPostDelayMilliSeconds = 1200;
+    public static final int sPostDelayMilliSeconds = 2000;
     private boolean mIsOriginalVisible = false;
     private boolean mIsOriginalCompleted = false;
     private boolean mTryToLoadOtherWebViewFlag = false;

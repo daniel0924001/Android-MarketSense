@@ -109,7 +109,7 @@ public class StockListFragment extends Fragment {
         }
         mNoDataTextView = view.findViewById(R.id.no_stock_tv);
 
-        mStockListRecyclerAdapter = new StockListRecyclerAdapter(getActivity(), mTaskId, SORT_BY_DIFF, SORT_DOWNWARD);
+        mStockListRecyclerAdapter = new StockListRecyclerAdapter(getActivity(), mTaskId, SORT_BY_NEWS, SORT_DOWNWARD);
         mRecyclerView.setAdapter(mStockListRecyclerAdapter);
 
         mLoadingProgressBar = view.findViewById(R.id.loading_progress_bar);

@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/navigation_main_page"
+        android:icon="@drawable/ic_home_black_24dp"
+        android:title="@string/title_main_page" />
+
+    <item
         android:id="@+id/navigation_predict"
         android:icon="@drawable/ic_poll_black_24px"
         android:title="@string/title_predict_tab" />

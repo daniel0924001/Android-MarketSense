@@ -2,10 +2,8 @@ package com.idroi.marketsense.common;
 
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.idroi.marketsense.Logging.MSLog;
 
 import java.text.DecimalFormat;
-import java.util.Locale;
 
 /**
  * Created by daniel.hsieh on 2018/5/22.

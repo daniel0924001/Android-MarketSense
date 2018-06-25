@@ -1,8 +1,6 @@
 package com.idroi.marketsense.data;
 
-import android.content.Context;
 import android.support.annotation.Nullable;
-import android.widget.ImageView;
 
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.R;

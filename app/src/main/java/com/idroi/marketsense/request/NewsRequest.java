@@ -166,7 +166,8 @@ public class NewsRequest extends Request<ArrayList<News>> {
 
     // start of query news
     public static String queryNewsUrlPrefix(String status, int level, String gts) {
-        return String.format(Locale.US, API_QUERY_NEWS_URL, 300, status, level, gts);
+        long gtsLong = Long.valueOf(gts) / (REFRESH_TIME * 1000) * (REFRESH_TIME * 1000);
+        return String.format(Locale.US, API_QUERY_NEWS_URL, 300, status, level, String.valueOf(gtsLong));
     }
 
     public static String queryNewsUrl(Context context, String status,

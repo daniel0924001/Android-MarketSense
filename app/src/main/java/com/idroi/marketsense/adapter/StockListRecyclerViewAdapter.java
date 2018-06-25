@@ -1,22 +1,12 @@
 package com.idroi.marketsense.adapter;
 
-import android.app.Activity;
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Filter;
-import android.widget.TextView;
 
-import com.idroi.marketsense.Logging.MSLog;
-import com.idroi.marketsense.R;
 import com.idroi.marketsense.data.Stock;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 

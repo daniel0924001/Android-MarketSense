@@ -1,12 +1,9 @@
 package com.idroi.marketsense;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,17 +14,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
@@ -35,7 +28,6 @@ import com.facebook.login.widget.LoginButton;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.adapter.SettingAdapter;
 import com.idroi.marketsense.common.ClientData;
-import com.idroi.marketsense.common.Constants;
 import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.common.FrescoHelper;
 import com.idroi.marketsense.common.MarketSenseRendererHelper;
@@ -45,13 +37,10 @@ import com.idroi.marketsense.data.UserProfile;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Locale;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
-import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_REQUEST_NAME;
 import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_USER_SETTING;
 import static com.idroi.marketsense.common.Constants.USER_SETTING_NOTIFICATION_KEY;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;

@@ -7,10 +7,8 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.ClientData;
-import com.idroi.marketsense.notification.NotificationHelper;
 import com.idroi.marketsense.datasource.Networking;
 
 import org.json.JSONException;
@@ -18,8 +16,6 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.idroi.marketsense.data.UserProfile.NOTIFY_USER_HAS_LOGIN;
 
 /**
  * Created by daniel.hsieh on 2018/5/7.

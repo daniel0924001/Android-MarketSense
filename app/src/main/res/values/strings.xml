@@ -13,8 +13,13 @@
     <string name="title_news_tab">新聞</string>
     <string name="title_choices_tab">自選</string>
     <string name="title_predict_tab">預測</string>
+    <string name="title_main_page">首頁</string>
     <string name="title_no_comment">暫無評論</string>
     <string name="title_send_first">立馬搶頭香</string>
+
+    <string name="main_page_people_ranking">鄉民風向榜</string>
+    <string name="main_page_news_ranking">新聞風向榜</string>
+    <string name="main_page_news">最新消息</string>
 
     <string name="title_news_title">新聞標題</string>
     <string name="title_news_date">新聞時間</string>

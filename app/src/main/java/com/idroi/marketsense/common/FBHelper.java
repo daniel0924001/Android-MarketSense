@@ -7,7 +7,6 @@ import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.idroi.marketsense.Logging.MSLog;
-import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
 
 import org.json.JSONException;

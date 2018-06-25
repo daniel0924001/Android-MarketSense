@@ -1,7 +1,5 @@
 package com.idroi.marketsense.data;
 
-import com.idroi.marketsense.Logging.MSLog;
-
 import java.util.ArrayList;
 
 /**

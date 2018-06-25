@@ -37,7 +37,7 @@ public class Networking {
 
                     // Instantiate the cache
                     Cache cache = new DiskBasedCache(context.getApplicationContext().getCacheDir(),
-                            3 * 1024 * 1024); // 1MB cap
+                            10 * 1024 * 1024); // 10MB cap
 
                     // Set up the network to use HttpURLConnection as the HTTP client.
                     Network network = new BasicNetwork(new HurlStack());

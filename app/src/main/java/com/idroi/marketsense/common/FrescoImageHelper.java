@@ -21,7 +21,6 @@ import com.facebook.imagepipeline.image.ImageInfo;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.idroi.marketsense.Logging.MSLog;
-import com.idroi.marketsense.common.MarketSenseError;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;

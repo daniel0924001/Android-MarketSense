@@ -1,6 +1,5 @@
 package com.idroi.marketsense.fragments;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,7 +22,6 @@ import com.idroi.marketsense.R;
 import com.idroi.marketsense.StockActivity;
 import com.idroi.marketsense.adapter.StockListRecyclerAdapter;
 import com.idroi.marketsense.common.ClientData;
-import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.StockRequest;
@@ -31,7 +29,6 @@ import com.idroi.marketsense.request.StockRequest;
 import java.util.HashMap;
 
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
-import static com.idroi.marketsense.data.UserProfile.NOTIFY_USER_HAS_LOGIN;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_DIFF;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_NAME;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_NEWS;

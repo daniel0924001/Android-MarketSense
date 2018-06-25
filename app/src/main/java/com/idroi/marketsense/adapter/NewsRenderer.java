@@ -1,18 +1,14 @@
 package com.idroi.marketsense.adapter;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.WeakHashMap;
 
-import com.idroi.marketsense.Logging.MSLog;
-import com.idroi.marketsense.common.FrescoImageHelper;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.common.MarketSenseRendererHelper;
 import com.idroi.marketsense.data.News;

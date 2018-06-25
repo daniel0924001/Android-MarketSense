@@ -1,7 +1,6 @@
 package com.idroi.marketsense.data;
 
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.DateConverter;
@@ -11,12 +10,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Iterator;
-import java.util.Locale;
 
 /**
  * Created by daniel.hsieh on 2018/4/18.

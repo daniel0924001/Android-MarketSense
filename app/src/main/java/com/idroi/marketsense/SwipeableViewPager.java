@@ -7,8 +7,6 @@ import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-import com.idroi.marketsense.Logging.MSLog;
-
 /**
  * Created by daniel.hsieh on 2018/5/30.
  */

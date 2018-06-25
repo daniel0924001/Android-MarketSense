@@ -1,7 +1,5 @@
 package com.idroi.marketsense.util;
 
-import com.idroi.marketsense.Logging.MSLog;
-
 import java.util.Calendar;
 import java.util.Date;
 

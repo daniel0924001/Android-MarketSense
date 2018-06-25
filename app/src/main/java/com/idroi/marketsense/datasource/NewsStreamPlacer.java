@@ -5,7 +5,6 @@ import android.os.Bundle;
 
 import java.util.ArrayList;
 
-import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.adapter.NewsRecyclerAdapter;
 import com.idroi.marketsense.data.News;
 

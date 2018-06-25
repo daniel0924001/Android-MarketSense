@@ -8,8 +8,6 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.R;
 
-import java.util.WeakHashMap;
-
 /**
  * Created by daniel.hsieh on 2018/5/16.
  */

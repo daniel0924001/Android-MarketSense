@@ -28,12 +28,14 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.idroi.marketsense.adapter.MainPageScreenSlidePagerAdapter;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.adapter.BaseScreenSlidePagerAdapter;
 import com.idroi.marketsense.adapter.ChoiceScreenSlidePagerAdapter;
 import com.idroi.marketsense.adapter.ChoicesNewsScreenSlidePagerAdapter;
 import com.idroi.marketsense.adapter.PredictScreenSlidePagerAdapter;
 import com.idroi.marketsense.adapter.NewsScreenSlidePagerAdapter;
+import com.idroi.marketsense.common.BottomNavigationViewHelper;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.common.FrescoHelper;
@@ -86,6 +88,9 @@ public class MainActivity extends AppCompatActivity {
             if(mLastSelectedItemId != item.getItemId()) {
                 mLastSelectedItemId = item.getItemId();
                 switch (item.getItemId()) {
+                    case R.id.navigation_main_page:
+                        setViewPager(R.id.navigation_main_page);
+                        return true;
                     case R.id.navigation_predict:
                         setViewPager(R.id.navigation_predict);
                         return true;
@@ -173,17 +178,12 @@ public class MainActivity extends AppCompatActivity {
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        BottomNavigationViewHelper.disableShiftMode(navigation);
 
         mFab = findViewById(R.id.fab_add);
 
         setActionBar();
         setViewPager();
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-
-        super.onNewIntent(intent);
     }
 
     @Override
@@ -207,6 +207,7 @@ public class MainActivity extends AppCompatActivity {
         ClientData.getInstance(this).getUserProfile().deleteUserProfileChangeListener(mUserProfileChangeListener);
         MSLog.i("Exit MainActivity");
         super.onDestroy();
+        finish();
     }
 
     private void setAvatarImage() {
@@ -361,7 +362,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setViewPager() {
-        setViewPager(R.id.navigation_predict);
+        setViewPager(R.id.navigation_main_page);
     }
 
     private static final int SELF_CHOICE_NEWS_SLIDE_PAGER = 1;
@@ -376,6 +377,14 @@ public class MainActivity extends AppCompatActivity {
 
         BaseScreenSlidePagerAdapter baseScreenSlidePagerAdapter = null;
         switch (itemId) {
+            case R.id.navigation_main_page:
+                baseScreenSlidePagerAdapter =
+                        new MainPageScreenSlidePagerAdapter(this, getSupportFragmentManager());
+                setFab(false);
+                mViewPager.setSwipeable(false);
+                mMagicIndicator.setVisibility(View.GONE);
+                setActionBarTwoButton(false, false);
+                break;
             case R.id.navigation_predict:
                 baseScreenSlidePagerAdapter =
                         new PredictScreenSlidePagerAdapter(this, getSupportFragmentManager());

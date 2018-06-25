@@ -9,9 +9,6 @@ import android.util.DisplayMetrics;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.ClientData;
-import com.idroi.marketsense.common.FBHelper;
-import com.idroi.marketsense.data.PostEvent;
-import com.idroi.marketsense.data.UserProfile;
 
 import static com.idroi.marketsense.notification.NotificationHelper.NEWS_GENERAL_ALL;
 

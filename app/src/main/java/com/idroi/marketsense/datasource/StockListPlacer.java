@@ -13,7 +13,6 @@ import com.idroi.marketsense.request.StockRequest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Objects;
 
 import static com.idroi.marketsense.fragments.StockListFragment.ACTUAL_LOSE_ID;
 import static com.idroi.marketsense.fragments.StockListFragment.ACTUAL_WIN_ID;
@@ -58,6 +57,10 @@ public class StockListPlacer {
     private Runnable mRefreshRunnable;
     private static final int REFRESH_TIME = 2 * 60 * 1000;
     private boolean mHasPostRefresh;
+
+    public StockListPlacer(Activity activity) {
+        this(activity, PREDICT_WIN_ID, SORT_BY_NEWS, SORT_DOWNWARD);
+    }
 
     public StockListPlacer(Activity activity, int taskId, int field, int direction) {
         mActivity = activity;
@@ -220,6 +223,10 @@ public class StockListPlacer {
         } else {
             return 0;
         }
+    }
+
+    public ArrayList<Stock> getStocks() {
+        return mStockArrayList;
     }
 
     public Stock getStockData(int position) {

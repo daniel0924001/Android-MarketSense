@@ -132,6 +132,7 @@ public class StockListFragment extends Fragment {
                     .addUserProfileChangeListener(mUserProfileChangeListener);
         }
 
+        view.setBackgroundColor(getResources().getColor(R.color.bottom_navigation_item_checked_false_bg));
         return view;
     }
 

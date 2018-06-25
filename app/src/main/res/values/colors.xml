@@ -38,4 +38,7 @@
     <color name="color_volume_line">#e7f11b1b</color>
     <color name="color_price_line">#e73b76ec</color>
     <color name="color_yellow">#E9C46A</color>
+
+    <color name="card_top_color">#ffdb62</color>
+    <color name="card_bottom_color">#ff8185</color>
 </resources>

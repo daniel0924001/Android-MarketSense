@@ -24,10 +24,13 @@ import static com.idroi.marketsense.request.NewsRequest.PARAM_STATUS_RISING;
 
 public class MainPageScreenSlidePagerAdapter extends BaseScreenSlidePagerAdapter {
 
-    public MainPageScreenSlidePagerAdapter(Context context, FragmentManager fm) {
+    private MainFragment.OnActionBarChangeListener mListener;
+
+    public MainPageScreenSlidePagerAdapter(Context context, FragmentManager fm, MainFragment.OnActionBarChangeListener listener) {
         super(context, fm, new String[]{
                 context.getResources().getString(R.string.title_main_page)
         });
+        mListener = listener;
     }
 
     @Override
@@ -49,6 +52,7 @@ public class MainPageScreenSlidePagerAdapter extends BaseScreenSlidePagerAdapter
         bundle.putStringArrayList(PARAM_STATUS, statusArrayList);
         bundle.putIntegerArrayList(PARAM_LEVEL,levelArrayList);
         mainFragment.setArguments(bundle);
+        mainFragment.setOnActionBarChangeListener(mListener);
 
         return mainFragment;
     }

@@ -22,6 +22,43 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/top_banner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/tv_people_ranking">
+
+                <!--<android.support.constraint.ConstraintLayout-->
+                <!--android:id="@+id/top_banner_left_arrow"-->
+                <!--android:layout_width="10dp"-->
+                <!--android:layout_height="127dp"-->
+                <!--android:background="@drawable/card_background_left"-->
+                <!--app:layout_constraintStart_toStartOf="parent"/>-->
+
+                <!--<android.support.constraint.ConstraintLayout-->
+                <!--android:id="@+id/top_banner_right_arrow"-->
+                <!--android:layout_width="10dp"-->
+                <!--android:layout_height="127dp"-->
+                <!--android:background="@drawable/card_background_right"-->
+                <!--app:layout_constraintEnd_toEndOf="parent"/>-->
+
+                <include
+                    android:id="@+id/top_banner_1"
+                    layout="@layout/top_banner_card" />
+
+                <!--<include-->
+                <!--android:id="@+id/top_banner_2"-->
+                <!--layout="@layout/top_banner_card" />-->
+
+                <!--<include-->
+                <!--android:id="@+id/top_banner_3"-->
+                <!--layout="@layout/top_banner_card" />-->
+
+            </android.support.constraint.ConstraintLayout>
+
             <TextView
                 android:id="@+id/tv_people_ranking"
                 android:layout_width="0dp"
@@ -36,7 +73,7 @@
                 android:fontFamily="Roboto-Regular"
                 android:text="@string/main_page_people_ranking"
                 android:background="@color/text_light_gray"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/top_banner"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 

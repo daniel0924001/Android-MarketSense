@@ -43,6 +43,7 @@ import com.idroi.marketsense.common.MarketSenseCommonNavigator;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.UserProfile;
+import com.idroi.marketsense.fragments.MainFragment;
 import com.idroi.marketsense.util.MarketSenseUtils;
 
 import net.lucode.hackware.magicindicator.MagicIndicator;
@@ -79,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
     private CallbackManager mFBCallbackManager;
 
     UserProfile.UserProfileChangeListener mUserProfileChangeListener;
+
+    private boolean mClickable, mSwitchable, mCanReturn = false;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -189,7 +192,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        setAvatarImage();
+        if(!mCanReturn) {
+            setAvatarImage();
+        }
     }
 
     @Override
@@ -206,8 +211,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         ClientData.getInstance(this).getUserProfile().deleteUserProfileChangeListener(mUserProfileChangeListener);
         MSLog.i("Exit MainActivity");
-        super.onDestroy();
         finish();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if(!mCanReturn) {
+            setActionBar();
+            setActionBarTwoButton(mClickable, mSwitchable);
+        }
     }
 
     private void setAvatarImage() {
@@ -342,6 +356,7 @@ public class MainActivity extends AppCompatActivity {
                 mLeftButton.setVisibility(View.VISIBLE);
                 mRightButton.setVisibility(View.VISIBLE);
                 mActionTitleBar.setVisibility(View.GONE);
+                initActionBarTwoButton();
             } else {
                 mLeftButton.setOnClickListener(null);
                 mRightButton.setOnClickListener(null);
@@ -379,11 +394,43 @@ public class MainActivity extends AppCompatActivity {
         switch (itemId) {
             case R.id.navigation_main_page:
                 baseScreenSlidePagerAdapter =
-                        new MainPageScreenSlidePagerAdapter(this, getSupportFragmentManager());
+                        new MainPageScreenSlidePagerAdapter(this, getSupportFragmentManager(), new MainFragment.OnActionBarChangeListener() {
+                            @Override
+                            public void onActionBarChange(String title, boolean canReturn) {
+                                mCanReturn = canReturn;
+                                if(mActionTitleBar != null) {
+                                    mActionTitleBar.setText(title);
+                                }
+                                if(mAvatarImageView != null) {
+                                    if (mCanReturn) {
+                                        mAvatarImageView.setImageResource(R.drawable.ic_keyboard_backspace_white_24px);
+                                        mAvatarImageView.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                mCanReturn = false;
+                                                onBackPressed();
+                                            }
+                                        });
+                                    } else {
+                                        mAvatarImageView.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                Intent intent = new Intent(MainActivity.this, SettingActivity.class);
+                                                startActivityForResult(intent, sSettingRequestCode);
+                                                overridePendingTransition(R.anim.left_to_right, R.anim.stop);
+                                            }
+                                        });
+                                        setAvatarImage();
+                                    }
+                                }
+                            }
+                        });
                 setFab(false);
                 mViewPager.setSwipeable(false);
                 mMagicIndicator.setVisibility(View.GONE);
-                setActionBarTwoButton(false, false);
+//                setActionBarTwoButton(false, false);
+                mClickable = false;
+                mSwitchable = false;
                 break;
             case R.id.navigation_predict:
                 baseScreenSlidePagerAdapter =
@@ -392,8 +439,10 @@ public class MainActivity extends AppCompatActivity {
                 mViewPager.setSwipeable(false);
                 mMagicIndicator.setVisibility(View.GONE);
                 mViewPager.addOnPageChangeListener(mOnPageChangeListener);
-                setActionBarTwoButton(true, true);
-                initActionBarTwoButton();
+//                setActionBarTwoButton(true, true);
+                mClickable = true;
+                mSwitchable = true;
+//                initActionBarTwoButton();
                 break;
             case R.id.navigation_news:
                 baseScreenSlidePagerAdapter =
@@ -401,8 +450,10 @@ public class MainActivity extends AppCompatActivity {
                 setFab(false);
                 mViewPager.setSwipeable(true);
                 mMagicIndicator.setVisibility(View.VISIBLE);
-                setActionBarTwoButton(true, false);
-                initActionBarTwoButton();
+//                setActionBarTwoButton(true, false);
+                mClickable = true;
+                mSwitchable = false;
+//                initActionBarTwoButton();
                 break;
             case SELF_CHOICE_NEWS_SLIDE_PAGER:
                 baseScreenSlidePagerAdapter =
@@ -410,7 +461,9 @@ public class MainActivity extends AppCompatActivity {
                 setFab(false);
                 mViewPager.setSwipeable(false);
                 mMagicIndicator.setVisibility(View.GONE);
-                setActionBarTwoButton(true, false);
+//                setActionBarTwoButton(true, false);
+                mClickable = true;
+                mSwitchable = false;
                 break;
             case R.id.navigation_choices:
                 baseScreenSlidePagerAdapter =
@@ -418,12 +471,15 @@ public class MainActivity extends AppCompatActivity {
                 setFab(true);
                 mViewPager.setSwipeable(true);
                 mMagicIndicator.setVisibility(View.VISIBLE);
-                setActionBarTwoButton(false, false);
+//                setActionBarTwoButton(false, false);
+                mClickable = false;
+                mSwitchable = false;
                 break;
             default:
                 // invalid category
                 return;
         }
+        setActionBarTwoButton(mClickable, mSwitchable);
         mViewPager.setAdapter(baseScreenSlidePagerAdapter);
 
         MarketSenseCommonNavigator commonNavigator =

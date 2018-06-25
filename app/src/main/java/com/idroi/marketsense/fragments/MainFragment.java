@@ -5,13 +5,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -22,8 +23,7 @@ import com.idroi.marketsense.StockActivity;
 import com.idroi.marketsense.WrapGridView;
 import com.idroi.marketsense.adapter.NewsRecyclerAdapter;
 import com.idroi.marketsense.adapter.RankingGridViewAdapter;
-import com.idroi.marketsense.adapter.RankingGridViewHolder;
-import com.idroi.marketsense.common.ClientData;
+import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.data.Stock;
@@ -45,6 +45,10 @@ import static com.idroi.marketsense.request.NewsRequest.PARAM_STATUS;
 
 public class MainFragment extends Fragment {
 
+    public interface OnActionBarChangeListener {
+        void onActionBarChange(String title, boolean canReturn);
+    }
+
     private RecyclerView mNewsRecyclerView;
     private NewsRecyclerAdapter mNewsRecyclerAdapter;
 
@@ -59,6 +63,8 @@ public class MainFragment extends Fragment {
     private StockListPlacer mStockListPlacer;
 
     private NestedScrollView mNestedScrollView;
+    private Fragment mStockListFragment;
+    private OnActionBarChangeListener mOnActionBarChangeListener;
 
     @Nullable
     @Override
@@ -85,6 +91,8 @@ public class MainFragment extends Fragment {
         mNewsGridView = view.findViewById(R.id.grid_ranking_news);
 
         mNestedScrollView = view.findViewById(R.id.body_scroll_view);
+
+        initTopBanner(view);
 
         return view;
     }
@@ -192,6 +200,39 @@ public class MainFragment extends Fragment {
         mNewsRecyclerAdapter.loadNews(generateURL(true), generateURL(false));
     }
 
+    public void setOnActionBarChangeListener(OnActionBarChangeListener listener) {
+        mOnActionBarChangeListener = listener;
+    }
+
+    private void initTopBanner(final View view) {
+
+        mStockListFragment = new StockListFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt(StockListFragment.TASK_NAME, StockListFragment.TASK.PREDICT_WIN.getTaskId());
+        mStockListFragment.setArguments(bundle);
+
+        ConstraintLayout card1 = view.findViewById(R.id.top_banner_1);
+        card1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                FragmentManager fm = getFragmentManager();
+                if(fm != null) {
+                    FragmentTransaction transaction = fm.beginTransaction();
+
+                    transaction.replace(R.id.container, mStockListFragment);
+                    transaction.addToBackStack(null);
+
+                    // Commit the transaction
+                    transaction.commit();
+                }
+                if(mOnActionBarChangeListener != null) {
+                    mOnActionBarChangeListener.onActionBarChange(getResources().getString(R.string.main_page_card_sub_title), true);
+                }
+            }
+        });
+    }
+
     private void openStockActivity(Stock stock) {
         startActivity(StockActivity.generateStockActivityIntent(
                 getContext(), stock.getName(), stock.getCode(),
@@ -239,6 +280,8 @@ public class MainFragment extends Fragment {
         return results;
     }
 
+
+
     @Override
     public void onDestroyView() {
         if(mNewsRecyclerAdapter != null) {
@@ -247,6 +290,19 @@ public class MainFragment extends Fragment {
         if(mStockListPlacer != null) {
             mStockListPlacer.clear();
         }
+
+        FragmentManager fm = getFragmentManager();
+        if(fm != null) {
+            FragmentTransaction transaction = fm.beginTransaction();
+            transaction.remove(mStockListFragment);
+            // Commit the transaction
+            transaction.commitAllowingStateLoss();
+        }
+
+        if(mOnActionBarChangeListener != null) {
+            mOnActionBarChangeListener.onActionBarChange(getResources().getString(R.string.app_name), false);
+        }
+
         super.onDestroyView();
     }
 }

@@ -107,8 +107,8 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorPrimary" />
 
-        <meta-data android:name="firebase_crash_collection_enabled" android:value="false" />
-
+        <!--<meta-data android:name="firebase_crash_collection_enabled" android:value="false" />-->
+Marke
     </application>
 
 </manifest>

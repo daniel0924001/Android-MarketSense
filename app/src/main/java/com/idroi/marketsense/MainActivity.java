@@ -168,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
                     internalSetAvatarImage(true);
                 } else if(notifyId == NOTIFY_USER_LOGIN_FAILED) {
                     MSLog.e("[user login]: notify user login failed");
+                    LoginManager.getInstance().logOut();
                     internalSetAvatarImage(false);
                     Toast.makeText(MainActivity.this, R.string.login_failed, Toast.LENGTH_SHORT).show();
                 }
@@ -356,7 +357,6 @@ public class MainActivity extends AppCompatActivity {
                 mLeftButton.setVisibility(View.VISIBLE);
                 mRightButton.setVisibility(View.VISIBLE);
                 mActionTitleBar.setVisibility(View.GONE);
-                initActionBarTwoButton();
             } else {
                 mLeftButton.setOnClickListener(null);
                 mRightButton.setOnClickListener(null);
@@ -442,7 +442,7 @@ public class MainActivity extends AppCompatActivity {
 //                setActionBarTwoButton(true, true);
                 mClickable = true;
                 mSwitchable = true;
-//                initActionBarTwoButton();
+                initActionBarTwoButton();
                 break;
             case R.id.navigation_news:
                 baseScreenSlidePagerAdapter =
@@ -453,7 +453,7 @@ public class MainActivity extends AppCompatActivity {
 //                setActionBarTwoButton(true, false);
                 mClickable = true;
                 mSwitchable = false;
-//                initActionBarTwoButton();
+                initActionBarTwoButton();
                 break;
             case SELF_CHOICE_NEWS_SLIDE_PAGER:
                 baseScreenSlidePagerAdapter =

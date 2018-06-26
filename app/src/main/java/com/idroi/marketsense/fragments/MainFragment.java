@@ -107,12 +107,9 @@ public class MainFragment extends Fragment {
             public void onStockListLoaded() {
                 if(mLoadingProgressBarRankingNews != null) {
                     mLoadingProgressBarRankingNews.setVisibility(View.GONE);
-
-
                 }
                 if(mLoadingProgressBarRankingPeople != null) {
                     mLoadingProgressBarRankingPeople.setVisibility(View.GONE);
-
                 }
                 TextView secondTitle = view.findViewById(R.id.tv_news_ranking);
                 ((ConstraintLayout.LayoutParams) secondTitle.getLayoutParams()).topToBottom = R.id.grid_ranking_people;

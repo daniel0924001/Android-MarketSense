@@ -74,7 +74,7 @@ public class SettingActivity extends AppCompatActivity {
             R.drawable.setting_about,
     };
 
-    private AlertDialog mLoginAlertDialog;
+    private AlertDialog mLoginAlertDialog, mStarAlertDialog;
     private CallbackManager mFBCallbackManager;
     private LoginButton mFBLoginBtn;
     private ListView mListView;
@@ -98,6 +98,11 @@ public class SettingActivity extends AppCompatActivity {
         if(mLoginAlertDialog != null) {
             mLoginAlertDialog.dismiss();
             mLoginAlertDialog = null;
+        }
+
+        if(mStarAlertDialog != null) {
+            mStarAlertDialog.dismiss();
+            mStarAlertDialog = null;
         }
     }
 
@@ -274,6 +279,42 @@ public class SettingActivity extends AppCompatActivity {
         mLoginAlertDialog.show();
     }
 
+    private void showStarAlertDialog() {
+        if(mStarAlertDialog != null) {
+            mStarAlertDialog.dismiss();
+            mStarAlertDialog = null;
+        }
+
+        mStarAlertDialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.star_title)
+                .setMessage(R.string.star_description)
+                .setPositiveButton(R.string.star_positive, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+                        try {
+                            MSLog.d("go to: " + Uri.parse("market://details?id=" + appPackageName));
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                        } catch (android.content.ActivityNotFoundException e) {
+                            MSLog.d("go to: " + Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName));
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                        }
+                    }
+                })
+                .setNegativeButton(R.string.star_negative, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        mStarAlertDialog.dismiss();
+                        startActivity(WebViewActivity.generateWebViewActivityIntent(
+                                SettingActivity.this,
+                                R.string.preference_feedback,
+                                getResources().getString(R.string.preference_feedback),
+                                "https://docs.google.com/forms/d/e/1FAIpQLSfT0nDlt-Ra052pzXeG7nSjwkStnChRhyTOD5M5flRkukLWoQ/viewform"));
+                    }
+                })
+                .show();
+    }
+
     private void handleListClick(int position) {
         if(position <= 0 || position >= mStringIds.length) {
             return;
@@ -288,6 +329,9 @@ public class SettingActivity extends AppCompatActivity {
                 sendIntent.putExtra(Intent.EXTRA_TEXT, getResources().getString(R.string.share_description) + SHARE_APP_INSTALL_LINK);
                 sendIntent.setType("text/plain");
                 startActivity(sendIntent);
+                break;
+            case R.string.preference_star:
+                showStarAlertDialog();
                 break;
             case R.string.preference_feedback:
                 startActivity(WebViewActivity.generateWebViewActivityIntent(

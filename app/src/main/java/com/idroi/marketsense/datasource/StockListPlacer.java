@@ -10,6 +10,7 @@ import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.StockRequest;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -46,7 +47,7 @@ public class StockListPlacer {
     private MarketSenseStockFetcher.MarketSenseStockNetworkListener mMarketSenseStockNetworkListener;
     private StockListListener mStockListListener;
 
-    private Activity mActivity;
+    private WeakReference<Activity> mActivity;
     private MarketSenseStockFetcher mMarketSenseStockFetcher;
     private String mNetworkUrl, mCacheUrl;
     private int mTask;
@@ -63,7 +64,7 @@ public class StockListPlacer {
     }
 
     public StockListPlacer(Activity activity, int taskId, int field, int direction) {
-        mActivity = activity;
+        mActivity = new WeakReference<Activity>(activity);
         mSortedField = field;
         mSortedDirection = direction;
         mRefreshHandler = new Handler();
@@ -72,6 +73,10 @@ public class StockListPlacer {
         mMarketSenseStockNetworkListener = new MarketSenseStockFetcher.MarketSenseStockNetworkListener() {
             @Override
             public void onStockListLoad(ArrayList<Stock> stockArrayList, boolean isAutoRefresh) {
+
+                if(mActivity.get() == null) {
+                    return;
+                }
 
                 if (mStockArrayList != null) {
                     mStockArrayList.clear();
@@ -121,6 +126,11 @@ public class StockListPlacer {
 
             @Override
             public void onStockListFail(MarketSenseError marketSenseError) {
+
+                if(mActivity.get() == null) {
+                    return;
+                }
+
                 increaseRetryTime();
                 if(isRetry()) {
                     mMarketSenseStockFetcher.makeRequest(mNetworkUrl, mCacheUrl);
@@ -140,7 +150,13 @@ public class StockListPlacer {
                 mHasPostRefresh = false;
                 if(mMarketSenseStockFetcher != null) {
                     MSLog.d("[stock price refresh]");
-                    mNetworkUrl = StockRequest.queryStockList(mActivity, true);
+
+                    Activity activity = mActivity.get();
+                    if(activity == null) {
+                        return;
+                    }
+
+                    mNetworkUrl = StockRequest.queryStockList(activity, true);
                     mMarketSenseStockFetcher.makeRequest(mNetworkUrl, null, true);
                 }
             }
@@ -150,7 +166,7 @@ public class StockListPlacer {
     private void updateRealTimeStockPrices(ArrayList<Stock> stockPrices) {
         if(stockPrices != null) {
             for (Stock stock : stockPrices) {
-                ClientData.getInstance(mActivity).setRealTimeStockPriceHashMap(stock);
+                ClientData.getInstance(mActivity.get()).setRealTimeStockPriceHashMap(stock);
             }
         }
         MSLog.i("refresh real time stock price");
@@ -179,9 +195,14 @@ public class StockListPlacer {
     }
 
     public void loadStockList(String networkUrl, String cacheUrl) {
+        Activity activity = mActivity.get();
+        if(activity == null) {
+            return;
+        }
+
         mNetworkUrl = networkUrl;
         mCacheUrl = cacheUrl;
-        loadStockList(new MarketSenseStockFetcher(mActivity, mMarketSenseStockNetworkListener));
+        loadStockList(new MarketSenseStockFetcher(activity, mMarketSenseStockNetworkListener));
     }
 
     private void loadStockList(MarketSenseStockFetcher stockFetcher) {
@@ -238,7 +259,7 @@ public class StockListPlacer {
     }
 
     private Stock getRealTimeStock(String code) {
-        return ClientData.getInstance(mActivity).getPriceFromCode(code);
+        return ClientData.getInstance(mActivity.get()).getPriceFromCode(code);
     }
 
     private Comparator<Stock> genComparator(final int field, final int direction) {

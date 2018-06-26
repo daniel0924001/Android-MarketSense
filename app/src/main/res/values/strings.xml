@@ -111,7 +111,7 @@
     <string name="title_unavailable_score">0.0</string>
     <string name="title_unavailable_score_int">0</string>
     <string name="title_unavailable_score_double">+0.0 (+0.0)</string>
-    <string name="title_max_score"> / 5</string>
+    <string name="title_max_score"> / 5.0</string>
     <string name="title_you_look_good">你 <![CDATA[<font color="#EF476F">看漲</font>]]> 這支股票</string>
     <string name="title_you_look_bad">你 <![CDATA[<font color="#00BE9F">看跌</font>]]> 這支股票</string>
     <string name="title_publish_comment">發表評論</string>
@@ -162,11 +162,22 @@
     <string name="preference_about">關於</string>
     <string name="preference_feedback_and_start">意見與評價</string>
     <string name="preference_feedback">意見回饋</string>
-    <string name="preference_star">評價 APP</string>
+    <string name="preference_star">給予鼓勵</string>
     <string name="preference_privacy_statement">隱私權暨個人資料保護聲明</string>
     <string name="preference_term_of_service">服務條款</string>
     <string name="preference_disclaimer">免責聲明</string>
     <string name="preference_sorry">不好意思，功能尚未開放</string>
+
+    <string name="star_title">給予鼓勵</string>
+    <string name="star_description">
+        如果您喜歡本程式，\n
+        敬請你給予我們五顆星的評價！\n
+        若有任何的建議與想法，\n
+        煩請利用 意見回饋 功能，\n
+        提供意見給我們，感謝您，\n
+        期許能帶給你更好的使用者體驗。</string>
+    <string name="star_positive">確定</string>
+    <string name="star_negative">意見回饋</string>
 
     <string name="hello">Hello, 市覺使用者</string>
     <string name="login">登入</string>

@@ -173,6 +173,9 @@ public class NewsFragment extends Fragment {
             mNewsRecyclerAdapter.loadNews(urls, generateURL(false));
         } else {
             setVisibilityForEmptyData(true);
+            if(mLoadingProgressBar != null) {
+                mLoadingProgressBar.setVisibility(View.GONE);
+            }
         }
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -208,11 +211,20 @@ public class NewsFragment extends Fragment {
         mNoDataRefreshLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                ArrayList<String> urls = generateURL(true);
+                if(urls != null) {
+                    mNewsRecyclerAdapter.loadNews(urls, generateURL(false));
+                } else {
+                    return;
+                }
+
                 if(mSkeletonScreen != null) {
                     mSkeletonScreen.show();
                 }
+                if(mLoadingProgressBar != null) {
+                    mLoadingProgressBar.setVisibility(View.VISIBLE);
+                }
                 setVisibilityForEmptyData(false);
-                mNewsRecyclerAdapter.loadNews(generateURL(true), generateURL(false));
             }
         });
     }

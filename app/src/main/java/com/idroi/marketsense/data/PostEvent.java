@@ -295,6 +295,14 @@ public class PostEvent {
                             if(error.networkResponse != null) {
                                 MSLog.e("Event Post Request error: " + new String(error.networkResponse.data), error);
                             }
+
+                            switch (mPostType) {
+                                case POST_TYPE_LOGIN:
+                                    if(mListener != null) {
+                                        mListener.onResponse(false);
+                                    }
+                                    break;
+                            }
                         }
                     }){
 

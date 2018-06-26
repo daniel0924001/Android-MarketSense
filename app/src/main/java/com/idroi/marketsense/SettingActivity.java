@@ -42,6 +42,7 @@ import org.json.JSONObject;
 
 import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
 import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_USER_SETTING;
+import static com.idroi.marketsense.common.Constants.SHARE_APP_INSTALL_LINK;
 import static com.idroi.marketsense.common.Constants.USER_SETTING_NOTIFICATION_KEY;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 
@@ -280,6 +281,14 @@ public class SettingActivity extends AppCompatActivity {
         int id = mStringIds[position];
         String title = getResources().getString(id);
         switch (id) {
+            // https://play.google.com/store/apps/details?id=com.idroi.marketsense&referrer=utm_source%3Dandroid_app%26utm_medium%3Dinapp%26utm_campaign%3Dshare%26
+            case R.string.preference_share:
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, getResources().getString(R.string.share_description) + SHARE_APP_INSTALL_LINK);
+                sendIntent.setType("text/plain");
+                startActivity(sendIntent);
+                break;
             case R.string.preference_feedback:
                 startActivity(WebViewActivity.generateWebViewActivityIntent(
                         this, id, title, "https://docs.google.com/forms/d/e/1FAIpQLSfT0nDlt-Ra052pzXeG7nSjwkStnChRhyTOD5M5flRkukLWoQ/viewform"));

@@ -17,6 +17,8 @@ public class Constants {
     public static final String FACEBOOK_CONSTANTS = "Facebook";
     public static final String GOOGLE_PLUS_CONSTANTS = "GooglePlus";
 
+    public static final String SHARE_APP_INSTALL_LINK = "https://play.google.com/store/apps/details?id=com.idroi.marketsense&referrer=utm_source%3Dandroid_app%26utm_medium%3Dinapp%26utm_campaign%3Dshare%26";
+
     public static final Stock[] HOT_STOCKS_KEYWORDS = new Stock[] {
             new Stock("2454", "聯發科"),
             new Stock("2330", "台積電"),

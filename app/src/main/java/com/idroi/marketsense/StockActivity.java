@@ -848,8 +848,17 @@ public class StockActivity extends AppCompatActivity {
                 String userId = FBHelper.fetchFbData(data, UserProfile.FB_USER_ID_KEY);
                 String userEmail = FBHelper.fetchFbData(data, UserProfile.FB_USER_EMAIL_KEY);
                 PostEvent.sendRegister(StockActivity.this, userId, userName, FACEBOOK_CONSTANTS,
-                        UserProfile.generatePassword(userId, FACEBOOK_CONSTANTS), userEmail, avatarLink);
-                mUserProfile.notifyUserProfile(NOTIFY_USER_HAS_LOGIN);
+                        UserProfile.generatePassword(userId, FACEBOOK_CONSTANTS), userEmail, avatarLink, new PostEvent.PostEventListener() {
+                            @Override
+                            public void onResponse(boolean isSuccessful) {
+                                if(!isSuccessful) {
+                                    Toast.makeText(StockActivity.this, R.string.login_failed_description, Toast.LENGTH_SHORT).show();
+                                    LoginManager.getInstance().logOut();
+                                } else {
+                                    mUserProfile.notifyUserProfile(NOTIFY_USER_HAS_LOGIN);
+                                }
+                            }
+                        });
             }
         }, true);
     }

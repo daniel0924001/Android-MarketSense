@@ -330,7 +330,7 @@ public class PostEvent {
                 jsonObject.optString(RESPONSE_RESULT) != null &&
                 jsonObject.optString(RESPONSE_RESULT).equals(RESPONSE_DUPLICATE_REGISTER)) {
             // {"status":false,"result":"You have registered before!"}
-            sendLogin(null, mUserId, mUserPassword, mUserEmail, null);
+            sendLogin(null, mUserId, mUserPassword, mUserEmail, mListener);
         }
     }
 
@@ -404,13 +404,15 @@ public class PostEvent {
 
     public static void sendRegister(Context context,
                                     String userId, String userName, String userType,
-                                    String userPassword, String userEmail, String avatarLink) {
+                                    String userPassword, String userEmail, String avatarLink,
+                                    PostEventListener listener) {
         new PostEvent(userId, PostEventType.REGISTER)
                 .setUserName(userName)
                 .setUserType(userType)
                 .setUserPassword(userPassword)
                 .setUserEmail(userEmail)
                 .setAvatarLink(avatarLink)
+                .setPostEventListener(listener)
                 .send(context);
     }
 

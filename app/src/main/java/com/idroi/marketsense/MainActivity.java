@@ -167,10 +167,7 @@ public class MainActivity extends AppCompatActivity {
                     MSLog.i("[user login]: notify user login success");
                     internalSetAvatarImage(true);
                 } else if(notifyId == NOTIFY_USER_LOGIN_FAILED) {
-                    MSLog.e("[user login]: notify user login failed");
-                    LoginManager.getInstance().logOut();
-                    internalSetAvatarImage(false);
-                    Toast.makeText(MainActivity.this, R.string.login_failed, Toast.LENGTH_SHORT).show();
+                    // empty
                 }
             }
         };
@@ -581,7 +578,17 @@ public class MainActivity extends AppCompatActivity {
                 String userId = FBHelper.fetchFbData(data, UserProfile.FB_USER_ID_KEY);
                 String userEmail = FBHelper.fetchFbData(data, UserProfile.FB_USER_EMAIL_KEY);
                 PostEvent.sendRegister(MainActivity.this, userId, userName, FACEBOOK_CONSTANTS,
-                        UserProfile.generatePassword(userId, FACEBOOK_CONSTANTS), userEmail, avatarLink);
+                        UserProfile.generatePassword(userId, FACEBOOK_CONSTANTS), userEmail, avatarLink, new PostEvent.PostEventListener() {
+                            @Override
+                            public void onResponse(boolean isSuccessful) {
+                                if(!isSuccessful) {
+                                    MSLog.e("[user login]: notify user login failed");
+                                    Toast.makeText(MainActivity.this, R.string.login_failed_description, Toast.LENGTH_SHORT).show();
+                                    LoginManager.getInstance().logOut();
+                                    internalSetAvatarImage(false);
+                                }
+                            }
+                        });
                 setAvatarImage();
             }
         }, true);

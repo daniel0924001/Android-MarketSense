@@ -25,6 +25,7 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ethanhua.skeleton.Skeleton;
 import com.ethanhua.skeleton.ViewSkeletonScreen;
@@ -674,9 +675,18 @@ public class NewsWebViewActivity extends AppCompatActivity {
                 String userId = FBHelper.fetchFbData(data, UserProfile.FB_USER_ID_KEY);
                 String userEmail = FBHelper.fetchFbData(data, UserProfile.FB_USER_EMAIL_KEY);
                 PostEvent.sendRegister(NewsWebViewActivity.this, userId, userName, FACEBOOK_CONSTANTS,
-                        UserProfile.generatePassword(userId, FACEBOOK_CONSTANTS), userEmail, avatarLink);
-                UserProfile userProfile = ClientData.getInstance(NewsWebViewActivity.this).getUserProfile();
-                userProfile.notifyUserProfile(NOTIFY_ID_NEWS_COMMENT_CLICK);
+                        UserProfile.generatePassword(userId, FACEBOOK_CONSTANTS), userEmail, avatarLink, new PostEvent.PostEventListener() {
+                            @Override
+                            public void onResponse(boolean isSuccessful) {
+                                if(!isSuccessful) {
+                                    Toast.makeText(NewsWebViewActivity.this, R.string.login_failed_description, Toast.LENGTH_SHORT).show();
+                                    LoginManager.getInstance().logOut();
+                                } else {
+                                    UserProfile userProfile = ClientData.getInstance(NewsWebViewActivity.this).getUserProfile();
+                                    userProfile.notifyUserProfile(NOTIFY_ID_NEWS_COMMENT_CLICK);
+                                }
+                            }
+                        });
             }
         }, true);
     }

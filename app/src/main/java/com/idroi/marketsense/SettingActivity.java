@@ -144,15 +144,24 @@ public class SettingActivity extends AppCompatActivity {
     private void getFBUserProfile(final boolean shouldRegister) {
         FBHelper.getFBUserProfile(this, new FBHelper.FBHelperListener() {
             @Override
-            public void onTaskCompleted(JSONObject data, String avatarLink) {
-                String userName = FBHelper.fetchFbData(data, UserProfile.FB_USER_NAME_KEY);
+            public void onTaskCompleted(JSONObject data, final String avatarLink) {
+                final String userName = FBHelper.fetchFbData(data, UserProfile.FB_USER_NAME_KEY);
                 if(shouldRegister) {
                     String userId = FBHelper.fetchFbData(data, UserProfile.FB_USER_ID_KEY);
                     String userEmail = FBHelper.fetchFbData(data, UserProfile.FB_USER_EMAIL_KEY);
                     PostEvent.sendRegister(SettingActivity.this, userId, userName, FACEBOOK_CONSTANTS,
-                            UserProfile.generatePassword(userId, FACEBOOK_CONSTANTS), userEmail, avatarLink);
+                            UserProfile.generatePassword(userId, FACEBOOK_CONSTANTS), userEmail, avatarLink, new PostEvent.PostEventListener() {
+                                @Override
+                                public void onResponse(boolean isSuccessful) {
+                                    if(!isSuccessful) {
+                                        Toast.makeText(SettingActivity.this, R.string.login_failed_description, Toast.LENGTH_SHORT).show();
+                                        LoginManager.getInstance().logOut();
+                                    } else {
+                                        refreshFBUi(userName, avatarLink);
+                                    }
+                                }
+                            });
                 }
-                refreshFBUi(userName, avatarLink);
             }
         }, true);
     }

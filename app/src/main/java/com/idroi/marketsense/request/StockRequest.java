@@ -95,7 +95,23 @@ public class StockRequest extends Request<ArrayList<Stock>> {
         return null;
     }
 
+    public static final String MODE_WPCT = "wpct";
+
     public static final String API_URL = "http://apiv2.infohubapp.com/v1/stock/prices";
+    public static final String API_URL_WITH_MODE = "http://apiv2.infohubapp.com/v1/stock/prices?mode=%s";
+
+    public static String queryStockListWithMode(Context context, boolean isNetworkUrl, String mode) {
+
+        String url = String.format(API_URL_WITH_MODE, mode);
+
+        if(isNetworkUrl) {
+            return url + "&timestamp=" + System.currentTimeMillis() / (STOCK_REQUEST_SOFT_TTL);
+        } else {
+            SharedPreferences sharedPreferences =
+                    context.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE);
+            return sharedPreferences.getString(url, url + "?timestamp=" + System.currentTimeMillis() / (30 * 1000));
+        }
+    }
 
     public static String queryStockList(Context context, boolean isNetworkUrl) {
         if(isNetworkUrl) {

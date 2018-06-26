@@ -208,7 +208,7 @@ public class MainFragment extends Fragment {
 
         mStockListFragment = new StockListFragment();
         Bundle bundle = new Bundle();
-        bundle.putInt(StockListFragment.TASK_NAME, StockListFragment.TASK.PREDICT_WIN.getTaskId());
+        bundle.putInt(StockListFragment.TASK_NAME, StockListFragment.TASK.WPCT.getTaskId());
         mStockListFragment.setArguments(bundle);
 
         ConstraintLayout card1 = view.findViewById(R.id.top_banner_1);
@@ -220,7 +220,7 @@ public class MainFragment extends Fragment {
                 if(fm != null) {
                     FragmentTransaction transaction = fm.beginTransaction();
 
-                    transaction.replace(R.id.container, mStockListFragment);
+                    transaction.replace(R.id.fragment_container, mStockListFragment);
                     transaction.addToBackStack(null);
 
                     // Commit the transaction

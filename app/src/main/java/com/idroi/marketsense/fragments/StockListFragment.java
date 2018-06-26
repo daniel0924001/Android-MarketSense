@@ -48,13 +48,15 @@ public class StockListFragment extends Fragment {
     public final static int ACTUAL_WIN_ID = 3;
     public final static int ACTUAL_LOSE_ID = 4;
     public final static int SELF_CHOICES_ID = 5;
+    public final static int WPCT_ID = 6;
 
     public enum TASK {
         PREDICT_WIN(PREDICT_WIN_ID),
         PREDICT_LOSE(PREDICT_LOSE_ID),
         ACTUAL_WIN(ACTUAL_WIN_ID),
         ACTUAL_LOSE(ACTUAL_LOSE_ID),
-        SELF_CHOICES(SELF_CHOICES_ID);
+        SELF_CHOICES(SELF_CHOICES_ID),
+        WPCT(WPCT_ID);
 
         int taskId;
         TASK(int id) {
@@ -274,11 +276,19 @@ public class StockListFragment extends Fragment {
     }
 
     public String generateNetworkURL() {
-        return StockRequest.queryStockList(getContext(), true);
+        if(mTaskId == WPCT_ID) {
+            return StockRequest.queryStockListWithMode(getContext(), true, StockRequest.MODE_WPCT);
+        } else {
+            return StockRequest.queryStockList(getContext(), true);
+        }
     }
 
     public String generateCacheUrl() {
-        return StockRequest.queryStockList(getContext(), false);
+        if(mTaskId == WPCT_ID) {
+            return StockRequest.queryStockListWithMode(getContext(), false, StockRequest.MODE_WPCT);
+        } else {
+            return StockRequest.queryStockList(getContext(), false);
+        }
     }
 
     @Override

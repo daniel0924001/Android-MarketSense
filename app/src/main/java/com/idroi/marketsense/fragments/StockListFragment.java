@@ -33,6 +33,7 @@ import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_DIFF;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_NAME;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_NEWS;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_PEOPLE;
+import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_PRICE;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_DOWNWARD;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_UPWARD;
 
@@ -77,7 +78,7 @@ public class StockListFragment extends Fragment {
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private int mTaskId;
 
-    private TextView mSortedByDiff, mSortedByPeople, mSortedByNews;
+    private TextView mSortedByName, mSortedByPrice, mSortedByDiff, mSortedByPeople, mSortedByNews;
     private TextView[] mSortedViews;
     private HashMap<View, String> mSortedTexts;
     private View mLastSortedView;
@@ -208,18 +209,37 @@ public class StockListFragment extends Fragment {
     }
 
     private void setSortBlock(View view) {
-        mSortedByDiff = view .findViewById(R.id.title_diff);
-        mSortedByPeople = view.findViewById(R.id.title_people);
-        mSortedByNews = view.findViewById(R.id.title_news);
+        mSortedByName = view.findViewById(R.id.sorted_by_name);
+        mSortedByPrice = view.findViewById(R.id.sorted_by_price);
+        mSortedByDiff = view.findViewById(R.id.sorted_by_diff);
+        mSortedByPeople = view.findViewById(R.id.sorted_by_people);
+        mSortedByNews = view.findViewById(R.id.sorted_by_news);
 
-        mSortedViews = new TextView[] {mSortedByDiff, mSortedByPeople, mSortedByNews};
+        mSortedViews = new TextView[] {
+                mSortedByName, mSortedByPrice, mSortedByDiff, mSortedByPeople, mSortedByNews};
         mSortedTexts = new HashMap<>();
-        mSortedTexts.put(mSortedByDiff, getString(R.string.title_company_fluctuation));
+        mSortedTexts.put(mSortedByName, getString(R.string.title_company_predict_name));
+        mSortedTexts.put(mSortedByPrice, getString(R.string.title_company_predict_price));
+        mSortedTexts.put(mSortedByDiff, getString(R.string.title_company_predict_fluctuation));
         mSortedTexts.put(mSortedByPeople, getString(R.string.title_company_predict_people_title));
         mSortedTexts.put(mSortedByNews, getString(R.string.title_company_predict_news_title));
 
         mLastSortedView = null;
         mSortedDirection = SORT_UPWARD;
+
+        mSortedByName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeSortedBlockLayout(SORT_BY_NAME, view);
+            }
+        });
+
+        mSortedByPrice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeSortedBlockLayout(SORT_BY_PRICE, view);
+            }
+        });
 
         mSortedByDiff.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -258,19 +278,16 @@ public class StockListFragment extends Fragment {
         mStockListRecyclerAdapter.sortByTask(field, mSortedDirection);
 
         for (TextView textView : mSortedViews) {
-            String initString = mSortedTexts.get(textView);
             if (textView != view) {
                 // others
-                textView.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_sorting_off, 0, 0, 0);
-                textView.setTextColor(getResources().getColor(R.color.text_gray));
+                textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.mipmap.ic_sorting_off, 0);
             } else {
                 // sorted one
                 if(mSortedDirection == SORT_UPWARD) {
-                    textView.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_sorting_on_up, 0, 0, 0);
+                    textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.mipmap.ic_sorting_on_up, 0);
                 } else {
-                    textView.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_sorting_on_down, 0, 0, 0);
+                    textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.mipmap.ic_sorting_on_down, 0);
                 }
-                textView.setTextColor(getResources().getColor(R.color.colorPrimary));
             }
         }
     }

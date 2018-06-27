@@ -82,10 +82,11 @@
     <string name="title_company_confidence">公司信心指數</string>
 
     <string name="title_sort_by">排序依：</string>
-    <string name="title_company_fluctuation">漲跌幅度</string>
-    <string name="title_company_predict_news_title">新聞預測</string>
-    <string name="title_company_predict_people_title">鄉民預測</string>
-    <string name="title_company_predict_our_title">大鳥預測</string>
+    <string name="title_company_predict_name">名稱</string>
+    <string name="title_company_predict_price">當前價</string>
+    <string name="title_company_predict_fluctuation">漲跌幅</string>
+    <string name="title_company_predict_news_title">新聞</string>
+    <string name="title_company_predict_people_title">鄉民</string>
 
     <string name="title_level_up_highest">最看漲！</string>
     <string name="title_level_up_high">非常看漲</string>

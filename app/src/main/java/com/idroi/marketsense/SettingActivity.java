@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -21,7 +22,10 @@ import android.widget.Toast;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
@@ -131,7 +135,6 @@ public class SettingActivity extends AppCompatActivity {
 
         if(FBHelper.checkFBLogin()) {
             getFBUserProfile(false);
-            refreshFBUi();
         }
     }
 
@@ -161,6 +164,8 @@ public class SettingActivity extends AppCompatActivity {
                                     }
                                 }
                             });
+                } else {
+                    refreshFBUi(userName, avatarLink);
                 }
             }
         }, true);

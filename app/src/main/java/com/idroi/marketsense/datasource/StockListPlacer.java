@@ -28,6 +28,7 @@ import static com.idroi.marketsense.fragments.StockListFragment.SELF_CHOICES_ID;
 public class StockListPlacer {
 
     public final static int SORT_BY_NAME = 1;
+    public final static int SORT_BY_PRICE = 5;
     public final static int SORT_BY_DIFF = 2;
     public final static int SORT_BY_PEOPLE = 3;
     public final static int SORT_BY_NEWS = 4;
@@ -281,6 +282,8 @@ public class StockListPlacer {
                     case SORT_BY_NAME:
                         int res = String.CASE_INSENSITIVE_ORDER.compare(stock1.getCode(), stock2.getCode());
                         return (res != 0) ? res : stock1.getCode().compareTo(stock2.getCode());
+                    case SORT_BY_PRICE:
+                        return compareValue(Double.valueOf(stock1.getPrice()), Double.valueOf(stock2.getPrice()));
                     case SORT_BY_DIFF:
                         return compareValue(stock1.getDiffDirection() * stock1.getDiffPercentageDouble(),
                                 stock2.getDiffDirection() * stock2.getDiffPercentageDouble());

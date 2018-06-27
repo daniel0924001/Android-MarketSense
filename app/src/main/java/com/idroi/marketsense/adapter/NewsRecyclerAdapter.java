@@ -122,20 +122,15 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
         mNewsExpandListener = new NewsExpandListener() {
             @Override
             public void onExpandSuccess(final int start, final int amount) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(mInitLayoutType == NEWS_MULTIPLE_LAYOUT) {
-                            if(start >= 4) {
-                                notifyItemRangeInserted(start - 1, amount);
-                            } else {
-                                notifyItemRangeInserted(start, amount - 1);
-                            }
-                        } else {
-                            notifyItemRangeInserted(start, amount);
-                        }
+                if(mInitLayoutType == NEWS_MULTIPLE_LAYOUT) {
+                    if(start >= 4) {
+                        notifyItemRangeInserted(start - 1, amount);
+                    } else {
+                        notifyItemRangeInserted(start, amount - 1);
                     }
-                });
+                } else {
+                    notifyItemRangeInserted(start, amount);
+                }
                 resetRetryTime();
             }
 

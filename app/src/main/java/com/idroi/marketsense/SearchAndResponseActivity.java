@@ -13,20 +13,23 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.facebook.drawee.view.SimpleDraweeView;
+import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.adapter.NewsRecyclerAdapter;
 import com.idroi.marketsense.adapter.StockListRecyclerViewAdapter;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FrescoHelper;
+import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.Stock;
+import com.idroi.marketsense.request.NewsRequest;
 
 import java.util.ArrayList;
+
+import static com.idroi.marketsense.adapter.NewsRecyclerAdapter.NEWS_SINGLE_LAYOUT;
+import static com.idroi.marketsense.fragments.NewsFragment.KEYWORD_TASK_ID;
 
 /**
  * Created by daniel.hsieh on 2018/4/27.
@@ -39,9 +42,12 @@ public class SearchAndResponseActivity extends AppCompatActivity {
 
     private EditText mSearchView;
     private ImageButton mSearchCancelButton;
-    private TextView mResultTextView;
-    private RecyclerView mResultRecyclerView;
-    StockListRecyclerViewAdapter mAdapter;
+    private RecyclerView mStockResultRecyclerView, mNewsResultRecyclerView;
+    private StockListRecyclerViewAdapter mStockRecyclerAdapter;
+    private NewsRecyclerAdapter mNewsRecyclerAdapter;
+    private TextView mStockResultsTextView, mNewsResultsTextView, mSearchStatusTextView;
+
+    private String mQueryString;
 
     private  ArrayList<Stock> mAllStocks = ClientData.getInstance(this).getAllStocksListInfo();
 
@@ -87,7 +93,6 @@ public class SearchAndResponseActivity extends AppCompatActivity {
 
                     @Override
                     public void afterTextChanged(Editable editable) {
-                        filter(editable.toString());
                     }
                 });
             }
@@ -102,11 +107,11 @@ public class SearchAndResponseActivity extends AppCompatActivity {
                 });
             }
 
-            TextView cancelSearchTextView = view.findViewById(R.id.cancel);
-            cancelSearchTextView.setOnClickListener(new View.OnClickListener() {
+            TextView doSearchTextView = view.findViewById(R.id.do_search);
+            doSearchTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    onBackPressed();
+                    filter(mSearchView.getText().toString());
                 }
             });
 
@@ -121,10 +126,43 @@ public class SearchAndResponseActivity extends AppCompatActivity {
     }
 
     private void setResultsLayout() {
+        mSearchStatusTextView = findViewById(R.id.tv_search_status);
+        mStockResultsTextView = findViewById(R.id.tv_search_result_stock);
+        mNewsResultsTextView = findViewById(R.id.tv_search_result_news);
 
-        mAdapter = new StockListRecyclerViewAdapter(this,
+        mNewsRecyclerAdapter = new NewsRecyclerAdapter(this, KEYWORD_TASK_ID, null);
+        mNewsRecyclerAdapter.setNewsLayoutType(NEWS_SINGLE_LAYOUT);
+        mNewsRecyclerAdapter.setOnItemClickListener(new NewsRecyclerAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(News news) {
+                startActivity(NewsWebViewActivity.generateNewsWebViewActivityIntent(
+                        SearchAndResponseActivity.this, news.getId(), news.getTitle(),
+                        news.getUrlImage(), news.getDate(),
+                        news.getPageLink(), news.getOriginLink(),
+                        news.getVoteRaiseNum(), news.getVoteFallNum()));
+                overridePendingTransition(R.anim.enter, R.anim.stop);
+            }
+        });
+        mNewsRecyclerAdapter.setNewsAvailableListener(new NewsRecyclerAdapter.NewsAvailableListener() {
+            @Override
+            public void onNewsAvailable() {
+                adjustUIForEndSearching(true, mQueryString);
+            }
+
+            @Override
+            public void onNewsEmpty() {
+                adjustUIForEndSearching(false, mQueryString);
+            }
+        });
+
+        mNewsResultRecyclerView = findViewById(R.id.search_news_result_list);
+        mNewsResultRecyclerView.setAdapter(mNewsRecyclerAdapter);
+        mNewsResultRecyclerView.setNestedScrollingEnabled(false);
+        mNewsResultRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        mStockRecyclerAdapter = new StockListRecyclerViewAdapter(this,
                 ClientData.getInstance(this).getAllStocksListInfo());
-        mAdapter.setOnClickListener(new StockListRecyclerViewAdapter.OnItemClickListener() {
+        mStockRecyclerAdapter.setOnClickListener(new StockListRecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Stock stock) {
                 Intent intent = new Intent();
@@ -140,54 +178,102 @@ public class SearchAndResponseActivity extends AppCompatActivity {
             }
         });
 
-        mResultTextView = findViewById(R.id.tv_search_result);
-        mResultRecyclerView = findViewById(R.id.search_result_list);
-        mResultRecyclerView.setAdapter(mAdapter);
-        mResultRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mStockResultRecyclerView = findViewById(R.id.search_stock_result_list);
+        mStockResultRecyclerView.setAdapter(mStockRecyclerAdapter);
+        mStockResultRecyclerView.setNestedScrollingEnabled(false);
+        mStockResultRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         resetSearchState();
     }
 
+    private void adjustUIForStartSearching(String query) {
+        mStockResultsTextView.setVisibility(View.GONE);
+        mStockResultRecyclerView.setVisibility(View.GONE);
+        mNewsResultRecyclerView.setVisibility(View.GONE);
+        mNewsResultsTextView.setVisibility(View.GONE);
+
+        mSearchStatusTextView.setVisibility(View.VISIBLE);
+        String text = String.format(getResources().getString(R.string.title_search_processing), query);
+        mSearchStatusTextView.setText(text);
+    }
+
+    private void adjustUIForEndSearching(boolean hasNewsContent, String query) {
+        boolean isAllEmpty = true;
+        if(mStockRecyclerAdapter.getItemCount() > 0) {
+            mStockResultsTextView.setVisibility(View.VISIBLE);
+            mStockResultRecyclerView.setVisibility(View.VISIBLE);
+            isAllEmpty = false;
+        }
+        if(hasNewsContent) {
+            mNewsResultRecyclerView.setVisibility(View.VISIBLE);
+            mNewsResultsTextView.setVisibility(View.VISIBLE);
+            isAllEmpty = false;
+        }
+        if(isAllEmpty) {
+            mSearchStatusTextView.setVisibility(View.VISIBLE);
+            String text = String.format(getResources().getString(R.string.title_search_no_results), query);
+            mSearchStatusTextView.setText(text);
+        } else {
+            mSearchStatusTextView.setVisibility(View.GONE);
+        }
+    }
+
     private void filter(String text) {
+
+        MSLog.d("search stock: " + text);
+        mQueryString = text;
+        adjustUIForStartSearching(mQueryString);
+        ArrayList<String> newsQueryStrings = new ArrayList<>();
+        // stock search part
         ArrayList<Stock> filterStocks = new ArrayList<>();
 
         if(mAllStocks != null) {
             for (Stock stock : mAllStocks) {
-                if(stock.getCode().contains(text) || stock.getName().contains(text)) {
+                if(stock.getCode().equals(text) || stock.getName().equals(text)) {
                     filterStocks.add(stock);
+                    newsQueryStrings.add(stock.getName());
                 }
             }
         }
-        setResultNumber(filterStocks.size());
-        mAdapter.filterList(filterStocks);
-    }
+        mStockRecyclerAdapter.filterList(filterStocks);
 
-    private void setResultNumber(int number) {
-        if(mResultTextView != null) {
-            String format = getResources().getString(R.string.title_search_result);
-            mResultTextView.setText(String.format(format, number));
+        // news search part
+        if(newsQueryStrings.size() > 0) {
+            ArrayList<String> networkUrls = new ArrayList<>();
+            ArrayList<String> cacheUrls = new ArrayList<>();
+            for (String name : newsQueryStrings) {
+                String networkUrl = NewsRequest.queryKeywordNewsUrl(this, name, true);
+                if (networkUrl == null) {
+                    return;
+                }
+                MSLog.d("search news: " + name);
+                String cacheUrl = NewsRequest.queryKeywordNewsUrl(this, name, false);
+                networkUrls.add(networkUrl);
+                cacheUrls.add(cacheUrl);
+            }
+            if (networkUrls.size() > 0) {
+                MSLog.d("search news size: " + networkUrls.size());
+                mNewsRecyclerAdapter.loadNews(networkUrls, cacheUrls);
+            }
+        } else {
+            adjustUIForEndSearching(false, mQueryString);
         }
+
+        hideSoftKeyboard();
     }
 
     private void resetSearchState() {
-        if(mResultRecyclerView != null) {
-            mResultRecyclerView.scrollToPosition(0);
+        if(mStockResultRecyclerView != null) {
+            mStockResultRecyclerView.scrollToPosition(0);
         }
         if (mSearchView != null) {
             mSearchView.clearFocus();
             mSearchView.setText("");
         }
-        if(mAllStocks != null) {
-            setResultNumber(mAllStocks.size());
-            mAdapter.filterList(mAllStocks);
-        } else {
-            setResultNumber(0);
-            mAdapter.filterList(new ArrayList<Stock>());
-        }
         hideSoftKeyboard();
     }
 
-    private  void hideSoftKeyboard() {
+    private void hideSoftKeyboard() {
         InputMethodManager inputMethodManager =
                 (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
         if (inputMethodManager != null) {
@@ -203,5 +289,13 @@ public class SearchAndResponseActivity extends AppCompatActivity {
         super.onBackPressed();
         setResult(RESULT_CANCELED);
         overridePendingTransition(0, 0);
+    }
+
+    @Override
+    protected void onDestroy() {
+        if(mNewsRecyclerAdapter != null) {
+            mNewsRecyclerAdapter.destroy();
+        }
+        super.onDestroy();
     }
 }

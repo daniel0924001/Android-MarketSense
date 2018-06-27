@@ -113,8 +113,10 @@ public class MainFragment extends Fragment {
                 }
                 TextView secondTitle = view.findViewById(R.id.tv_news_ranking);
                 ((ConstraintLayout.LayoutParams) secondTitle.getLayoutParams()).topToBottom = R.id.grid_ranking_people;
+                ((ConstraintLayout.LayoutParams) secondTitle.getLayoutParams()).topMargin = 0;
                 TextView thirdTitle = view.findViewById(R.id.tv_news);
                 ((ConstraintLayout.LayoutParams) thirdTitle.getLayoutParams()).topToBottom = R.id.grid_ranking_news;
+                ((ConstraintLayout.LayoutParams) thirdTitle.getLayoutParams()).topMargin = 0;
 
                 mPeopleGridViewAdapter = new RankingGridViewAdapter(getActivity(), mStockListPlacer.getStocks(), RankingGridViewAdapter.RANKING_BY_PEOPLE);
                 mNewsGridViewAdapter = new RankingGridViewAdapter(getActivity(), mStockListPlacer.getStocks(), RankingGridViewAdapter.RANKING_BY_NEWS);

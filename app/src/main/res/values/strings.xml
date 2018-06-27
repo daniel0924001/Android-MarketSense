@@ -46,13 +46,17 @@
     <string name="title_search_add">加入自選</string>
     <string name="title_add_complete">已加入自選股 %s(%s)</string>
     <string name="title_delete_complete">已刪除自選股 %s(%s)</string>
+    <string name="title_search">搜尋</string>
     <string name="title_search_cancel">取消</string>
-    <string name="title_search_result">搜尋結果：%d筆</string>
+    <string name="title_search_result_stock">相關股票</string>
+    <string name="title_search_result_news">相關新聞</string>
     <string name="title_hint_delete">長按自選列表裡的項目可刪除你的自選個股</string>
     <string name="title_delete">請問你要刪除以下這支股票嗎？</string>
     <string name="message_delete">股票名稱：%s\n股票代碼：%s</string>
     <string name="cancel">取消</string>
     <string name="confirm">確定</string>
+    <string name="title_search_processing">正在搜尋「 %s 」 &#8230;</string>
+    <string name="title_search_no_results">很抱歉，我們目前沒有任何符合「 %s 」的搜尋結果。</string>
 
     <string name="title_comment_user_name">使用者名稱</string>
     <string name="title_comment_create_time">留言時間</string>

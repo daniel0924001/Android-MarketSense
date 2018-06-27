@@ -36,7 +36,7 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
     }
 
     public interface OnItemClickListener {
-        void onItemClick(News stock);
+        void onItemClick(News news);
     }
 
     public enum ITEM_TYPE {

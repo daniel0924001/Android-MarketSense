@@ -2,6 +2,7 @@ package com.idroi.marketsense;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
@@ -10,8 +11,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -41,7 +44,6 @@ public class SearchAndResponseActivity extends AppCompatActivity {
     public static final String EXTRA_SELECTED_COMPANY_CODE_KEY = "extra_selected_company_code";
 
     private EditText mSearchView;
-    private ImageButton mSearchCancelButton;
     private RecyclerView mStockResultRecyclerView, mNewsResultRecyclerView;
     private StockListRecyclerViewAdapter mStockRecyclerAdapter;
     private NewsRecyclerAdapter mNewsRecyclerAdapter;
@@ -67,53 +69,32 @@ public class SearchAndResponseActivity extends AppCompatActivity {
 
         if(actionBar != null) {
             actionBar.setElevation(0);
+            actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.text_white)));
             View view = LayoutInflater.from(actionBar.getThemedContext())
                     .inflate(R.layout.action_bar_search, null);
 
             mSearchView = view.findViewById(R.id.search_text);
             if(mSearchView != null) {
-                mSearchView.addTextChangedListener(new TextWatcher() {
+                mSearchView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                     @Override
-                    public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-                        if(count == 0) {
-                            if(mSearchCancelButton != null) {
-                                mSearchCancelButton.setVisibility(View.GONE);
-                            }
-                        } else {
-                            if(mSearchCancelButton != null) {
-                                mSearchCancelButton.setVisibility(View.VISIBLE);
-                            }
+                    public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                        if(actionId == EditorInfo.IME_ACTION_DONE) {
+                            filter(mSearchView.getText().toString());
                         }
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable editable) {
+                        return true;
                     }
                 });
             }
 
-            mSearchCancelButton = view.findViewById(R.id.search_cancel);
-            if(mSearchCancelButton != null) {
-                mSearchCancelButton.setOnClickListener(new View.OnClickListener() {
+            ImageButton goBackImageButton = view.findViewById(R.id.go_back);
+            if(goBackImageButton != null) {
+                goBackImageButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        resetSearchState();
+                        onBackPressed();
                     }
                 });
             }
-
-            TextView doSearchTextView = view.findViewById(R.id.do_search);
-            doSearchTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    filter(mSearchView.getText().toString());
-                }
-            });
 
             actionBar.setDisplayShowHomeEnabled(false);
             actionBar.setDisplayShowTitleEnabled(false);

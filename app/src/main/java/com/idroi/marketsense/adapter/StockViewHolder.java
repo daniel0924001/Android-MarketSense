@@ -21,9 +21,6 @@ public class StockViewHolder {
     TextView priceView;
     TextView diffView;
 
-    TextView predictNewsText;
-    TextView predictPeopleText;
-
     ImageView predictNewsImageView;
     ImageView predictPeopleImageView;
 
@@ -40,8 +37,6 @@ public class StockViewHolder {
             stockViewHolder.priceView = view.findViewById(R.id.marketsense_stock_price_tv);
             stockViewHolder.diffView = view.findViewById(R.id.marketsense_stock_diff_tv);
 
-            stockViewHolder.predictNewsText = view.findViewById(R.id.marketsense_stock_news_tv);
-            stockViewHolder.predictPeopleText = view.findViewById(R.id.marketsense_stock_people_tv);
             stockViewHolder.predictNewsImageView = view.findViewById(R.id.marketsense_stock_news_iv);
             stockViewHolder.predictPeopleImageView = view.findViewById(R.id.marketsense_stock_people_iv);
 

@@ -12,7 +12,7 @@
     <string name="preview">預覽</string>
     <string name="title_news_tab">新聞</string>
     <string name="title_choices_tab">自選</string>
-    <string name="title_predict_tab">預測</string>
+    <string name="title_predict_tab">風向</string>
     <string name="title_main_page">首頁</string>
     <string name="title_no_comment">暫無評論</string>
     <string name="title_send_first">立馬搶頭香</string>
@@ -76,9 +76,9 @@
     <string name="title_company_code">公司代號</string>
     <string name="title_company_name_code_format">%s (%s)</string>
     <string name="title_company_name_and_code">公司名稱/代號</string>
-    <string name="title_company_price">股價</string>
+    <string name="title_company_price">1467.32</string>
     <string name="title_company_price_diff_num">股價漲跌數字</string>
-    <string name="title_company_price_diff_percentage">股價漲跌百分比</string>
+    <string name="title_company_price_diff_percentage">+10.00%</string>
     <string name="title_company_confidence">公司信心指數</string>
 
     <string name="title_sort_by">排序依：</string>

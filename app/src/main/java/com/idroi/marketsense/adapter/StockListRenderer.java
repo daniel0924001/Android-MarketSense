@@ -52,31 +52,24 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
         MarketSenseRendererHelper.addTextView(stockViewHolder.codeView, content.getCode());
 
         MarketSenseRendererHelper.addTextView(stockViewHolder.priceView, content.getPrice());
-        String format = context.getResources().getString(R.string.title_company_name_code_format);
-        MarketSenseRendererHelper.addTextView(stockViewHolder.diffView, String.format(format, content.getDiffNumber(), content.getDiffPercentage()));
+        MarketSenseRendererHelper.addTextView(stockViewHolder.diffView, content.getDiffPercentage());
 
         int peopleLevel = content.getPredictPeopleLevel();
         int newsLevel = content.getPredictNewsLevel();
 
         if(content.getPredictPeopleDirection() == Stock.TREND_UP) {
-            stockViewHolder.predictPeopleText.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_red_s, 0, 0, 0);
             stockViewHolder.predictPeopleImageView.setImageResource(mBarRedResourceId[peopleLevel]);
         } else if(content.getPredictPeopleDirection() == Stock.TREND_DOWN) {
-            stockViewHolder.predictPeopleText.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_green_s, 0, 0, 0);
             stockViewHolder.predictPeopleImageView.setImageResource(mBarGreenResourceId[peopleLevel]);
         } else {
-            stockViewHolder.predictPeopleText.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_none, 0, 0, 0);
             stockViewHolder.predictPeopleImageView.setImageResource(R.mipmap.ic_bar0);
         }
 
         if(content.getConfidenceDirection() == Stock.TREND_UP) {
-            stockViewHolder.predictNewsText.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_red_s, 0, 0, 0);
             stockViewHolder.predictNewsImageView.setImageResource(mBarRedResourceId[newsLevel]);
         } else if(content.getConfidenceDirection() == Stock.TREND_DOWN) {
-            stockViewHolder.predictNewsText.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_green_s, 0, 0, 0);
             stockViewHolder.predictNewsImageView.setImageResource(mBarGreenResourceId[newsLevel]);
         } else {
-            stockViewHolder.predictNewsText.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_none, 0, 0, 0);
             stockViewHolder.predictNewsImageView.setImageResource(R.mipmap.ic_bar0);
         }
 

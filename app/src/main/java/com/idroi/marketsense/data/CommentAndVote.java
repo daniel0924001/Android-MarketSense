@@ -19,8 +19,8 @@ public class CommentAndVote {
     private ArrayList<Comment> mCommentArray;
     private int mRaiseNumber;
     private int mFallNumber;
-    private int mVoting;
-    private int mPrediction;
+    private double mVoting;
+    private double mPrediction;
 
     public CommentAndVote() {
     }
@@ -40,11 +40,11 @@ public class CommentAndVote {
         mFallNumber = number;
     }
 
-    public void setVoting(int number) {
+    public void setVoting(double number) {
         mVoting = number;
     }
 
-    public void setPrediction(int number) {
+    public void setPrediction(double number) {
         mPrediction = number;
     }
 

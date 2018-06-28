@@ -108,7 +108,7 @@
             android:resource="@color/colorPrimary" />
 
         <!--<meta-data android:name="firebase_crash_collection_enabled" android:value="false" />-->
-Marke
+
     </application>
 
 </manifest>

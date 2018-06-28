@@ -7,8 +7,8 @@ android {
         applicationId "com.idroi.marketsense"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 5
-        versionName "1.0.004"
+        versionCode 6
+        versionName "1.0.005"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true

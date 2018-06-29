@@ -3,6 +3,7 @@ package com.idroi.marketsense.common;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Cache;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -18,6 +19,7 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by daniel.hsieh on 2018/5/3.
@@ -249,7 +251,18 @@ public class ClientData {
                             mLoadPreferenceRetryCounter = DEFAULT_RETRY_TIME;
                         }
                     }
-                });
+                }){
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        String token = ClientData.getInstance().getUserToken();
+                        HashMap<String, String> headers = new HashMap<String, String>();
+                        headers.put("Content-Type", "application/json");
+                        if(token != null && !token.isEmpty()) {
+                            headers.put("User-Token", token);
+                        }
+                        return headers;
+                    }
+            };
 
         userEventsAndCodesRequest.setShouldCache(false);
         Networking.getRequestQueue(mContext).add(userEventsAndCodesRequest);

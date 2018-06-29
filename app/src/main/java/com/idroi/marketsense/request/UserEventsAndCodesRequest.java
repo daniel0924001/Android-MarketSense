@@ -114,7 +114,7 @@ public class UserEventsAndCodesRequest extends Request<Void> {
     private static final String API_URL_SELF_CHOICES = "http://apiv2.infohubapp.com/v1/stock/user/";
 
     public static String querySelfStockList() {
-        String token = ClientData.getInstance().getUserToken();
-        return API_URL_SELF_CHOICES + token + "?timestamp=" + System.currentTimeMillis();
+        String id = ClientData.getInstance().getUserProfile().getUserId();
+        return API_URL_SELF_CHOICES + id + "?timestamp=" + System.currentTimeMillis();
     }
 }

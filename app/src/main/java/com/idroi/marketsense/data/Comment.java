@@ -1,11 +1,16 @@
 package com.idroi.marketsense.data;
 
+import android.support.annotation.Nullable;
+
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.DateConverter;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
@@ -22,6 +27,10 @@ public class Comment {
     private static final String COMMENT_TARGET = "event_target";// news or stock
     private static final String USER_PROFILE = "user_profile";  // user profile: name, avatar_link
 
+    private static final String REPLIES = "replies";            // replies (comments)
+    private static final String LIKE = "like";                  // like number;
+    private static final String LIKE_LIST = "like_list";        // user profile of like event
+
     private String mUserId;
     private String mCommentId;
     private String mCommentTarget;
@@ -30,6 +39,10 @@ public class Comment {
     private String mContentId;
     private String mDateString;
     private int mTimeStamp;
+
+    private ArrayList<Comment> mReplyArrayList;
+    private int mLikeNumber;
+    private boolean mIsLiked = false;
 
     private UserProfile mUserProfile;
 
@@ -71,6 +84,52 @@ public class Comment {
 
     public void setDateString(String dateString) {
         mDateString = dateString;
+    }
+
+    public void setLike(int likeNumber) {
+        mLikeNumber = likeNumber;
+    }
+
+    public void setLikeUserProfile(JSONArray likes) {
+        String userId = ClientData.getInstance().getUserProfile().getUserId();
+        for(int i = 0; i < likes.length(); i++) {
+            try {
+                Event event = Event.JsonObjectToEvent(likes.getJSONObject(i));
+                if(event.getUserId().equals(userId)) {
+                    mIsLiked = true;
+                }
+            } catch (JSONException e) {
+                MSLog.e("JSONException in setLikeUserProfile: " + i);
+            }
+        }
+    }
+
+    public void increaseLike() {
+        mLikeNumber += 1;
+    }
+
+    public void decreaseLike() {
+        mLikeNumber -= 1;
+    }
+
+    public void setReplies(JSONArray comments) {
+        mReplyArrayList = new ArrayList<>();
+        for(int i = 0; i < comments.length(); i++) {
+            try {
+                Comment comment = Comment.jsonObjectToComment(comments.getJSONObject(i));
+                mReplyArrayList.add(comment);
+            } catch (JSONException e) {
+                MSLog.e("JSONException in setReplies: " + i);
+            }
+        }
+    }
+
+    public void addReply(Comment comment) {
+        if(mReplyArrayList == null) {
+            mReplyArrayList = new ArrayList<>();
+        }
+
+        mReplyArrayList.add(comment);
     }
 
     public String getUserId() {
@@ -123,12 +182,43 @@ public class Comment {
         return mTimeStamp;
     }
 
+    @Nullable
+    public ArrayList<Comment> getReplyArrayList() {
+        return mReplyArrayList;
+    }
+
+    public int getReplyNumber() {
+        if(mReplyArrayList != null){
+            return mReplyArrayList.size();
+        } else {
+            return 0;
+        }
+    }
+
+    public int getLikeNumber() {
+        return mLikeNumber;
+    }
+
     public String getDateString() {
         if(mDateString != null) {
             return mDateString;
         } else {
             return "剛剛";
         }
+    }
+
+    public boolean isLiked() {
+        return mIsLiked;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Comment) {
+            if(this.getCommentId().equals(((Comment)obj).getCommentId())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static Comment jsonObjectToComment(JSONObject jsonObject) {
@@ -161,11 +251,18 @@ public class Comment {
                         comment.setUserProfile(UserProfile.jsonObjectToUserProfile(
                                 jsonObject.optJSONObject(USER_PROFILE)));
                         break;
+                    case LIKE:
+                        comment.setLike(jsonObject.optInt(LIKE));
+                        break;
+                    case REPLIES:
+                        comment.setReplies(jsonObject.optJSONArray(REPLIES));
+                        break;
+                    case LIKE_LIST:
+                        comment.setLikeUserProfile(jsonObject.optJSONArray(LIKE_LIST));
+                        break;
                     default:
                         break;
                 }
-            } catch (ClassCastException e) {
-                MSLog.e(e.toString());
             } catch (Exception e) {
                 MSLog.e(e.toString());
             }

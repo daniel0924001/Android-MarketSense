@@ -62,6 +62,8 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_HTML;
+import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_ID;
+import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_TYPE;
 import static com.idroi.marketsense.RichEditorActivity.sEditorRequestCode;
 import static com.idroi.marketsense.adapter.NewsRecyclerAdapter.NEWS_SINGLE_LAYOUT;
 import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
@@ -125,6 +127,8 @@ public class StockActivity extends AppCompatActivity {
     private ImageView mAddFavorite;
     private ConstraintLayout mSelectorComment, mSelectorNews;
     private NestedScrollView mNestedScrollView;
+
+    private Comment mTempComment;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -348,9 +352,16 @@ public class StockActivity extends AppCompatActivity {
 
                     switch (mLastClickedButton) {
                         case CLICK_COMMENT_BEFORE_LOGIN:
-                            startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
-                                    StockActivity.this, RichEditorActivity.TYPE.STOCK, mCode),
-                                    sEditorRequestCode);
+                            if(mTempComment != null) {
+                                startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
+                                        StockActivity.this, RichEditorActivity.TYPE.REPLY, mTempComment.getCommentId()),
+                                        sEditorRequestCode);
+                                mTempComment = null;
+                            } else {
+                                startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
+                                        StockActivity.this, RichEditorActivity.TYPE.STOCK, mCode),
+                                        sEditorRequestCode);
+                            }
                             overridePendingTransition(R.anim.enter, R.anim.stop);
                             return;
                         case CLICK_STAR_BEFORE_LOGIN:
@@ -372,6 +383,11 @@ public class StockActivity extends AppCompatActivity {
             }
         };
         mUserProfile.addUserProfileChangeListener(mUserProfileChangeListener);
+    }
+
+    private void showLoginAlertDialog(int lastButton, Comment tempComment) {
+        mTempComment = tempComment;
+        showLoginAlertDialog(lastButton);
     }
 
     private void showLoginAlertDialog(int lastButton) {
@@ -567,7 +583,27 @@ public class StockActivity extends AppCompatActivity {
     private void initComments() {
         mCommentRecyclerView = findViewById(R.id.marketsense_stock_comment_rv);
 
-        mCommentsRecyclerViewAdapter = new CommentsRecyclerViewAdapter(this);
+        mCommentsRecyclerViewAdapter = new CommentsRecyclerViewAdapter(this, new CommentsRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onSayLikeItemClick(Comment comment) {
+                comment.increaseLike();
+                PostEvent.sendLike(StockActivity.this, comment.getCommentId());
+                int position = mCommentsRecyclerViewAdapter.getItemPositionById(comment.getCommentId());
+                mCommentsRecyclerViewAdapter.notifyItemChanged(position);
+            }
+
+            @Override
+            public void onReplyItemClick(Comment comment) {
+                if(FBHelper.checkFBLogin()) {
+                    startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
+                            StockActivity.this, RichEditorActivity.TYPE.REPLY, comment.getCommentId()),
+                            sEditorRequestCode);
+                    overridePendingTransition(R.anim.enter, R.anim.stop);
+                } else {
+                    showLoginAlertDialog(CLICK_COMMENT_BEFORE_LOGIN, comment);
+                }
+            }
+        });
         mCommentRecyclerView.setAdapter(mCommentsRecyclerViewAdapter);
         mCommentRecyclerView.setNestedScrollingEnabled(false);
 
@@ -870,12 +906,25 @@ public class StockActivity extends AppCompatActivity {
         if(requestCode == sEditorRequestCode) {
             if(resultCode == RESULT_OK) {
                 String html = data.getStringExtra(EXTRA_RES_HTML);
-                Comment comment = new Comment();
-                comment.setCommentHtml(html);
-                mCommentsRecyclerViewAdapter.addOneComment(comment);
-                showCommentBlock();
-                MSLog.d("user send a comment on code: " + mCode);
-                MSLog.d("user send a comment of html: " + html);
+                String type = data.getStringExtra(EXTRA_RES_TYPE);
+                String id = data.getStringExtra(EXTRA_RES_ID);
+
+                Comment newComment = new Comment();
+                newComment.setCommentHtml(html);
+                if (type.equals(RichEditorActivity.TYPE.REPLY.getType())) {
+                    int position = mCommentsRecyclerViewAdapter.getItemPositionById(id);
+                    Comment comment = mCommentsRecyclerViewAdapter.getComment(position);
+                    comment.addReply(newComment);
+                    if (position != -1) {
+                        MSLog.e("position: " + position);
+                        mCommentsRecyclerViewAdapter.notifyItemChanged(position);
+                    }
+                } else {
+                    mCommentsRecyclerViewAdapter.addOneComment(newComment);
+                    showCommentBlock();
+                }
+
+                MSLog.d(String.format("user send a comment on (%s, %s): %s", type, id, html));
             }
         }
         mFBCallbackManager.onActivityResult(requestCode, resultCode, data);

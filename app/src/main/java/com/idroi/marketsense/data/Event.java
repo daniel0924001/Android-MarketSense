@@ -25,7 +25,7 @@ public class Event {
     public static final String EVENT_TARGET_STOCK = "stock";
     public static final String EVENT_TARGET_NEWS = "news";
 
-    private String mId;
+    private String mUserId;
     private String mEvent;
     private String mEventContent;
     private String mEventType;
@@ -37,8 +37,8 @@ public class Event {
     public Event() {
     }
 
-    public Event setId(String id) {
-        mId = id;
+    public Event setUserId(String id) {
+        mUserId = id;
         return this;
     }
 
@@ -75,6 +75,10 @@ public class Event {
     public Event setEventCreatedTs(String timestamp) {
         mEventCreatedTs = timestamp;
         return this;
+    }
+
+    public String getUserId() {
+        return mUserId;
     }
 
     public String getEvent() {
@@ -120,7 +124,7 @@ public class Event {
             try {
                 switch (key) {
                     case USER_ID:
-                        event.setId(jsonObject.optString(key));
+                        event.setUserId(jsonObject.optString(key));
                         break;
                     case EVENT:
                         event.setEvent(jsonObject.optString(EVENT));

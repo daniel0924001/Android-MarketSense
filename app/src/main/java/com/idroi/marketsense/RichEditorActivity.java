@@ -41,6 +41,8 @@ public class RichEditorActivity extends AppCompatActivity {
     public static final String EXTRA_REQ_TYPE = "extra_type";
     public static final String EXTRA_REQ_ID = "extra_id";
     public static final String EXTRA_RES_HTML = "extra_response_html";
+    public static final String EXTRA_RES_TYPE = EXTRA_REQ_TYPE;
+    public static final String EXTRA_RES_ID = EXTRA_REQ_ID;
     public final static int sEditorRequestCode = 2;
 
     private String mType;
@@ -51,7 +53,8 @@ public class RichEditorActivity extends AppCompatActivity {
 
     public enum TYPE {
         NEWS("news"),
-        STOCK("stock");
+        STOCK("stock"),
+        REPLY("reply");
 
         private String mType;
 
@@ -111,9 +114,14 @@ public class RichEditorActivity extends AppCompatActivity {
                 } else if(mType.equals(TYPE.STOCK.getType())) {
                     MSLog.i("send stock comment (" + mId + "): " + html);
                     PostEvent.sendStockComment(RichEditorActivity.this, mId, html);
+                } else if(mType.equals(TYPE.REPLY.getType())) {
+                    MSLog.i("send reply comment (" + mId + "): " + html);
+                    PostEvent.sendReplyComment(RichEditorActivity.this, mId, html);
                 }
                 Intent intent = new Intent();
                 intent.putExtra(EXTRA_RES_HTML, html);
+                intent.putExtra(EXTRA_RES_TYPE, mType);
+                intent.putExtra(EXTRA_RES_ID, mId);
                 setResult(RESULT_OK, intent);
                 finish();
                 overridePendingTransition(R.anim.stop, R.anim.right_to_left);

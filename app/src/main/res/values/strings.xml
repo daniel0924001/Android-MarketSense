@@ -142,6 +142,11 @@
     <string name="title_go_top">TOP</string>
     <string name="title_comment">評論</string>
     <string name="title_comment_colon">評論:</string>
+    <string name="title_reply">回覆</string>
+    <string name="title_good">讚</string>
+    <string name="title_good_already">已讚</string>
+    <string name="title_reply_number">回覆 %d</string>
+    <string name="title_good_number">讚 %d</string>
     <string name="title_action_seven">快來表達你對這支股票一週內的想法吧！</string>
     <string name="title_welcome_tomorrow">歡迎您明日八點過後再來表達您的看法唷！</string>
     <string name="title_welcome_but_you_have_voted">歡迎回來，今日你已經於稍早時表達過看法了！</string>

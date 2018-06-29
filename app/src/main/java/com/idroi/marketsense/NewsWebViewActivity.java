@@ -55,6 +55,8 @@ import java.io.ByteArrayInputStream;
 import java.util.Locale;
 
 import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_HTML;
+import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_ID;
+import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_TYPE;
 import static com.idroi.marketsense.RichEditorActivity.sEditorRequestCode;
 import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_NEWS_COMMENT_CLICK;
@@ -107,7 +109,10 @@ public class NewsWebViewActivity extends AppCompatActivity {
     private LoginButton mFBLoginBtn;
     private UserProfile.UserProfileChangeListener mUserProfileChangeListener;
     private CallbackManager mFBCallbackManager;
+
     private boolean mLastClickedButtonIsComment;
+    private RichEditorActivity.TYPE mWriteWhichType;
+    private String mWriteWhichCommentId;
 
     public static final int sPostDelayMilliSeconds = 2000;
     private boolean mIsOriginalVisible = false;
@@ -169,7 +174,30 @@ public class NewsWebViewActivity extends AppCompatActivity {
         commentTitle.setText(getResources().getString(R.string.title_comment));
         mCommentRecyclerView = findViewById(R.id.marketsense_webview_comment_rv);
 
-        mCommentsRecyclerViewAdapter = new CommentsRecyclerViewAdapter(this);
+        mCommentsRecyclerViewAdapter = new CommentsRecyclerViewAdapter(this, new CommentsRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onSayLikeItemClick(Comment comment) {
+                comment.increaseLike();
+                PostEvent.sendLike(NewsWebViewActivity.this, comment.getCommentId());
+                int position = mCommentsRecyclerViewAdapter.getItemPositionById(comment.getCommentId());
+                mCommentsRecyclerViewAdapter.notifyItemChanged(position);
+            }
+
+            @Override
+            public void onReplyItemClick(Comment comment) {
+                mLastClickedButtonIsComment = true;
+                mWriteWhichType = RichEditorActivity.TYPE.REPLY;
+                mWriteWhichCommentId = comment.getCommentId();
+                if(FBHelper.checkFBLogin()) {
+                    startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
+                            NewsWebViewActivity.this, RichEditorActivity.TYPE.REPLY, comment.getCommentId()),
+                            sEditorRequestCode);
+                    overridePendingTransition(R.anim.enter, R.anim.stop);
+                } else {
+                    showLoginAlertDialog();
+                }
+            }
+        });
         mCommentRecyclerView.setAdapter(mCommentsRecyclerViewAdapter);
 
         mCommentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -288,6 +316,8 @@ public class NewsWebViewActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 mLastClickedButtonIsComment = true;
+                mWriteWhichType = RichEditorActivity.TYPE.NEWS;
+                mWriteWhichCommentId = mId;
                 if(FBHelper.checkFBLogin()) {
                     startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
                             NewsWebViewActivity.this, RichEditorActivity.TYPE.NEWS, mId),
@@ -303,6 +333,8 @@ public class NewsWebViewActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 mLastClickedButtonIsComment = true;
+                mWriteWhichType = RichEditorActivity.TYPE.NEWS;
+                mWriteWhichCommentId = mId;
                 if(FBHelper.checkFBLogin()) {
                     startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
                             NewsWebViewActivity.this, RichEditorActivity.TYPE.NEWS, mId),
@@ -318,6 +350,8 @@ public class NewsWebViewActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 mLastClickedButtonIsComment = true;
+                mWriteWhichType = RichEditorActivity.TYPE.NEWS;
+                mWriteWhichCommentId = mId;
                 if(FBHelper.checkFBLogin()) {
                     startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
                             NewsWebViewActivity.this, RichEditorActivity.TYPE.NEWS, mId),
@@ -336,7 +370,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
                 if(notifyId == NOTIFY_ID_NEWS_COMMENT_CLICK && mLastClickedButtonIsComment) {
                     if(FBHelper.checkFBLogin() ) {
                         startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
-                                NewsWebViewActivity.this, RichEditorActivity.TYPE.NEWS, mId),
+                                NewsWebViewActivity.this, mWriteWhichType, mWriteWhichCommentId),
                                 sEditorRequestCode);
                         overridePendingTransition(R.anim.enter, R.anim.stop);
                     }
@@ -427,12 +461,25 @@ public class NewsWebViewActivity extends AppCompatActivity {
         if(requestCode == sEditorRequestCode) {
             if(resultCode == RESULT_OK) {
                 String html = data.getStringExtra(EXTRA_RES_HTML);
-                Comment comment = new Comment();
-                comment.setCommentHtml(html);
-                mCommentsRecyclerViewAdapter.addOneComment(comment);
-                showCommentBlock();
-                MSLog.d("user send a comment on id: " + mId);
-                MSLog.d("user send a comment of html: " + html);
+                String type = data.getStringExtra(EXTRA_RES_TYPE);
+                String id = data.getStringExtra(EXTRA_RES_ID);
+
+                Comment newComment = new Comment();
+                newComment.setCommentHtml(html);
+                if(type.equals(RichEditorActivity.TYPE.REPLY.getType())) {
+                    int position = mCommentsRecyclerViewAdapter.getItemPositionById(id);
+                    Comment comment = mCommentsRecyclerViewAdapter.getComment(position);
+                    comment.addReply(newComment);
+                    if(position != -1) {
+                        MSLog.e("position: " + position);
+                        mCommentsRecyclerViewAdapter.notifyItemChanged(position);
+                    }
+                } else {
+                    mCommentsRecyclerViewAdapter.addOneComment(newComment);
+                    showCommentBlock();
+                }
+
+                MSLog.d(String.format("user send a comment on (%s, %s): %s", type, id, html));
             }
         }
         mFBCallbackManager.onActivityResult(requestCode, resultCode, data);

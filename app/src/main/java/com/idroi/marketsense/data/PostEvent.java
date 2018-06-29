@@ -32,6 +32,8 @@ public class PostEvent {
         LOGIN("login", POST_TYPE_LOGIN),
         VOTING("voting", POST_TYPE_EVENT),
         COMMENT("comment", POST_TYPE_EVENT),
+        REPLY("reply", POST_TYPE_EVENT),
+        LIKE("like", POST_TYPE_EVENT),
         FAVORITE_STOCK_ADD("favorite_stock_add", POST_TYPE_ADD_FAVORITE),
         FAVORITE_STOCK_DELETE("favorite_stock_delete", POST_TYPE_DELETE_FAVORITE);
 
@@ -103,6 +105,7 @@ public class PostEvent {
 
     private static final String NEWS_CONST = "news";
     private static final String STOCK_CONST = "stock";
+    private static final String EVENT_CONST = "event";
 
     private int mPostType;
     private int mMethod;
@@ -398,6 +401,28 @@ public class PostEvent {
                 .setEventValueString(html)
                 .setEventType("normal")
                 .setEventTarget(NEWS_CONST)
+                .setUserToken(clientData.getUserToken())
+                .send(context);
+    }
+
+    public static void sendReplyComment(Context context, String eventId, String html) {
+        ClientData clientData = ClientData.getInstance(context);
+        new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.REPLY)
+                .setEventContent(eventId)
+                .setEventValueString(html)
+                .setEventType("normal")
+                .setEventTarget(EVENT_CONST)
+                .setUserToken(clientData.getUserToken())
+                .send(context);
+    }
+
+    public static void sendLike(Context context, String eventId) {
+        ClientData clientData = ClientData.getInstance(context);
+        new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.LIKE)
+                .setEventContent(eventId)
+                .setEventValueInteger(1)
+                .setEventType("normal")
+                .setEventTarget(EVENT_CONST)
                 .setUserToken(clientData.getUserToken())
                 .send(context);
     }

@@ -1,5 +1,6 @@
 package com.idroi.marketsense.adapter;
 
+import android.support.constraint.ConstraintLayout;
 import android.view.View;
 import android.widget.TextView;
 
@@ -19,6 +20,14 @@ public class CommentViewHolder {
     TextView userNameView;
     TextView createTimeView;
     NewsWebView commentBodyView;
+
+    TextView replyNumberView;
+    TextView likeNumberView;
+
+    TextView replyView;
+    TextView likeView;
+
+    ConstraintLayout socialFunctionView;
 
     static final CommentViewHolder EMPTY_VIEW_HOLDER = new CommentViewHolder();
 
@@ -40,6 +49,14 @@ public class CommentViewHolder {
             commentViewHolder.commentBodyView = view.findViewById(R.id.comment_body);
             commentViewHolder.commentBodyView.getSettings().setLoadWithOverviewMode(false);
             commentViewHolder.commentBodyView.getSettings().setUseWideViewPort(false);
+
+            commentViewHolder.replyNumberView = view.findViewById(R.id.tv_reply_number);
+            commentViewHolder.likeNumberView = view.findViewById(R.id.tv_like_number);
+
+            commentViewHolder.replyView = view.findViewById(R.id.tv_reply);
+            commentViewHolder.likeView = view.findViewById(R.id.tv_like);
+
+            commentViewHolder.socialFunctionView = view.findViewById(R.id.social_function_block);
 
             return commentViewHolder;
         } catch (ClassCastException exception) {

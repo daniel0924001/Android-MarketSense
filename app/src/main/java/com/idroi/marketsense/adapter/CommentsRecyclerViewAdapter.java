@@ -18,7 +18,8 @@ import com.idroi.marketsense.datasource.CommentsPlacer;
 public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
 
     public interface OnItemClickListener {
-        void onItemClick(Comment comment);
+        void onSayLikeItemClick(Comment comment);
+        void onReplyItemClick(Comment comment);
     }
 
     public interface CommentsAvailableListener {
@@ -34,9 +35,14 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
     private Handler mHandler;
 
     public CommentsRecyclerViewAdapter(final Activity activity) {
+        this(activity, null);
+    }
+
+    public CommentsRecyclerViewAdapter(final Activity activity, OnItemClickListener listener) {
         mActivity = activity;
         mCommentsPlacer = new CommentsPlacer(activity);
-        mCommentsRenderer = new CommentsRenderer();
+        mOnItemClickListener = listener;
+        mCommentsRenderer = new CommentsRenderer(mOnItemClickListener);
         mHandler = new Handler();
         mCommentsPlacer.setCommentsListener(new CommentsPlacer.CommentsListener() {
             @Override
@@ -57,10 +63,6 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
                 MSLog.d("no comment or failed");
             }
         });
-    }
-
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        mOnItemClickListener = listener;
     }
 
     public void setCommentsAvailableListener(CommentsAvailableListener listener) {
@@ -87,14 +89,14 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
         if(comment != null) {
             mCommentsRenderer.renderView(holder.itemView, comment);
         }
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(mOnItemClickListener != null) {
-                    mOnItemClickListener.onItemClick(mCommentsPlacer.getCommentData(holder.getAdapterPosition()));
-                }
-            }
-        });
+    }
+
+    public Comment getComment(int position) {
+        return mCommentsPlacer.getCommentData(position);
+    }
+
+    public int getItemPositionById(String eventId) {
+        return mCommentsPlacer.getItemPositionById(eventId);
     }
 
     @Override

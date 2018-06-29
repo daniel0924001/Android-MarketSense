@@ -128,6 +128,15 @@ public class CommentsPlacer {
         }
     }
 
+    public int getItemPositionById(String eventId) {
+        for(int i = 0; i < mCommentArrayList.size(); i++) {
+            if(mCommentArrayList.get(i).getCommentId().equals(eventId)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public int getItemCount() {
         if(mCommentArrayList != null) {
             return mCommentArrayList.size();

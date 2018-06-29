@@ -171,6 +171,7 @@
     <string name="preference_privacy_statement">隱私權暨個人資料保護聲明</string>
     <string name="preference_term_of_service">服務條款</string>
     <string name="preference_disclaimer">免責聲明</string>
+    <string name="preference_version">版本資訊： %s</string>
     <string name="preference_sorry">不好意思，功能尚未開放</string>
 
     <string name="star_title">給予鼓勵</string>

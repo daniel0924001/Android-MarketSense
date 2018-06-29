@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -22,10 +21,7 @@ import android.widget.Toast;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
@@ -38,9 +34,7 @@ import com.idroi.marketsense.common.MarketSenseRendererHelper;
 import com.idroi.marketsense.common.SharedPreferencesCompat;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
-
-import java.util.ArrayList;
-import java.util.Arrays;
+import com.idroi.marketsense.datasource.SettingSource;
 
 import org.json.JSONObject;
 
@@ -56,33 +50,34 @@ import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 
 public class SettingActivity extends AppCompatActivity {
 
-    private int[] mStringIds = {
-            R.string.preference_notification, // fake
-            R.string.preference_notification,
-            R.string.preference_share,
-            R.string.preference_feedback,
-            R.string.preference_star,
-            R.string.preference_privacy_statement,
-            R.string.preference_term_of_service,
-            R.string.preference_disclaimer
-    };
-
-    private Integer[] mDrawableIds = {
-            R.drawable.setting_notification, // fake
-            R.drawable.setting_notification,
-            R.drawable.setting_share,
-            R.drawable.setting_feedback,
-            R.drawable.setting_star,
-            R.drawable.setting_about,
-            R.drawable.setting_about,
-            R.drawable.setting_about,
-    };
+//    private int[] mStringIds = {
+//            R.string.preference_notification, // fake
+//            R.string.preference_notification,
+//            R.string.preference_share,
+//            R.string.preference_feedback,
+//            R.string.preference_star,
+//            R.string.preference_privacy_statement,
+//            R.string.preference_term_of_service,
+//            R.string.preference_disclaimer
+//    };
+//
+//    private Integer[] mDrawableIds = {
+//            R.drawable.setting_notification, // fake
+//            R.drawable.setting_notification,
+//            R.drawable.setting_share,
+//            R.drawable.setting_feedback,
+//            R.drawable.setting_star,
+//            R.drawable.setting_about,
+//            R.drawable.setting_about,
+//            R.drawable.setting_about,
+//    };
 
     private AlertDialog mLoginAlertDialog, mStarAlertDialog;
     private CallbackManager mFBCallbackManager;
     private LoginButton mFBLoginBtn;
     private ListView mListView;
     private SettingAdapter mSettingAdapter;
+    private SettingSource mSettingSource;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -227,16 +222,9 @@ public class SettingActivity extends AppCompatActivity {
 
     private void setListView() {
         mListView = (ListView) findViewById(R.id.setting_listview);
+        mSettingSource = new SettingSource(this);
 
-        final ArrayList<String> list = new ArrayList<>();
-        for (int stringId : mStringIds) {
-            list.add(getResources().getString(stringId));
-        }
-
-        final ArrayList<Integer> list2 = new ArrayList<>();
-        list2.addAll(Arrays.asList(mDrawableIds));
-
-        mSettingAdapter = new SettingAdapter(this, list, list2);
+        mSettingAdapter = new SettingAdapter(this, mSettingSource);
         mSettingAdapter.setSettingOnClickListener(new SettingAdapter.SettingOnClickListener() {
             @Override
             public void onLoginBtnClick() {
@@ -269,7 +257,9 @@ public class SettingActivity extends AppCompatActivity {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                handleListClick(position);
+                if(mSettingSource.getItem(position).isClickable()) {
+                    handleListClick(position);
+                }
             }
         });
     }
@@ -330,10 +320,10 @@ public class SettingActivity extends AppCompatActivity {
     }
 
     private void handleListClick(int position) {
-        if(position <= 0 || position >= mStringIds.length) {
+        if(position <= 0 || position >= mSettingSource.getSize()) {
             return;
         }
-        int id = mStringIds[position];
+        int id = mSettingSource.getId(position);
         String title = getResources().getString(id);
         switch (id) {
             // https://play.google.com/store/apps/details?id=com.idroi.marketsense&referrer=utm_source%3Dandroid_app%26utm_medium%3Dinapp%26utm_campaign%3Dshare%26
@@ -407,5 +397,11 @@ public class SettingActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         overridePendingTransition(R.anim.stop, R.anim.left_to_right_leave);
+    }
+
+    @Override
+    protected void onDestroy() {
+        mSettingSource.destroy();
+        super.onDestroy();
     }
 }

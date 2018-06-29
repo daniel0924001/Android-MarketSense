@@ -1,5 +1,6 @@
 package com.idroi.marketsense.adapter;
 
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Switch;
@@ -16,9 +17,9 @@ public class SettingViewHolder {
 
     View mainView;
     TextView titleView;
-    ImageView iconView;
-    Switch switchView;
-    ImageView gotoView;
+    @Nullable ImageView iconView;
+    @Nullable Switch switchView;
+    @Nullable ImageView gotoView;
 
     static final SettingViewHolder EMPTY_VIEW_HOLDER = new SettingViewHolder();
 

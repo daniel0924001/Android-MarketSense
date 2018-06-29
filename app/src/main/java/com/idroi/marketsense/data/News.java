@@ -8,8 +8,10 @@ import com.idroi.marketsense.common.DateConverter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
@@ -34,6 +36,7 @@ public class News {
     private static final String PREDICTION = "prediction";
     private static final String RAISE = "raise";
     private static final String FALL = "fall";
+    private static final String HIGHLIGHT_SENTENCE = "highlight_sens";
 
     private String mId;
     private String mTitle;
@@ -49,6 +52,7 @@ public class News {
     private int mVoteRaiseNum;
     private int mVoteFallNum;
 
+    @Nullable private ArrayList<HighLightSentence> mHighLightSentences;
     @Nullable private News mNextNews;
 
     public News() {
@@ -105,6 +109,21 @@ public class News {
 
     public void setNextNews(News news) {
         mNextNews = news;
+    }
+
+    public void setHighlightSentence(JSONArray jsonArray) {
+        if(jsonArray != null) {
+            mHighLightSentences = new ArrayList<>();
+            for (int i = 0; i < jsonArray.length(); i++) {
+                try {
+                    HighLightSentence sentence =
+                            HighLightSentence.jsonObjectToHighLightSentence(jsonArray.getJSONObject(i));
+                    mHighLightSentences.add(sentence);
+                } catch (JSONException e) {
+                    MSLog.e("JSONException in setHighlightSentence: " + e.toString());
+                }
+            }
+        }
     }
 
     public String getId() {
@@ -167,6 +186,11 @@ public class News {
         return mNextNews;
     }
 
+    @Nullable
+    public ArrayList<HighLightSentence> getHighLightSentence() {
+        return mHighLightSentences;
+    }
+
     public static News jsonObjectToNews(JSONObject jsonObject) {
         News news = new News();
         Iterator<String> iterator = jsonObject.keys();
@@ -217,6 +241,9 @@ public class News {
                         break;
                     case FALL:
                         news.setVoteFallNum(jsonObject.optInt(key));
+                        break;
+                    case HIGHLIGHT_SENTENCE:
+                        news.setHighlightSentence(jsonObject.optJSONArray(HIGHLIGHT_SENTENCE));
                         break;
                     default:
                         break;

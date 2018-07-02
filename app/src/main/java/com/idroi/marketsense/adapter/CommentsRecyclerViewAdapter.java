@@ -105,5 +105,6 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
     public void destroy() {
         mCommentsRenderer.clear();
         mCommentsPlacer.clear();
+        mCommentsAvailableListener = null;
     }
 }

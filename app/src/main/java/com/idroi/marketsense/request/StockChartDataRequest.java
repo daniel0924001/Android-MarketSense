@@ -48,13 +48,13 @@ public class StockChartDataRequest extends Request<StockTradeData> {
             jsonString = jsonString.substring(5, jsonString.length() - 1);
             JSONObject jsonData = new JSONObject(jsonString);
 
-            MSLog.d("" + jsonData);
+            MSLog.d("Yahoo stock trade data: " + jsonData);
             StockTradeData stockTradeData = new StockTradeData();
             setTickData(stockTradeData, jsonData);
             setMemData(stockTradeData, jsonData);
 
 
-            if(stockTradeData.getStockTickData().size() > 0) {
+            if(stockTradeData.size() > 0) {
                 return Response.success(stockTradeData, HttpHeaderParser.parseCacheHeaders(response));
             } else {
                 return Response.error(new MarketSenseNetworkError(MarketSenseError.JSON_PARSED_NO_DATA));

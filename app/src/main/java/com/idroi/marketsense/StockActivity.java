@@ -162,6 +162,7 @@ public class StockActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         mNewsRecyclerAdapter.destroy();
+        mCommentsRecyclerViewAdapter.destroy();
         mUserProfile.deleteUserProfileChangeListener(mUserProfileChangeListener);
         mStockAIWebView.destroy();
         super.onDestroy();

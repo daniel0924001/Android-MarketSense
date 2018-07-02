@@ -37,6 +37,14 @@ public class StockTradeData {
         }
     }
 
+    public int size() {
+        if(mStockTickDataArrayList != null) {
+            return mStockTickDataArrayList.size();
+        } else {
+            return 0;
+        }
+    }
+
     public ArrayList<StockTickData> getStockTickData() {
         return mStockTickDataArrayList;
     }

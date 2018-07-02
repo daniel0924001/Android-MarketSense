@@ -15,19 +15,21 @@ import com.idroi.marketsense.R;
 
 public class CommentViewHolder {
 
+    private final static int MAX_COMMENT_HEIGHT = 110;
+
     View mainView;
     SimpleDraweeView avatarView;
     TextView userNameView;
     TextView createTimeView;
     NewsWebView commentBodyView;
 
-    TextView replyNumberView;
-    TextView likeNumberView;
-
+    ConstraintLayout replyBlock;
+    ConstraintLayout likeBlock;
     TextView replyView;
     TextView likeView;
 
-    ConstraintLayout socialFunctionView;
+    View horizontalLineView;
+    TextView readMoreView;
 
     static final CommentViewHolder EMPTY_VIEW_HOLDER = new CommentViewHolder();
 
@@ -49,14 +51,16 @@ public class CommentViewHolder {
             commentViewHolder.commentBodyView = view.findViewById(R.id.comment_body);
             commentViewHolder.commentBodyView.getSettings().setLoadWithOverviewMode(false);
             commentViewHolder.commentBodyView.getSettings().setUseWideViewPort(false);
+            float density = view.getContext().getResources().getDisplayMetrics().density;
+            commentViewHolder.commentBodyView.setMaxHeight((int)(MAX_COMMENT_HEIGHT * density));
 
-            commentViewHolder.replyNumberView = view.findViewById(R.id.tv_reply_number);
-            commentViewHolder.likeNumberView = view.findViewById(R.id.tv_like_number);
-
+            commentViewHolder.replyBlock = view.findViewById(R.id.social_reply_block);
+            commentViewHolder.likeBlock = view.findViewById(R.id.social_like_block);
             commentViewHolder.replyView = view.findViewById(R.id.tv_reply);
             commentViewHolder.likeView = view.findViewById(R.id.tv_like);
 
-            commentViewHolder.socialFunctionView = view.findViewById(R.id.social_function_block);
+            commentViewHolder.horizontalLineView = view.findViewById(R.id.social_horizontal_line);
+            commentViewHolder.readMoreView = view.findViewById(R.id.tv_read_more);
 
             return commentViewHolder;
         } catch (ClassCastException exception) {

@@ -12,6 +12,14 @@ import android.webkit.WebView;
 
 public class NewsWebView extends WebView {
 
+    public interface OnReachMaxHeightListener {
+        void onReachMaxHeight();
+    }
+
+    private int mMaxHeight = -1;
+    private OnReachMaxHeightListener mOnReachMaxHeightListener;
+    private boolean mIsReachMaxHeight = false;
+
     public NewsWebView(Context context) {
         super(context);
         init();
@@ -27,6 +35,10 @@ public class NewsWebView extends WebView {
     public NewsWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
+    }
+
+    public void setOnReachMaxHeightListener(OnReachMaxHeightListener listener) {
+        mOnReachMaxHeightListener = listener;
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -58,5 +70,22 @@ public class NewsWebView extends WebView {
         }
         removeAllViews();
         super.destroy();
+    }
+
+    public void setMaxHeight(int height) {
+        mMaxHeight = height;
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        if(mMaxHeight > -1 && getMeasuredHeight() > mMaxHeight) {
+            setMeasuredDimension(getMeasuredWidth(), mMaxHeight);
+            if(mOnReachMaxHeightListener != null && !mIsReachMaxHeight) {
+                mIsReachMaxHeight = true;
+                mOnReachMaxHeightListener.onReachMaxHeight();
+            }
+        }
     }
 }

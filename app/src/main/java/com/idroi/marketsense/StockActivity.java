@@ -564,6 +564,7 @@ public class StockActivity extends AppCompatActivity {
         TextView newsJoin = findViewById(R.id.news_join);
         String format = getResources().getString(R.string.title_news_join);
         newsJoin.setText(String.format(format, mNewsRecyclerAdapter.getNewsTotalCount()));
+        newsJoin.setVisibility(View.VISIBLE);
 
         ImageView noDataImageView = findViewById(R.id.no_news_iv);
         TextView noDataTextView = findViewById(R.id.no_news_tv);
@@ -635,6 +636,7 @@ public class StockActivity extends AppCompatActivity {
         TextView peopleJoin = findViewById(R.id.people_join);
         String format = getResources().getString(R.string.title_people_join);
         peopleJoin.setText(String.format(format, commentAndVote.getCommentSize()));
+        peopleJoin.setVisibility(View.VISIBLE);
 
         TextView peopleScore = findViewById(R.id.people_score);
         TextView peopleMaxScore = findViewById(R.id.people_score_max_const);

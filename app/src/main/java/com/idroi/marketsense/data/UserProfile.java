@@ -236,6 +236,27 @@ public class UserProfile {
         return null;
     }
 
+    public Event getRecentVoteForNewsEvent(String newsId) {
+        long max = -1;
+        Event result = null;
+        if(mEventsArrayList != null) {
+            for (int i = 0; i < mEventsArrayList.size(); i++) {
+                Event event = mEventsArrayList.get(i);
+                if(event.getEvent().equals(EVENT_VOTING) &&
+                        event.getEventTarget().equals(EVENT_TARGET_NEWS) &&
+                        event.getEventContent().equals(newsId)) {
+                    long temp = Long.valueOf(event.getEventCreatedTs());
+                    if(temp > max) {
+                        max = temp;
+                        result = event;
+                    }
+                }
+            }
+            return result;
+        }
+        return null;
+    }
+
     public boolean canVoteAgain(String code) {
         Event event = getRecentVoteForStockEvent(code);
         if(event == null) {

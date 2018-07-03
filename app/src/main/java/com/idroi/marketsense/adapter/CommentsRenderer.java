@@ -87,10 +87,9 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
         });
         commentViewHolder.likeView.setText(String.valueOf(likeNum));
         if(content.isLiked()) {
-            commentViewHolder.likeView.setTextColor(view.getContext().getResources().getColor(R.color.text_black));
             commentViewHolder.likeBlock.setOnClickListener(null);
+            commentViewHolder.likeImageView.setImageResource(R.mipmap.ic_like_on);
         } else {
-            commentViewHolder.likeView.setTextColor(view.getContext().getResources().getColor(R.color.text_gray));
             commentViewHolder.likeBlock.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -99,6 +98,7 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
                     }
                 }
             });
+            commentViewHolder.likeImageView.setImageResource(R.mipmap.ic_like_off);
         }
 
         setViewVisibility(commentViewHolder, View.VISIBLE);

@@ -2,6 +2,7 @@ package com.idroi.marketsense.adapter;
 
 import android.support.constraint.ConstraintLayout;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -27,6 +28,7 @@ public class CommentViewHolder {
     ConstraintLayout likeBlock;
     TextView replyView;
     TextView likeView;
+    ImageView likeImageView;
 
     View horizontalLineView;
     TextView readMoreView;
@@ -58,6 +60,7 @@ public class CommentViewHolder {
             commentViewHolder.likeBlock = view.findViewById(R.id.social_like_block);
             commentViewHolder.replyView = view.findViewById(R.id.tv_reply);
             commentViewHolder.likeView = view.findViewById(R.id.tv_like);
+            commentViewHolder.likeImageView = view.findViewById(R.id.iv_like);
 
             commentViewHolder.horizontalLineView = view.findViewById(R.id.social_horizontal_line);
             commentViewHolder.readMoreView = view.findViewById(R.id.tv_read_more);

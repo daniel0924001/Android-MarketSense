@@ -14,7 +14,7 @@
     <string name="title_choices_tab">自選</string>
     <string name="title_predict_tab">風向</string>
     <string name="title_main_page">首頁</string>
-    <string name="title_no_comment">暫無評論</string>
+    <string name="title_no_comment">目前暫無評論</string>
     <string name="title_send_first">立馬搶頭香</string>
 
     <string name="main_page_people_ranking">鄉民風向榜</string>
@@ -140,8 +140,11 @@
     <string name="title_predict_down">看空:</string>
     <string name="title_vote">投票</string>
     <string name="title_go_top">TOP</string>
-    <string name="title_comment">評論</string>
-    <string name="title_comment_colon">評論:</string>
+    <string name="title_comment">留言</string>
+    <string name="title_comment_format">留言(%d)</string>
+    <string name="title_comment_colon">留言:</string>
+    <string name="title_comment_hint">留下你的評論 &#8230;</string>
+    <string name="title_go_back">返回</string>
     <string name="title_reply">回覆</string>
     <string name="title_good">讚</string>
     <string name="title_good_already">已讚</string>

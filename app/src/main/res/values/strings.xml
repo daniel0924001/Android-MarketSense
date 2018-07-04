@@ -207,6 +207,10 @@
     <string name="choice_name_or_code_are_invalid">
         不好意思，似乎有什麼出錯了，目前無法添加您所喜好的標的。</string>
 
+    <string name="publish_comment">發布貼文</string>
+    <string name="reply_comment">回覆貼文</string>
+    <string name="send_comment_fail">不好意思，無法發布貼文，請待會再試一次。</string>
+
     <string name="comment_warning">我們歡迎各位在此留言，請不要散播垃圾訊息，
         並且謹記勿用任何具有不雅、歧視或仇恨的字眼與言論，讓我們共同維護與創造良好的交流環境。</string>
     <string name="image_alt">無此圖片</string>

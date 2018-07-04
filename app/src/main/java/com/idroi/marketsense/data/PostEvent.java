@@ -24,7 +24,7 @@ import java.util.Map;
 public class PostEvent {
 
     public interface PostEventListener {
-        void onResponse(boolean isSuccessful);
+        void onResponse(boolean isSuccessful, Object data);
     }
 
     public enum PostEventType {
@@ -94,6 +94,7 @@ public class PostEvent {
 
     private static final String RESPONSE_STATUS = "status";
     private static final String RESPONSE_RESULT = "result";
+    private static final String RESPONSE_EVENT_ID = "event_id";
     private static final String RESPONSE_USER_TOKEN = "user_token";
     private static final String RESPONSE_DUPLICATE_REGISTER = "You have registered before!";
 
@@ -288,6 +289,9 @@ public class PostEvent {
                                 case POST_TYPE_LOGIN:
                                     processLogin(response);
                                     break;
+                                case POST_TYPE_EVENT:
+                                    processEventResponse(response);
+                                    break;
                             }
                         }
                     },
@@ -302,9 +306,15 @@ public class PostEvent {
                             switch (mPostType) {
                                 case POST_TYPE_LOGIN:
                                     if(mListener != null) {
-                                        mListener.onResponse(false);
+                                        mListener.onResponse(false, null);
                                     }
                                     break;
+                                case POST_TYPE_EVENT:
+                                    if(mListener != null) {
+                                        mListener.onResponse(false, null);
+                                    }
+                                    break;
+
                             }
                         }
                     }){
@@ -351,7 +361,19 @@ public class PostEvent {
         }
 
         if(mListener != null) {
-            mListener.onResponse(isSuccessful);
+            mListener.onResponse(isSuccessful, null);
+        }
+    }
+
+    private void processEventResponse(JSONObject jsonObject) {
+        if(mListener != null) {
+            boolean isSuccessful = jsonObject.optBoolean(RESPONSE_STATUS, false);
+            JSONObject resultJsonObject = jsonObject.optJSONObject(RESPONSE_RESULT);
+            String id = null;
+            if(resultJsonObject != null) {
+                id = resultJsonObject.optString(RESPONSE_EVENT_ID);
+            }
+            mListener.onResponse(isSuccessful, id);
         }
     }
 
@@ -383,7 +405,7 @@ public class PostEvent {
         userProfile.addEvent(event);
     }
 
-    public static void sendStockComment(Context context, String code, String html) {
+    public static void sendStockComment(Context context, String code, String html, PostEventListener listener) {
         ClientData clientData = ClientData.getInstance(context);
         UserProfile userProfile = clientData.getUserProfile();
         PostEvent postEvent = new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.COMMENT)
@@ -392,12 +414,13 @@ public class PostEvent {
                 .setEventType("normal")
                 .setEventTarget(STOCK_CONST)
                 .setUserToken(clientData.getUserToken())
+                .setPostEventListener(listener)
                 .send(context);
         Event event = postEvent.convertToEvent();
         userProfile.addEvent(event);
     }
 
-    public static void sendNewsComment(Context context, String newsId, String html) {
+    public static void sendNewsComment(Context context, String newsId, String html, PostEventListener listener) {
         ClientData clientData = ClientData.getInstance(context);
         UserProfile userProfile = clientData.getUserProfile();
         PostEvent postEvent = new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.COMMENT)
@@ -406,6 +429,7 @@ public class PostEvent {
                 .setEventType("normal")
                 .setEventTarget(NEWS_CONST)
                 .setUserToken(clientData.getUserToken())
+                .setPostEventListener(listener)
                 .send(context);
         Event event = postEvent.convertToEvent();
         userProfile.addEvent(event);

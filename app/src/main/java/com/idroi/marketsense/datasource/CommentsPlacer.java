@@ -107,7 +107,9 @@ public class CommentsPlacer {
     }
 
     public void setCommentArrayList(ArrayList<Comment> arrayList) {
-        mCommentArrayList = arrayList;
+        if(arrayList != null) {
+            mCommentArrayList = new ArrayList<Comment>(arrayList);
+        }
     }
 
     public void loadComments(String url) {
@@ -130,15 +132,6 @@ public class CommentsPlacer {
             mMarketSenseCommentsFetcher.destroy();
             mMarketSenseCommentsFetcher = null;
         }
-    }
-
-    public int getItemPositionById(String eventId) {
-        for(int i = 0; i < mCommentArrayList.size(); i++) {
-            if(mCommentArrayList.get(i).getCommentId().equals(eventId)) {
-                return i;
-            }
-        }
-        return -1;
     }
 
     public int getItemCount() {

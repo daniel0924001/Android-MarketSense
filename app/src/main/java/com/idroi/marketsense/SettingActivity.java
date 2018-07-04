@@ -150,7 +150,7 @@ public class SettingActivity extends AppCompatActivity {
                     PostEvent.sendRegister(SettingActivity.this, userId, userName, FACEBOOK_CONSTANTS,
                             UserProfile.generatePassword(userId, FACEBOOK_CONSTANTS), userEmail, avatarLink, new PostEvent.PostEventListener() {
                                 @Override
-                                public void onResponse(boolean isSuccessful) {
+                                public void onResponse(boolean isSuccessful, Object data) {
                                     if(!isSuccessful) {
                                         Toast.makeText(SettingActivity.this, R.string.login_failed_description, Toast.LENGTH_SHORT).show();
                                         LoginManager.getInstance().logOut();

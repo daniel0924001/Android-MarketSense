@@ -21,8 +21,8 @@ import static com.idroi.marketsense.data.Comment.VIEW_TYPE_REPLY;
 public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
 
     public interface OnItemClickListener {
-        void onSayLikeItemClick(Comment comment);
-        void onReplyItemClick(Comment comment);
+        void onSayLikeItemClick(Comment comment, int position);
+        void onReplyItemClick(Comment comment, int position);
     }
 
     public interface CommentsAvailableListener {
@@ -112,6 +112,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
                 mReplyRenderer.renderView(holder.itemView, comment);
             } else {
                 mCommentsRenderer.renderView(holder.itemView, comment);
+                mCommentsRenderer.setClickListener(holder.itemView, comment, position);
             }
         }
     }
@@ -123,12 +124,8 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
         comment.setLike(other.isLiked());
     }
 
-    public Comment getComment(int position) {
+    private Comment getComment(int position) {
         return mCommentsPlacer.getCommentData(position);
-    }
-
-    public int getItemPositionById(String eventId) {
-        return mCommentsPlacer.getItemPositionById(eventId);
     }
 
     @Override

@@ -580,7 +580,7 @@ public class MainActivity extends AppCompatActivity {
                 PostEvent.sendRegister(MainActivity.this, userId, userName, FACEBOOK_CONSTANTS,
                         UserProfile.generatePassword(userId, FACEBOOK_CONSTANTS), userEmail, avatarLink, new PostEvent.PostEventListener() {
                             @Override
-                            public void onResponse(boolean isSuccessful) {
+                            public void onResponse(boolean isSuccessful, Object data) {
                                 if(!isSuccessful) {
                                     MSLog.e("[user login]: notify user login failed");
                                     Toast.makeText(MainActivity.this, R.string.login_failed_description, Toast.LENGTH_SHORT).show();

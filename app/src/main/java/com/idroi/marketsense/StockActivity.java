@@ -64,6 +64,8 @@ import java.util.Locale;
 
 import static com.idroi.marketsense.CommentActivity.EXTRA_COMMENT;
 import static com.idroi.marketsense.CommentActivity.EXTRA_NEED_TO_CHANGE;
+import static com.idroi.marketsense.CommentActivity.EXTRA_POSITION;
+import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_EVENT_ID;
 import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_HTML;
 import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_ID;
 import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_TYPE;
@@ -574,17 +576,19 @@ public class StockActivity extends AppCompatActivity {
 
         mCommentsRecyclerViewAdapter = new CommentsRecyclerViewAdapter(this, new CommentsRecyclerViewAdapter.OnItemClickListener() {
             @Override
-            public void onSayLikeItemClick(Comment comment) {
+            public void onSayLikeItemClick(Comment comment, int position) {
+                MSLog.d("say like at position: " + position);
                 comment.increaseLike();
+                comment.setLike(true);
                 PostEvent.sendLike(StockActivity.this, comment.getCommentId());
-                int position = mCommentsRecyclerViewAdapter.getItemPositionById(comment.getCommentId());
                 mCommentsRecyclerViewAdapter.notifyItemChanged(position);
             }
 
             @Override
-            public void onReplyItemClick(Comment comment) {
+            public void onReplyItemClick(Comment comment, int position) {
+                MSLog.d("reply at position: " + position);
                 startActivityForResult(CommentActivity.generateCommentActivityIntent(
-                        StockActivity.this, comment), sReplyEditorRequestCode);
+                        StockActivity.this, comment, position), sReplyEditorRequestCode);
                 overridePendingTransition(R.anim.enter, R.anim.stop);
             }
         });
@@ -877,7 +881,7 @@ public class StockActivity extends AppCompatActivity {
                 PostEvent.sendRegister(StockActivity.this, userId, userName, FACEBOOK_CONSTANTS,
                         UserProfile.generatePassword(userId, FACEBOOK_CONSTANTS), userEmail, avatarLink, new PostEvent.PostEventListener() {
                             @Override
-                            public void onResponse(boolean isSuccessful) {
+                            public void onResponse(boolean isSuccessful, Object data) {
                                 if(!isSuccessful) {
                                     Toast.makeText(StockActivity.this, R.string.login_failed_description, Toast.LENGTH_SHORT).show();
                                     LoginManager.getInstance().logOut();
@@ -898,30 +902,23 @@ public class StockActivity extends AppCompatActivity {
                 String html = data.getStringExtra(EXTRA_RES_HTML);
                 String type = data.getStringExtra(EXTRA_RES_TYPE);
                 String id = data.getStringExtra(EXTRA_RES_ID);
+                String eventId = data.getStringExtra(EXTRA_RES_EVENT_ID);
 
                 Comment newComment = new Comment();
+                newComment.setCommentId(eventId);
                 newComment.setCommentHtml(html);
-                if (type.equals(RichEditorActivity.TYPE.REPLY.getType())) {
-                    int position = mCommentsRecyclerViewAdapter.getItemPositionById(id);
-                    Comment comment = mCommentsRecyclerViewAdapter.getComment(position);
-                    comment.addReply(newComment);
-                    if (position != -1) {
-                        MSLog.e("position: " + position);
-                        mCommentsRecyclerViewAdapter.notifyItemChanged(position);
-                    }
-                } else {
-                    mCommentsRecyclerViewAdapter.addOneComment(newComment);
-                    showCommentBlock();
-                }
+                mCommentsRecyclerViewAdapter.addOneComment(newComment);
+                showCommentBlock();
 
-                MSLog.d(String.format("user send a comment on (%s, %s): %s", type, id, html));
+                MSLog.d(String.format("user send a comment on (%s, %s, %s): %s", type, id, eventId, html));
             }
         } else if(requestCode == sReplyEditorRequestCode) {
             if(resultCode == RESULT_OK && data.getBooleanExtra(EXTRA_NEED_TO_CHANGE, false)) {
                 Serializable serializable = data.getSerializableExtra(EXTRA_COMMENT);
-                if (serializable != null && serializable instanceof Comment) {
+                int position = data.getIntExtra(EXTRA_POSITION, -1);
+                if (serializable != null && serializable instanceof Comment && position != -1) {
+                    MSLog.d("comment with position " + position + " is needed to change");
                     Comment comment = (Comment) serializable;
-                    int position = mCommentsRecyclerViewAdapter.getItemPositionById(comment.getCommentId());
                     mCommentsRecyclerViewAdapter.cloneSocialContent(position, comment);
                     mCommentsRecyclerViewAdapter.notifyItemChanged(position);
                 }

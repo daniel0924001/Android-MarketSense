@@ -54,10 +54,12 @@ public class CommentActivity extends AppCompatActivity {
 
     public static final String EXTRA_COMMENT = "com.idroi.marketsense.CommentActivity.extra_comment";
     public static final String EXTRA_NEED_TO_CHANGE = "com.idroi.marketsense.CommentActivity.extra_need_to_change";
+    public static final String EXTRA_POSITION = "com.idroi.marketsense.CommentActivity.extra_position";
     public final static int CLICK_LIKE_BEFORE_LOGIN = 1;
     public final static int CLICK_COMMENT_BEFORE_LOGIN = 2;
 
     private Comment mComment;
+    private int mPosition;
 
     private RecyclerView mCommentRecyclerView;
     private CommentsRecyclerViewAdapter mCommentsRecyclerViewAdapter;
@@ -243,10 +245,12 @@ public class CommentActivity extends AppCompatActivity {
                 String id = data.getStringExtra(EXTRA_RES_ID);
 
                 Comment newComment = new Comment();
+                newComment.setCommentId(id);
                 newComment.setCommentHtml(html);
                 newComment.setViewType(Comment.VIEW_TYPE_REPLY);
                 if(type.equals(RichEditorActivity.TYPE.REPLY.getType())) {
                     mCommentsRecyclerViewAdapter.addOneComment(newComment);
+                    mComment.addReply(newComment);
                     updateCommentTitle();
                 }
 
@@ -291,7 +295,7 @@ public class CommentActivity extends AppCompatActivity {
                 PostEvent.sendRegister(CommentActivity.this, userId, userName, FACEBOOK_CONSTANTS,
                         UserProfile.generatePassword(userId, FACEBOOK_CONSTANTS), userEmail, avatarLink, new PostEvent.PostEventListener() {
                             @Override
-                            public void onResponse(boolean isSuccessful) {
+                            public void onResponse(boolean isSuccessful, Object data) {
                                 if(!isSuccessful) {
                                     Toast.makeText(CommentActivity.this, R.string.login_failed_description, Toast.LENGTH_SHORT).show();
                                     LoginManager.getInstance().logOut();
@@ -350,6 +354,7 @@ public class CommentActivity extends AppCompatActivity {
         Intent intent = new Intent();
         intent.putExtra(EXTRA_COMMENT, mComment);
         intent.putExtra(EXTRA_NEED_TO_CHANGE, mIsNeedToChange);
+        intent.putExtra(EXTRA_POSITION, mPosition);
         setResult(RESULT_OK, intent);
         finish();
         overridePendingTransition(R.anim.stop, R.anim.right_to_left);
@@ -359,11 +364,13 @@ public class CommentActivity extends AppCompatActivity {
     private void setInformation() {
         Intent intent = getIntent();
         mComment = (Comment) intent.getSerializableExtra(EXTRA_COMMENT);
+        mPosition = intent.getIntExtra(EXTRA_POSITION, -1);
     }
 
-    public static Intent generateCommentActivityIntent(Context context, Comment comment) {
+    public static Intent generateCommentActivityIntent(Context context, Comment comment, int position) {
         Intent intent = new Intent(context, CommentActivity.class);
         intent.putExtra(EXTRA_COMMENT, comment);
+        intent.putExtra(EXTRA_POSITION, position);
         return intent;
     }
 }

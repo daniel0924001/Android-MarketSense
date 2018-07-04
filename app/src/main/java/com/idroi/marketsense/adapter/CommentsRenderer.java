@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.NewsWebView;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.common.FrescoImageHelper;
@@ -62,48 +63,61 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
         // https://blog.csdn.net/top_code/article/details/9163597
         // we have a /assets/img.css file.
         String htmlData = "<link rel=\"stylesheet\" type=\"text/css\" href=\"img.css\" />" + content.getCommentHtml();
-        commentViewHolder.commentBodyView.setOnReachMaxHeightListener(new NewsWebView.OnReachMaxHeightListener() {
-            @Override
-            public void onReachMaxHeight() {
-                setReadMoreTextView(commentViewHolder, true, content);
-            }
-        });
         commentViewHolder.commentBodyView.
                 loadDataWithBaseURL("file:///android_asset/", htmlData, "text/html", "UTF-8", null);
-        setReadMoreTextView(commentViewHolder, false, content);
 
         int likeNum = content.getLikeNumber();
         int replyNum = content.getReplyNumber();
 
         commentViewHolder.replyView.setText(String.valueOf(replyNum));
-        commentViewHolder.replyBlock.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(mOnItemClickListener != null) {
-                    mOnItemClickListener.onReplyItemClick(content);
-                }
-            }
-        });
+
         commentViewHolder.likeView.setText(String.valueOf(likeNum));
         if(content.isLiked()) {
             commentViewHolder.likeBlock.setOnClickListener(null);
             commentViewHolder.likeImageView.setImageResource(R.mipmap.ic_like_on);
         } else {
-            commentViewHolder.likeBlock.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (mOnItemClickListener != null) {
-                        mOnItemClickListener.onSayLikeItemClick(content);
-                    }
-                }
-            });
             commentViewHolder.likeImageView.setImageResource(R.mipmap.ic_like_off);
         }
 
         setViewVisibility(commentViewHolder, View.VISIBLE);
     }
 
-    private void setReadMoreTextView(final CommentViewHolder commentViewHolder, final boolean show, final Comment comment) {
+    public void setClickListener(View view, final Comment comment, final int position) {
+        final CommentViewHolder commentViewHolder = mViewHolderMap.get(view);
+        if(commentViewHolder != null) {
+            commentViewHolder.replyBlock.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mOnItemClickListener != null) {
+                        mOnItemClickListener.onReplyItemClick(comment, position);
+                    }
+                }
+            });
+
+            if (!comment.isLiked()) {
+                commentViewHolder.likeBlock.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (mOnItemClickListener != null) {
+                            mOnItemClickListener.onSayLikeItemClick(comment, position);
+                        }
+                    }
+                });
+            }
+
+            commentViewHolder.commentBodyView.setOnReachMaxHeightListener(new NewsWebView.OnReachMaxHeightListener() {
+                @Override
+                public void onReachMaxHeight() {
+                    setReadMoreTextView(commentViewHolder, true, comment, position);
+                }
+            });
+            setReadMoreTextView(commentViewHolder, false, comment, position);
+        } else {
+            MSLog.e("commentViewHolder should not be null in setClickListener.");
+        }
+    }
+
+    private void setReadMoreTextView(final CommentViewHolder commentViewHolder, final boolean show, final Comment comment, final int position) {
         new Handler().post(new Runnable() {
             @Override
             public void run() {
@@ -116,7 +130,7 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
                         @Override
                         public void onClick(View view) {
                             if(mOnItemClickListener != null) {
-                                mOnItemClickListener.onReplyItemClick(comment);
+                                mOnItemClickListener.onReplyItemClick(comment, position);
                             }
                         }
                     });

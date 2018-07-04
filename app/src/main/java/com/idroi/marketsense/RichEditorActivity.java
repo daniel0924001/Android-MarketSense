@@ -43,6 +43,7 @@ public class RichEditorActivity extends AppCompatActivity {
     public static final String EXTRA_RES_HTML = "extra_response_html";
     public static final String EXTRA_RES_TYPE = EXTRA_REQ_TYPE;
     public static final String EXTRA_RES_ID = EXTRA_REQ_ID;
+    public static final String EXTRA_RES_EVENT_ID = "extra_event_id";
     public final static int sEditorRequestCode = 2;
     public final static int sReplyEditorRequestCode = 3;
 
@@ -103,7 +104,7 @@ public class RichEditorActivity extends AppCompatActivity {
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String html = mEditor.getHtml();
+                final String html = mEditor.getHtml();
                 if(html == null) {
                     Toast.makeText(RichEditorActivity.this,
                             R.string.title_comment_create_null, Toast.LENGTH_SHORT).show();
@@ -111,23 +112,52 @@ public class RichEditorActivity extends AppCompatActivity {
                 }
                 if(mType.equals(TYPE.NEWS.getType())) {
                     MSLog.i("send news comment (" + mId + "): " + html);
-                    PostEvent.sendNewsComment(RichEditorActivity.this, mId, html);
+                    PostEvent.sendNewsComment(RichEditorActivity.this, mId, html, new PostEvent.PostEventListener() {
+                        @Override
+                        public void onResponse(boolean isSuccessful, Object data) {
+                            if(data instanceof String) {
+                                leaveRichEditorActivity(isSuccessful, html, (String) data);
+                            } else {
+                                leaveRichEditorActivity(false, html, null);
+                            }
+                        }
+                    });
                 } else if(mType.equals(TYPE.STOCK.getType())) {
                     MSLog.i("send stock comment (" + mId + "): " + html);
-                    PostEvent.sendStockComment(RichEditorActivity.this, mId, html);
+                    PostEvent.sendStockComment(RichEditorActivity.this, mId, html, new PostEvent.PostEventListener() {
+                        @Override
+                        public void onResponse(boolean isSuccessful, Object data) {
+                            if(data instanceof String) {
+                                leaveRichEditorActivity(isSuccessful, html, (String) data);
+                            } else {
+                                leaveRichEditorActivity(false, html, null);
+                            }
+                        }
+                    });
                 } else if(mType.equals(TYPE.REPLY.getType())) {
                     MSLog.i("send reply comment (" + mId + "): " + html);
                     PostEvent.sendReplyComment(RichEditorActivity.this, mId, html);
+                    leaveRichEditorActivity(true, html, null);
                 }
-                Intent intent = new Intent();
-                intent.putExtra(EXTRA_RES_HTML, html);
-                intent.putExtra(EXTRA_RES_TYPE, mType);
-                intent.putExtra(EXTRA_RES_ID, mId);
-                setResult(RESULT_OK, intent);
-                finish();
-                overridePendingTransition(R.anim.stop, R.anim.right_to_left);
             }
         });
+    }
+
+    private void leaveRichEditorActivity(boolean isSuccessful, String html, String eventId) {
+        if(isSuccessful) {
+            Intent intent = new Intent();
+            intent.putExtra(EXTRA_RES_HTML, html);
+            intent.putExtra(EXTRA_RES_TYPE, mType);
+            intent.putExtra(EXTRA_RES_ID, mId);
+            if(eventId != null) {
+                intent.putExtra(EXTRA_RES_EVENT_ID, eventId);
+            }
+            setResult(RESULT_OK, intent);
+            finish();
+            overridePendingTransition(R.anim.stop, R.anim.right_to_left);
+        } else {
+            Toast.makeText(this, R.string.send_comment_fail, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void changeBtnBackgroundColor(View view) {

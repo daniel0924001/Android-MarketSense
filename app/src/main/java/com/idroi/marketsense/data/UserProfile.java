@@ -74,7 +74,7 @@ public class UserProfile implements Serializable {
     private ArrayList<UserProfileChangeListener> mUserProfileChangeListeners;
 
     @Nullable private ArrayList<String> mFavoriteStocks;
-    @Nullable private ArrayList<Event> mEventsArrayList;
+    @Nullable private transient ArrayList<Event> mEventsArrayList;
 
     private UserProfile() {
         this(null, false);
@@ -339,7 +339,7 @@ public class UserProfile implements Serializable {
             String password = UserProfile.generatePassword(mUserId, mUserType);
             PostEvent.sendLogin(context, mUserId, password, mUserEmail, new PostEvent.PostEventListener() {
                 @Override
-                public void onResponse(boolean isSuccessful) {
+                public void onResponse(boolean isSuccessful, Object data) {
                     MSLog.i("[user login]: end login and the result is: " + isSuccessful);
                     mLoginOnGoing = false;
                     mHasLogin = isSuccessful;

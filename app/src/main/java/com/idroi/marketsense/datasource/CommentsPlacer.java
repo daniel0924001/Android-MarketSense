@@ -106,6 +106,10 @@ public class CommentsPlacer {
         }
     }
 
+    public void setCommentArrayList(ArrayList<Comment> arrayList) {
+        mCommentArrayList = arrayList;
+    }
+
     public void loadComments(String url) {
         mUrl = url;
         loadComments(new MarketSenseCommentsFetcher(mActivity, mMarketSenseCommentNetworkListener));

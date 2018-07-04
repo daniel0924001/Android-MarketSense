@@ -6,6 +6,7 @@
     <string name="activity_news_setting">設定</string>
     <string name="activity_news_search">搜尋</string>
     <string name="activity_rich_editor">撰寫評論</string>
+    <string name="activity_comment">貼文</string>
     <string name="activity_splash">市覺</string>
     <string name="user_avatar">大頭照</string>
     <string name="notification">推播</string>

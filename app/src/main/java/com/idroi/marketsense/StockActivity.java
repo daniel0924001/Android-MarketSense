@@ -57,14 +57,18 @@ import com.idroi.marketsense.util.MarketSenseUtils;
 
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import static com.idroi.marketsense.CommentActivity.EXTRA_COMMENT;
+import static com.idroi.marketsense.CommentActivity.EXTRA_NEED_TO_CHANGE;
 import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_HTML;
 import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_ID;
 import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_TYPE;
 import static com.idroi.marketsense.RichEditorActivity.sEditorRequestCode;
+import static com.idroi.marketsense.RichEditorActivity.sReplyEditorRequestCode;
 import static com.idroi.marketsense.adapter.NewsRecyclerAdapter.NEWS_SINGLE_LAYOUT;
 import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_EVENT_LIST;
@@ -105,6 +109,7 @@ public class StockActivity extends AppCompatActivity {
 
     private NewsWebView mStockAIWebView;
     private boolean mIsStockAIOpen = false;
+    private boolean mIsStockAILoading = false;
 
     private Button mButtonRaise, mButtonFall;
     private TextView mResultTextView;
@@ -127,8 +132,6 @@ public class StockActivity extends AppCompatActivity {
     private ImageView mAddFavorite;
     private ConstraintLayout mSelectorComment, mSelectorNews;
     private NestedScrollView mNestedScrollView;
-
-    private Comment mTempComment;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -264,9 +267,6 @@ public class StockActivity extends AppCompatActivity {
                 super.onProgressChanged(view, newProgress);
             }
         });
-        String stockAIUrl = String.format(Locale.US, "https://stock-ai.com/tw-Dly-8-%s.php", mCode);
-        MSLog.d("load stock ai page: " + stockAIUrl);
-        mStockAIWebView.loadUrl(stockAIUrl);
     }
 
     private void initSocialButtons() {
@@ -352,16 +352,9 @@ public class StockActivity extends AppCompatActivity {
 
                     switch (mLastClickedButton) {
                         case CLICK_COMMENT_BEFORE_LOGIN:
-                            if(mTempComment != null) {
-                                startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
-                                        StockActivity.this, RichEditorActivity.TYPE.REPLY, mTempComment.getCommentId()),
-                                        sEditorRequestCode);
-                                mTempComment = null;
-                            } else {
-                                startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
-                                        StockActivity.this, RichEditorActivity.TYPE.STOCK, mCode),
-                                        sEditorRequestCode);
-                            }
+                            startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
+                                    StockActivity.this, RichEditorActivity.TYPE.STOCK, mCode),
+                                    sEditorRequestCode);
                             overridePendingTransition(R.anim.enter, R.anim.stop);
                             return;
                         case CLICK_STAR_BEFORE_LOGIN:
@@ -383,11 +376,6 @@ public class StockActivity extends AppCompatActivity {
             }
         };
         mUserProfile.addUserProfileChangeListener(mUserProfileChangeListener);
-    }
-
-    private void showLoginAlertDialog(int lastButton, Comment tempComment) {
-        mTempComment = tempComment;
-        showLoginAlertDialog(lastButton);
     }
 
     private void showLoginAlertDialog(int lastButton) {
@@ -595,14 +583,9 @@ public class StockActivity extends AppCompatActivity {
 
             @Override
             public void onReplyItemClick(Comment comment) {
-                if(FBHelper.checkFBLogin()) {
-                    startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
-                            StockActivity.this, RichEditorActivity.TYPE.REPLY, comment.getCommentId()),
-                            sEditorRequestCode);
-                    overridePendingTransition(R.anim.enter, R.anim.stop);
-                } else {
-                    showLoginAlertDialog(CLICK_COMMENT_BEFORE_LOGIN, comment);
-                }
+                startActivityForResult(CommentActivity.generateCommentActivityIntent(
+                        StockActivity.this, comment), sReplyEditorRequestCode);
+                overridePendingTransition(R.anim.enter, R.anim.stop);
             }
         });
         mCommentRecyclerView.setAdapter(mCommentsRecyclerViewAdapter);
@@ -718,6 +701,11 @@ public class StockActivity extends AppCompatActivity {
                 mIsStockAIOpen = true;
                 if(mLoadingProgressBarMore != null && !mIsMoreLoadFinished) {
                     mLoadingProgressBarMore.setVisibility(View.VISIBLE);
+                }
+                if(!mIsStockAILoading) {
+                    String stockAIUrl = String.format(Locale.US, "https://stock-ai.com/tw-Dly-8-%s.php", mCode);
+                    MSLog.d("load stock ai page: " + stockAIUrl);
+                    mStockAIWebView.loadUrl(stockAIUrl);
                 }
             }
         });
@@ -927,6 +915,16 @@ public class StockActivity extends AppCompatActivity {
                 }
 
                 MSLog.d(String.format("user send a comment on (%s, %s): %s", type, id, html));
+            }
+        } else if(requestCode == sReplyEditorRequestCode) {
+            if(resultCode == RESULT_OK && data.getBooleanExtra(EXTRA_NEED_TO_CHANGE, false)) {
+                Serializable serializable = data.getSerializableExtra(EXTRA_COMMENT);
+                if (serializable != null && serializable instanceof Comment) {
+                    Comment comment = (Comment) serializable;
+                    int position = mCommentsRecyclerViewAdapter.getItemPositionById(comment.getCommentId());
+                    mCommentsRecyclerViewAdapter.cloneSocialContent(position, comment);
+                    mCommentsRecyclerViewAdapter.notifyItemChanged(position);
+                }
             }
         }
         mFBCallbackManager.onActivityResult(requestCode, resultCode, data);

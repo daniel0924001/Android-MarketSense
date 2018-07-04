@@ -3,13 +3,16 @@ package com.idroi.marketsense.adapter;
 import android.app.Activity;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
 import com.idroi.marketsense.datasource.CommentsPlacer;
+
+import java.util.ArrayList;
+
+import static com.idroi.marketsense.data.Comment.VIEW_TYPE_REPLY;
 
 /**
  * Created by daniel.hsieh on 2018/5/8.
@@ -29,6 +32,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
     private Activity mActivity;
     private CommentsPlacer mCommentsPlacer;
     private CommentsRenderer mCommentsRenderer;
+    private ReplyRenderer mReplyRenderer;
     private OnItemClickListener mOnItemClickListener;
     private CommentsAvailableListener mCommentsAvailableListener;
 
@@ -43,6 +47,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
         mCommentsPlacer = new CommentsPlacer(activity);
         mOnItemClickListener = listener;
         mCommentsRenderer = new CommentsRenderer(mOnItemClickListener);
+        mReplyRenderer = new ReplyRenderer();
         mHandler = new Handler();
         mCommentsPlacer.setCommentsListener(new CommentsPlacer.CommentsListener() {
             @Override
@@ -73,6 +78,11 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
         mCommentsPlacer.loadComments(url);
     }
 
+    public void setCommentArrayList(ArrayList<Comment> arrayList) {
+        mCommentsPlacer.setCommentArrayList(arrayList);
+        notifyDataSetChanged();
+    }
+
     public void addOneComment(Comment comment) {
         mCommentsPlacer.addOneComment(comment);
         notifyItemInserted(0);
@@ -80,15 +90,37 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new MarketSenseViewHolder(mCommentsRenderer.createView(mActivity, parent));
+        if(viewType == VIEW_TYPE_REPLY) {
+            return new MarketSenseViewHolder(mReplyRenderer.createView(mActivity, parent));
+        } else {
+            return new MarketSenseViewHolder(mCommentsRenderer.createView(mActivity, parent));
+        }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        Comment comment = mCommentsPlacer.getCommentData(position);
+        return comment.getViewType();
     }
 
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
         Comment comment = mCommentsPlacer.getCommentData(position);
         if(comment != null) {
-            mCommentsRenderer.renderView(holder.itemView, comment);
+            int viewType = comment.getViewType();
+            if(viewType == VIEW_TYPE_REPLY) {
+                mReplyRenderer.renderView(holder.itemView, comment);
+            } else {
+                mCommentsRenderer.renderView(holder.itemView, comment);
+            }
         }
+    }
+
+    public void cloneSocialContent(int position, Comment other) {
+        Comment comment = getComment(position);
+        comment.setLikeNumber(other.getLikeNumber());
+        comment.cloneReplies(other.getReplyArrayList());
+        comment.setLike(other.isLiked());
     }
 
     public Comment getComment(int position) {
@@ -106,6 +138,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
 
     public void destroy() {
         mCommentsRenderer.clear();
+        mReplyRenderer.clear();
         mCommentsPlacer.clear();
         mCommentsAvailableListener = null;
     }

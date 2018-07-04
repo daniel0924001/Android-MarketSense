@@ -10,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -17,7 +18,7 @@ import java.util.Iterator;
  * Created by daniel.hsieh on 2018/5/8.
  */
 
-public class Comment {
+public class Comment implements Serializable {
 
     private static final String TIMESTAMP = "created_ts";       // the timestamp of this event
     private static final String COMMENT_ID = "event_id";        // the unique id of comment
@@ -30,6 +31,9 @@ public class Comment {
     private static final String REPLIES = "replies";            // replies (comments)
     private static final String LIKE = "like";                  // like number;
     private static final String LIKE_LIST = "like_list";        // user profile of like event
+
+    public static final int VIEW_TYPE_COMMENT = 1;
+    public static final int VIEW_TYPE_REPLY = 2;
 
     private String mUserId;
     private String mCommentId;
@@ -44,10 +48,16 @@ public class Comment {
     private int mLikeNumber;
     private boolean mIsLiked = false;
 
+    private int mViewType;
+
     private UserProfile mUserProfile;
 
     public Comment() {
+        mViewType = VIEW_TYPE_COMMENT;
+    }
 
+    public void setViewType(int viewType) {
+        mViewType = viewType;
     }
 
     public void setUserId(String userId) {
@@ -86,7 +96,7 @@ public class Comment {
         mDateString = dateString;
     }
 
-    public void setLike(int likeNumber) {
+    public void setLikeNumber(int likeNumber) {
         mLikeNumber = likeNumber;
     }
 
@@ -117,6 +127,7 @@ public class Comment {
         for(int i = 0; i < comments.length(); i++) {
             try {
                 Comment comment = Comment.jsonObjectToComment(comments.getJSONObject(i));
+                comment.setViewType(VIEW_TYPE_REPLY);
                 mReplyArrayList.add(comment);
             } catch (JSONException e) {
                 MSLog.e("JSONException in setReplies: " + i);
@@ -129,7 +140,17 @@ public class Comment {
             mReplyArrayList = new ArrayList<>();
         }
 
-        mReplyArrayList.add(comment);
+        mReplyArrayList.add(0, comment);
+    }
+
+    public void cloneReplies(ArrayList<Comment> replyArrayList) {
+        if(replyArrayList != null) {
+            mReplyArrayList = new ArrayList<>(replyArrayList);
+        }
+    }
+
+    public int getViewType() {
+        return mViewType;
     }
 
     public String getUserId() {
@@ -207,6 +228,10 @@ public class Comment {
         }
     }
 
+    public void setLike(boolean isLike) {
+        mIsLiked = isLike;
+    }
+
     public boolean isLiked() {
         return mIsLiked;
     }
@@ -252,7 +277,7 @@ public class Comment {
                                 jsonObject.optJSONObject(USER_PROFILE)));
                         break;
                     case LIKE:
-                        comment.setLike(jsonObject.optInt(LIKE));
+                        comment.setLikeNumber(jsonObject.optInt(LIKE));
                         break;
                     case REPLIES:
                         comment.setReplies(jsonObject.optJSONArray(REPLIES));

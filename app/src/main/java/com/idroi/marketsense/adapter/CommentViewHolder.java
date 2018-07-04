@@ -53,6 +53,7 @@ public class CommentViewHolder {
             commentViewHolder.commentBodyView = view.findViewById(R.id.comment_body);
             commentViewHolder.commentBodyView.getSettings().setLoadWithOverviewMode(false);
             commentViewHolder.commentBodyView.getSettings().setUseWideViewPort(false);
+            commentViewHolder.commentBodyView.getSettings().setJavaScriptEnabled(false);
             float density = view.getContext().getResources().getDisplayMetrics().density;
             commentViewHolder.commentBodyView.setMaxHeight((int)(MAX_COMMENT_HEIGHT * density));
 

@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.NewsWebView;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.common.FrescoImageHelper;
@@ -66,12 +65,12 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
         commentViewHolder.commentBodyView.setOnReachMaxHeightListener(new NewsWebView.OnReachMaxHeightListener() {
             @Override
             public void onReachMaxHeight() {
-                setReadMoreTextView(commentViewHolder, true);
+                setReadMoreTextView(commentViewHolder, true, content);
             }
         });
         commentViewHolder.commentBodyView.
                 loadDataWithBaseURL("file:///android_asset/", htmlData, "text/html", "UTF-8", null);
-        setReadMoreTextView(commentViewHolder, false);
+        setReadMoreTextView(commentViewHolder, false, content);
 
         int likeNum = content.getLikeNumber();
         int replyNum = content.getReplyNumber();
@@ -104,7 +103,7 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
         setViewVisibility(commentViewHolder, View.VISIBLE);
     }
 
-    private void setReadMoreTextView(final CommentViewHolder commentViewHolder, final boolean show) {
+    private void setReadMoreTextView(final CommentViewHolder commentViewHolder, final boolean show, final Comment comment) {
         new Handler().post(new Runnable() {
             @Override
             public void run() {
@@ -113,9 +112,18 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
                 if(show) {
                     params.topMargin = (int) (37 * density);
                     commentViewHolder.readMoreView.setVisibility(View.VISIBLE);
+                    commentViewHolder.readMoreView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            if(mOnItemClickListener != null) {
+                                mOnItemClickListener.onReplyItemClick(comment);
+                            }
+                        }
+                    });
                 } else {
                     params.topMargin = (int) (16 * density);
                     commentViewHolder.readMoreView.setVisibility(View.GONE);
+                    commentViewHolder.readMoreView.setOnClickListener(null);
                 }
                 commentViewHolder.horizontalLineView.setLayoutParams(params);
             }

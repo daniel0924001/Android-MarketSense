@@ -14,6 +14,7 @@ import com.idroi.marketsense.util.DateUtils;
 
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
@@ -30,11 +31,12 @@ import static com.idroi.marketsense.data.Event.EVENT_VOTING;
  * Created by daniel.hsieh on 2018/5/8.
  */
 
-public class UserProfile {
+public class UserProfile implements Serializable {
 
     public static final int NOTIFY_ID_FAVORITE_LIST = 1;
     public static final int NOTIFY_ID_STOCK_COMMENT_CLICK = 2;
     public static final int NOTIFY_ID_NEWS_COMMENT_CLICK = 3;
+    public static final int NOTIFY_ID_REPLY_COMMENT_CLICK = 7;
     public static final int NOTIFY_USER_HAS_LOGIN = 4;
     public static final int NOTIFY_ID_EVENT_LIST = 5;
     public static final int NOTIFY_USER_LOGIN_FAILED = 6;

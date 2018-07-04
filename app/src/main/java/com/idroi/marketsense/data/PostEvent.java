@@ -385,46 +385,58 @@ public class PostEvent {
 
     public static void sendStockComment(Context context, String code, String html) {
         ClientData clientData = ClientData.getInstance(context);
-        new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.COMMENT)
+        UserProfile userProfile = clientData.getUserProfile();
+        PostEvent postEvent = new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.COMMENT)
                 .setEventContent(code)
                 .setEventValueString(html)
                 .setEventType("normal")
                 .setEventTarget(STOCK_CONST)
                 .setUserToken(clientData.getUserToken())
                 .send(context);
+        Event event = postEvent.convertToEvent();
+        userProfile.addEvent(event);
     }
 
     public static void sendNewsComment(Context context, String newsId, String html) {
         ClientData clientData = ClientData.getInstance(context);
-        new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.COMMENT)
+        UserProfile userProfile = clientData.getUserProfile();
+        PostEvent postEvent = new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.COMMENT)
                 .setEventContent(newsId)
                 .setEventValueString(html)
                 .setEventType("normal")
                 .setEventTarget(NEWS_CONST)
                 .setUserToken(clientData.getUserToken())
                 .send(context);
+        Event event = postEvent.convertToEvent();
+        userProfile.addEvent(event);
     }
 
     public static void sendReplyComment(Context context, String eventId, String html) {
         ClientData clientData = ClientData.getInstance(context);
-        new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.REPLY)
+        UserProfile userProfile = clientData.getUserProfile();
+        PostEvent postEvent = new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.REPLY)
                 .setEventContent(eventId)
                 .setEventValueString(html)
                 .setEventType("normal")
                 .setEventTarget(EVENT_CONST)
                 .setUserToken(clientData.getUserToken())
                 .send(context);
+        Event event = postEvent.convertToEvent();
+        userProfile.addEvent(event);
     }
 
     public static void sendLike(Context context, String eventId) {
         ClientData clientData = ClientData.getInstance(context);
-        new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.LIKE)
+        UserProfile userProfile = clientData.getUserProfile();
+        PostEvent postEvent = new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.LIKE)
                 .setEventContent(eventId)
                 .setEventValueInteger(1)
                 .setEventType("normal")
                 .setEventTarget(EVENT_CONST)
                 .setUserToken(clientData.getUserToken())
                 .send(context);
+        Event event = postEvent.convertToEvent();
+        userProfile.addEvent(event);
     }
 
     public static void sendRegister(Context context,

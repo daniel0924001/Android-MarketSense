@@ -44,6 +44,7 @@ public class RichEditorActivity extends AppCompatActivity {
     public static final String EXTRA_RES_TYPE = EXTRA_REQ_TYPE;
     public static final String EXTRA_RES_ID = EXTRA_REQ_ID;
     public final static int sEditorRequestCode = 2;
+    public final static int sReplyEditorRequestCode = 3;
 
     private String mType;
     private String mId;
@@ -475,7 +476,7 @@ public class RichEditorActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(mDoubleClickBack || mEditor.getHtml() == null) {
+        if(mDoubleClickBack || mEditor.getHtml() == null || mEditor.getHtml().isEmpty()) {
             super.onBackPressed();
             overridePendingTransition(R.anim.stop, R.anim.right_to_left);
             return;

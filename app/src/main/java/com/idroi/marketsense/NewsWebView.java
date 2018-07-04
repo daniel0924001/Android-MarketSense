@@ -2,7 +2,9 @@ package com.idroi.marketsense;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Build;
 import android.util.AttributeSet;
+import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 
@@ -50,6 +52,7 @@ public class NewsWebView extends WebView {
         getSettings().setBuiltInZoomControls(true);
         getSettings().setDisplayZoomControls(false);
 
+        setLayerType(View.LAYER_TYPE_HARDWARE, null);
     }
 
     @Override

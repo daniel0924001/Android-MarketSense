@@ -54,7 +54,6 @@ import com.idroi.marketsense.request.SingleNewsRequest;
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
-import java.util.Locale;
 
 import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_HTML;
 import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_ID;

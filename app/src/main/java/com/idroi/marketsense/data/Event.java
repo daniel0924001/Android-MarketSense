@@ -2,6 +2,7 @@ package com.idroi.marketsense.data;
 
 import com.idroi.marketsense.Logging.MSLog;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Iterator;
@@ -30,7 +31,7 @@ public class Event {
     private String mEventContent;
     private String mEventType;
     private Object mEventValue;
-    private String mEventDetail;
+    private JSONArray mEventDetail;
     private String mEventTarget;
     private String mEventCreatedTs;
 
@@ -62,7 +63,7 @@ public class Event {
         return this;
     }
 
-    public Event setEventDetail(String detail) {
+    public Event setEventDetail(JSONArray detail) {
         mEventDetail = detail;
         return this;
     }
@@ -97,7 +98,7 @@ public class Event {
         return mEventValue;
     }
 
-    public String getEventDetail() {
+    public JSONArray getEventDetail() {
         return mEventDetail;
     }
 
@@ -142,7 +143,7 @@ public class Event {
                         event.setEventTarget(jsonObject.optString(EVENT_TARGET));
                         break;
                     case EVENT_DETAIL:
-                        event.setEventDetail(jsonObject.optString(EVENT_DETAIL));
+                        event.setEventDetail(jsonObject.optJSONArray(EVENT_DETAIL));
                         break;
                     case EVENT_CREATED_TS:
                         event.setEventCreatedTs(jsonObject.optString(EVENT_CREATED_TS));

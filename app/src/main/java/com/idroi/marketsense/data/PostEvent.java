@@ -11,9 +11,12 @@ import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.datasource.Networking;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -117,7 +120,7 @@ public class PostEvent {
     private String mEventContent;
     private String mEventType;
     private Object mEventValue; // String or Integer
-    private String mEventDetail;
+    private JSONArray mEventDetail;
     private String mEventTarget;
 
     // POST_TYPE_REGISTER
@@ -169,7 +172,7 @@ public class PostEvent {
         return this;
     }
 
-    private PostEvent setEventDetail(String eventDetail) {
+    private PostEvent setEventDetail(JSONArray eventDetail) {
         mEventDetail = eventDetail;
         return this;
     }
@@ -239,7 +242,7 @@ public class PostEvent {
                     postJsonObject.put(POST_FIELD_USER_ID, mUserId);
                     postJsonObject.put(POST_FIELD_EVENT, mEvent);
                     postJsonObject.putOpt(POST_FIELD_EVENT_CONTENT, mEventContent);
-                    postJsonObject.putOpt(POST_FIELD_EVENT_DETAIL, mEventDetail);
+                    postJsonObject.put(POST_FIELD_EVENT_DETAIL, mEventDetail);
                     postJsonObject.putOpt(POST_FIELD_EVENT_TYPE, mEventType);
                     postJsonObject.putOpt(POST_FIELD_EVENT_VALUE, mEventValue);
                     postJsonObject.putOpt(POST_FIELD_EVENT_TARGET, mEventTarget);
@@ -405,7 +408,7 @@ public class PostEvent {
         userProfile.addEvent(event);
     }
 
-    public static void sendStockComment(Context context, String code, String html, PostEventListener listener) {
+    public static void sendStockComment(Context context, String code, String html, ArrayList<String> tags, PostEventListener listener) {
         ClientData clientData = ClientData.getInstance(context);
         UserProfile userProfile = clientData.getUserProfile();
         PostEvent postEvent = new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.COMMENT)
@@ -413,6 +416,7 @@ public class PostEvent {
                 .setEventValueString(html)
                 .setEventType("normal")
                 .setEventTarget(STOCK_CONST)
+                .setEventDetail(new JSONArray(tags))
                 .setUserToken(clientData.getUserToken())
                 .setPostEventListener(listener)
                 .send(context);
@@ -420,7 +424,7 @@ public class PostEvent {
         userProfile.addEvent(event);
     }
 
-    public static void sendNewsComment(Context context, String newsId, String html, PostEventListener listener) {
+    public static void sendNewsComment(Context context, String newsId, String html, ArrayList<String> tags, PostEventListener listener) {
         ClientData clientData = ClientData.getInstance(context);
         UserProfile userProfile = clientData.getUserProfile();
         PostEvent postEvent = new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.COMMENT)
@@ -428,6 +432,7 @@ public class PostEvent {
                 .setEventValueString(html)
                 .setEventType("normal")
                 .setEventTarget(NEWS_CONST)
+                .setEventDetail(new JSONArray(tags))
                 .setUserToken(clientData.getUserToken())
                 .setPostEventListener(listener)
                 .send(context);
@@ -435,7 +440,7 @@ public class PostEvent {
         userProfile.addEvent(event);
     }
 
-    public static void sendReplyComment(Context context, String eventId, String html) {
+    public static void sendReplyComment(Context context, String eventId, String html, ArrayList<String> tags) {
         ClientData clientData = ClientData.getInstance(context);
         UserProfile userProfile = clientData.getUserProfile();
         PostEvent postEvent = new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.REPLY)
@@ -443,6 +448,7 @@ public class PostEvent {
                 .setEventValueString(html)
                 .setEventType("normal")
                 .setEventTarget(EVENT_CONST)
+                .setEventDetail(new JSONArray(tags))
                 .setUserToken(clientData.getUserToken())
                 .send(context);
         Event event = postEvent.convertToEvent();

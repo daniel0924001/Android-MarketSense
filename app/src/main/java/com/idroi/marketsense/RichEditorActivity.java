@@ -21,8 +21,14 @@ import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FrescoHelper;
 import com.idroi.marketsense.data.PostEvent;
+import com.idroi.marketsense.data.Stock;
+
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import jp.wasabeef.richeditor.RichEditor;
 
@@ -146,6 +152,13 @@ public class RichEditorActivity extends AppCompatActivity {
                 overridePendingTransition(0, 0);
             }
         });
+
+        if(mType.equals(TYPE.STOCK.getType())) {
+            Stock stock = ClientData.getInstance(this).getPriceFromCode(mId);
+            if(stock != null) {
+                insertLink(stock.getCode(), stock.getName());
+            }
+        }
     }
 
     private void setActionBar() {
@@ -203,9 +216,10 @@ public class RichEditorActivity extends AppCompatActivity {
                     R.string.title_comment_create_null, Toast.LENGTH_SHORT).show();
             return;
         }
+        ArrayList<String> tags = parseStockCodeTags(html);
         if(mType.equals(TYPE.NEWS.getType())) {
             MSLog.i("send news comment (" + mId + "): " + html);
-            PostEvent.sendNewsComment(RichEditorActivity.this, mId, html, new PostEvent.PostEventListener() {
+            PostEvent.sendNewsComment(RichEditorActivity.this, mId, html, tags, new PostEvent.PostEventListener() {
                 @Override
                 public void onResponse(boolean isSuccessful, Object data) {
                     if(data instanceof String) {
@@ -217,7 +231,7 @@ public class RichEditorActivity extends AppCompatActivity {
             });
         } else if(mType.equals(TYPE.STOCK.getType())) {
             MSLog.i("send stock comment (" + mId + "): " + html);
-            PostEvent.sendStockComment(RichEditorActivity.this, mId, html, new PostEvent.PostEventListener() {
+            PostEvent.sendStockComment(RichEditorActivity.this, mId, html, tags, new PostEvent.PostEventListener() {
                 @Override
                 public void onResponse(boolean isSuccessful, Object data) {
                     if(data instanceof String) {
@@ -229,9 +243,21 @@ public class RichEditorActivity extends AppCompatActivity {
             });
         } else if(mType.equals(TYPE.REPLY.getType())) {
             MSLog.i("send reply comment (" + mId + "): " + html);
-            PostEvent.sendReplyComment(RichEditorActivity.this, mId, html);
+            PostEvent.sendReplyComment(RichEditorActivity.this, mId, html, tags);
             leaveRichEditorActivity(true, html, null);
         }
+    }
+
+    private ArrayList<String> parseStockCodeTags(String html) {
+        ArrayList<String> tags = new ArrayList<>();
+        Pattern pattern = Pattern.compile("marketsense:\\/\\/open.marketsense.app\\/stock\\/code\\/(\\d+)");
+        Matcher matcher = pattern.matcher(html);
+        while (matcher.find()) {
+            String code = matcher.group(1);
+            tags.add(code);
+            MSLog.d("find tag: " + code);
+        }
+        return tags;
     }
 
     @Override

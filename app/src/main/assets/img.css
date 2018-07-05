@@ -3,3 +3,8 @@ img {
     height: auto;
     max-width: 100%;
 }
+
+a {
+    color: #4a90e2;
+    text-decoration: none;
+}

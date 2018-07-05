@@ -42,6 +42,10 @@ public class SearchAndResponseActivity extends AppCompatActivity {
 
     public static final String EXTRA_SELECTED_COMPANY_NAME_KEY = "extra_selected_company_name";
     public static final String EXTRA_SELECTED_COMPANY_CODE_KEY = "extra_selected_company_code";
+    public static final String EXTRA_SEARCH_TYPE = "extra_search_type";
+
+    public static final int SEARCH_BOTH = 1;
+    public static final int SEARCH_CODE_ONLY = 2;
 
     private EditText mSearchView;
     private RecyclerView mStockResultRecyclerView, mNewsResultRecyclerView;
@@ -50,6 +54,7 @@ public class SearchAndResponseActivity extends AppCompatActivity {
     private TextView mStockResultsTextView, mNewsResultsTextView, mSearchStatusTextView;
 
     private String mQueryString;
+    private int mSearchType;
 
     private  ArrayList<Stock> mAllStocks = ClientData.getInstance(this).getAllStocksListInfo();
 
@@ -60,6 +65,7 @@ public class SearchAndResponseActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search);
 
         ClientData.getInstance(this);
+        setInformation();
         setResultsLayout();
         setActionBar();
     }
@@ -104,6 +110,10 @@ public class SearchAndResponseActivity extends AppCompatActivity {
                             ActionBar.LayoutParams.MATCH_PARENT));
             actionBar.setDisplayShowCustomEnabled(true);
         }
+    }
+
+    private void setInformation() {
+        mSearchType = getIntent().getIntExtra(EXTRA_SEARCH_TYPE, SEARCH_BOTH);
     }
 
     private void setResultsLayout() {
@@ -217,6 +227,12 @@ public class SearchAndResponseActivity extends AppCompatActivity {
             }
         }
         mStockRecyclerAdapter.filterList(filterStocks);
+
+        if(mSearchType == SEARCH_CODE_ONLY) {
+            adjustUIForEndSearching(false, mQueryString);
+            hideSoftKeyboard();
+            return;
+        }
 
         // news search part
         if(newsQueryStrings.size() > 0) {

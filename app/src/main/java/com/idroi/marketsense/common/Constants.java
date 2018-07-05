@@ -24,4 +24,6 @@ public class Constants {
             new Stock("2330", "台積電"),
             new Stock("2317", "鴻海")
     };
+
+    public static final String STOCK_CODE_DEEP_LINK = "marketsense://open.marketsense.app/stock/code/%s";
 }

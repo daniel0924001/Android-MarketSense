@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -50,6 +51,7 @@ import com.idroi.marketsense.data.CommentAndVote;
 import com.idroi.marketsense.data.Event;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.PostEvent;
+import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.NewsRequest;
 import com.idroi.marketsense.request.SingleNewsRequest;
@@ -60,6 +62,7 @@ import org.json.JSONObject;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import static com.idroi.marketsense.CommentActivity.EXTRA_COMMENT;
@@ -746,16 +749,47 @@ public class StockActivity extends AppCompatActivity {
     }
 
     private void setInformation() {
-        mStockName = getIntent().getStringExtra(Intent.EXTRA_TITLE);
-        mCode = getIntent().getStringExtra(EXTRA_CODE);
-        mVoteRaiseNum = getIntent().getIntExtra(EXTRA_RAISE_NUM, 0);
-        mVoteFallNum = getIntent().getIntExtra(EXTRA_FALL_NUM, 0);
+        if(getIntent().getStringExtra(EXTRA_CODE) != null) {
+            MSLog.d("set information in normal stock list click");
+            mStockName = getIntent().getStringExtra(Intent.EXTRA_TITLE);
+            mCode = getIntent().getStringExtra(EXTRA_CODE);
+            mVoteRaiseNum = getIntent().getIntExtra(EXTRA_RAISE_NUM, 0);
+            mVoteFallNum = getIntent().getIntExtra(EXTRA_FALL_NUM, 0);
 
-        mIsFavorite = mUserProfile.isFavoriteStock(mCode);
+            mIsFavorite = mUserProfile.isFavoriteStock(mCode);
 
-        mPrice = getIntent().getStringExtra(EXTRA_PRICE);
-        mDiffNum = getIntent().getStringExtra(EXTRA_DIFF_NUM);
-        mDiffPercentage = getIntent().getStringExtra(EXTRA_DIFF_PERCENTAGE);
+            mPrice = getIntent().getStringExtra(EXTRA_PRICE);
+            mDiffNum = getIntent().getStringExtra(EXTRA_DIFF_NUM);
+            mDiffPercentage = getIntent().getStringExtra(EXTRA_DIFF_PERCENTAGE);
+        } else {
+            Intent intent = getIntent();
+            String action = intent.getAction();
+            Uri data = intent.getData();
+            Stock stock = null;
+            if(data != null) {
+                MSLog.d("set information in comment's deep link: " + action + ", uri: " + data);
+
+                List<String> pathSegments = data.getPathSegments();
+                int index = pathSegments.indexOf("code");
+                try {
+                    stock = ClientData.getInstance(this).getPriceFromCode(pathSegments.get(index + 1));
+                } catch (Exception e) {
+                    MSLog.e("deep link parse error: " + data);
+                    stock = ClientData.getInstance(this).getPriceFromCode("2330");
+                }
+
+                mStockName = stock.getName();
+                mCode = stock.getCode();
+                mVoteRaiseNum = stock.getRaiseNum();
+                mVoteFallNum = stock.getFallNum();
+
+                mIsFavorite = mUserProfile.isFavoriteStock(mCode);
+
+                mPrice = stock.getPrice();
+                mDiffNum = stock.getDiffNumber();
+                mDiffPercentage = stock.getDiffPercentage();
+            }
+        }
     }
 
     private void setActionBar() {

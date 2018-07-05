@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">市覺</string>
     <string name="activity_stock_name">個股總覽</string>
+    <string name="activity_stock_name_filter_deep_link">個股總覽市覺deep link</string>
     <string name="activity_news_web_name">市覺新聞</string>
     <string name="activity_news_notification">通知</string>
     <string name="activity_news_setting">設定</string>
@@ -210,6 +211,9 @@
     <string name="publish_comment">發布貼文</string>
     <string name="reply_comment">回覆貼文</string>
     <string name="send_comment_fail">不好意思，無法發布貼文，請待會再試一次。</string>
+    <string name="tag_stock_code">標註個股</string>
+    <string name="complete">完成</string>
+    <string name="comment_hint">輸入文字&#8230;</string>
 
     <string name="comment_warning">我們歡迎各位在此留言，請不要散播垃圾訊息，
         並且謹記勿用任何具有不雅、歧視或仇恨的字眼與言論，讓我們共同維護與創造良好的交流環境。</string>

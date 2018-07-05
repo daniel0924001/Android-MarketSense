@@ -39,6 +39,14 @@
         <activity
             android:name=".StockActivity"
             android:label="@string/activity_stock_name">
+            <intent-filter android:label="@string/activity_stock_name_filter_deep_link">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="marketsense"
+                    android:host="open.marketsense.app"
+                    android:pathPrefix="/stock/code/" />
+            </intent-filter>
         </activity>
 
         <activity android:name=".NewsWebViewActivity"

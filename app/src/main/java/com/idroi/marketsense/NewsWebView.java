@@ -40,6 +40,7 @@ public class NewsWebView extends WebView {
     }
 
     public void setOnReachMaxHeightListener(OnReachMaxHeightListener listener) {
+        mIsReachMaxHeight = false;
         mOnReachMaxHeightListener = listener;
     }
 

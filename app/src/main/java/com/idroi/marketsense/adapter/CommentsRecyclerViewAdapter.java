@@ -51,7 +51,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
         mActivity = activity;
         mCommentsPlacer = new CommentsPlacer(activity);
         mOnItemClickListener = listener;
-        mCommentsRenderer = new CommentsRenderer(activity, largeBorder, mOnItemClickListener);
+        mCommentsRenderer = new CommentsRenderer(largeBorder, mOnItemClickListener);
         mReplyRenderer = new ReplyRenderer();
         mHandler = new Handler();
         mCommentsPlacer.setCommentsListener(new CommentsPlacer.CommentsListener() {

@@ -28,13 +28,11 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
     @NonNull private final WeakHashMap<View, CommentViewHolder> mViewHolderMap;
     @Nullable private final CommentsRecyclerViewAdapter.OnItemClickListener mOnItemClickListener;
     private boolean mIsLargeBorder;
-    private float mDensity;
 
-    CommentsRenderer(Context context, boolean isLargeBorder, @Nullable CommentsRecyclerViewAdapter.OnItemClickListener listener) {
+    CommentsRenderer(boolean isLargeBorder, @Nullable CommentsRecyclerViewAdapter.OnItemClickListener listener) {
         mViewHolderMap = new WeakHashMap<>();
         mOnItemClickListener = listener;
         mIsLargeBorder = isLargeBorder;
-        mDensity = context.getResources().getDisplayMetrics().density;
     }
 
     @Override
@@ -132,10 +130,8 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
             @Override
             public void run() {
                 ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) commentViewHolder.horizontalLineView.getLayoutParams();
-                // TODO swipeLayout refresh: read more view problem
-                MSLog.d("position: " + position + ", show read more view: " + show + ", body: " + comment.getCommentHtml());
                 if(show) {
-                    params.topMargin = (int) (37 * mDensity);
+                    params.topToBottom = commentViewHolder.readMoreView.getId();
                     commentViewHolder.readMoreView.setVisibility(View.VISIBLE);
                     commentViewHolder.readMoreView.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -146,7 +142,7 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
                         }
                     });
                 } else {
-                    params.topMargin = (int) (16 * mDensity);
+                    params.topToBottom = commentViewHolder.commentBodyView.getId();
                     commentViewHolder.readMoreView.setVisibility(View.GONE);
                     commentViewHolder.readMoreView.setOnClickListener(null);
                 }

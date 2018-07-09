@@ -369,7 +369,7 @@ public class RichEditorActivity extends AppCompatActivity {
     }
 
     private void initEditorPanel() {
-        // TODO: maybe one day we will open these funcitons
+        // TODO: maybe one day we will open these functions
 //        findViewById(R.id.action_undo).setOnClickListener(new View.OnClickListener() {
 //            @Override public void onClick(View v) {
 //                mEditor.undo();

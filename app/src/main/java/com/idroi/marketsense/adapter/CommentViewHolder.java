@@ -16,7 +16,7 @@ import com.idroi.marketsense.R;
 
 public class CommentViewHolder {
 
-    private final static int MAX_COMMENT_HEIGHT = 110;
+    private final static int MAX_COMMENT_HEIGHT = 120;
 
     View mainView;
     SimpleDraweeView avatarView;

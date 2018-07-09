@@ -166,13 +166,13 @@ public class CommentActivity extends AppCompatActivity {
         }
     }
 
-    private void setSocialFunctionBlock() {
-
+    private void setLikeBlock() {
         mSayLikeBlock = findViewById(R.id.social_say_like);
         mSayLikeImageView = findViewById(R.id.social_say_like_iv);
         mSayLikeTextView = findViewById(R.id.social_say_like_tv);
         mSayLikeTextView.setText(String.valueOf(mComment.getLikeNumber()));
         if(!mComment.isLiked()) {
+            mSayLikeImageView.setImageResource(R.mipmap.ic_like_off);
             mSayLikeBlock.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -185,8 +185,12 @@ public class CommentActivity extends AppCompatActivity {
             });
         } else {
             mSayLikeImageView.setImageResource(R.mipmap.ic_like_on);
+            mSayLikeBlock.setOnClickListener(null);
         }
+    }
 
+    private void setSocialFunctionBlock() {
+        setLikeBlock();
         TextView writeReply = findViewById(R.id.social_write_comment);
         writeReply.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -207,6 +211,8 @@ public class CommentActivity extends AppCompatActivity {
             @Override
             public void onUserProfileChange(int notifyId) {
                 if(notifyId == NOTIFY_ID_REPLY_COMMENT_CLICK && FBHelper.checkFBLogin()) {
+                    mComment.updateLikeUserProfile();
+                    setLikeBlock();
                     switch (mLastClickedButton) {
                         case CLICK_COMMENT_BEFORE_LOGIN:
                             startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
@@ -215,7 +221,9 @@ public class CommentActivity extends AppCompatActivity {
                             overridePendingTransition(R.anim.enter, R.anim.stop);
                             return;
                         case CLICK_LIKE_BEFORE_LOGIN:
-                            sayLike();
+                            if(!mComment.isLiked()) {
+                                sayLike();
+                            }
                     }
                 }
             }

@@ -117,7 +117,7 @@ public class MarketSenseCommentsFetcher {
             }
         });
 
-        mTimeoutHandler.postDelayed(mTimeoutRunnable, 3000);
+        mTimeoutHandler.postDelayed(mTimeoutRunnable, 10000);
         mCommentAndVoteRequest.setShouldCache(false);
         Networking.getRequestQueue(context).add(mCommentAndVoteRequest);
 

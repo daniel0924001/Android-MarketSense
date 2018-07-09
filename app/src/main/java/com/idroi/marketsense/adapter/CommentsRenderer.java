@@ -27,17 +27,27 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
 
     @NonNull private final WeakHashMap<View, CommentViewHolder> mViewHolderMap;
     @Nullable private final CommentsRecyclerViewAdapter.OnItemClickListener mOnItemClickListener;
+    private boolean mIsLargeBorder;
+    private float mDensity;
 
-    CommentsRenderer(@Nullable CommentsRecyclerViewAdapter.OnItemClickListener listener) {
+    CommentsRenderer(Context context, boolean isLargeBorder, @Nullable CommentsRecyclerViewAdapter.OnItemClickListener listener) {
         mViewHolderMap = new WeakHashMap<>();
         mOnItemClickListener = listener;
+        mIsLargeBorder = isLargeBorder;
+        mDensity = context.getResources().getDisplayMetrics().density;
     }
 
     @Override
     public View createView(@NonNull Context context, @Nullable ViewGroup parent) {
-        return LayoutInflater
-                .from(context)
-                .inflate(R.layout.comment_list_item, parent, false);
+        if(mIsLargeBorder) {
+            return LayoutInflater
+                    .from(context)
+                    .inflate(R.layout.comment_list_item_large_border, parent, false);
+        } else {
+            return LayoutInflater
+                    .from(context)
+                    .inflate(R.layout.comment_list_item, parent, false);
+        }
     }
 
     @Override
@@ -121,10 +131,11 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
         new Handler().post(new Runnable() {
             @Override
             public void run() {
-                float density = commentViewHolder.readMoreView.getContext().getResources().getDisplayMetrics().density;
                 ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) commentViewHolder.horizontalLineView.getLayoutParams();
+                // TODO swipeLayout refresh: read more view problem
+                MSLog.d("position: " + position + ", show read more view: " + show + ", body: " + comment.getCommentHtml());
                 if(show) {
-                    params.topMargin = (int) (37 * density);
+                    params.topMargin = (int) (37 * mDensity);
                     commentViewHolder.readMoreView.setVisibility(View.VISIBLE);
                     commentViewHolder.readMoreView.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -135,7 +146,7 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
                         }
                     });
                 } else {
-                    params.topMargin = (int) (16 * density);
+                    params.topMargin = (int) (16 * mDensity);
                     commentViewHolder.readMoreView.setVisibility(View.GONE);
                     commentViewHolder.readMoreView.setOnClickListener(null);
                 }

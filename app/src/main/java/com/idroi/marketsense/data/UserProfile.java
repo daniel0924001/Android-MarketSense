@@ -128,6 +128,7 @@ public class UserProfile implements Serializable {
     }
 
     public void notifyUserProfile(int notifyId) {
+        MSLog.i("notify for id: " + notifyId);
         for(int i = 0; i < mUserProfileChangeListeners.size(); i++) {
             mUserProfileChangeListeners.get(i).onUserProfileChange(notifyId);
         }
@@ -309,12 +310,15 @@ public class UserProfile implements Serializable {
     /* end of event */
 
     public void clearUserProfile() {
-        mUserId = "";
-        mUserName = "";
-        mUserEmail = "";
-        mUserType = "";
-        mUserAvatarLink = "";
+        MSLog.d("clear userId...");
+        mUserId = null;
+        mUserName = null;
+        mUserEmail = null;
+        mUserType = null;
+        mUserAvatarLink = null;
+        MSLog.d("clear events...");
         clearEvents();
+        MSLog.d("clear favorite stocks...");
         clearFavoriteStock();
     }
 

@@ -136,12 +136,12 @@ public class CommentAndVoteRequest extends Request<CommentAndVote> {
 
     public static String queryCommentsEvent() {
         return String.format(Locale.US,
-                API_URL_COMMENT_EVENT, (System.currentTimeMillis() / (10 * 1000)), 300);
+                API_URL_COMMENT_EVENT, (System.currentTimeMillis() / 1000), 300);
     }
 
     public static String queryCommentsEventForStockCode(String code) {
         return String.format(Locale.US,
                 API_URL_COMMENT_EVENT_FOR_CODE,
-                (System.currentTimeMillis() / (10 * 1000)), 300, code);
+                (System.currentTimeMillis() / 1000), 300, code);
     }
 }

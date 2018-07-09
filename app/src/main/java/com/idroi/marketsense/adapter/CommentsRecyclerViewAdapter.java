@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
 import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.NewsWebView;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
 import com.idroi.marketsense.datasource.CommentsPlacer;
@@ -39,14 +40,18 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
     private Handler mHandler;
 
     public CommentsRecyclerViewAdapter(final Activity activity) {
-        this(activity, null);
+        this(activity, false, null);
     }
 
     public CommentsRecyclerViewAdapter(final Activity activity, OnItemClickListener listener) {
+        this(activity, false, listener);
+    }
+
+    public CommentsRecyclerViewAdapter(final Activity activity, boolean largeBorder, OnItemClickListener listener) {
         mActivity = activity;
         mCommentsPlacer = new CommentsPlacer(activity);
         mOnItemClickListener = listener;
-        mCommentsRenderer = new CommentsRenderer(mOnItemClickListener);
+        mCommentsRenderer = new CommentsRenderer(activity, largeBorder, mOnItemClickListener);
         mReplyRenderer = new ReplyRenderer();
         mHandler = new Handler();
         mCommentsPlacer.setCommentsListener(new CommentsPlacer.CommentsListener() {

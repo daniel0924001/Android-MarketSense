@@ -39,6 +39,7 @@ import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_STOCK_COMMENT_CLI
  * Created by daniel.hsieh on 2018/5/6.
  */
 
+@Deprecated
 public class StockFragment extends Fragment {
 
     public final static String STOCK_CODE = "STOCK_CODE";

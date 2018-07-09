@@ -190,7 +190,6 @@ public class NewsWebViewActivity extends AppCompatActivity {
         mCommentsRecyclerViewAdapter = new CommentsRecyclerViewAdapter(this, new CommentsRecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void onSayLikeItemClick(Comment comment, int position) {
-                // TODO
                 if(FBHelper.checkFBLogin()) {
                     MSLog.d("say like at position: " + position);
                     comment.increaseLike();

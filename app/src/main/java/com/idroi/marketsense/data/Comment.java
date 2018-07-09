@@ -45,7 +45,7 @@ public class Comment implements Serializable {
     private int mTimeStamp;
 
     private ArrayList<Comment> mReplyArrayList;
-    private JSONArray mLikeList;
+    private String mLikeListJsonString;
     private int mLikeNumber;
     private boolean mIsLiked = false;
 
@@ -102,17 +102,26 @@ public class Comment implements Serializable {
     }
 
     public void setLikeList(JSONArray likes) {
-        mLikeList = likes;
+        if(likes != null) {
+            mLikeListJsonString = likes.toString();
+        }
     }
 
     public void updateLikeUserProfile() {
-        setLikeUserProfile(mLikeList);
+        if(mLikeListJsonString != null) {
+            try {
+                setLikeUserProfile(new JSONArray(mLikeListJsonString));
+            } catch (JSONException e) {
+                MSLog.e("JSONException is updateLikeUserProfile: " + e.toString());
+            }
+        }
     }
 
     public void setLikeUserProfile(JSONArray likes) {
-        setLikeList(likes);
         if(likes != null) {
+            setLikeList(likes);
             String userId = ClientData.getInstance().getUserProfile().getUserId();
+            mIsLiked = false;
             for (int i = 0; i < likes.length(); i++) {
                 try {
                     Event event = Event.JsonObjectToEvent(likes.getJSONObject(i));
@@ -303,7 +312,7 @@ public class Comment implements Serializable {
                         break;
                 }
             } catch (Exception e) {
-                MSLog.e(e.toString());
+                MSLog.e("key: " + key + ", " + e.toString());
             }
         }
         return comment;

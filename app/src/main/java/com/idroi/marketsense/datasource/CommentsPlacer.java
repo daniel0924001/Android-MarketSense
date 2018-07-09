@@ -144,10 +144,12 @@ public class CommentsPlacer {
     }
 
     public void updateCommentsLike() {
-        MSLog.d("update comments' like information");
-        for(int i = 0; i < mCommentArrayList.size(); i++) {
-            Comment comment = mCommentArrayList.get(i);
-            comment.updateLikeUserProfile();
+        if(mCommentArrayList != null) {
+            MSLog.d("update comments' like information");
+            for (int i = 0; i < mCommentArrayList.size(); i++) {
+                Comment comment = mCommentArrayList.get(i);
+                comment.updateLikeUserProfile();
+            }
         }
     }
 

@@ -54,7 +54,7 @@ import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.NewsRequest;
-import com.idroi.marketsense.request.SingleNewsRequest;
+import com.idroi.marketsense.request.CommentAndVoteRequest;
 import com.idroi.marketsense.util.MarketSenseUtils;
 
 import org.json.JSONObject;
@@ -98,7 +98,9 @@ public class StockActivity extends AppCompatActivity {
     public final static int CLICK_NOTHING_BEFORE_LOGIN = 0;
     public final static int CLICK_STAR_BEFORE_LOGIN = 1;
     public final static int CLICK_COMMENT_BEFORE_LOGIN = 2;
-    public final static int CLICK_VOTE_BEFORE_LOGIN = 3;
+    public final static int CLICK_LIKE_BEFORE_LOGIN = 4;
+    public final static int CLICK_VOTE_UP_BEFORE_LOGIN = 5;
+    public final static int CLICK_VOTE_DOWN_BEFORE_LOGIN = 6;
 
     private static final float CONST_ENABLE_ALPHA = 1.0f;
     private static final float CONST_DISABLE_ALPHA = 0.7f;
@@ -137,6 +139,9 @@ public class StockActivity extends AppCompatActivity {
     private ImageView mAddFavorite;
     private ConstraintLayout mSelectorComment, mSelectorNews;
     private NestedScrollView mNestedScrollView;
+
+    private Comment mTempComment;
+    private int mTempPosition;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -297,7 +302,7 @@ public class StockActivity extends AppCompatActivity {
                 if(FBHelper.checkFBLogin()) {
                     doVoteAction(true);
                 } else {
-                    showLoginAlertDialog(CLICK_VOTE_BEFORE_LOGIN);
+                    showLoginAlertDialog(CLICK_VOTE_UP_BEFORE_LOGIN);
                 }
             }
         });
@@ -308,7 +313,7 @@ public class StockActivity extends AppCompatActivity {
                 if(FBHelper.checkFBLogin()) {
                     doVoteAction(false);
                 } else {
-                    showLoginAlertDialog(CLICK_VOTE_BEFORE_LOGIN);
+                    showLoginAlertDialog(CLICK_VOTE_DOWN_BEFORE_LOGIN);
                 }
             }
         });
@@ -364,12 +369,31 @@ public class StockActivity extends AppCompatActivity {
                             return;
                         case CLICK_STAR_BEFORE_LOGIN:
                             changeFavorite(mAddFavorite);
+                            break;
+                        case CLICK_LIKE_BEFORE_LOGIN:
+                            mCommentsRecyclerViewAdapter.updateCommentsLike();
+                            MSLog.d("is like: " + mTempComment.isLiked());
+                            if(!mTempComment.isLiked()) {
+                                MSLog.d("say like at position: " + mTempPosition);
+                                mTempComment.increaseLike();
+                                mTempComment.setLike(true);
+                                PostEvent.sendLike(StockActivity.this, mTempComment.getCommentId());
+                                mCommentsRecyclerViewAdapter.notifyItemChanged(mTempPosition);
+                            }
                     }
                 } else if(notifyId == NOTIFY_ID_EVENT_LIST) {
-                    if(mLastClickedButton == CLICK_VOTE_BEFORE_LOGIN && !mUserProfile.canVoteAgain(mCode)) {
-                        Toast.makeText(StockActivity.this, R.string.title_welcome_but_you_have_voted, Toast.LENGTH_SHORT).show();
+                    if(mLastClickedButton == CLICK_VOTE_UP_BEFORE_LOGIN || mLastClickedButton == CLICK_VOTE_DOWN_BEFORE_LOGIN) {
+                        if(!mUserProfile.canVoteAgain(mCode)) {
+                            Toast.makeText(StockActivity.this, R.string.title_welcome_but_you_have_voted, Toast.LENGTH_SHORT).show();
+                            setVoteButtons();
+                        } else if(mLastClickedButton == CLICK_VOTE_UP_BEFORE_LOGIN) {
+                            doVoteAction(true);
+                        } else if(mLastClickedButton == CLICK_VOTE_DOWN_BEFORE_LOGIN) {
+                            doVoteAction(false);
+                        }
+                    } else {
+                        setVoteButtons();
                     }
-                    setVoteButtons();
                 } else if(notifyId == NOTIFY_ID_FAVORITE_LIST) {
                     mIsFavorite = mUserProfile.isFavoriteStock(mCode);
                     if(mIsFavorite) {
@@ -546,7 +570,7 @@ public class StockActivity extends AppCompatActivity {
                         StockActivity.this, news.getId(), news.getTitle(),
                         news.getUrlImage(), news.getDate(),
                         news.getPageLink(), news.getOriginLink(),
-                        news.getVoteRaiseNum(), news.getVoteFallNum()));
+                        news.getVoteRaiseNum(), news.getVoteFallNum(), news.getStockKeywords()));
                 overridePendingTransition(R.anim.enter, R.anim.stop);
             }
         });
@@ -580,11 +604,17 @@ public class StockActivity extends AppCompatActivity {
         mCommentsRecyclerViewAdapter = new CommentsRecyclerViewAdapter(this, new CommentsRecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void onSayLikeItemClick(Comment comment, int position) {
-                MSLog.d("say like at position: " + position);
-                comment.increaseLike();
-                comment.setLike(true);
-                PostEvent.sendLike(StockActivity.this, comment.getCommentId());
-                mCommentsRecyclerViewAdapter.notifyItemChanged(position);
+                mTempComment = comment;
+                mTempPosition = position;
+                if(FBHelper.checkFBLogin()) {
+                    MSLog.d("say like at position: " + position);
+                    comment.increaseLike();
+                    comment.setLike(true);
+                    PostEvent.sendLike(StockActivity.this, comment.getCommentId());
+                    mCommentsRecyclerViewAdapter.notifyItemChanged(position);
+                } else {
+                    showLoginAlertDialog(CLICK_LIKE_BEFORE_LOGIN);
+                }
             }
 
             @Override
@@ -602,17 +632,19 @@ public class StockActivity extends AppCompatActivity {
         mCommentsRecyclerViewAdapter.setCommentsAvailableListener(new CommentsRecyclerViewAdapter.CommentsAvailableListener() {
             @Override
             public void onCommentsAvailable(CommentAndVote commentAndVote) {
-                if(commentAndVote.getCommentSize() > 0) {
-                    showCommentBlock();
+                if(commentAndVote != null) {
+                    if (commentAndVote.getCommentSize() > 0) {
+                        showCommentBlock();
+                    }
+                    mVoteRaiseNum = commentAndVote.getRaiseNumber();
+                    mVoteFallNum = commentAndVote.getFallNumber();
+                    MSLog.d("update stock raise vote number: " + commentAndVote.getRaiseNumber());
+                    MSLog.d("update stock fall vote number: " + commentAndVote.getFallNumber());
+                    setSocialInformation(commentAndVote);
                 }
-                mVoteRaiseNum = commentAndVote.getRaiseNumber();
-                mVoteFallNum = commentAndVote.getFallNumber();
-                MSLog.d("update stock raise vote number: " + commentAndVote.getRaiseNumber());
-                MSLog.d("update stock fall vote number: " + commentAndVote.getFallNumber());
-                setSocialInformation(commentAndVote);
             }
         });
-        mCommentsRecyclerViewAdapter.loadCommentsList(SingleNewsRequest.querySingleNewsUrl(mCode, SingleNewsRequest.TASK.STOCK_COMMENT));
+        mCommentsRecyclerViewAdapter.loadCommentsList(CommentAndVoteRequest.querySingleNewsUrl(mCode, CommentAndVoteRequest.TASK.STOCK_COMMENT));
     }
 
     private void showCommentBlock() {

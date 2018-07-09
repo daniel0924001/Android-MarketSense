@@ -37,6 +37,7 @@ public class News {
     private static final String RAISE = "raise";
     private static final String FALL = "fall";
     private static final String HIGHLIGHT_SENTENCE = "highlight_sens";
+    private static final String STOCK_KEYWORDS = "stock_keywords";
 
     private String mId;
     private String mTitle;
@@ -54,6 +55,7 @@ public class News {
 
     @Nullable private ArrayList<HighLightSentence> mHighLightSentences;
     @Nullable private News mNextNews;
+    @Nullable private String[] mStockKeywords;
 
     public News() {
     }
@@ -126,6 +128,15 @@ public class News {
         }
     }
 
+    public void setStockKeywords(JSONArray jsonArray) {
+        if(jsonArray != null) {
+            mStockKeywords = new String[jsonArray.length()];
+            for(int i = 0; i < jsonArray.length(); i++) {
+                mStockKeywords[i] = jsonArray.optString(i);
+            }
+        }
+    }
+
     public String getId() {
         return mId;
     }
@@ -186,6 +197,10 @@ public class News {
         return mNextNews;
     }
 
+    public String[] getStockKeywords() {
+        return mStockKeywords;
+    }
+
     @Nullable
     public ArrayList<HighLightSentence> getHighLightSentence() {
         return mHighLightSentences;
@@ -244,6 +259,9 @@ public class News {
                         break;
                     case HIGHLIGHT_SENTENCE:
                         news.setHighlightSentence(jsonObject.optJSONArray(HIGHLIGHT_SENTENCE));
+                        break;
+                    case STOCK_KEYWORDS:
+                        news.setStockKeywords(jsonObject.optJSONArray(STOCK_KEYWORDS));
                         break;
                     default:
                         break;

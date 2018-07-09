@@ -26,7 +26,7 @@ import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
-import com.idroi.marketsense.request.SingleNewsRequest;
+import com.idroi.marketsense.request.CommentAndVoteRequest;
 
 import java.util.Locale;
 
@@ -93,17 +93,19 @@ public class StockFragment extends Fragment {
         mCommentsRecyclerViewAdapter.setCommentsAvailableListener(new CommentsRecyclerViewAdapter.CommentsAvailableListener() {
             @Override
             public void onCommentsAvailable(CommentAndVote commentAndVote) {
-                if(commentAndVote.getCommentSize() > 0) {
-                    showCommentBlock(view);
+                if(commentAndVote != null) {
+                    if (commentAndVote.getCommentSize() > 0) {
+                        showCommentBlock(view);
+                    }
+                    mVoteRaiseNum = commentAndVote.getRaiseNumber();
+                    mVoteFallNum = commentAndVote.getFallNumber();
+                    setButtonStatus();
+                    MSLog.d("raise number: " + commentAndVote.getRaiseNumber());
+                    MSLog.d("fall number: " + commentAndVote.getFallNumber());
                 }
-                mVoteRaiseNum = commentAndVote.getRaiseNumber();
-                mVoteFallNum = commentAndVote.getFallNumber();
-                setButtonStatus();
-                MSLog.d("raise number: " + commentAndVote.getRaiseNumber());
-                MSLog.d("fall number: " + commentAndVote.getFallNumber());
             }
         });
-        mCommentsRecyclerViewAdapter.loadCommentsList(SingleNewsRequest.querySingleNewsUrl(mStockId, SingleNewsRequest.TASK.STOCK_COMMENT));
+        mCommentsRecyclerViewAdapter.loadCommentsList(CommentAndVoteRequest.querySingleNewsUrl(mStockId, CommentAndVoteRequest.TASK.STOCK_COMMENT));
     }
 
     private void showCommentBlock(View view) {

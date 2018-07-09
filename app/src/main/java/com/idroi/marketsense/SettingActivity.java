@@ -234,8 +234,7 @@ public class SettingActivity extends AppCompatActivity {
                     internalRefreshFBUi(null, null);
 
                     UserProfile userProfile = ClientData.getInstance(SettingActivity.this).getUserProfile();
-                    userProfile.clearFavoriteStock();
-                    userProfile.clearEvents();
+                    userProfile.clearUserProfile();
                     userProfile.notifyUserProfile(NOTIFY_ID_FAVORITE_LIST);
                 } else {
                     MSLog.d("perform login");

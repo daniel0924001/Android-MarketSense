@@ -52,6 +52,7 @@ public class RichEditorActivity extends AppCompatActivity {
 
     public static final String EXTRA_REQ_TYPE = "extra_type";
     public static final String EXTRA_REQ_ID = "extra_id";
+    public static final String EXTRA_REQ_STOCK_KEYWORDS = "extra_stock_keywords";
     public static final String EXTRA_RES_HTML = "extra_response_html";
     public static final String EXTRA_RES_TYPE = EXTRA_REQ_TYPE;
     public static final String EXTRA_RES_ID = EXTRA_REQ_ID;
@@ -61,6 +62,7 @@ public class RichEditorActivity extends AppCompatActivity {
 
     private String mType;
     private String mId;
+    private String[] mStockKeywords;
     private boolean mDoubleClickBack = false;
     private AlertDialog mImageAlertDialog;
     private AlertDialog mUrlAlertDialog;
@@ -110,6 +112,7 @@ public class RichEditorActivity extends AppCompatActivity {
     private void setInformation() {
         mId = getIntent().getStringExtra(EXTRA_REQ_ID);
         mType = getIntent().getStringExtra(EXTRA_REQ_TYPE);
+        mStockKeywords = getIntent().getStringArrayExtra(EXTRA_REQ_STOCK_KEYWORDS);
     }
 
     private void leaveRichEditorActivity(boolean isSuccessful, String html, String eventId) {
@@ -157,6 +160,13 @@ public class RichEditorActivity extends AppCompatActivity {
             Stock stock = ClientData.getInstance(this).getPriceFromCode(mId);
             if(stock != null) {
                 insertLink(stock.getCode(), stock.getName());
+            }
+        } else if(mType.equals(TYPE.NEWS.getType())) {
+            for (String name: mStockKeywords) {
+                String code = ClientData.getInstance(this).getCodeFromName(name);
+                if(code != null) {
+                    insertLink(code, name);
+                }
             }
         }
     }
@@ -309,9 +319,14 @@ public class RichEditorActivity extends AppCompatActivity {
     }
 
     public static Intent generateRichEditorActivityIntent(Context context, TYPE type, String id) {
+        return generateRichEditorActivityIntent(context, type, id, null);
+    }
+
+    public static Intent generateRichEditorActivityIntent(Context context, TYPE type, String id, String[] stockKeywords) {
         Intent intent = new Intent(context, RichEditorActivity.class);
         intent.putExtra(EXTRA_REQ_TYPE, type.getType());
         intent.putExtra(EXTRA_REQ_ID, id);
+        intent.putExtra(EXTRA_REQ_STOCK_KEYWORDS, stockKeywords);
         return intent;
     }
 

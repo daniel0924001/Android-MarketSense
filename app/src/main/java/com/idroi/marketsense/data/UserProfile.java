@@ -308,6 +308,16 @@ public class UserProfile implements Serializable {
     }
     /* end of event */
 
+    public void clearUserProfile() {
+        mUserId = "";
+        mUserName = "";
+        mUserEmail = "";
+        mUserType = "";
+        mUserAvatarLink = "";
+        clearEvents();
+        clearFavoriteStock();
+    }
+
     public void updateUserData(Context context) {
         MSLog.d(String.format("update user data to share preference: %s %s %s %s %s",
                 mUserId, mUserType, mUserName, mUserEmail, mUserAvatarLink));
@@ -362,36 +372,40 @@ public class UserProfile implements Serializable {
     }
 
     static UserProfile jsonObjectToUserProfile(JSONObject jsonObject) {
-        UserProfile userProfile = new UserProfile();
-        Iterator<String> iterator = jsonObject.keys();
-        while (iterator.hasNext()) {
-            String key = iterator.next();
-            try {
-                switch (key) {
-                    case USER_ID:
-                        userProfile.setUserId(jsonObject.optString(USER_ID));
-                        break;
-                    case USER_TYPE:
-                        userProfile.setUserType(jsonObject.optString(USER_TYPE));
-                        break;
-                    case USER_EMAIL:
-                        userProfile.setUserEmail(jsonObject.optString(USER_EMAIL));
-                        break;
-                    case USER_NAME:
-                        userProfile.setUserName(jsonObject.optString(USER_NAME));
-                        break;
-                    case USER_AVATAR_LINK:
-                        userProfile.setUserAvatarLink(jsonObject.optString(USER_AVATAR_LINK));
-                        break;
-                    default:
-                        break;
+        if(jsonObject != null) {
+            UserProfile userProfile = new UserProfile();
+            Iterator<String> iterator = jsonObject.keys();
+            while (iterator.hasNext()) {
+                String key = iterator.next();
+                try {
+                    switch (key) {
+                        case USER_ID:
+                            userProfile.setUserId(jsonObject.optString(USER_ID));
+                            break;
+                        case USER_TYPE:
+                            userProfile.setUserType(jsonObject.optString(USER_TYPE));
+                            break;
+                        case USER_EMAIL:
+                            userProfile.setUserEmail(jsonObject.optString(USER_EMAIL));
+                            break;
+                        case USER_NAME:
+                            userProfile.setUserName(jsonObject.optString(USER_NAME));
+                            break;
+                        case USER_AVATAR_LINK:
+                            userProfile.setUserAvatarLink(jsonObject.optString(USER_AVATAR_LINK));
+                            break;
+                        default:
+                            break;
+                    }
+                } catch (Exception e) {
+                    MSLog.e(e.toString());
                 }
-            } catch (Exception e) {
-                MSLog.e(e.toString());
             }
-        }
 
-        return userProfile;
+            return userProfile;
+        } else {
+            return null;
+        }
     }
 
     public static String generatePassword(String id, String type) {

@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +29,7 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.idroi.marketsense.adapter.DiscussionScreenSlidePagerAdapter;
 import com.idroi.marketsense.adapter.MainPageScreenSlidePagerAdapter;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.adapter.BaseScreenSlidePagerAdapter;
@@ -65,8 +67,12 @@ public class MainActivity extends AppCompatActivity {
     private SwipeableViewPager mViewPager;
     private MagicIndicator mMagicIndicator;
     private FloatingActionButton mFab;
+
     private Button mLeftButton, mRightButton;
     private TextView mActionTitleBar;
+    private EditText mFindKeywordEditText;
+    private ImageView mActionRightImage;
+
     private int mLastSelectedItemId = -1;
 
     public final static int sSearchAndAddRequestCode = 1;
@@ -81,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
 
     UserProfile.UserProfileChangeListener mUserProfileChangeListener;
 
-    private boolean mClickable, mSwitchable, mCanReturn = false;
+    private boolean mClickable, mSwitchable, mCanReturn = false, mIsDiscussion;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -99,6 +105,9 @@ public class MainActivity extends AppCompatActivity {
                         return true;
                     case R.id.navigation_news:
                         setViewPager(R.id.navigation_news);
+                        return true;
+                    case R.id.navigation_discussion:
+                        setViewPager(R.id.navigation_discussion);
                         return true;
                     case R.id.navigation_choices:
                         setViewPager(R.id.navigation_choices);
@@ -218,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
         super.onBackPressed();
         if(!mCanReturn) {
             setActionBar();
-            setActionBarTwoButton(mClickable, mSwitchable);
+            setActionBarTwoButton(mClickable, mSwitchable, mIsDiscussion);
         }
     }
 
@@ -283,10 +292,9 @@ public class MainActivity extends AppCompatActivity {
                 setAvatarImage();
             }
 
-            ImageView searchAndOpenView = view.findViewById(R.id.action_bar_search);
-            if(searchAndOpenView != null) {
-                searchAndOpenView.setVisibility(View.VISIBLE);
-                searchAndOpenView.setOnClickListener(new View.OnClickListener() {
+            mActionRightImage = view.findViewById(R.id.action_bar_search);
+            if(mActionRightImage != null) {
+                mActionRightImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         Intent intent = new Intent(MainActivity.this, SearchAndResponseActivity.class);
@@ -296,6 +304,7 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
 
+            mFindKeywordEditText = view.findViewById(R.id.search_edit_text);
             mActionTitleBar = view.findViewById(R.id.action_bar_name);
             mLeftButton = view.findViewById(R.id.btn_left);
             mRightButton = view.findViewById(R.id.btn_right);
@@ -314,14 +323,26 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void setActionBarTwoButton(boolean clickable, final boolean switchable) {
+    private void setActionBarTwoButton(boolean clickable, final boolean switchable, final boolean isDiscussion) {
 
-        if(switchable && !clickable) {
+        if(!isDiscussion && switchable && !clickable) {
             throw new IllegalStateException();
         }
 
-        if(mLeftButton != null && mRightButton != null) {
-            if(clickable) {
+        if(isDiscussion) {
+            mFindKeywordEditText.setVisibility(View.VISIBLE);
+            mLeftButton.setOnClickListener(null);
+            mRightButton.setOnClickListener(null);
+            mLeftButton.setVisibility(View.GONE);
+            mRightButton.setVisibility(View.GONE);
+            mActionTitleBar.setVisibility(View.GONE);
+            // TODO: before we implement this function, we hide this icon.
+            mActionRightImage.setVisibility(View.GONE);
+        } else {
+            // TODO: before we implement this function, we hide this icon.
+            mActionRightImage.setVisibility(View.VISIBLE);
+            mFindKeywordEditText.setVisibility(View.GONE);
+            if (clickable) {
                 mLeftButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -329,7 +350,7 @@ public class MainActivity extends AppCompatActivity {
                         mRightButton.setBackground(getDrawable(R.drawable.btn_oval_right_black));
                         mLeftButton.setTextColor(getResources().getColor(R.color.text_black));
                         mLeftButton.setBackground(getDrawable(R.drawable.btn_oval_left_white));
-                        if(switchable) {
+                        if (switchable) {
                             mViewPager.setCurrentItem(0, false);
                         } else {
                             setViewPager(R.id.navigation_news);
@@ -344,7 +365,7 @@ public class MainActivity extends AppCompatActivity {
                         mRightButton.setBackground(getDrawable(R.drawable.btn_oval_right_white));
                         mLeftButton.setTextColor(getResources().getColor(R.color.text_white));
                         mLeftButton.setBackground(getDrawable(R.drawable.btn_oval_left_black));
-                        if(switchable) {
+                        if (switchable) {
                             mViewPager.setCurrentItem(1, false);
                         } else {
                             setViewPager(SELF_CHOICE_NEWS_SLIDE_PAGER);
@@ -428,6 +449,7 @@ public class MainActivity extends AppCompatActivity {
 //                setActionBarTwoButton(false, false);
                 mClickable = false;
                 mSwitchable = false;
+                mIsDiscussion = false;
                 break;
             case R.id.navigation_predict:
                 baseScreenSlidePagerAdapter =
@@ -439,6 +461,7 @@ public class MainActivity extends AppCompatActivity {
 //                setActionBarTwoButton(true, true);
                 mClickable = true;
                 mSwitchable = true;
+                mIsDiscussion = false;
                 initActionBarTwoButton();
                 break;
             case R.id.navigation_news:
@@ -450,6 +473,7 @@ public class MainActivity extends AppCompatActivity {
 //                setActionBarTwoButton(true, false);
                 mClickable = true;
                 mSwitchable = false;
+                mIsDiscussion = false;
                 initActionBarTwoButton();
                 break;
             case SELF_CHOICE_NEWS_SLIDE_PAGER:
@@ -461,6 +485,17 @@ public class MainActivity extends AppCompatActivity {
 //                setActionBarTwoButton(true, false);
                 mClickable = true;
                 mSwitchable = false;
+                mIsDiscussion = false;
+                break;
+            case R.id.navigation_discussion:
+                baseScreenSlidePagerAdapter =
+                        new DiscussionScreenSlidePagerAdapter(this, getSupportFragmentManager());
+                setFab(false);
+                mViewPager.setSwipeable(false);
+                mMagicIndicator.setVisibility(View.GONE);
+                mClickable = false;
+                mSwitchable = false;
+                mIsDiscussion = true;
                 break;
             case R.id.navigation_choices:
                 baseScreenSlidePagerAdapter =
@@ -471,12 +506,13 @@ public class MainActivity extends AppCompatActivity {
 //                setActionBarTwoButton(false, false);
                 mClickable = false;
                 mSwitchable = false;
+                mIsDiscussion = false;
                 break;
             default:
                 // invalid category
                 return;
         }
-        setActionBarTwoButton(mClickable, mSwitchable);
+        setActionBarTwoButton(mClickable, mSwitchable, mIsDiscussion);
         mViewPager.setAdapter(baseScreenSlidePagerAdapter);
 
         MarketSenseCommonNavigator commonNavigator =

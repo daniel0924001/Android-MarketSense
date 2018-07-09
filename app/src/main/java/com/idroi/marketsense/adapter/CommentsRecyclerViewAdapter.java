@@ -66,6 +66,9 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
             @Override
             public void onCommentsFailed() {
                 MSLog.d("no comment or failed");
+                if(mCommentsAvailableListener != null) {
+                    mCommentsAvailableListener.onCommentsAvailable(null);
+                }
             }
         });
     }
@@ -122,6 +125,11 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
         comment.setLikeNumber(other.getLikeNumber());
         comment.cloneReplies(other.getReplyArrayList());
         comment.setLike(other.isLiked());
+    }
+
+    public void updateCommentsLike() {
+        mCommentsPlacer.updateCommentsLike();
+        notifyItemRangeChanged(0, getItemCount());
     }
 
     private Comment getComment(int position) {

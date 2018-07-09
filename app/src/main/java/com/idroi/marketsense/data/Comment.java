@@ -45,6 +45,7 @@ public class Comment implements Serializable {
     private int mTimeStamp;
 
     private ArrayList<Comment> mReplyArrayList;
+    private JSONArray mLikeList;
     private int mLikeNumber;
     private boolean mIsLiked = false;
 
@@ -100,16 +101,27 @@ public class Comment implements Serializable {
         mLikeNumber = likeNumber;
     }
 
+    public void setLikeList(JSONArray likes) {
+        mLikeList = likes;
+    }
+
+    public void updateLikeUserProfile() {
+        setLikeUserProfile(mLikeList);
+    }
+
     public void setLikeUserProfile(JSONArray likes) {
-        String userId = ClientData.getInstance().getUserProfile().getUserId();
-        for(int i = 0; i < likes.length(); i++) {
-            try {
-                Event event = Event.JsonObjectToEvent(likes.getJSONObject(i));
-                if(event.getUserId().equals(userId)) {
-                    mIsLiked = true;
+        setLikeList(likes);
+        if(likes != null) {
+            String userId = ClientData.getInstance().getUserProfile().getUserId();
+            for (int i = 0; i < likes.length(); i++) {
+                try {
+                    Event event = Event.JsonObjectToEvent(likes.getJSONObject(i));
+                    if (event.getUserId().equals(userId)) {
+                        mIsLiked = true;
+                    }
+                } catch (JSONException e) {
+                    MSLog.e("JSONException in setLikeUserProfile: " + i);
                 }
-            } catch (JSONException e) {
-                MSLog.e("JSONException in setLikeUserProfile: " + i);
             }
         }
     }
@@ -124,13 +136,15 @@ public class Comment implements Serializable {
 
     public void setReplies(JSONArray comments) {
         mReplyArrayList = new ArrayList<>();
-        for(int i = 0; i < comments.length(); i++) {
-            try {
-                Comment comment = Comment.jsonObjectToComment(comments.getJSONObject(i));
-                comment.setViewType(VIEW_TYPE_REPLY);
-                mReplyArrayList.add(comment);
-            } catch (JSONException e) {
-                MSLog.e("JSONException in setReplies: " + i);
+        if(comments != null) {
+            for (int i = 0; i < comments.length(); i++) {
+                try {
+                    Comment comment = Comment.jsonObjectToComment(comments.getJSONObject(i));
+                    comment.setViewType(VIEW_TYPE_REPLY);
+                    mReplyArrayList.add(comment);
+                } catch (JSONException e) {
+                    MSLog.e("JSONException in setReplies: " + i);
+                }
             }
         }
     }

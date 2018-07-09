@@ -10,7 +10,7 @@ import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.common.MarketSenseNetworkError;
 import com.idroi.marketsense.data.CommentAndVote;
-import com.idroi.marketsense.request.SingleNewsRequest;
+import com.idroi.marketsense.request.CommentAndVoteRequest;
 import com.idroi.marketsense.util.MarketSenseUtils;
 
 import java.lang.ref.WeakReference;
@@ -43,7 +43,7 @@ public class MarketSenseCommentsFetcher {
 
     private WeakReference<Context> mContext;
     private MarketSenseCommentsNetworkListener mMarketSenseCommentsNetworkListener;
-    private SingleNewsRequest mSingleNewsRequest;
+    private CommentAndVoteRequest mCommentAndVoteRequest;
 
     MarketSenseCommentsFetcher(Context context,
            MarketSenseCommentsNetworkListener marketSenseCommentsNetworkListener) {
@@ -53,9 +53,9 @@ public class MarketSenseCommentsFetcher {
         mTimeoutRunnable = new Runnable() {
             @Override
             public void run() {
-                if(mSingleNewsRequest != null) {
-                    mSingleNewsRequest.cancel();
-                    mSingleNewsRequest = null;
+                if(mCommentAndVoteRequest != null) {
+                    mCommentAndVoteRequest.cancel();
+                    mCommentAndVoteRequest = null;
                 }
                 mMarketSenseCommentsNetworkListener.onCommentsFail(MarketSenseError.NETWORK_CONNECTION_TIMEOUT);
             }
@@ -84,7 +84,7 @@ public class MarketSenseCommentsFetcher {
 
         MSLog.i("Loading comments ...: " + url);
 
-        mSingleNewsRequest = new SingleNewsRequest(Request.Method.GET, url, new Response.Listener<CommentAndVote>() {
+        mCommentAndVoteRequest = new CommentAndVoteRequest(Request.Method.GET, url, new Response.Listener<CommentAndVote>() {
             @Override
             public void onResponse(CommentAndVote response) {
                 final Context context = getContextOrDestroy();
@@ -118,16 +118,16 @@ public class MarketSenseCommentsFetcher {
         });
 
         mTimeoutHandler.postDelayed(mTimeoutRunnable, 3000);
-        mSingleNewsRequest.setShouldCache(false);
-        Networking.getRequestQueue(context).add(mSingleNewsRequest);
+        mCommentAndVoteRequest.setShouldCache(false);
+        Networking.getRequestQueue(context).add(mCommentAndVoteRequest);
 
     }
 
     public void destroy() {
         mContext.clear();
-        if(mSingleNewsRequest != null) {
-            mSingleNewsRequest.cancel();
-            mSingleNewsRequest = null;
+        if(mCommentAndVoteRequest != null) {
+            mCommentAndVoteRequest.cancel();
+            mCommentAndVoteRequest = null;
         }
         mMarketSenseCommentsNetworkListener = EMPTY_NETWORK_LISTENER;
         if(mTimeoutHandler != null) {

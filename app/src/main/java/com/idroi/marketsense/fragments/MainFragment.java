@@ -180,7 +180,7 @@ public class MainFragment extends Fragment {
                         getContext(), news.getId(), news.getTitle(),
                         news.getUrlImage(), news.getDate(),
                         news.getPageLink(), news.getOriginLink(),
-                        news.getVoteRaiseNum(), news.getVoteFallNum()));
+                        news.getVoteRaiseNum(), news.getVoteFallNum(), news.getStockKeywords()));
                 getActivity().overridePendingTransition(R.anim.enter, R.anim.stop);
             }
         });

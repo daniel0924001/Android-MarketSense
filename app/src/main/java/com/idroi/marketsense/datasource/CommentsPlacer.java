@@ -2,6 +2,7 @@ package com.idroi.marketsense.datasource;
 
 import android.app.Activity;
 
+import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
@@ -139,6 +140,14 @@ public class CommentsPlacer {
             return mCommentArrayList.size();
         } else {
             return 0;
+        }
+    }
+
+    public void updateCommentsLike() {
+        MSLog.d("update comments' like information");
+        for(int i = 0; i < mCommentArrayList.size(); i++) {
+            Comment comment = mCommentArrayList.get(i);
+            comment.updateLikeUserProfile();
         }
     }
 

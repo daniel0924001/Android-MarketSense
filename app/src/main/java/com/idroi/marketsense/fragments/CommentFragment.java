@@ -18,12 +18,14 @@ import android.widget.ProgressBar;
 import com.facebook.login.widget.LoginButton;
 import com.idroi.marketsense.CommentActivity;
 import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.NewsWebViewActivity;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
+import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.CommentAndVoteRequest;
@@ -73,27 +75,34 @@ public class CommentFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mCommentRecyclerViewAdapter = new CommentsRecyclerViewAdapter(getActivity(), true,
                 new CommentsRecyclerViewAdapter.OnItemClickListener() {
-            @Override
-            public void onSayLikeItemClick(Comment comment, int position) {
-                if(FBHelper.checkFBLogin()) {
-                    MSLog.d("say like at position: " + position);
-                    comment.increaseLike();
-                    comment.setLike(true);
-                    PostEvent.sendLike(getActivity(), comment.getCommentId());
-                    mCommentRecyclerViewAdapter.notifyItemChanged(position);
-                } else {
-                    mTempComment = comment;
-                    mTempPosition = position;
-                    showLoginAlertDialog(LAST_CLICK_IS_LIKE);
-                }
-            }
+                    @Override
+                    public void onSayLikeItemClick(Comment comment, int position) {
+                        if (FBHelper.checkFBLogin()) {
+                            MSLog.d("say like at position: " + position);
+                            comment.increaseLike();
+                            comment.setLike(true);
+                            PostEvent.sendLike(getActivity(), comment.getCommentId());
+                            mCommentRecyclerViewAdapter.notifyItemChanged(position);
+                        } else {
+                            mTempComment = comment;
+                            mTempPosition = position;
+                            showLoginAlertDialog(LAST_CLICK_IS_LIKE);
+                        }
+                    }
 
-            @Override
-            public void onReplyItemClick(Comment comment, int position) {
-                startActivityForResult(CommentActivity.generateCommentActivityIntent(
-                        getActivity(), comment, position), sReplyEditorRequestCode);
-                getActivity().overridePendingTransition(R.anim.enter, R.anim.stop);
-            }
+                    @Override
+                    public void onReplyItemClick(Comment comment, int position) {
+                        startActivityForResult(CommentActivity.generateCommentActivityIntent(
+                                getActivity(), comment, position), sReplyEditorRequestCode);
+                        getActivity().overridePendingTransition(R.anim.enter, R.anim.stop);
+                    }
+                }, new CommentsRecyclerViewAdapter.OnNewsItemClickListener() {
+                @Override
+                public void onNewsItemClick(News news) {
+                    startActivity(NewsWebViewActivity.generateNewsWebViewActivityIntent(
+                            getActivity(), news));
+                    getActivity().overridePendingTransition(R.anim.enter, R.anim.stop);
+                }
         });
         mCommentRecyclerViewAdapter.setCommentsAvailableListener(new CommentsRecyclerViewAdapter.CommentsAvailableListener() {
             @Override

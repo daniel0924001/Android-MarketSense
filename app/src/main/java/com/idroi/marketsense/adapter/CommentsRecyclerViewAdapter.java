@@ -9,6 +9,7 @@ import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.NewsWebView;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
+import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.datasource.CommentsPlacer;
 
 import java.util.ArrayList;
@@ -30,28 +31,34 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
         void onCommentsAvailable(CommentAndVote commentAndVote);
     }
 
+    public interface OnNewsItemClickListener {
+        void onNewsItemClick(News news);
+    }
+
     private Activity mActivity;
     private CommentsPlacer mCommentsPlacer;
     private CommentsRenderer mCommentsRenderer;
     private ReplyRenderer mReplyRenderer;
     private OnItemClickListener mOnItemClickListener;
     private CommentsAvailableListener mCommentsAvailableListener;
+    private OnNewsItemClickListener mOnNewsItemClickListener;
 
     private Handler mHandler;
 
     public CommentsRecyclerViewAdapter(final Activity activity) {
-        this(activity, false, null);
+        this(activity, false, null, null);
     }
 
     public CommentsRecyclerViewAdapter(final Activity activity, OnItemClickListener listener) {
-        this(activity, false, listener);
+        this(activity, false, listener, null);
     }
 
-    public CommentsRecyclerViewAdapter(final Activity activity, boolean largeBorder, OnItemClickListener listener) {
+    public CommentsRecyclerViewAdapter(final Activity activity, boolean largeBorder,
+                                       OnItemClickListener listener, OnNewsItemClickListener newsListener) {
         mActivity = activity;
         mCommentsPlacer = new CommentsPlacer(activity);
         mOnItemClickListener = listener;
-        mCommentsRenderer = new CommentsRenderer(largeBorder, mOnItemClickListener);
+        mCommentsRenderer = new CommentsRenderer(largeBorder, mOnItemClickListener, newsListener);
         mReplyRenderer = new ReplyRenderer();
         mHandler = new Handler();
         mCommentsPlacer.setCommentsListener(new CommentsPlacer.CommentsListener() {

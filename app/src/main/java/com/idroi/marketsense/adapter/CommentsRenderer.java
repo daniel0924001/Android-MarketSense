@@ -15,6 +15,7 @@ import com.idroi.marketsense.R;
 import com.idroi.marketsense.common.FrescoImageHelper;
 import com.idroi.marketsense.common.MarketSenseRendererHelper;
 import com.idroi.marketsense.data.Comment;
+import com.idroi.marketsense.data.News;
 
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -27,11 +28,15 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
 
     @NonNull private final WeakHashMap<View, CommentViewHolder> mViewHolderMap;
     @Nullable private final CommentsRecyclerViewAdapter.OnItemClickListener mOnItemClickListener;
+    private final CommentsRecyclerViewAdapter.OnNewsItemClickListener mOnNewsItemClickListener;
     private boolean mIsLargeBorder;
 
-    CommentsRenderer(boolean isLargeBorder, @Nullable CommentsRecyclerViewAdapter.OnItemClickListener listener) {
+    CommentsRenderer(boolean isLargeBorder,
+                     @Nullable CommentsRecyclerViewAdapter.OnItemClickListener listener,
+                    CommentsRecyclerViewAdapter.OnNewsItemClickListener newsListener) {
         mViewHolderMap = new WeakHashMap<>();
         mOnItemClickListener = listener;
+        mOnNewsItemClickListener = newsListener;
         mIsLargeBorder = isLargeBorder;
     }
 
@@ -87,7 +92,79 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
             commentViewHolder.likeImageView.setImageResource(R.mipmap.ic_like_off);
         }
 
+        if(mIsLargeBorder) {
+            News news = content.getNews();
+            if(news != null) {
+                setNewsBlock(commentViewHolder, content.getNews());
+            } else {
+                if(commentViewHolder.newsBlock != null) {
+                    commentViewHolder.newsBlock.setVisibility(View.GONE);
+                }
+            }
+        }
+
         setViewVisibility(commentViewHolder, View.VISIBLE);
+    }
+
+    private void setNewsBlock(CommentViewHolder commentViewHolder, final News news) {
+        if(commentViewHolder.newsBlock != null) {
+            commentViewHolder.newsBlock.setVisibility(View.VISIBLE);
+            commentViewHolder.newsBlock.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mOnNewsItemClickListener.onNewsItemClick(news);
+                }
+            });
+        }
+        MarketSenseRendererHelper.addTextView(commentViewHolder.newsTitleView, news.getTitle());
+
+        // fire text
+        if(commentViewHolder.fireTextView != null) {
+            if (news.isOptimistic()) {
+                commentViewHolder.fireTextView.setText(R.string.title_news_good);
+                commentViewHolder.fireTextView.setTextColor(
+                        commentViewHolder.fireTextView.getContext().getResources().getColor(R.color.colorTrendUp));
+                commentViewHolder.fireTextView.setVisibility(View.VISIBLE);
+            } else if (news.isPessimistic()) {
+                commentViewHolder.fireTextView.setText(R.string.title_news_bad);
+                commentViewHolder.fireTextView.setTextColor(
+                        commentViewHolder.fireTextView.getContext().getResources().getColor(R.color.colorTrendDown));
+                commentViewHolder.fireTextView.setVisibility(View.VISIBLE);
+            } else {
+                commentViewHolder.fireTextView.setVisibility(View.GONE);
+            }
+        }
+
+        // fire image
+        if(commentViewHolder.fireImageView != null) {
+            commentViewHolder.fireImageView.setVisibility(View.VISIBLE);
+            switch (news.getLevel()) {
+                case 3:
+                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_red3);
+                    break;
+                case 2:
+                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_red2);
+                    break;
+                case 1:
+                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_red1);
+                    break;
+                case -1:
+                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_green1);
+                    break;
+                case -2:
+                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_green2);
+                    break;
+                case -3:
+                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_green3);
+                    break;
+                default:
+                    commentViewHolder.fireImageView.setVisibility(View.GONE);
+            }
+        }
+
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) commentViewHolder.horizontalLineView.getLayoutParams();
+        params.topToBottom = commentViewHolder.newsBlock.getId();
+        commentViewHolder.horizontalLineView.setLayoutParams(params);
     }
 
     public void setClickListener(View view, final Comment comment, final int position) {
@@ -131,7 +208,11 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
             public void run() {
                 ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) commentViewHolder.horizontalLineView.getLayoutParams();
                 if(show) {
-                    params.topToBottom = commentViewHolder.readMoreView.getId();
+                    if(comment.getNews() != null && commentViewHolder.newsBlock != null) {
+                        params.topToBottom = commentViewHolder.newsBlock.getId();
+                    } else {
+                        params.topToBottom = commentViewHolder.readMoreView.getId();
+                    }
                     commentViewHolder.readMoreView.setVisibility(View.VISIBLE);
                     commentViewHolder.readMoreView.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -142,7 +223,11 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
                         }
                     });
                 } else {
-                    params.topToBottom = commentViewHolder.commentBodyView.getId();
+                    if(comment.getNews() != null && commentViewHolder.newsBlock != null) {
+                        params.topToBottom = commentViewHolder.newsBlock.getId();
+                    } else {
+                        params.topToBottom = commentViewHolder.commentBodyView.getId();
+                    }
                     commentViewHolder.readMoreView.setVisibility(View.GONE);
                     commentViewHolder.readMoreView.setOnClickListener(null);
                 }

@@ -32,6 +32,7 @@ import com.idroi.marketsense.common.FrescoHelper;
 import com.idroi.marketsense.common.FrescoImageHelper;
 import com.idroi.marketsense.common.MarketSenseRendererHelper;
 import com.idroi.marketsense.data.Comment;
+import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
 
@@ -143,6 +144,80 @@ public class CommentActivity extends AppCompatActivity {
         commentBody.getSettings().setJavaScriptEnabled(false);
         String htmlData = "<link rel=\"stylesheet\" type=\"text/css\" href=\"img.css\" />" + mComment.getCommentHtml();
         commentBody.loadDataWithBaseURL("file:///android_asset/", htmlData, "text/html", "UTF-8", null);
+
+        News news = mComment.getNews();
+        if(news != null) {
+            setNewsBlock(news);
+        }
+    }
+
+    private void setNewsBlock(final News news) {
+        ConstraintLayout newsBlock = findViewById(R.id.comment_news_block);
+        TextView newsTitleView = findViewById(R.id.comment_news_title_tv);
+        TextView fireTextView = findViewById(R.id.comment_news_fire_tv);
+        ImageView fireImageView = findViewById(R.id.comment_news_fire_iv);
+
+        MarketSenseRendererHelper.addTextView(newsTitleView, news.getTitle());
+
+        // fire text
+        if(fireTextView != null) {
+            if (news.isOptimistic()) {
+                fireTextView.setText(R.string.title_news_good);
+                fireTextView.setTextColor(
+                        fireTextView.getContext().getResources().getColor(R.color.colorTrendUp));
+                fireTextView.setVisibility(View.VISIBLE);
+            } else if (news.isPessimistic()) {
+                fireTextView.setText(R.string.title_news_bad);
+                fireTextView.setTextColor(
+                        fireTextView.getContext().getResources().getColor(R.color.colorTrendDown));
+                fireTextView.setVisibility(View.VISIBLE);
+            } else {
+                fireTextView.setVisibility(View.GONE);
+            }
+        }
+
+        // fire image
+        if(fireImageView != null) {
+            fireImageView.setVisibility(View.VISIBLE);
+            switch (news.getLevel()) {
+                case 3:
+                    fireImageView.setImageResource(R.mipmap.ic_fire_red3);
+                    break;
+                case 2:
+                    fireImageView.setImageResource(R.mipmap.ic_fire_red2);
+                    break;
+                case 1:
+                    fireImageView.setImageResource(R.mipmap.ic_fire_red1);
+                    break;
+                case -1:
+                    fireImageView.setImageResource(R.mipmap.ic_fire_green1);
+                    break;
+                case -2:
+                    fireImageView.setImageResource(R.mipmap.ic_fire_green2);
+                    break;
+                case -3:
+                    fireImageView.setImageResource(R.mipmap.ic_fire_green3);
+                    break;
+                default:
+                    fireImageView.setVisibility(View.GONE);
+            }
+        }
+
+        View horizontalLineView = findViewById(R.id.social_horizontal_line);
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) horizontalLineView.getLayoutParams();
+        if(newsBlock != null) {
+            params.topToBottom = newsBlock.getId();
+            newsBlock.setVisibility(View.VISIBLE);
+            newsBlock.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    startActivity(NewsWebViewActivity.generateNewsWebViewActivityIntent(
+                            CommentActivity.this, news));
+                    overridePendingTransition(R.anim.enter, R.anim.stop);
+                }
+            });
+        }
+        horizontalLineView.setLayoutParams(params);
     }
 
     private void setReplyBlock() {

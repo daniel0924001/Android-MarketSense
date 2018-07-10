@@ -1,5 +1,6 @@
 package com.idroi.marketsense.adapter;
 
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.view.View;
 import android.widget.ImageView;
@@ -33,6 +34,12 @@ public class CommentViewHolder {
     View horizontalLineView;
     TextView readMoreView;
 
+    // comment_list_item_large_border
+    @Nullable ConstraintLayout newsBlock;
+    @Nullable TextView newsTitleView;
+    @Nullable TextView fireTextView;
+    @Nullable ImageView fireImageView;
+
     static final CommentViewHolder EMPTY_VIEW_HOLDER = new CommentViewHolder();
 
     private CommentViewHolder() {
@@ -65,6 +72,12 @@ public class CommentViewHolder {
 
             commentViewHolder.horizontalLineView = view.findViewById(R.id.social_horizontal_line);
             commentViewHolder.readMoreView = view.findViewById(R.id.tv_read_more);
+
+            // comment_list_item_large_border
+            commentViewHolder.newsBlock = view.findViewById(R.id.comment_news_block);
+            commentViewHolder.newsTitleView = view.findViewById(R.id.comment_news_title_tv);
+            commentViewHolder.fireTextView = view.findViewById(R.id.comment_news_fire_tv);
+            commentViewHolder.fireImageView = view.findViewById(R.id.comment_news_fire_iv);
 
             return commentViewHolder;
         } catch (ClassCastException exception) {

@@ -31,6 +31,7 @@ public class Comment implements Serializable {
     private static final String REPLIES = "replies";            // replies (comments)
     private static final String LIKE = "like";                  // like number;
     private static final String LIKE_LIST = "like_list";        // user profile of like event
+    private static final String TARGET_PROFILE = "target_profile";
 
     public static final int VIEW_TYPE_COMMENT = 1;
     public static final int VIEW_TYPE_REPLY = 2;
@@ -50,6 +51,9 @@ public class Comment implements Serializable {
     private boolean mIsLiked = false;
 
     private int mViewType;
+
+    private String mNewsJsonString;
+    private transient News mNews;
 
     private UserProfile mUserProfile;
 
@@ -135,12 +139,35 @@ public class Comment implements Serializable {
         }
     }
 
+    public void setNews(JSONObject jsonObject) {
+        if(jsonObject != null) {
+            mNewsJsonString = jsonObject.toString();
+            mNews = News.jsonObjectToNews(jsonObject);
+        }
+    }
+
     public void increaseLike() {
         mLikeNumber += 1;
     }
 
     public void decreaseLike() {
         mLikeNumber -= 1;
+    }
+
+    public News getNews() {
+        if(mNewsJsonString == null) {
+            return null;
+        }
+
+        if(mNews == null) {
+            try {
+                mNews = News.jsonObjectToNews(new JSONObject(mNewsJsonString));
+            } catch (JSONException e) {
+                MSLog.e("JSONException in getNews: " + e.toString());
+                return null;
+            }
+        }
+        return mNews;
     }
 
     public void setReplies(JSONArray comments) {
@@ -307,6 +334,9 @@ public class Comment implements Serializable {
                         break;
                     case LIKE_LIST:
                         comment.setLikeUserProfile(jsonObject.optJSONArray(LIKE_LIST));
+                        break;
+                    case TARGET_PROFILE:
+                        comment.setNews(jsonObject.optJSONObject(TARGET_PROFILE));
                         break;
                     default:
                         break;

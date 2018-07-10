@@ -31,8 +31,8 @@ import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.CommentAndVoteRequest;
 
 import static com.idroi.marketsense.RichEditorActivity.sReplyEditorRequestCode;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_DISCUSSION_COMMENT_CLICK;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
-import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_STOCK_COMMENT_CLICK;
 
 /**
  * Created by daniel.hsieh on 2018/7/5.
@@ -131,26 +131,33 @@ public class CommentFragment extends Fragment {
         });
         mCommentRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        UserProfile userProfile = ClientData.getInstance(getActivity()).getUserProfile();
+        final UserProfile userProfile = ClientData.getInstance(getActivity()).getUserProfile();
         mUserProfileChangeListener = new UserProfile.UserProfileChangeListener() {
             @Override
             public void onUserProfileChange(int notifyId) {
-                if(notifyId == NOTIFY_ID_STOCK_COMMENT_CLICK &&
+                if(notifyId == NOTIFY_ID_DISCUSSION_COMMENT_CLICK &&
                         FBHelper.checkFBLogin() &&
                         getActivity() != null) {
                     if(mLastClickAction == LAST_CLICK_IS_LIKE) {
                         mCommentRecyclerViewAdapter.updateCommentsLike();
-                        MSLog.d("is like: " + mTempComment.isLiked());
-                        if(mTempComment.isLiked()) {
-                            MSLog.d("say like at position: " + mTempPosition);
-                            mTempComment.increaseLike();
-                            mTempComment.setLike(true);
-                            PostEvent.sendLike(getActivity(), mTempComment.getCommentId());
-                            mCommentRecyclerViewAdapter.notifyItemChanged(mTempPosition);
+                        if(mTempComment != null) {
+                            MSLog.d("is like: " + mTempComment.isLiked());
+                            if(!mTempComment.isLiked()) {
+                                MSLog.d("say like at position: " + mTempPosition);
+                                mTempComment.increaseLike();
+                                mTempComment.setLike(true);
+                                PostEvent.sendLike(getActivity(), mTempComment.getCommentId());
+                                mCommentRecyclerViewAdapter.notifyItemChanged(mTempPosition);
+                                mTempComment = null;
+                            }
                         }
                     }
                 } else if(notifyId == NOTIFY_ID_FAVORITE_LIST) {
-                    mCommentRecyclerViewAdapter.updateCommentsLike();
+                    if(mTempComment != null) {
+                        userProfile.notifyUserProfile(NOTIFY_ID_DISCUSSION_COMMENT_CLICK);
+                    } else {
+                        mCommentRecyclerViewAdapter.updateCommentsLike();
+                    }
                 }
             }
         };

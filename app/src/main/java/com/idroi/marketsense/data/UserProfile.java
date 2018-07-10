@@ -37,6 +37,7 @@ public class UserProfile implements Serializable {
     public static final int NOTIFY_ID_STOCK_COMMENT_CLICK = 2;
     public static final int NOTIFY_ID_NEWS_COMMENT_CLICK = 3;
     public static final int NOTIFY_ID_REPLY_COMMENT_CLICK = 7;
+    public static final int NOTIFY_ID_DISCUSSION_COMMENT_CLICK = 8;
     public static final int NOTIFY_USER_HAS_LOGIN = 4;
     public static final int NOTIFY_ID_EVENT_LIST = 5;
     public static final int NOTIFY_USER_LOGIN_FAILED = 6;

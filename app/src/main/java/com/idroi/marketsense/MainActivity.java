@@ -53,8 +53,10 @@ import net.lucode.hackware.magicindicator.ViewPagerHelper;
 
 import org.json.JSONObject;
 
+import static com.idroi.marketsense.SearchAndResponseActivity.EXTRA_SEARCH_TYPE;
 import static com.idroi.marketsense.SearchAndResponseActivity.EXTRA_SELECTED_COMPANY_CODE_KEY;
 import static com.idroi.marketsense.SearchAndResponseActivity.EXTRA_SELECTED_COMPANY_NAME_KEY;
+import static com.idroi.marketsense.SearchAndResponseActivity.SEARCH_CODE_ONLY;
 import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_USER_HAS_LOGIN;
@@ -70,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Button mLeftButton, mRightButton;
     private TextView mActionTitleBar;
-    private EditText mFindKeywordEditText;
+    private TextView mFindKeywordEditText;
     private ImageView mActionRightImage;
 
     private int mLastSelectedItemId = -1;
@@ -78,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
     public final static int sSearchAndAddRequestCode = 1;
     public final static int sSettingRequestCode = 2;
     public final static int sSearchAndOpenRequestCode = 3;
+    public final static int sSearchAndQueryCommentRequestCode = 4;
     private SimpleDraweeView mAvatarImageView;
 
     // fb login part when the user click fab
@@ -147,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, sSearchAndAddRequestCode);
                 overridePendingTransition(0, 0);
             } else {
-                initFBLogin();
+//                initFBLogin();
                 showLoginAlertDialog();
             }
         }
@@ -192,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
 
         mFab = findViewById(R.id.fab_add);
 
+        initFBLogin();
         setActionBar();
         setViewPager();
     }
@@ -305,6 +309,17 @@ public class MainActivity extends AppCompatActivity {
             }
 
             mFindKeywordEditText = view.findViewById(R.id.search_edit_text);
+            if(mFindKeywordEditText != null) {
+                mFindKeywordEditText.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(MainActivity.this, SearchAndResponseActivity.class);
+                        intent.putExtra(EXTRA_SEARCH_TYPE, SEARCH_CODE_ONLY);
+                        startActivityForResult(intent, sSearchAndQueryCommentRequestCode);
+                        overridePendingTransition(0, 0);
+                    }
+                });
+            }
             mActionTitleBar = view.findViewById(R.id.action_bar_name);
             mLeftButton = view.findViewById(R.id.btn_left);
             mRightButton = view.findViewById(R.id.btn_right);
@@ -337,10 +352,10 @@ public class MainActivity extends AppCompatActivity {
             mRightButton.setVisibility(View.GONE);
             mActionTitleBar.setVisibility(View.GONE);
             // TODO: before we implement this function, we hide this icon.
-            mActionRightImage.setVisibility(View.GONE);
+            mActionRightImage.setImageResource(R.drawable.ic_create_white_24px);
         } else {
             // TODO: before we implement this function, we hide this icon.
-            mActionRightImage.setVisibility(View.VISIBLE);
+            mActionRightImage.setImageResource(R.drawable.ic_search_white_24px);
             mFindKeywordEditText.setVisibility(View.GONE);
             if (clickable) {
                 mLeftButton.setOnClickListener(new View.OnClickListener() {
@@ -552,6 +567,14 @@ public class MainActivity extends AppCompatActivity {
             }
         } else if(requestCode == sSettingRequestCode) {
             setAvatarImage();
+        } else if(requestCode == sSearchAndQueryCommentRequestCode) {
+            if(resultCode == RESULT_OK) {
+                String code = data.getStringExtra(EXTRA_SELECTED_COMPANY_CODE_KEY);
+                String name = data.getStringExtra(EXTRA_SELECTED_COMPANY_NAME_KEY);
+
+                // TODO: search stock name's comment
+                MSLog.d("try to search name: " + name + ", code: " + code);
+            }
         }
         if(mFBCallbackManager != null) {
             mFBCallbackManager.onActivityResult(requestCode, resultCode, data);

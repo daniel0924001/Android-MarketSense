@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.facebook.login.widget.LoginButton;
 import com.idroi.marketsense.CommentActivity;
@@ -33,6 +34,7 @@ import com.idroi.marketsense.request.CommentAndVoteRequest;
 import static com.idroi.marketsense.RichEditorActivity.sReplyEditorRequestCode;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_DISCUSSION_COMMENT_CLICK;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FUNCTION_SEARCH_COMMENT;
 
 /**
  * Created by daniel.hsieh on 2018/7/5.
@@ -53,10 +55,13 @@ public class CommentFragment extends Fragment {
 
     private AlertDialog mLoginAlertDialog;
     private LoginButton mFBLoginBtn;
-    private UserProfile.UserProfileChangeListener mUserProfileChangeListener;
+    private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
 
     private Comment mTempComment;
     private int mTempPosition;
+
+    private TextView mNoDataTextView;
+    private String mTempSearchString;
 
     @Nullable
     @Override
@@ -67,6 +72,7 @@ public class CommentFragment extends Fragment {
         mSwipeRefreshLayout = view.findViewById(R.id.swipe_to_refresh);
         mNoDataRefreshLayout = view.findViewById(R.id.no_data_block);
         mLoadingProgressBar = view.findViewById(R.id.loading_progress_bar);
+        mNoDataTextView = view.findViewById(R.id.no_comment_tv);
         return view;
     }
 
@@ -113,12 +119,15 @@ public class CommentFragment extends Fragment {
                     } else {
                         showCommentBlock(false);
                     }
+                } else {
+                    showCommentBlock(false);
                 }
             }
         });
         mNoDataRefreshLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                mTempSearchString = null;
                 mCommentRecyclerViewAdapter.loadCommentsList(CommentAndVoteRequest.queryCommentsEvent());
                 startToLoadComment();
             }
@@ -126,15 +135,16 @@ public class CommentFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                mTempSearchString = null;
                 mCommentRecyclerViewAdapter.loadCommentsList(CommentAndVoteRequest.queryCommentsEvent());
             }
         });
         mCommentRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         final UserProfile userProfile = ClientData.getInstance(getActivity()).getUserProfile();
-        mUserProfileChangeListener = new UserProfile.UserProfileChangeListener() {
+        mGlobalBroadcastListener = new UserProfile.GlobalBroadcastListener() {
             @Override
-            public void onUserProfileChange(int notifyId) {
+            public void onGlobalBroadcast(int notifyId, Object payload) {
                 if(notifyId == NOTIFY_ID_DISCUSSION_COMMENT_CLICK &&
                         FBHelper.checkFBLogin() &&
                         getActivity() != null) {
@@ -154,15 +164,22 @@ public class CommentFragment extends Fragment {
                     }
                 } else if(notifyId == NOTIFY_ID_FAVORITE_LIST) {
                     if(mTempComment != null) {
-                        userProfile.notifyUserProfile(NOTIFY_ID_DISCUSSION_COMMENT_CLICK);
+                        userProfile.globalBroadcast(NOTIFY_ID_DISCUSSION_COMMENT_CLICK);
                     } else {
                         mCommentRecyclerViewAdapter.updateCommentsLike();
+                    }
+                } else if(notifyId == NOTIFY_ID_FUNCTION_SEARCH_COMMENT) {
+                    if(payload != null && payload instanceof String) {
+                        mTempSearchString = (String) payload;
+                        mCommentRecyclerViewAdapter.loadCommentsList(CommentAndVoteRequest.queryCommentsEventForStockCode(mTempSearchString));
+                        startToLoadComment();
                     }
                 }
             }
         };
-        userProfile.addUserProfileChangeListener(mUserProfileChangeListener);
+        userProfile.addGlobalBroadcastListener(mGlobalBroadcastListener);
 
+        mTempSearchString = null;
         mCommentRecyclerViewAdapter.loadCommentsList(CommentAndVoteRequest.queryCommentsEvent());
         mCommentRecyclerView.setAdapter(mCommentRecyclerViewAdapter);
         startToLoadComment();
@@ -185,6 +202,20 @@ public class CommentFragment extends Fragment {
             mSwipeRefreshLayout.setVisibility(View.GONE);
             mNoDataRefreshLayout.setVisibility(View.VISIBLE);
             mCommentRecyclerView.setVisibility(View.GONE);
+            if(getActivity() != null) {
+                if (mTempSearchString != null) {
+                    String name = ClientData.getInstance(getActivity()).getNameFromCode(mTempSearchString);
+                    String noDataDescription = null;
+                    if(name != null) {
+                        noDataDescription = String.format(getActivity().getResources().getString(R.string.ops_name_or_code_not_found_for_comment), name);
+                    } else {
+                        noDataDescription = String.format(getActivity().getResources().getString(R.string.ops_name_or_code_not_found_for_comment), mTempSearchString);
+                    }
+                    mNoDataTextView.setText(noDataDescription);
+                } else {
+                    mNoDataTextView.setText(getActivity().getResources().getString(R.string.ops_something_wrong));
+                }
+            }
         }
     }
 
@@ -225,7 +256,7 @@ public class CommentFragment extends Fragment {
     @Override
     public void onDestroyView() {
         UserProfile userProfile = ClientData.getInstance(getActivity()).getUserProfile();
-        userProfile.deleteUserProfileChangeListener(mUserProfileChangeListener);
+        userProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
         super.onDestroyView();
     }
 }

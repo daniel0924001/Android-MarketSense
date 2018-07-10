@@ -235,7 +235,7 @@ public class SettingActivity extends AppCompatActivity {
 
                     UserProfile userProfile = ClientData.getInstance(SettingActivity.this).getUserProfile();
                     userProfile.clearUserProfile();
-                    userProfile.notifyUserProfile(NOTIFY_ID_FAVORITE_LIST);
+                    userProfile.globalBroadcast(NOTIFY_ID_FAVORITE_LIST);
                 } else {
                     MSLog.d("perform login");
                     showLoginAlertDialog();

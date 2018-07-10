@@ -69,7 +69,7 @@ public class NewsFragment extends Fragment {
     private ProgressBar mLoadingProgressBar;
 
     private int mTaskId;
-    private UserProfile.UserProfileChangeListener mUserProfileChangeListener;
+    private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
 
     private ConstraintLayout mNoDataRefreshLayout;
 
@@ -113,9 +113,9 @@ public class NewsFragment extends Fragment {
         MSLog.i("Enter NewsFragment");
 
         if(mTaskId == KEYWORD_ARRAY_TASK_ID) {
-            mUserProfileChangeListener = new UserProfile.UserProfileChangeListener() {
+            mGlobalBroadcastListener = new UserProfile.GlobalBroadcastListener() {
                 @Override
-                public void onUserProfileChange(int notifyId) {
+                public void onGlobalBroadcast(int notifyId, Object payload) {
                     if(notifyId == NOTIFY_ID_FAVORITE_LIST) {
                         ArrayList<String> urls = generateURL(true);
                         MSLog.d("onUserProfileChange in NewsFragment");
@@ -128,7 +128,7 @@ public class NewsFragment extends Fragment {
                 }
             };
             ClientData.getInstance().getUserProfile()
-                    .addUserProfileChangeListener(mUserProfileChangeListener);
+                    .addGlobalBroadcastListener(mGlobalBroadcastListener);
         }
 
         mNewsRecyclerAdapter.setNewsAvailableListener(new NewsRecyclerAdapter.NewsAvailableListener() {
@@ -280,7 +280,7 @@ public class NewsFragment extends Fragment {
         mNewsRecyclerAdapter.destroy();
         if(mTaskId == KEYWORD_ARRAY_TASK_ID) {
             ClientData.getInstance().getUserProfile()
-                    .deleteUserProfileChangeListener(mUserProfileChangeListener);
+                    .deleteGlobalBroadcastListener(mGlobalBroadcastListener);
         }
         super.onDestroyView();
     }

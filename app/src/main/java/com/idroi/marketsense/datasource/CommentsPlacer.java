@@ -73,6 +73,7 @@ public class CommentsPlacer {
                 if(isRetry()) {
                     mMarketSenseCommentsFetcher.makeRequest(mUrl);
                 } else {
+                    resetRetryTime();
                     mCommentsListener.onCommentsFailed();
                 }
             }

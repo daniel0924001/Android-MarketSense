@@ -64,7 +64,7 @@ public class StockFragment extends Fragment {
 
     private AlertDialog mLoginAlertDialog;
     private LoginButton mFBLoginBtn;
-    private UserProfile.UserProfileChangeListener mUserProfileChangeListener;
+    private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
 
     @Nullable
     @Override
@@ -229,9 +229,9 @@ public class StockFragment extends Fragment {
         });
 
         UserProfile userProfile = ClientData.getInstance(getActivity()).getUserProfile();
-        mUserProfileChangeListener = new UserProfile.UserProfileChangeListener() {
+        mGlobalBroadcastListener = new UserProfile.GlobalBroadcastListener() {
             @Override
-            public void onUserProfileChange(int notifyId) {
+            public void onGlobalBroadcast(int notifyId, Object payload) {
                 if(notifyId == NOTIFY_ID_STOCK_COMMENT_CLICK && mLastClickedButtonIsComment) {
                     if(FBHelper.checkFBLogin() && getActivity() != null) {
                         startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
@@ -242,7 +242,7 @@ public class StockFragment extends Fragment {
                 }
             }
         };
-        userProfile.addUserProfileChangeListener(mUserProfileChangeListener);
+        userProfile.addGlobalBroadcastListener(mGlobalBroadcastListener);
     }
 
     private void setButtonStatus() {
@@ -280,7 +280,7 @@ public class StockFragment extends Fragment {
     @Override
     public void onDestroy() {
         UserProfile userProfile = ClientData.getInstance(getActivity()).getUserProfile();
-        userProfile.deleteUserProfileChangeListener(mUserProfileChangeListener);
+        userProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
         super.onDestroy();
     }
 

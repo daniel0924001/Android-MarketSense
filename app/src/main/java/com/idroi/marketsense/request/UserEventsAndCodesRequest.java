@@ -85,7 +85,7 @@ public class UserEventsAndCodesRequest extends Request<Void> {
             MarketSenseUtils.postOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    userProfile.notifyUserProfile(NOTIFY_ID_FAVORITE_LIST);
+                    userProfile.globalBroadcast(NOTIFY_ID_FAVORITE_LIST);
                 }
             });
 
@@ -102,7 +102,7 @@ public class UserEventsAndCodesRequest extends Request<Void> {
             MarketSenseUtils.postOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    userProfile.notifyUserProfile(NOTIFY_ID_EVENT_LIST);
+                    userProfile.globalBroadcast(NOTIFY_ID_EVENT_LIST);
                 }
             });
 

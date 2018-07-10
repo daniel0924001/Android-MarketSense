@@ -132,7 +132,7 @@ public class StockActivity extends AppCompatActivity {
 
     private int mVoteRaiseNum, mVoteFallNum;
 
-    private UserProfile.UserProfileChangeListener mUserProfileChangeListener;
+    private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
     private int mLastClickedButton;
     private AlertDialog mLoginAlertDialog;
     private LoginButton mFBLoginBtn;
@@ -171,7 +171,7 @@ public class StockActivity extends AppCompatActivity {
             mIsStockAIOpen = false;
         } else {
             super.onBackPressed();
-            mUserProfile.deleteUserProfileChangeListener(mUserProfileChangeListener);
+            mUserProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
             overridePendingTransition(R.anim.stop, R.anim.right_to_left);
         }
     }
@@ -180,7 +180,7 @@ public class StockActivity extends AppCompatActivity {
     protected void onDestroy() {
         mNewsRecyclerAdapter.destroy();
         mCommentsRecyclerViewAdapter.destroy();
-        mUserProfile.deleteUserProfileChangeListener(mUserProfileChangeListener);
+        mUserProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
         mStockAIWebView.destroy();
         super.onDestroy();
     }
@@ -350,9 +350,9 @@ public class StockActivity extends AppCompatActivity {
             }
         });
 
-        mUserProfileChangeListener = new UserProfile.UserProfileChangeListener() {
+        mGlobalBroadcastListener = new UserProfile.GlobalBroadcastListener() {
             @Override
-            public void onUserProfileChange(int notifyId) {
+            public void onGlobalBroadcast(int notifyId, Object payload) {
                 if(notifyId == NOTIFY_USER_HAS_LOGIN && FBHelper.checkFBLogin()) {
                     mVoteTopBlock.setVisibility(View.VISIBLE);
                     mButtonRaise.setClickable(false);
@@ -404,7 +404,7 @@ public class StockActivity extends AppCompatActivity {
                 }
             }
         };
-        mUserProfile.addUserProfileChangeListener(mUserProfileChangeListener);
+        mUserProfile.addGlobalBroadcastListener(mGlobalBroadcastListener);
     }
 
     private void showLoginAlertDialog(int lastButton) {
@@ -894,7 +894,7 @@ public class StockActivity extends AppCompatActivity {
             imageView.setImageResource(R.drawable.ic_star_yellow_24px);
         }
         mIsFavorite = mUserProfile.isFavoriteStock(mCode);
-        mUserProfile.notifyUserProfile(NOTIFY_ID_FAVORITE_LIST);
+        mUserProfile.globalBroadcast(NOTIFY_ID_FAVORITE_LIST);
     }
 
     public static Intent generateStockActivityIntent(Context context,
@@ -952,7 +952,7 @@ public class StockActivity extends AppCompatActivity {
                                     Toast.makeText(StockActivity.this, R.string.login_failed_description, Toast.LENGTH_SHORT).show();
                                     LoginManager.getInstance().logOut();
                                 } else {
-                                    mUserProfile.notifyUserProfile(NOTIFY_USER_HAS_LOGIN);
+                                    mUserProfile.globalBroadcast(NOTIFY_USER_HAS_LOGIN);
                                 }
                             }
                         });

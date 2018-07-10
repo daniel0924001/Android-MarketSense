@@ -81,6 +81,12 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
                 if(mCommentsAvailableListener != null) {
                     mCommentsAvailableListener.onCommentsAvailable(null);
                 }
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        notifyDataSetChanged();
+                    }
+                });
             }
         });
     }

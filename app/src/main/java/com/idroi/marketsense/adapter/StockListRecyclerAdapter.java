@@ -137,7 +137,7 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
                         PostEvent.sendFavoriteStocksDelete(mActivity, code);
                         UserProfile userProfile = ClientData.getInstance(mActivity).getUserProfile();
                         userProfile.deleteFavoriteStock(code);
-                        userProfile.notifyUserProfile(NOTIFY_ID_FAVORITE_LIST);
+                        userProfile.globalBroadcast(NOTIFY_ID_FAVORITE_LIST);
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {

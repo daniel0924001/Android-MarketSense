@@ -120,7 +120,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
 
     private AlertDialog mLoginAlertDialog;
     private LoginButton mFBLoginBtn;
-    private UserProfile.UserProfileChangeListener mUserProfileChangeListener;
+    private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
     private CallbackManager mFBCallbackManager;
 
     private int mLastClickAction;
@@ -311,9 +311,9 @@ public class NewsWebViewActivity extends AppCompatActivity {
         setButtonStatus();
 
         UserProfile userProfile = ClientData.getInstance(this).getUserProfile();
-        mUserProfileChangeListener = new UserProfile.UserProfileChangeListener() {
+        mGlobalBroadcastListener = new UserProfile.GlobalBroadcastListener() {
             @Override
-            public void onUserProfileChange(int notifyId) {
+            public void onGlobalBroadcast(int notifyId, Object payload) {
                 if(notifyId == NOTIFY_ID_NEWS_COMMENT_CLICK && FBHelper.checkFBLogin()) {
                     if(mLastClickAction == LAST_CLICK_IS_COMMENT) {
                         startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
@@ -344,7 +344,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
                 }
             }
         };
-        userProfile.addUserProfileChangeListener(mUserProfileChangeListener);
+        userProfile.addGlobalBroadcastListener(mGlobalBroadcastListener);
     }
 
     private void changeWebViewVisibility() {
@@ -605,7 +605,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
             mCommentsRecyclerViewAdapter = null;
         }
         UserProfile userProfile = ClientData.getInstance(this).getUserProfile();
-        userProfile.deleteUserProfileChangeListener(mUserProfileChangeListener);
+        userProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
         super.onDestroy();
     }
 
@@ -650,7 +650,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
                                     LoginManager.getInstance().logOut();
                                 } else {
                                     UserProfile userProfile = ClientData.getInstance(NewsWebViewActivity.this).getUserProfile();
-                                    userProfile.notifyUserProfile(NOTIFY_ID_NEWS_COMMENT_CLICK);
+                                    userProfile.globalBroadcast(NOTIFY_ID_NEWS_COMMENT_CLICK);
                                 }
                             }
                         });

@@ -163,6 +163,7 @@
     <string name="title_comment_create_null">不好意思，不能留下空白言論。</string>
 
     <string name="ops_something_wrong">暫時沒有資料\n輕觸來重新整理</string>
+    <string name="ops_name_or_code_not_found_for_comment">很抱歉，目前沒有任何符合「 %s 」的評論，輕觸來重新整理。</string>
     <string name="ops_something_wrong_with_no_refresh">暫時沒有資料</string>
     <string name="title_can_not_open_stock_page">網路不穩，暫時無法開啟股票頁面</string>
     <string name="add_first_stock">快來新增第一筆自選股</string>

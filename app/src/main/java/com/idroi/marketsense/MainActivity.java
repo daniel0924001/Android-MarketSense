@@ -15,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,6 +58,7 @@ import static com.idroi.marketsense.SearchAndResponseActivity.EXTRA_SELECTED_COM
 import static com.idroi.marketsense.SearchAndResponseActivity.SEARCH_CODE_ONLY;
 import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FUNCTION_SEARCH_COMMENT;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_USER_HAS_LOGIN;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_USER_LOGIN_FAILED;
 import static com.idroi.marketsense.notification.NotificationHelper.NEWS_GENERAL_ALL;
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
     private LoginButton mFBLoginBtn;
     private CallbackManager mFBCallbackManager;
 
-    UserProfile.UserProfileChangeListener mUserProfileChangeListener;
+    UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
 
     private boolean mClickable, mSwitchable, mCanReturn = false, mIsDiscussion;
 
@@ -172,9 +172,9 @@ public class MainActivity extends AppCompatActivity {
         clientData.setScreenSizeInPixels(metrics.widthPixels, metrics.heightPixels);
         clientData.setScreenSize(width, height);
 
-        mUserProfileChangeListener = new UserProfile.UserProfileChangeListener() {
+        mGlobalBroadcastListener = new UserProfile.GlobalBroadcastListener() {
             @Override
-            public void onUserProfileChange(int notifyId) {
+            public void onGlobalBroadcast(int notifyId, Object payload) {
                 if(notifyId == NOTIFY_USER_HAS_LOGIN) {
                     MSLog.i("[user login]: notify user login success");
                     internalSetAvatarImage(true);
@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        clientData.getUserProfile().addUserProfileChangeListener(mUserProfileChangeListener);
+        clientData.getUserProfile().addGlobalBroadcastListener(mGlobalBroadcastListener);
 
         FrescoHelper.initialize(getApplicationContext());
         setContentView(R.layout.activity_main);
@@ -220,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        ClientData.getInstance(this).getUserProfile().deleteUserProfileChangeListener(mUserProfileChangeListener);
+        ClientData.getInstance(this).getUserProfile().deleteGlobalBroadcastListener(mGlobalBroadcastListener);
         MSLog.i("Exit MainActivity");
         finish();
         super.onDestroy();
@@ -574,6 +574,8 @@ public class MainActivity extends AppCompatActivity {
 
                 // TODO: search stock name's comment
                 MSLog.d("try to search name: " + name + ", code: " + code);
+                UserProfile userProfile = ClientData.getInstance(this).getUserProfile();
+                userProfile.globalBroadcast(NOTIFY_ID_FUNCTION_SEARCH_COMMENT, code);
             }
         }
         if(mFBCallbackManager != null) {
@@ -597,7 +599,7 @@ public class MainActivity extends AppCompatActivity {
         PostEvent.sendFavoriteStocksAdd(this, code);
         UserProfile userProfile = ClientData.getInstance(this).getUserProfile();
         userProfile.addFavoriteStock(code);
-        userProfile.notifyUserProfile(NOTIFY_ID_FAVORITE_LIST);
+        userProfile.globalBroadcast(NOTIFY_ID_FAVORITE_LIST);
 
         String format = getResources().getString(R.string.title_add_complete);
         String name = ClientData.getInstance(this).getNameFromCode(code);

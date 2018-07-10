@@ -42,8 +42,11 @@ public class UserProfile implements Serializable {
     public static final int NOTIFY_ID_EVENT_LIST = 5;
     public static final int NOTIFY_USER_LOGIN_FAILED = 6;
 
-    public interface UserProfileChangeListener {
-        void onUserProfileChange(int notifyId);
+    public static final int NOTIFY_ID_FUNCTION_SEARCH_COMMENT = 9;
+    public static final int NOTIFY_ID_FUNCTION_INSERT_COMMENT = 10;
+
+    public interface GlobalBroadcastListener {
+        void onGlobalBroadcast(int notifyId, Object payload);
     }
 
     private static final String USER_PROFILE_SHARE_PREFERENCE = "user_profile";
@@ -72,7 +75,7 @@ public class UserProfile implements Serializable {
 
     private boolean mLoginOnGoing, mHasLogin;
 
-    private ArrayList<UserProfileChangeListener> mUserProfileChangeListeners;
+    private ArrayList<GlobalBroadcastListener> mGlobalBroadcastListeners;
 
     @Nullable private ArrayList<String> mFavoriteStocks;
     @Nullable private transient ArrayList<Event> mEventsArrayList;
@@ -82,7 +85,7 @@ public class UserProfile implements Serializable {
     }
 
     public UserProfile(Context context, boolean initUserDataFromCache) {
-        mUserProfileChangeListeners = new ArrayList<>();
+        mGlobalBroadcastListeners = new ArrayList<>();
         mLoginOnGoing = false;
         mHasLogin = false;
         if(initUserDataFromCache) {
@@ -120,18 +123,22 @@ public class UserProfile implements Serializable {
         mUserAvatarLink = avatarLink;
     }
 
-    public void addUserProfileChangeListener(UserProfileChangeListener listener) {
-        mUserProfileChangeListeners.add(listener);
+    public void addGlobalBroadcastListener(GlobalBroadcastListener listener) {
+        mGlobalBroadcastListeners.add(listener);
     }
 
-    public void deleteUserProfileChangeListener(UserProfileChangeListener listener) {
-        mUserProfileChangeListeners.remove(listener);
+    public void deleteGlobalBroadcastListener(GlobalBroadcastListener listener) {
+        mGlobalBroadcastListeners.remove(listener);
     }
 
-    public void notifyUserProfile(int notifyId) {
+    public void globalBroadcast(int notifyId) {
+        globalBroadcast(notifyId, null);
+    }
+
+    public void globalBroadcast(int notifyId, Object payload) {
         MSLog.i("notify for id: " + notifyId);
-        for(int i = 0; i < mUserProfileChangeListeners.size(); i++) {
-            mUserProfileChangeListeners.get(i).onUserProfileChange(notifyId);
+        for(int i = 0; i < mGlobalBroadcastListeners.size(); i++) {
+            mGlobalBroadcastListeners.get(i).onGlobalBroadcast(notifyId, payload);
         }
     }
 
@@ -340,7 +347,7 @@ public class UserProfile implements Serializable {
 
         if(mHasLogin) {
             MSLog.i("[user login]: start to login but has login");
-            notifyUserProfile(NOTIFY_USER_HAS_LOGIN);
+            globalBroadcast(NOTIFY_USER_HAS_LOGIN);
             return;
         }
 
@@ -367,9 +374,9 @@ public class UserProfile implements Serializable {
                                 context.getResources().getString(R.string.default_user_avatar_link));
                         MSLog.d(String.format("init user data from share preference: %s %s %s %s",
                                 mUserId, mUserName, mUserEmail, mUserAvatarLink));
-                        notifyUserProfile(NOTIFY_USER_HAS_LOGIN);
+                        globalBroadcast(NOTIFY_USER_HAS_LOGIN);
                     } else {
-                        notifyUserProfile(NOTIFY_USER_LOGIN_FAILED);
+                        globalBroadcast(NOTIFY_USER_LOGIN_FAILED);
                     }
                 }
             });

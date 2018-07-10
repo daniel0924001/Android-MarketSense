@@ -67,7 +67,7 @@ public class CommentActivity extends AppCompatActivity {
 
     private AlertDialog mLoginAlertDialog;
     private LoginButton mFBLoginBtn;
-    private UserProfile.UserProfileChangeListener mUserProfileChangeListener;
+    private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
     private CallbackManager mFBCallbackManager;
 
     private ConstraintLayout mSayLikeBlock;
@@ -282,9 +282,9 @@ public class CommentActivity extends AppCompatActivity {
         });
 
         UserProfile userProfile = ClientData.getInstance(this).getUserProfile();
-        mUserProfileChangeListener = new UserProfile.UserProfileChangeListener() {
+        mGlobalBroadcastListener = new UserProfile.GlobalBroadcastListener() {
             @Override
-            public void onUserProfileChange(int notifyId) {
+            public void onGlobalBroadcast(int notifyId, Object payload) {
                 if(notifyId == NOTIFY_ID_REPLY_COMMENT_CLICK && FBHelper.checkFBLogin()) {
                     mComment.updateLikeUserProfile();
                     setLikeBlock();
@@ -303,7 +303,7 @@ public class CommentActivity extends AppCompatActivity {
                 }
             }
         };
-        userProfile.addUserProfileChangeListener(mUserProfileChangeListener);
+        userProfile.addGlobalBroadcastListener(mGlobalBroadcastListener);
     }
 
     private void sayLike() {
@@ -384,7 +384,7 @@ public class CommentActivity extends AppCompatActivity {
                                     LoginManager.getInstance().logOut();
                                 } else {
                                     UserProfile userProfile = ClientData.getInstance(CommentActivity.this).getUserProfile();
-                                    userProfile.notifyUserProfile(NOTIFY_ID_REPLY_COMMENT_CLICK);
+                                    userProfile.globalBroadcast(NOTIFY_ID_REPLY_COMMENT_CLICK);
                                 }
                             }
                         });
@@ -417,7 +417,7 @@ public class CommentActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         UserProfile userProfile = ClientData.getInstance(this).getUserProfile();
-        userProfile.deleteUserProfileChangeListener(mUserProfileChangeListener);
+        userProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
         mCommentsRecyclerViewAdapter.destroy();
         super.onDestroy();
     }

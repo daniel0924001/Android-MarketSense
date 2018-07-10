@@ -84,7 +84,7 @@ public class StockListFragment extends Fragment {
     private View mLastSortedView;
     private int mSortedDirection;
 
-    private UserProfile.UserProfileChangeListener mUserProfileChangeListener;
+    private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
 
     private ConstraintLayout mNoDataRefreshLayout;
 
@@ -122,9 +122,9 @@ public class StockListFragment extends Fragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         if(mTaskId == SELF_CHOICES_ID) {
-            mUserProfileChangeListener = new UserProfile.UserProfileChangeListener() {
+            mGlobalBroadcastListener = new UserProfile.GlobalBroadcastListener() {
                 @Override
-                public void onUserProfileChange(int notifyId) {
+                public void onGlobalBroadcast(int notifyId, Object payload) {
                     if(notifyId == NOTIFY_ID_FAVORITE_LIST) {
                         MSLog.d("onUserProfileChange in StockListFragment: " + generateNetworkURL());
                         mStockListRecyclerAdapter.loadStockList(generateNetworkURL(), generateCacheUrl());
@@ -132,7 +132,7 @@ public class StockListFragment extends Fragment {
                 }
             };
             ClientData.getInstance().getUserProfile()
-                    .addUserProfileChangeListener(mUserProfileChangeListener);
+                    .addGlobalBroadcastListener(mGlobalBroadcastListener);
         }
 
         view.setBackgroundColor(getResources().getColor(R.color.bottom_navigation_item_checked_false_bg));
@@ -313,7 +313,7 @@ public class StockListFragment extends Fragment {
         mStockListRecyclerAdapter.destroy();
         if(mTaskId == SELF_CHOICES_ID) {
             ClientData.getInstance().getUserProfile()
-                    .deleteUserProfileChangeListener(mUserProfileChangeListener);
+                    .deleteGlobalBroadcastListener(mGlobalBroadcastListener);
         }
         super.onDestroyView();
     }

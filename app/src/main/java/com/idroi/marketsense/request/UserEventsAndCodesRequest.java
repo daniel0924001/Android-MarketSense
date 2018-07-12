@@ -67,6 +67,7 @@ public class UserEventsAndCodesRequest extends Request<Void> {
                 jsonResponse.optJSONObject(PARAM_RESULT).optJSONArray(PARAM_STOCK_CODES) != null) {
 
             final UserProfile userProfile = ClientData.getInstance().getUserProfile();
+            userProfile.setIsInitFavoriteStocksAndEvents(true);
             userProfile.clearFavoriteStock();
             userProfile.clearEvents();
 
@@ -91,6 +92,7 @@ public class UserEventsAndCodesRequest extends Request<Void> {
 
             // event
             JSONArray eventsJsonArray = jsonResponse.optJSONObject(PARAM_RESULT).optJSONArray(PARAM_EVENTS);
+            userProfile.setUserAllEventsString(eventsJsonArray.toString());     // we want to save event array to string
             for(int i = 0; i < eventsJsonArray.length(); i++) {
                 if(eventsJsonArray.optJSONObject(i) != null) {
                     Event event = Event.JsonObjectToEvent(eventsJsonArray.optJSONObject(i));

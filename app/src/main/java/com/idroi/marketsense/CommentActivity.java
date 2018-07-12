@@ -389,7 +389,7 @@ public class CommentActivity extends AppCompatActivity {
                             }
                         });
             }
-        }, true);
+        });
     }
 
     private void showLoginAlertDialog(int lastButton) {

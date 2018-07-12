@@ -489,6 +489,10 @@ public class PostEvent {
                                     String userId, String userName, String userType,
                                     String userPassword, String userEmail, String avatarLink,
                                     PostEventListener listener) {
+
+        UserProfile userProfile = ClientData.getInstance(context).getUserProfile();
+        userProfile.getFavoriteStocksAndEvents(context, userId);
+
         new PostEvent(userId, PostEventType.REGISTER)
                 .setUserName(userName)
                 .setUserType(userType)

@@ -13,6 +13,8 @@ import com.idroi.marketsense.notification.NotificationHelper;
 import com.idroi.marketsense.util.DateUtils;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
@@ -22,7 +24,9 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import static com.idroi.marketsense.data.Event.EVENT_TARGET_NEWS;
 import static com.idroi.marketsense.data.Event.EVENT_TARGET_STOCK;
@@ -52,6 +56,7 @@ public class UserProfile implements Serializable {
     }
 
     private static final String USER_PROFILE_SHARE_PREFERENCE = "user_profile";
+    private static final String FAVORITE_STOCKS_AND_EVENT_SHARE_PREFERENCE = "favorite_stocks_and_events_%s";
 
     private static final String USER_ID = "user_id";
     private static final String USER_TYPE = "user_type";
@@ -65,6 +70,10 @@ public class UserProfile implements Serializable {
     private static final String SHARE_PREF_EMAIL_KEY = "user_profile_email";
     private static final String SHARE_PREF_AVATAR_URL_KEY = "user_profile_avatar_link";
 
+    private static final String SHARE_PREF_FAVORITE_STOCKS = "favorite_stocks";
+    private static final String SHARE_PREF_EVENTS = "events";
+    private boolean mIsInitFavoriteStocksAndEvents = false;
+
     public static final String FB_USER_ID_KEY = "id";
     public static final String FB_USER_NAME_KEY = "name";
     public static final String FB_USER_EMAIL_KEY = "email";
@@ -74,6 +83,8 @@ public class UserProfile implements Serializable {
     private String mUserEmail;
     private String mUserName;
     private String mUserAvatarLink;
+
+    private String mUserAllEventsString;
 
     private boolean mLoginOnGoing, mHasLogin;
 
@@ -123,6 +134,10 @@ public class UserProfile implements Serializable {
 
     public void setUserAvatarLink(String avatarLink) {
         mUserAvatarLink = avatarLink;
+    }
+
+    public void setUserAllEventsString(String eventsString) {
+        mUserAllEventsString = eventsString;
     }
 
     public void addGlobalBroadcastListener(GlobalBroadcastListener listener) {
@@ -336,6 +351,61 @@ public class UserProfile implements Serializable {
         clearFavoriteStock();
     }
 
+    public void saveFavoriteStocksAndEvents(Context context) {
+        String s = String.format(FAVORITE_STOCKS_AND_EVENT_SHARE_PREFERENCE, mUserId);
+        SharedPreferences.Editor editor =
+                context.getSharedPreferences(s, Context.MODE_PRIVATE).edit();
+        if(mFavoriteStocks != null) {
+            editor.putStringSet(SHARE_PREF_FAVORITE_STOCKS, new HashSet<String>(mFavoriteStocks));
+        }
+        if(mUserAllEventsString != null) {
+            editor.putString(SHARE_PREF_EVENTS, mUserAllEventsString);
+        }
+        editor.apply();
+        MSLog.i("[user logout] save favorite stocks and events to cache: " + s);
+        setIsInitFavoriteStocksAndEvents(false);
+    }
+
+    public void setIsInitFavoriteStocksAndEvents(boolean isInit) {
+        mIsInitFavoriteStocksAndEvents = isInit;
+    }
+
+    public void getFavoriteStocksAndEvents(Context context, String userId) {
+        if(!mIsInitFavoriteStocksAndEvents) {
+            mIsInitFavoriteStocksAndEvents = true;
+
+            String s = String.format(FAVORITE_STOCKS_AND_EVENT_SHARE_PREFERENCE, userId);
+            final SharedPreferences sharedPreferences =
+                    context.getSharedPreferences(s, Context.MODE_PRIVATE);
+
+            // favorite stocks part
+            Set<String> set = sharedPreferences.getStringSet(SHARE_PREF_FAVORITE_STOCKS, null);
+            if (set != null) {
+                mFavoriteStocks = new ArrayList<>(set);
+                MSLog.i("[user login] notify we get favorite stocks from cache: " + mFavoriteStocks);
+                globalBroadcast(NOTIFY_ID_FAVORITE_LIST);
+            }
+
+            // events part
+            mUserAllEventsString = sharedPreferences.getString(SHARE_PREF_EVENTS, null);
+            if (mUserAllEventsString != null) {
+                try {
+                    JSONArray eventsJsonArray = new JSONArray(mUserAllEventsString);
+                    for (int i = 0; i < eventsJsonArray.length(); i++) {
+                        if (eventsJsonArray.optJSONObject(i) != null) {
+                            Event event = Event.JsonObjectToEvent(eventsJsonArray.optJSONObject(i));
+                            addEvent(event);
+                        }
+                    }
+                    MSLog.i("[user login] notify we get events from cache");
+                    globalBroadcast(NOTIFY_ID_EVENT_LIST);
+                } catch (JSONException e) {
+                    MSLog.e("JSONException in getFavoriteStocksAndEvents: " + e.toString());
+                }
+            }
+        }
+    }
+
     public void updateUserData(Context context) {
         MSLog.d(String.format("update user data to share preference: %s %s %s %s %s",
                 mUserId, mUserType, mUserName, mUserEmail, mUserAvatarLink));
@@ -364,6 +434,7 @@ public class UserProfile implements Serializable {
                     context.getSharedPreferences(USER_PROFILE_SHARE_PREFERENCE, Context.MODE_PRIVATE);
             mUserId = sharedPreferences.getString(SHARE_PREF_ID_KEY, null);
             mUserType = sharedPreferences.getString(SHARE_PREF_USER_TYPE, null);
+            getFavoriteStocksAndEvents(context, mUserId);
             String password = UserProfile.generatePassword(mUserId, mUserType);
             PostEvent.sendLogin(context, mUserId, password, mUserEmail, new PostEvent.PostEventListener() {
                 @Override

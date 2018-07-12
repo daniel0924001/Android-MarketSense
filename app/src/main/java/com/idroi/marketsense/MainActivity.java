@@ -712,7 +712,7 @@ public class MainActivity extends AppCompatActivity {
                         });
                 setAvatarImage();
             }
-        }, true);
+        });
     }
 
     private void showLoginAlertDialog(int lastClick) {

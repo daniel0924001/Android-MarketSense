@@ -656,7 +656,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
                             }
                         });
             }
-        }, true);
+        });
     }
 
     private void showLoginAlertDialog(int lastClick) {

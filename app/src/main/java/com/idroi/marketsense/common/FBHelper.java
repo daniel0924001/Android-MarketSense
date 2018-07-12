@@ -32,8 +32,7 @@ public class FBHelper {
     }
 
     public static void getFBUserProfile(final Context context,
-                                        final FBHelperListener listener,
-                                        final boolean shouldWrite) {
+                                        final FBHelperListener listener) {
         if(!FBHelper.checkFBLogin()) {
             MSLog.d("facebook not login");
             return;
@@ -61,11 +60,7 @@ public class FBHelper {
                             MSLog.e("JSONException occurs in getFBUserProfile");
                         }
 
-                        if(shouldWrite) {
-                            updateUserInfoFB(context, object, url, listener);
-                        } else {
-                            listener.onTaskCompleted(object, url);
-                        }
+                        updateUserInfoFB(context, object, url, listener);
                     }
                 });
         Bundle parameters = new Bundle();
@@ -74,7 +69,7 @@ public class FBHelper {
         request.executeAsync();
     }
 
-    private static void updateUserInfoFB(
+    private static void updateUserInfoFB (
             Context context, JSONObject jsonObject, String avatarUrl, final FBHelperListener listener) {
         MSLog.d("updateUserInfoFB object: " + jsonObject.toString());
         MSLog.d("updateUserInfoFB avatar's url: " + avatarUrl);

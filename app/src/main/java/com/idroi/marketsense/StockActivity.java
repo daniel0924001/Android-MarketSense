@@ -957,7 +957,7 @@ public class StockActivity extends AppCompatActivity {
                             }
                         });
             }
-        }, true);
+        });
     }
 
     @Override

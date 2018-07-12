@@ -163,7 +163,7 @@ public class SettingActivity extends AppCompatActivity {
                     refreshFBUi(userName, avatarLink);
                 }
             }
-        }, true);
+        });
     }
 
     private void refreshFBUi() {
@@ -234,6 +234,7 @@ public class SettingActivity extends AppCompatActivity {
                     internalRefreshFBUi(null, null);
 
                     UserProfile userProfile = ClientData.getInstance(SettingActivity.this).getUserProfile();
+                    userProfile.saveFavoriteStocksAndEvents(SettingActivity.this);
                     userProfile.clearUserProfile();
                     userProfile.globalBroadcast(NOTIFY_ID_FAVORITE_LIST);
                 } else {

@@ -70,7 +70,8 @@ public class RichEditorActivity extends AppCompatActivity {
     public enum TYPE {
         NEWS("news"),
         STOCK("stock"),
-        REPLY("reply");
+        REPLY("reply"),
+        NO_CONTENT("no_content");
 
         private String mType;
 
@@ -233,6 +234,7 @@ public class RichEditorActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(boolean isSuccessful, Object data) {
                     if(data instanceof String) {
+                        // we have to get event id
                         leaveRichEditorActivity(isSuccessful, html, (String) data);
                     } else {
                         leaveRichEditorActivity(false, html, null);
@@ -255,6 +257,18 @@ public class RichEditorActivity extends AppCompatActivity {
             MSLog.i("send reply comment (" + mId + "): " + html);
             PostEvent.sendReplyComment(RichEditorActivity.this, mId, html, tags);
             leaveRichEditorActivity(true, html, null);
+        } else if(mType.equals(TYPE.NO_CONTENT.getType())) {
+            MSLog.i("send no content comment: " + html);
+            PostEvent.sendNoContentComment(RichEditorActivity.this, html, tags, new PostEvent.PostEventListener() {
+                @Override
+                public void onResponse(boolean isSuccessful, Object data) {
+                    if(data instanceof String) {
+                        leaveRichEditorActivity(isSuccessful, html, (String) data);
+                    } else {
+                        leaveRichEditorActivity(false, html, null);
+                    }
+                }
+            });
         }
     }
 

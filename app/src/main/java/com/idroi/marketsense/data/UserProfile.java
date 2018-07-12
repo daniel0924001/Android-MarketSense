@@ -12,6 +12,7 @@ import com.idroi.marketsense.common.SharedPreferencesCompat;
 import com.idroi.marketsense.notification.NotificationHelper;
 import com.idroi.marketsense.util.DateUtils;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.json.JSONObject;
 
 import java.io.Serializable;
@@ -38,6 +39,7 @@ public class UserProfile implements Serializable {
     public static final int NOTIFY_ID_NEWS_COMMENT_CLICK = 3;
     public static final int NOTIFY_ID_REPLY_COMMENT_CLICK = 7;
     public static final int NOTIFY_ID_DISCUSSION_COMMENT_CLICK = 8;
+    public static final int NOTIFY_ID_MAIN_ACTIVITY_FUNCTION_CLICK = 9;
     public static final int NOTIFY_USER_HAS_LOGIN = 4;
     public static final int NOTIFY_ID_EVENT_LIST = 5;
     public static final int NOTIFY_USER_LOGIN_FAILED = 6;
@@ -174,11 +176,15 @@ public class UserProfile implements Serializable {
     }
 
     public void addFavoriteStock(String code) {
-        // subscribe FCM topic
-        MSLog.d("subscribeToTopic: " + NotificationHelper.getTopicForStockCode(code));
-        FirebaseMessaging.getInstance().subscribeToTopic(NotificationHelper.getTopicForStockCode(code));
-        if(mFavoriteStocks != null) {
-            mFavoriteStocks.add(code);
+        if(!isFavoriteStock(code)) {
+            // subscribe FCM topic
+            MSLog.d("subscribeToTopic: " + NotificationHelper.getTopicForStockCode(code));
+            FirebaseMessaging.getInstance().subscribeToTopic(NotificationHelper.getTopicForStockCode(code));
+            if (mFavoriteStocks != null) {
+                mFavoriteStocks.add(code);
+            }
+        } else {
+            MSLog.w("already add favorite stock of this code in UserProfile: " + code);
         }
     }
 

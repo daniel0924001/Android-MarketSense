@@ -41,6 +41,7 @@ import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.common.FrescoHelper;
 import com.idroi.marketsense.common.MarketSenseCommonNavigator;
+import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.UserProfile;
@@ -52,13 +53,17 @@ import net.lucode.hackware.magicindicator.ViewPagerHelper;
 
 import org.json.JSONObject;
 
+import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_EVENT_ID;
+import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_HTML;
 import static com.idroi.marketsense.SearchAndResponseActivity.EXTRA_SEARCH_TYPE;
 import static com.idroi.marketsense.SearchAndResponseActivity.EXTRA_SELECTED_COMPANY_CODE_KEY;
 import static com.idroi.marketsense.SearchAndResponseActivity.EXTRA_SELECTED_COMPANY_NAME_KEY;
 import static com.idroi.marketsense.SearchAndResponseActivity.SEARCH_CODE_ONLY;
 import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FUNCTION_INSERT_COMMENT;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FUNCTION_SEARCH_COMMENT;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_MAIN_ACTIVITY_FUNCTION_CLICK;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_USER_HAS_LOGIN;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_USER_LOGIN_FAILED;
 import static com.idroi.marketsense.notification.NotificationHelper.NEWS_GENERAL_ALL;
@@ -81,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
     public final static int sSettingRequestCode = 2;
     public final static int sSearchAndOpenRequestCode = 3;
     public final static int sSearchAndQueryCommentRequestCode = 4;
+    public final static int sEditorRequestCode = 5;
     private SimpleDraweeView mAvatarImageView;
 
     // fb login part when the user click fab
@@ -89,6 +95,11 @@ public class MainActivity extends AppCompatActivity {
     private CallbackManager mFBCallbackManager;
 
     UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
+
+    public final static int LAST_CLICK_IS_NONE = 0;
+    public final static int LAST_CLICK_IS_WRITE_COMMENT = 1;
+    public final static int LAST_CLICK_IS_ADD_FAVORITE = 2;
+    private int mLastClick;
 
     private boolean mClickable, mSwitchable, mCanReturn = false, mIsDiscussion;
 
@@ -151,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
                 overridePendingTransition(0, 0);
             } else {
 //                initFBLogin();
-                showLoginAlertDialog();
+                showLoginAlertDialog(LAST_CLICK_IS_ADD_FAVORITE);
             }
         }
     };
@@ -180,6 +191,21 @@ public class MainActivity extends AppCompatActivity {
                     internalSetAvatarImage(true);
                 } else if(notifyId == NOTIFY_USER_LOGIN_FAILED) {
                     // empty
+                } else if(notifyId == NOTIFY_ID_MAIN_ACTIVITY_FUNCTION_CLICK) {
+                    switch (mLastClick) {
+                        case LAST_CLICK_IS_WRITE_COMMENT:
+                            startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
+                                    MainActivity.this, RichEditorActivity.TYPE.NO_CONTENT, null),
+                                    sEditorRequestCode);
+                            overridePendingTransition(R.anim.enter, R.anim.stop);
+                            break;
+                        case LAST_CLICK_IS_ADD_FAVORITE:
+                            Intent intent = new Intent(MainActivity.this, SearchAndResponseActivity.class);
+                            startActivityForResult(intent, sSearchAndAddRequestCode);
+                            overridePendingTransition(0, 0);
+                            break;
+                    }
+                    mLastClick = LAST_CLICK_IS_NONE;
                 }
             }
         };
@@ -351,11 +377,30 @@ public class MainActivity extends AppCompatActivity {
             mLeftButton.setVisibility(View.GONE);
             mRightButton.setVisibility(View.GONE);
             mActionTitleBar.setVisibility(View.GONE);
-            // TODO: before we implement this function, we hide this icon.
             mActionRightImage.setImageResource(R.drawable.ic_create_white_24px);
+            mActionRightImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(FBHelper.checkFBLogin()) {
+                        startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
+                                MainActivity.this, RichEditorActivity.TYPE.NO_CONTENT, null),
+                                sEditorRequestCode);
+                        overridePendingTransition(R.anim.enter, R.anim.stop);
+                    } else {
+                        showLoginAlertDialog(LAST_CLICK_IS_WRITE_COMMENT);
+                    }
+                }
+            });
         } else {
-            // TODO: before we implement this function, we hide this icon.
             mActionRightImage.setImageResource(R.drawable.ic_search_white_24px);
+            mActionRightImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(MainActivity.this, SearchAndResponseActivity.class);
+                    startActivityForResult(intent, sSearchAndOpenRequestCode);
+                    overridePendingTransition(0, 0);
+                }
+            });
             mFindKeywordEditText.setVisibility(View.GONE);
             if (clickable) {
                 mLeftButton.setOnClickListener(new View.OnClickListener() {
@@ -572,12 +617,23 @@ public class MainActivity extends AppCompatActivity {
                 String code = data.getStringExtra(EXTRA_SELECTED_COMPANY_CODE_KEY);
                 String name = data.getStringExtra(EXTRA_SELECTED_COMPANY_NAME_KEY);
 
-                // TODO: search stock name's comment
                 MSLog.d("try to search name: " + name + ", code: " + code);
                 UserProfile userProfile = ClientData.getInstance(this).getUserProfile();
                 userProfile.globalBroadcast(NOTIFY_ID_FUNCTION_SEARCH_COMMENT, code);
             }
+        } else if(requestCode == sEditorRequestCode) {
+            if(resultCode == RESULT_OK) {
+                String html = data.getStringExtra(EXTRA_RES_HTML);
+                String eventId = data.getStringExtra(EXTRA_RES_EVENT_ID);
+
+                Comment newComment = new Comment();
+                newComment.setCommentId(eventId);
+                newComment.setCommentHtml(html);
+                UserProfile userProfile = ClientData.getInstance(this).getUserProfile();
+                userProfile.globalBroadcast(NOTIFY_ID_FUNCTION_INSERT_COMMENT, newComment);
+            }
         }
+
         if(mFBCallbackManager != null) {
             mFBCallbackManager.onActivityResult(requestCode, resultCode, data);
         }
@@ -587,6 +643,7 @@ public class MainActivity extends AppCompatActivity {
         if(mViewPager != null) {
             mViewPager.clearOnPageChangeListeners();
             mViewPager.setAdapter(null);
+            mViewPager.removeAllViewsInLayout();
             mViewPager = null;
         }
         if(mMagicIndicator != null) {
@@ -647,6 +704,9 @@ public class MainActivity extends AppCompatActivity {
                                     Toast.makeText(MainActivity.this, R.string.login_failed_description, Toast.LENGTH_SHORT).show();
                                     LoginManager.getInstance().logOut();
                                     internalSetAvatarImage(false);
+                                } else {
+                                    UserProfile userProfile = ClientData.getInstance(MainActivity.this).getUserProfile();
+                                    userProfile.globalBroadcast(NOTIFY_ID_MAIN_ACTIVITY_FUNCTION_CLICK);
                                 }
                             }
                         });
@@ -655,7 +715,8 @@ public class MainActivity extends AppCompatActivity {
         }, true);
     }
 
-    private void showLoginAlertDialog() {
+    private void showLoginAlertDialog(int lastClick) {
+        mLastClick = lastClick;
         if(mLoginAlertDialog != null) {
             mLoginAlertDialog.dismiss();
             mLoginAlertDialog = null;

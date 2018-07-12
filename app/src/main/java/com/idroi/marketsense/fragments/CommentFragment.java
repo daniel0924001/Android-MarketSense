@@ -2,6 +2,7 @@ package com.idroi.marketsense.fragments;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -21,6 +22,7 @@ import com.idroi.marketsense.CommentActivity;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.NewsWebViewActivity;
 import com.idroi.marketsense.R;
+import com.idroi.marketsense.RichEditorActivity;
 import com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
@@ -34,6 +36,7 @@ import com.idroi.marketsense.request.CommentAndVoteRequest;
 import static com.idroi.marketsense.RichEditorActivity.sReplyEditorRequestCode;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_DISCUSSION_COMMENT_CLICK;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FUNCTION_INSERT_COMMENT;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FUNCTION_SEARCH_COMMENT;
 
 /**
@@ -42,8 +45,7 @@ import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FUNCTION_SEARCH_C
 
 public class CommentFragment extends Fragment {
 
-    public static final int LAST_CLICK_IS_COMMENT = 1;
-    public static final int LAST_CLICK_IS_LIKE = 2;
+    public static final int LAST_CLICK_IS_LIKE = 1;
 
     private RecyclerView mCommentRecyclerView;
     private CommentsRecyclerViewAdapter mCommentRecyclerViewAdapter;
@@ -127,16 +129,14 @@ public class CommentFragment extends Fragment {
         mNoDataRefreshLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mTempSearchString = null;
-                mCommentRecyclerViewAdapter.loadCommentsList(CommentAndVoteRequest.queryCommentsEvent());
+                queryCommentsEvent();
                 startToLoadComment();
             }
         });
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mTempSearchString = null;
-                mCommentRecyclerViewAdapter.loadCommentsList(CommentAndVoteRequest.queryCommentsEvent());
+                queryCommentsEvent();
             }
         });
         mCommentRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -170,19 +170,49 @@ public class CommentFragment extends Fragment {
                     }
                 } else if(notifyId == NOTIFY_ID_FUNCTION_SEARCH_COMMENT) {
                     if(payload != null && payload instanceof String) {
-                        mTempSearchString = (String) payload;
-                        mCommentRecyclerViewAdapter.loadCommentsList(CommentAndVoteRequest.queryCommentsEventForStockCode(mTempSearchString));
+                        queryCommentsEventForStockCode((String) payload);
                         startToLoadComment();
+                    }
+                } else if(notifyId == NOTIFY_ID_FUNCTION_INSERT_COMMENT) {
+                    Comment newComment = (Comment) payload;
+                    if(mTempSearchString != null) {
+                        // in the code query
+                        queryCommentsEvent();
+                        startToLoadComment();
+                    } else {
+                        // in the general query
+                        mCommentRecyclerViewAdapter.addOneComment(newComment);
+                        new Handler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                // we have to wait for notifyItemInserted(0)
+                                mCommentRecyclerView.scrollToPosition(0);
+                            }
+                        });
+                        showCommentBlock(true);
+
+                        MSLog.d(String.format("user send a comment on (%s, %s): %s",
+                                RichEditorActivity.TYPE.NO_CONTENT.getType(),
+                                newComment.getCommentId(), newComment.getCommentHtml()));
                     }
                 }
             }
         };
         userProfile.addGlobalBroadcastListener(mGlobalBroadcastListener);
 
-        mTempSearchString = null;
-        mCommentRecyclerViewAdapter.loadCommentsList(CommentAndVoteRequest.queryCommentsEvent());
+        queryCommentsEvent();
         mCommentRecyclerView.setAdapter(mCommentRecyclerViewAdapter);
         startToLoadComment();
+    }
+
+    private void queryCommentsEvent() {
+        mTempSearchString = null;
+        mCommentRecyclerViewAdapter.loadCommentsList(CommentAndVoteRequest.queryCommentsEvent());
+    }
+
+    private void queryCommentsEventForStockCode(String code) {
+        mTempSearchString = code;
+        mCommentRecyclerViewAdapter.loadCommentsList(CommentAndVoteRequest.queryCommentsEventForStockCode(mTempSearchString));
     }
 
     private void startToLoadComment() {

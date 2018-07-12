@@ -110,6 +110,7 @@ public class PostEvent {
     private static final String NEWS_CONST = "news";
     private static final String STOCK_CONST = "stock";
     private static final String EVENT_CONST = "event";
+    private static final String THREAD_CONST = "thread";
 
     private int mPostType;
     private int mMethod;
@@ -455,6 +456,21 @@ public class PostEvent {
         userProfile.addEvent(event);
     }
 
+    public static void sendNoContentComment(Context context, String html, ArrayList<String> tags, PostEventListener listener) {
+        ClientData clientData = ClientData.getInstance(context);
+        UserProfile userProfile = clientData.getUserProfile();
+        PostEvent postEvent = new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.COMMENT)
+                .setEventValueString(html)
+                .setEventType("normal")
+                .setEventTarget(THREAD_CONST)
+                .setEventDetail(new JSONArray(tags))
+                .setUserToken(clientData.getUserToken())
+                .setPostEventListener(listener)
+                .send(context);
+        Event event = postEvent.convertToEvent();
+        userProfile.addEvent(event);
+    }
+
     public static void sendLike(Context context, String eventId) {
         ClientData clientData = ClientData.getInstance(context);
         UserProfile userProfile = clientData.getUserProfile();
@@ -494,9 +510,13 @@ public class PostEvent {
 
     public static void sendFavoriteStocksAdd(Context context, String code) {
         ClientData clientData = ClientData.getInstance(context);
-        new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.FAVORITE_STOCK_ADD)
-                .setStockCode(code)
-                .send(context);
+        if(!clientData.getUserProfile().isFavoriteStock(code)) {
+            new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.FAVORITE_STOCK_ADD)
+                    .setStockCode(code)
+                    .send(context);
+        } else {
+            MSLog.w("already add favorite stock of this code in PostEvent: " + code);
+        }
     }
 
     public static void sendFavoriteStocksDelete(Context context, String code) {

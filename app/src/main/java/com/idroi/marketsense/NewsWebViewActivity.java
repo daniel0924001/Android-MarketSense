@@ -537,10 +537,6 @@ public class NewsWebViewActivity extends AppCompatActivity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                mIsOriginalCompleted = true;
-                if(mLoadingProgressBarOriginal != null) {
-                    mLoadingProgressBarOriginal.setVisibility(View.GONE);
-                }
                 super.onPageFinished(view, url);
             }
         });
@@ -550,6 +546,11 @@ public class NewsWebViewActivity extends AppCompatActivity {
             public void onProgressChanged(WebView view, int newProgress) {
                 if(newProgress >= 80) {
                     mNewsWebViewOriginal.getSettings().setBlockNetworkImage(false);
+
+                    mIsOriginalCompleted = true;
+                    if(mLoadingProgressBarOriginal != null) {
+                        mLoadingProgressBarOriginal.setVisibility(View.GONE);
+                    }
                 }
                 super.onProgressChanged(view, newProgress);
             }

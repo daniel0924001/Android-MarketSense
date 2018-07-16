@@ -96,7 +96,11 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
     }
 
     public void loadCommentsList(String url) {
-        mCommentsPlacer.loadComments(url);
+        loadCommentsList(null, url);
+    }
+
+    public void loadCommentsList(String cacheKey, String url) {
+        mCommentsPlacer.loadComments(cacheKey, url);
     }
 
     public void setCommentArrayList(ArrayList<Comment> arrayList) {

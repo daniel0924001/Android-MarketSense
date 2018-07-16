@@ -1,6 +1,8 @@
 package com.idroi.marketsense.fragments;
 
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -26,6 +28,7 @@ import com.idroi.marketsense.RichEditorActivity;
 import com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
+import com.idroi.marketsense.common.SharedPreferencesCompat;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
 import com.idroi.marketsense.data.News;
@@ -34,10 +37,12 @@ import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.CommentAndVoteRequest;
 
 import static com.idroi.marketsense.RichEditorActivity.sReplyEditorRequestCode;
+import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_REQUEST_NAME;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_DISCUSSION_COMMENT_CLICK;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FUNCTION_INSERT_COMMENT;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FUNCTION_SEARCH_COMMENT;
+import static com.idroi.marketsense.request.CommentAndVoteRequest.COMMENT_CACHE_KEY_GENERAL;
 
 /**
  * Created by daniel.hsieh on 2018/7/5.
@@ -130,13 +135,12 @@ public class CommentFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 queryCommentsEvent();
-                startToLoadComment();
             }
         });
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                queryCommentsEvent();
+                queryCommentsEvent(false);
             }
         });
         mCommentRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -171,14 +175,20 @@ public class CommentFragment extends Fragment {
                 } else if(notifyId == NOTIFY_ID_FUNCTION_SEARCH_COMMENT) {
                     if(payload != null && payload instanceof String) {
                         queryCommentsEventForStockCode((String) payload);
-                        startToLoadComment();
                     }
                 } else if(notifyId == NOTIFY_ID_FUNCTION_INSERT_COMMENT) {
+                    // clear cache url and reload comments since user had inserted a new comment
+                    if(getActivity() != null) {
+                        SharedPreferences.Editor editor =
+                                getActivity().getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE).edit();
+                        editor.remove(COMMENT_CACHE_KEY_GENERAL);
+                        SharedPreferencesCompat.apply(editor);
+                    }
+
                     Comment newComment = (Comment) payload;
                     if(mTempSearchString != null) {
                         // in the code query
                         queryCommentsEvent();
-                        startToLoadComment();
                     } else {
                         // in the general query
                         mCommentRecyclerViewAdapter.addOneComment(newComment);
@@ -202,15 +212,22 @@ public class CommentFragment extends Fragment {
 
         queryCommentsEvent();
         mCommentRecyclerView.setAdapter(mCommentRecyclerViewAdapter);
-        startToLoadComment();
     }
 
     private void queryCommentsEvent() {
+        queryCommentsEvent(true);
+    }
+
+    private void queryCommentsEvent(boolean refreshUi) {
+        if(refreshUi) {
+            startToLoadComment();
+        }
         mTempSearchString = null;
-        mCommentRecyclerViewAdapter.loadCommentsList(CommentAndVoteRequest.queryCommentsEvent());
+        mCommentRecyclerViewAdapter.loadCommentsList(COMMENT_CACHE_KEY_GENERAL, CommentAndVoteRequest.queryCommentsEvent());
     }
 
     private void queryCommentsEventForStockCode(String code) {
+        startToLoadComment();
         mTempSearchString = code;
         mCommentRecyclerViewAdapter.loadCommentsList(CommentAndVoteRequest.queryCommentsEventForStockCode(mTempSearchString));
     }

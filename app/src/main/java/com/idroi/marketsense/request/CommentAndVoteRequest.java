@@ -71,7 +71,7 @@ public class CommentAndVoteRequest extends Request<CommentAndVote> {
         }
     }
 
-    private static CommentAndVote commentsParseResponse(byte[] data) throws JSONException {
+    public static CommentAndVote commentsParseResponse(byte[] data) throws JSONException {
         CommentAndVote commentAndVote = new CommentAndVote();
         JSONArray commentsJsonArray = getCommentResult(new JSONObject(new String(data)), commentAndVote);
 
@@ -116,6 +116,8 @@ public class CommentAndVoteRequest extends Request<CommentAndVote> {
     protected void deliverResponse(CommentAndVote response) {
         mListener.onResponse(response);
     }
+
+    public static final String COMMENT_CACHE_KEY_GENERAL = "comment_cache_key_general";
 
     private static final String API_URL_NEWS = "http://apiv2.infohubapp.com/v1/stock/news/";
     private static final String API_URL_STOCK = "http://apiv2.infohubapp.com/v1/stock/code/";

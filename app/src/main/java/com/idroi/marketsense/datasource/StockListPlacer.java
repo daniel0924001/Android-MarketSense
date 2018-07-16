@@ -166,9 +166,10 @@ public class StockListPlacer {
     }
 
     private void updateRealTimeStockPrices(ArrayList<Stock> stockPrices) {
-        if(stockPrices != null) {
+        ClientData clientData = ClientData.getInstance(mActivity.get());
+        if(stockPrices != null && clientData != null) {
             for (Stock stock : stockPrices) {
-                ClientData.getInstance(mActivity.get()).setRealTimeStockPriceHashMap(stock);
+                clientData.setRealTimeStockPriceHashMap(stock);
             }
         }
         MSLog.i("refresh real time stock price");

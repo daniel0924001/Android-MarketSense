@@ -28,6 +28,9 @@ public class StockChartDataRequest extends Request<StockTradeData> {
     private static final String PARAM_YESTERDAY = "129";
     private static final String PARAM_MIN_PRICE = "133";
     private static final String PARAM_MAX_PRICE = "132";
+    private static final String PARAM_REAL_PRICE = "125";
+    private static final String PARAM_DIFF_PRICE = "184";
+    private static final String PARAM_DIFF_PERCENTAGE = "185";
     private static final String PARAM_T = "t";
     private static final String PARAM_P = "p";
     private static final String PARAM_V = "v";
@@ -100,10 +103,17 @@ public class StockChartDataRequest extends Request<StockTradeData> {
                 float yesterdayPrice = (float) data.getDouble(PARAM_YESTERDAY);
                 float minPrice = (float) data.getDouble(PARAM_MIN_PRICE);
                 float maxPrice = (float) data.getDouble(PARAM_MAX_PRICE);
-                MSLog.d("" +yesterdayPrice + ", " + minPrice + ", " + maxPrice);
+                float realPrice = (float) data.getDouble(PARAM_REAL_PRICE);
+                float diffPrice = (float) data.getDouble(PARAM_DIFF_PRICE);
+                float diffPercentage = (float) data.getDouble(PARAM_DIFF_PERCENTAGE);
+                MSLog.d("yesterdayPrice: " + yesterdayPrice + ", minPrice: " + minPrice + ", maxPrice: " + maxPrice);
+                MSLog.d("realPrice: " + realPrice + ", diffPrice: " + diffPrice + ", diffPercentage: " + diffPercentage);
                 stockTradeData.setYesterdayPrice(yesterdayPrice);
                 stockTradeData.setMinPrice(minPrice);
                 stockTradeData.setMaxPrice(maxPrice);
+                stockTradeData.setRealPrice(realPrice);
+                stockTradeData.setDiffPrice(diffPrice);
+                stockTradeData.setDiffPercentage(diffPercentage);
             } catch (Exception e) {
                 MSLog.e("Exception in setMemData: " + e);
                 // pass

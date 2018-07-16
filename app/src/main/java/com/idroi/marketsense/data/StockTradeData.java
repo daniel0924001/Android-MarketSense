@@ -12,6 +12,7 @@ public class StockTradeData {
     private float mYesterdayPrice;
     private float mMinPrice, mMaxPrice;
     private float mMaxVolume;
+    private float mRealPrice, mDiffPrice, mDiffPercentage;
 
     public StockTradeData() {
 
@@ -61,6 +62,18 @@ public class StockTradeData {
         mMaxPrice = maxPrice;
     }
 
+    public void setRealPrice(float realPrice) {
+        mRealPrice = realPrice;
+    }
+
+    public void setDiffPrice(float diffPrice) {
+        mDiffPrice = diffPrice;
+    }
+
+    public void setDiffPercentage(float diffPercentage) {
+        mDiffPercentage = diffPercentage;
+    }
+
     public float getYesterdayPrice() {
         return mYesterdayPrice;
     }
@@ -75,5 +88,17 @@ public class StockTradeData {
 
     public float getMaxVolume() {
         return mMaxVolume;
+    }
+
+    public float getRealPrice() {
+        return mRealPrice;
+    }
+
+    public float getDiffPrice() {
+        return mDiffPrice;
+    }
+
+    public float getDiffPercentage() {
+        return mDiffPercentage;
     }
 }

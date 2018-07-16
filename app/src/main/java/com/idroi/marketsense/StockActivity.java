@@ -52,6 +52,7 @@ import com.idroi.marketsense.data.Event;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.Stock;
+import com.idroi.marketsense.data.StockTradeData;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.NewsRequest;
 import com.idroi.marketsense.request.CommentAndVoteRequest;
@@ -705,23 +706,29 @@ public class StockActivity extends AppCompatActivity {
         badPercentageTextView.setText(percentFormat.format(1 - goodPercentage));
     }
 
-    private void initStockChart() {
+    private void setPriceBlock(float price, float diffNum, float diffPercentage) {
+        String diffPercentageString = null;
+        if(diffPercentage > 0) {
+            diffPercentageString = String.format(Locale.US, "+%.2f%%", diffPercentage);
+        } else {
+            diffPercentageString = String.format(Locale.US, "%.2f%%", diffPercentage);
+        }
+        setPriceBlock(String.valueOf(price), String.valueOf(diffNum), diffPercentageString);
+    }
 
-        mLoadingProgressBar = findViewById(R.id.loading_progress_bar_1);
-        mLoadingProgressBarMore = findViewById(R.id.loading_progress_bar_2);
-
+    private void setPriceBlock(String price, String diffNum, String diffPercentage) {
         TextView priceTextView = findViewById(R.id.stock_price_tv);
         TextView diffTextView = findViewById(R.id.stock_diff_tv);
         String format = getResources().getString(R.string.title_diff_format);
 
-        priceTextView.setText(mPrice);
-        diffTextView.setText(String.format(format, mDiffNum, mDiffPercentage));
+        priceTextView.setText(price);
+        diffTextView.setText(String.format(format, diffNum, diffPercentage));
 
         try {
-            float diffPercentage = Float.valueOf(mDiffNum);
-            if(diffPercentage > 0) {
+            float diffPercentageFloat = Float.valueOf(diffNum);
+            if(diffPercentageFloat > 0) {
                 diffTextView.setTextColor(getResources().getColor(R.color.colorTrendUp));
-            } else if(diffPercentage < 0) {
+            } else if(diffPercentageFloat < 0) {
                 diffTextView.setTextColor(getResources().getColor(R.color.colorTrendDown));
             } else {
                 diffTextView.setTextColor(getResources().getColor(R.color.colorTrendFlat));
@@ -730,6 +737,14 @@ public class StockActivity extends AppCompatActivity {
             diffTextView.setTextColor(getResources().getColor(R.color.colorTrendFlat));
             MSLog.e("NumberFormatException: " + mDiffNum);
         }
+    }
+
+    private void initStockChart() {
+
+        mLoadingProgressBar = findViewById(R.id.loading_progress_bar_1);
+        mLoadingProgressBarMore = findViewById(R.id.loading_progress_bar_2);
+
+        setPriceBlock(mPrice, mDiffNum, mDiffPercentage);
 
         Button moreButton = findViewById(R.id.more_information_btn);
         moreButton.setOnClickListener(new View.OnClickListener() {
@@ -757,6 +772,12 @@ public class StockActivity extends AppCompatActivity {
             @Override
             public void onStxChartDataLoad() {
                 mYahooStxChartCrawler.renderStockChartData();
+                StockTradeData stockTradeData = mYahooStxChartCrawler.getStockTradeData();
+                if(stockTradeData != null) {
+                    setPriceBlock(stockTradeData.getRealPrice(),
+                            stockTradeData.getDiffPrice(),
+                            stockTradeData.getDiffPercentage());
+                }
                 mSkeletonScreen.hide();
                 if(mLoadingProgressBar != null) {
                     mLoadingProgressBar.setVisibility(View.GONE);

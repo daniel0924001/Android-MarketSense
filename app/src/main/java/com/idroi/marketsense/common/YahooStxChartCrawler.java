@@ -143,6 +143,10 @@ public class YahooStxChartCrawler {
         mPriceLineChart.invalidate();
     }
 
+    public StockTradeData getStockTradeData() {
+        return mStockTradeData;
+    }
+
     private void setTouchMarker(Context context) {
         StockChartMarkerView lineChartMarker = new StockChartMarkerView(context, R.layout.stock_price_chart_marker);
         StockChartMarkerView barChartMarker = new StockChartMarkerView(context, R.layout.stock_price_chart_marker);

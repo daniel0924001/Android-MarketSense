@@ -8,7 +8,9 @@
     <color name="text_white">#ffffff</color>
     <color name="text_red">#F20060</color>
     <color name="text_green">#00BE9F</color>
+    <color name="text_dark_gray">#b3b3b3</color>
     <color name="text_gray">#bababa</color>
+    <color name="text_middle_gray">#bebebe</color>
     <color name="text_light_gray">#f5f5f5</color>
     <color name="text_pink">#ff5a5a</color>
     <color name="border_gray">#f4f4f4</color>
@@ -43,4 +45,9 @@
 
     <color name="card_top_color">#ffdb62</color>
     <color name="card_bottom_color">#ff8185</color>
+
+    <color name="background_predict_up_top">#ff8862</color>
+    <color name="background_predict_up_bottom">#ff4248</color>
+    <color name="background_predict_down_top">#21d7c2</color>
+    <color name="background_predict_down_bottom">#03cab3</color>
 </resources>

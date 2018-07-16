@@ -48,8 +48,9 @@ public class NewsFirstRowRenderer implements MarketSenseRenderer<News> {
         if(!TextUtils.isEmpty(content.getUrlImage())) {
             FrescoImageHelper.loadImageView(content.getUrlImage(),
                     newsFirstRowViewHolder.mainImageView, FrescoImageHelper.MAIN_IMAGE_RATIO);
-        } FrescoImageHelper.loadImageView(R.mipmap.news_default_image,
-                newsFirstRowViewHolder.mainImageView, FrescoImageHelper.MAIN_IMAGE_RATIO);
+        }
+//        FrescoImageHelper.loadImageView(R.mipmap.news_default_image,
+//                newsFirstRowViewHolder.mainImageView, FrescoImageHelper.MAIN_IMAGE_RATIO);
     }
 
     @Override

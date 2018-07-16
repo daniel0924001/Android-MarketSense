@@ -72,8 +72,8 @@ public class NewsSecondRowRenderer implements MarketSenseRenderer<News> {
             FrescoImageHelper.loadImageView(content.getUrlImage(),
                     newsViewHolder.leftMainImageView, FrescoImageHelper.MAIN_IMAGE_RATIO);
         } else {
-            FrescoImageHelper.loadImageView(R.mipmap.news_default_image,
-                    newsViewHolder.leftMainImageView, FrescoImageHelper.MAIN_IMAGE_RATIO);
+//            FrescoImageHelper.loadImageView(R.mipmap.news_default_image,
+//                    newsViewHolder.leftMainImageView, FrescoImageHelper.MAIN_IMAGE_RATIO);
         }
 
         // right part
@@ -102,8 +102,8 @@ public class NewsSecondRowRenderer implements MarketSenseRenderer<News> {
             FrescoImageHelper.loadImageView(nextContent.getUrlImage(),
                     newsViewHolder.rightMainImageView, FrescoImageHelper.MAIN_IMAGE_RATIO);
         } else {
-            FrescoImageHelper.loadImageView(R.mipmap.news_default_image,
-                    newsViewHolder.rightMainImageView, FrescoImageHelper.MAIN_IMAGE_RATIO);
+//            FrescoImageHelper.loadImageView(R.mipmap.news_default_image,
+//                    newsViewHolder.rightMainImageView, FrescoImageHelper.MAIN_IMAGE_RATIO);
         }
     }
 

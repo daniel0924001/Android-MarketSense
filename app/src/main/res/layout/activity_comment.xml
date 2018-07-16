@@ -237,7 +237,7 @@
                     android:id="@+id/social_say_like_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:contentDescription="@string/title_level_down_low"
+                    android:contentDescription="@string/title_good"
                     android:src="@mipmap/ic_like_off"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"

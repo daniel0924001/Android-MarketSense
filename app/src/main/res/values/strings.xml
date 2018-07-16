@@ -91,18 +91,19 @@
     <string name="title_company_predict_news_title">新聞</string>
     <string name="title_company_predict_people_title">鄉民</string>
 
-    <string name="title_level_up_highest">最看漲！</string>
-    <string name="title_level_up_high">非常看漲</string>
-    <string name="title_level_up_low">看漲</string>
+    <string name="title_predict_today">今日預測</string>
+    <string name="title_predict_tomorrow">次交易日預測</string>
+    <string name="title_predict_none">無法預測</string>
 
-    <string name="title_news">新聞</string>
-    <string name="title_people">鄉民</string>
+    <string name="title_fundamental">基本面</string>
+    <string name="title_people">鄉民面</string>
+    <string name="title_news">新聞面</string>
 
-    <string name="title_level_flat">持平</string>
-
-    <string name="title_level_down_highest">最看跌！</string>
-    <string name="title_level_down_high">非常看跌</string>
-    <string name="title_level_down_low">看跌</string>
+    <string name="title_level_flat">？？？</string>
+    <string name="title_level_up_highest">超看漲</string>
+    <string name="title_level_up_high">看漲</string>
+    <string name="title_level_down_highest">超看跌</string>
+    <string name="title_level_down_high">看跌</string>
 
     <string name="title_news_look_good">新聞看漲</string>
     <string name="title_news_look_flat">新聞無定論</string>

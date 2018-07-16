@@ -24,6 +24,8 @@ public class Stock {
     private static final String PRICE = "price";
     private static final String RAISE = "raise";
     private static final String FALL = "fall";
+    private static final String TODAY_DIFF_PRED = "today_diff_predict";
+    private static final String NEXT_DIFF_PRED = "next_diff_predict";
 
     public static final int LEVEL_HIGHEST = 2;
     public static final int LEVEL_HIGH = 1;

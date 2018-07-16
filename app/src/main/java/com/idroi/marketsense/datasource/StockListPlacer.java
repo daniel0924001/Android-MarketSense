@@ -32,6 +32,7 @@ public class StockListPlacer {
     public final static int SORT_BY_DIFF = 2;
     public final static int SORT_BY_PEOPLE = 3;
     public final static int SORT_BY_NEWS = 4;
+    public final static int SORT_BY_PREDICTION = 6;
 
     public final static int SORT_UPWARD = 1;
     public final static int SORT_DOWNWARD = 2;

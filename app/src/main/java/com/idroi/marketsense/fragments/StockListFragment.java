@@ -78,11 +78,11 @@ public class StockListFragment extends Fragment {
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private int mTaskId;
 
-    private TextView mSortedByName, mSortedByPrice, mSortedByDiff, mSortedByPeople, mSortedByNews;
-    private TextView[] mSortedViews;
-    private HashMap<View, String> mSortedTexts;
-    private View mLastSortedView;
-    private int mSortedDirection;
+//    private TextView mSortedByName, mSortedByPrice, mSortedByDiff, mSortedByPeople, mSortedByNews;
+//    private TextView[] mSortedViews;
+//    private HashMap<View, String> mSortedTexts;
+//    private View mLastSortedView;
+//    private int mSortedDirection;
 
     private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
 
@@ -205,91 +205,7 @@ public class StockListFragment extends Fragment {
             }
         });
 
-        setSortBlock(view);
-    }
-
-    private void setSortBlock(View view) {
-        mSortedByName = view.findViewById(R.id.sorted_by_name);
-        mSortedByPrice = view.findViewById(R.id.sorted_by_price);
-        mSortedByDiff = view.findViewById(R.id.sorted_by_diff);
-        mSortedByPeople = view.findViewById(R.id.sorted_by_people);
-        mSortedByNews = view.findViewById(R.id.sorted_by_news);
-
-        mSortedViews = new TextView[] {
-                mSortedByName, mSortedByPrice, mSortedByDiff, mSortedByPeople, mSortedByNews};
-        mSortedTexts = new HashMap<>();
-        mSortedTexts.put(mSortedByName, getString(R.string.title_company_predict_name));
-        mSortedTexts.put(mSortedByPrice, getString(R.string.title_company_predict_price));
-        mSortedTexts.put(mSortedByDiff, getString(R.string.title_company_predict_fluctuation));
-        mSortedTexts.put(mSortedByPeople, getString(R.string.title_company_predict_people_title));
-        mSortedTexts.put(mSortedByNews, getString(R.string.title_company_predict_news_title));
-
-        mLastSortedView = null;
-        mSortedDirection = SORT_UPWARD;
-
-        mSortedByName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                changeSortedBlockLayout(SORT_BY_NAME, view);
-            }
-        });
-
-        mSortedByPrice.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                changeSortedBlockLayout(SORT_BY_PRICE, view);
-            }
-        });
-
-        mSortedByDiff.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                changeSortedBlockLayout(SORT_BY_DIFF, view);
-            }
-        });
-
-        mSortedByPeople.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                changeSortedBlockLayout(SORT_BY_PEOPLE, view);
-            }
-        });
-
-        mSortedByNews.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                changeSortedBlockLayout(SORT_BY_NEWS, view);
-            }
-        });
-        changeSortedBlockLayout(SORT_BY_NEWS, mSortedByNews);
-    }
-
-    private void changeSortedBlockLayout(int field, View view) {
-        if(view != mLastSortedView) {
-            mLastSortedView = view;
-            if(field != SORT_BY_NAME) {
-                mSortedDirection = SORT_DOWNWARD;
-            } else {
-                mSortedDirection = SORT_UPWARD;
-            }
-        } else {
-            mSortedDirection = (mSortedDirection == SORT_UPWARD ? SORT_DOWNWARD : SORT_UPWARD);
-        }
-        mStockListRecyclerAdapter.sortByTask(field, mSortedDirection);
-
-        for (TextView textView : mSortedViews) {
-            if (textView != view) {
-                // others
-                textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.mipmap.ic_sorting_off, 0);
-            } else {
-                // sorted one
-                if(mSortedDirection == SORT_UPWARD) {
-                    textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.mipmap.ic_sorting_on_up, 0);
-                } else {
-                    textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.mipmap.ic_sorting_on_down, 0);
-                }
-            }
-        }
+//        setSortBlock(view);
     }
 
     public String generateNetworkURL() {
@@ -338,4 +254,88 @@ public class StockListFragment extends Fragment {
     private boolean isSelfNoneChoices() {
         return mTaskId == SELF_CHOICES_ID && ClientData.getInstance().getUserProfile().isEmptyFavoriteStock();
     }
+
+//    private void setSortBlock(View view) {
+//        mSortedByName = view.findViewById(R.id.sorted_by_name);
+//        mSortedByPrice = view.findViewById(R.id.sorted_by_price);
+//        mSortedByDiff = view.findViewById(R.id.sorted_by_diff);
+//        mSortedByPeople = view.findViewById(R.id.sorted_by_people);
+//        mSortedByNews = view.findViewById(R.id.sorted_by_news);
+//
+//        mSortedViews = new TextView[] {
+//                mSortedByName, mSortedByPrice, mSortedByDiff, mSortedByPeople, mSortedByNews};
+//        mSortedTexts = new HashMap<>();
+//        mSortedTexts.put(mSortedByName, getString(R.string.title_company_predict_name));
+//        mSortedTexts.put(mSortedByPrice, getString(R.string.title_company_predict_price));
+//        mSortedTexts.put(mSortedByDiff, getString(R.string.title_company_predict_fluctuation));
+//        mSortedTexts.put(mSortedByPeople, getString(R.string.title_company_predict_people_title));
+//        mSortedTexts.put(mSortedByNews, getString(R.string.title_company_predict_news_title));
+//
+//        mLastSortedView = null;
+//        mSortedDirection = SORT_UPWARD;
+//
+//        mSortedByName.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                changeSortedBlockLayout(SORT_BY_NAME, view);
+//            }
+//        });
+//
+//        mSortedByPrice.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                changeSortedBlockLayout(SORT_BY_PRICE, view);
+//            }
+//        });
+//
+//        mSortedByDiff.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                changeSortedBlockLayout(SORT_BY_DIFF, view);
+//            }
+//        });
+//
+//        mSortedByPeople.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                changeSortedBlockLayout(SORT_BY_PEOPLE, view);
+//            }
+//        });
+//
+//        mSortedByNews.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                changeSortedBlockLayout(SORT_BY_NEWS, view);
+//            }
+//        });
+//        changeSortedBlockLayout(SORT_BY_NEWS, mSortedByNews);
+//    }
+//
+//    private void changeSortedBlockLayout(int field, View view) {
+//        if(view != mLastSortedView) {
+//            mLastSortedView = view;
+//            if(field != SORT_BY_NAME) {
+//                mSortedDirection = SORT_DOWNWARD;
+//            } else {
+//                mSortedDirection = SORT_UPWARD;
+//            }
+//        } else {
+//            mSortedDirection = (mSortedDirection == SORT_UPWARD ? SORT_DOWNWARD : SORT_UPWARD);
+//        }
+//        mStockListRecyclerAdapter.sortByTask(field, mSortedDirection);
+//
+//        for (TextView textView : mSortedViews) {
+//            if (textView != view) {
+//                // others
+//                textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.mipmap.ic_sorting_off, 0);
+//            } else {
+//                // sorted one
+//                if(mSortedDirection == SORT_UPWARD) {
+//                    textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.mipmap.ic_sorting_on_up, 0);
+//                } else {
+//                    textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.mipmap.ic_sorting_on_down, 0);
+//                }
+//            }
+//        }
+//    }
 }

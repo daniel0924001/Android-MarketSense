@@ -1,5 +1,6 @@
 package com.idroi.marketsense.adapter;
 
+import android.support.constraint.ConstraintLayout;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,6 +24,15 @@ public class StockViewHolder {
 
     ImageView predictNewsImageView;
     ImageView predictPeopleImageView;
+    ImageView predictFundamentalImageView;
+
+    TextView predictNewsAttitude;
+    TextView predictPeopleAttitude;
+    TextView predictFundamentalAttitude;
+
+    ConstraintLayout rightBlock;
+    TextView rightTitle;
+    TextView rightValue;
 
     static final StockViewHolder EMPTY_VIEW_HOLDER = new StockViewHolder();
 
@@ -39,6 +49,15 @@ public class StockViewHolder {
 
             stockViewHolder.predictNewsImageView = view.findViewById(R.id.marketsense_stock_news_iv);
             stockViewHolder.predictPeopleImageView = view.findViewById(R.id.marketsense_stock_people_iv);
+            stockViewHolder.predictFundamentalImageView = view.findViewById(R.id.marketsense_stock_fundamental_iv);
+
+            stockViewHolder.predictNewsAttitude = view.findViewById(R.id.marketsense_stock_news_attitude_tv);
+            stockViewHolder.predictPeopleAttitude = view.findViewById(R.id.marketsense_stock_people_attitude_tv);
+            stockViewHolder.predictFundamentalAttitude = view.findViewById(R.id.marketsense_stock_fundamental_attitude_tv);
+
+            stockViewHolder.rightBlock = view.findViewById(R.id.predict_block);
+            stockViewHolder.rightTitle = view.findViewById(R.id.predict_title);
+            stockViewHolder.rightValue = view.findViewById(R.id.predict_value);
 
             return stockViewHolder;
         } catch (ClassCastException exception) {

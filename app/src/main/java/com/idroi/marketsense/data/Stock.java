@@ -1,9 +1,14 @@
 package com.idroi.marketsense.data;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
+import android.widget.TextView;
 
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.R;
+import com.idroi.marketsense.util.DateUtils;
 
 import org.json.JSONObject;
 
@@ -38,14 +43,19 @@ public class Stock {
 
     private String mCode;
     private String mName;
-    private int mDiffDirection = 3;
-    private double mConfidence = 75;
-    private int mConfidenceDirection;
+
     private int mRaiseNum, mFallNum;
 
+    private int mDiffDirection = 3;
     private double mPrice, mDiffNumber, mDiffPercentage;
+
+    private double mConfidence = 75;
+    private int mConfidenceDirection;
     private double mVoting;
     private int mVotingDirection;
+
+    private int mTodayPredictionDiffDirection, mTomorrowPredictionDiffDirection;
+    private double mTodayPredictionDiff, mTomorrowPredictionDiff;
 
     public Stock() {
 
@@ -120,6 +130,28 @@ public class Stock {
 
     public void setFallNum(int number) {
         mFallNum = number;
+    }
+
+    public void setTodayPrediction(double prediction) {
+        mTodayPredictionDiff = Math.abs(prediction) * 100;
+        if(prediction > 0) {
+            mTodayPredictionDiffDirection = Stock.TREND_UP;
+        } else if(prediction == 0) {
+            mTodayPredictionDiffDirection = Stock.TREND_FLAT;
+        } else {
+            mTodayPredictionDiffDirection = Stock.TREND_DOWN;
+        }
+    }
+
+    public void setTomorrowPrediction(double prediction) {
+        mTomorrowPredictionDiff = Math.abs(prediction) * 100;
+        if(prediction > 0) {
+            mTomorrowPredictionDiffDirection = Stock.TREND_UP;
+        } else if(prediction == 0) {
+            mTomorrowPredictionDiffDirection = Stock.TREND_FLAT;
+        } else {
+            mTomorrowPredictionDiffDirection = Stock.TREND_DOWN;
+        }
     }
 
     public String getName() {
@@ -235,6 +267,52 @@ public class Stock {
         return mVotingDirection;
     }
 
+    public void setRightPredictionBlock(Context context,
+                                        ConstraintLayout predictionBlock,
+                                        TextView titleTextView,
+                                        TextView valueTextView) {
+        Resources resources = context.getResources();
+        if(DateUtils.isAfterStockClosed()) {
+            titleTextView.setText(resources.getString(R.string.title_predict_tomorrow));
+        } else {
+            titleTextView.setText(resources.getString(R.string.title_predict_today));
+        }
+
+        int predictionDirection = 0;
+        double predictionValue = 0;
+        if(DateUtils.doesUseTodayPredictionValue()) {
+            predictionDirection = mTodayPredictionDiffDirection;
+            predictionValue = mTodayPredictionDiff;
+        } else {
+            predictionDirection = mTomorrowPredictionDiffDirection;
+            predictionValue = mTomorrowPredictionDiff;
+        }
+        valueTextView.setTextColor(resources.getColor(R.color.text_white));
+        titleTextView.setTextColor(resources.getColor(R.color.text_white));
+        switch (predictionDirection) {
+            case TREND_UP:
+                predictionBlock.setBackground(resources.getDrawable(R.drawable.block_predict_up_background));
+                valueTextView.setText(String.format(Locale.US, "+%.2f%%", predictionValue));
+                break;
+            case TREND_FLAT:
+                predictionBlock.setBackgroundColor(resources.getColor(R.color.card_gray_background));
+                valueTextView.setText(String.format(Locale.US, "%.2f%%", predictionValue));
+                valueTextView.setTextColor(resources.getColor(R.color.text_dark_gray));
+                titleTextView.setTextColor(resources.getColor(R.color.text_dark_gray));
+                break;
+            case TREND_DOWN:
+                predictionBlock.setBackground(resources.getDrawable(R.drawable.block_predict_down_background));
+                valueTextView.setText(String.format(Locale.US, "-%.2f%%", predictionValue));
+                break;
+            default:
+                predictionBlock.setBackgroundColor(resources.getColor(R.color.card_gray_background));
+                valueTextView.setText(String.format(Locale.US, "%.2f%%", predictionValue));
+                valueTextView.setTextColor(resources.getColor(R.color.text_dark_gray));
+                titleTextView.setTextColor(resources.getColor(R.color.text_dark_gray));
+                break;
+        }
+    }
+
     @Nullable
     public static Stock jsonObjectToStock(JSONObject jsonObject, boolean removeNan) {
         Stock stock = new Stock();
@@ -276,6 +354,12 @@ public class Stock {
                         break;
                     case FALL:
                         stock.setFallNum(jsonObject.optInt(FALL));
+                        break;
+                    case TODAY_DIFF_PRED:
+                        stock.setTodayPrediction(jsonObject.optDouble(TODAY_DIFF_PRED));
+                        break;
+                    case NEXT_DIFF_PRED:
+                        stock.setTomorrowPrediction(jsonObject.optDouble(NEXT_DIFF_PRED));
                         break;
                     default:
                         break;

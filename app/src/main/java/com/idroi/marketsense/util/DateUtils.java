@@ -1,7 +1,10 @@
 package com.idroi.marketsense.util;
 
+import com.idroi.marketsense.Logging.MSLog;
+
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * Created by daniel.hsieh on 2018/5/15.
@@ -256,4 +259,37 @@ public class DateUtils {
     /** The maximum date possible. */
     public static Date MAX_DATE = new Date(Long.MAX_VALUE);
 
+    /* stock transaction related methods part */
+    public static Date getTodaySpecificTime(Date now, int hour, int minute) {
+        if(now == null) {
+            return null;
+        }
+        Calendar c = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei"));
+        c.setTime(now);
+        c.set(Calendar.HOUR_OF_DAY, hour);
+        c.set(Calendar.MINUTE, minute);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+        return c.getTime();
+    }
+
+    public static Date getTodayStockClosedTime(Date now) {
+        if(now == null) {
+            return null;
+        }
+        return getTodaySpecificTime(now, 13, 30);
+    }
+
+    public static boolean isAfterStockClosed() {
+        Date now = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei")).getTime();
+        Date close = getTodayStockClosedTime(now);
+        return now.after(close);
+    }
+
+    public static boolean doesUseTodayPredictionValue() {
+        Date now = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei")).getTime();
+        Date start = getTodaySpecificTime(now, 8, 10);
+        Date end = getTodaySpecificTime(now, 15, 0);
+        return now.after(start) && now.before(end);
+    }
 }

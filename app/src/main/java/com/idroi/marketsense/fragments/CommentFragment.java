@@ -1,8 +1,7 @@
 package com.idroi.marketsense.fragments;
 
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -28,7 +27,6 @@ import com.idroi.marketsense.RichEditorActivity;
 import com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
-import com.idroi.marketsense.common.SharedPreferencesCompat;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
 import com.idroi.marketsense.data.News;
@@ -36,8 +34,14 @@ import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.CommentAndVoteRequest;
 
+import java.io.Serializable;
+
+import static android.app.Activity.RESULT_OK;
+import static com.idroi.marketsense.CommentActivity.EXTRA_COMMENT;
+import static com.idroi.marketsense.CommentActivity.EXTRA_NEED_TO_CHANGE;
+import static com.idroi.marketsense.CommentActivity.EXTRA_POSITION;
 import static com.idroi.marketsense.RichEditorActivity.sReplyEditorRequestCode;
-import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_REQUEST_NAME;
+import static com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter.ADAPTER_CHANGE_LIKE_ONLY;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_DISCUSSION_COMMENT_CLICK;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FUNCTION_INSERT_COMMENT;
@@ -95,7 +99,8 @@ public class CommentFragment extends Fragment {
                             comment.increaseLike();
                             comment.setLike(true);
                             PostEvent.sendLike(getActivity(), comment.getCommentId());
-                            mCommentRecyclerViewAdapter.notifyItemChanged(position);
+                            mCommentRecyclerViewAdapter.notifyItemChanged(position, ADAPTER_CHANGE_LIKE_ONLY);
+                            mCommentRecyclerViewAdapter.removeCommentGeneralCache(getActivity());
                         } else {
                             mTempComment = comment;
                             mTempPosition = position;
@@ -161,7 +166,8 @@ public class CommentFragment extends Fragment {
                                 mTempComment.increaseLike();
                                 mTempComment.setLike(true);
                                 PostEvent.sendLike(getActivity(), mTempComment.getCommentId());
-                                mCommentRecyclerViewAdapter.notifyItemChanged(mTempPosition);
+                                mCommentRecyclerViewAdapter.notifyItemChanged(mTempPosition, ADAPTER_CHANGE_LIKE_ONLY);
+                                mCommentRecyclerViewAdapter.removeCommentGeneralCache(getActivity());
                                 mTempComment = null;
                             }
                         }
@@ -177,14 +183,7 @@ public class CommentFragment extends Fragment {
                         queryCommentsEventForStockCode((String) payload);
                     }
                 } else if(notifyId == NOTIFY_ID_FUNCTION_INSERT_COMMENT) {
-                    // clear cache url and reload comments since user had inserted a new comment
-                    if(getActivity() != null) {
-                        SharedPreferences.Editor editor =
-                                getActivity().getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE).edit();
-                        editor.remove(COMMENT_CACHE_KEY_GENERAL);
-                        SharedPreferencesCompat.apply(editor);
-                    }
-
+                    mCommentRecyclerViewAdapter.removeCommentGeneralCache(getActivity());
                     Comment newComment = (Comment) payload;
                     if(mTempSearchString != null) {
                         // in the code query
@@ -287,6 +286,23 @@ public class CommentFragment extends Fragment {
                 }
             });
             mLoginAlertDialog.show();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == sReplyEditorRequestCode) {
+            if(resultCode == RESULT_OK && data.getBooleanExtra(EXTRA_NEED_TO_CHANGE, false)) {
+                Serializable serializable = data.getSerializableExtra(EXTRA_COMMENT);
+                int position = data.getIntExtra(EXTRA_POSITION, -1);
+                if (serializable != null && serializable instanceof Comment && position != -1) {
+                    MSLog.d("comment with position " + position + " is needed to change");
+                    Comment comment = (Comment) serializable;
+                    mCommentRecyclerViewAdapter.cloneSocialContent(position, comment);
+                    mCommentRecyclerViewAdapter.notifyItemChanged(position, ADAPTER_CHANGE_LIKE_ONLY);
+                    mCommentRecyclerViewAdapter.removeCommentGeneralCache(getActivity());
+                }
+            }
         }
     }
 

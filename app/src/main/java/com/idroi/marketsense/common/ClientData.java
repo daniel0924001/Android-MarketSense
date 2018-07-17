@@ -14,6 +14,7 @@ import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.datasource.Networking;
 import com.idroi.marketsense.request.StocksListRequest;
 import com.idroi.marketsense.request.UserEventsAndCodesRequest;
+import com.idroi.marketsense.util.DateUtils;
 
 import org.json.JSONException;
 
@@ -41,6 +42,8 @@ public class ClientData {
     private static final int DEFAULT_RETRY_TIME = 3;
     private int mLoadPreferenceRetryCounter = DEFAULT_RETRY_TIME;
     private int mLoadAllStockListRetryCounter = DEFAULT_RETRY_TIME;
+
+    private boolean mIsAfterStockClosed, mDoesUseTodayPredictionValue;
 
     /**
      * Returns the singleton ClientMetadata object, using the context to obtain data if necessary.
@@ -81,6 +84,9 @@ public class ClientData {
         mContext = context.getApplicationContext();
         mUserProfile = new UserProfile(context, true);
         mRealTimePricesHashMap = new HashMap<>();
+
+        mIsAfterStockClosed = DateUtils.isAfterStockClosed();
+        mDoesUseTodayPredictionValue = DateUtils.doesUseTodayPredictionValue();
 
         loadAllStocksListTask(true);
     }
@@ -176,6 +182,14 @@ public class ClientData {
 
     public boolean isNameAndCodeAreValid(String name, String code) {
         return (name != null) && (code != null);
+    }
+
+    public boolean isAfterStockClosed() {
+        return mIsAfterStockClosed;
+    }
+
+    public boolean doesUseTodayPredictionValue() {
+        return mDoesUseTodayPredictionValue;
     }
 
     private void loadAllStocksListTask(boolean shouldReadCache) {

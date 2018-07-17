@@ -260,7 +260,7 @@ public class DateUtils {
     public static Date MAX_DATE = new Date(Long.MAX_VALUE);
 
     /* stock transaction related methods part */
-    public static Date getTodaySpecificTime(Date now, int hour, int minute) {
+    private static Date getTodaySpecificTime(Date now, int hour, int minute) {
         if(now == null) {
             return null;
         }
@@ -273,7 +273,7 @@ public class DateUtils {
         return c.getTime();
     }
 
-    public static Date getTodayStockClosedTime(Date now) {
+    private static Date getTodayStockClosedTime(Date now) {
         if(now == null) {
             return null;
         }

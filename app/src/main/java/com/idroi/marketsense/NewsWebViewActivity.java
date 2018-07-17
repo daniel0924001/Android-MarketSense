@@ -65,6 +65,7 @@ import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_ID;
 import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_TYPE;
 import static com.idroi.marketsense.RichEditorActivity.sEditorRequestCode;
 import static com.idroi.marketsense.RichEditorActivity.sReplyEditorRequestCode;
+import static com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter.ADAPTER_CHANGE_LIKE_ONLY;
 import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_NEWS_COMMENT_CLICK;
 
@@ -195,7 +196,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
                     comment.increaseLike();
                     comment.setLike(true);
                     PostEvent.sendLike(NewsWebViewActivity.this, comment.getCommentId());
-                    mCommentsRecyclerViewAdapter.notifyItemChanged(position);
+                    mCommentsRecyclerViewAdapter.notifyItemChanged(position, ADAPTER_CHANGE_LIKE_ONLY);
                 } else {
                     mTempComment = comment;
                     mTempPosition = position;
@@ -328,7 +329,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
                             mTempComment.increaseLike();
                             mTempComment.setLike(true);
                             PostEvent.sendLike(NewsWebViewActivity.this, mTempComment.getCommentId());
-                            mCommentsRecyclerViewAdapter.notifyItemChanged(mTempPosition);
+                            mCommentsRecyclerViewAdapter.notifyItemChanged(mTempPosition, ADAPTER_CHANGE_LIKE_ONLY);
                         }
                     } else if(mLastClickAction == LAST_CLICK_IS_VOTE_UP) {
                         MSLog.d("click good in news: " + mId);
@@ -420,7 +421,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
                     MSLog.d("comment with position " + position + " is needed to change");
                     Comment comment = (Comment) serializable;
                     mCommentsRecyclerViewAdapter.cloneSocialContent(position, comment);
-                    mCommentsRecyclerViewAdapter.notifyItemChanged(position);
+                    mCommentsRecyclerViewAdapter.notifyItemChanged(position, ADAPTER_CHANGE_LIKE_ONLY);
                 }
             }
         }

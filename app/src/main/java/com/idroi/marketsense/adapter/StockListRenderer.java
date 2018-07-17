@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.common.MarketSenseRendererHelper;
 import com.idroi.marketsense.data.Stock;
@@ -46,6 +47,33 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
         }
         update(view.getContext(), stockViewHolder, content);
         setViewVisibility(stockViewHolder, View.VISIBLE);
+    }
+
+    public void updatePriceOnly(View view, Stock stock) {
+        StockViewHolder stockViewHolder = mViewHolderMap.get(view);
+        if(stockViewHolder == null) {
+            MSLog.e("stockViewHolder is null in updatePriceOnly");
+            return;
+        }
+
+        // TODO
+        try {
+            float oldPrice = Float.valueOf(stockViewHolder.priceView.getText().toString());
+//            float newPrice = Float.valueOf(stock.getPrice());
+            float newPrice = oldPrice + 1;
+            MSLog.e("oldPrice: " + oldPrice + ", newPrice: " + Float.valueOf(stock.getPrice()) + ", result: " + (oldPrice == Float.valueOf(stock.getPrice())));
+            if(newPrice > oldPrice) {
+                MSLog.d("updatePriceOnly: " + stock.getName() + " go up");
+                MarketSenseRendererHelper.addTextView(stockViewHolder.priceView, stock.getPrice());
+                MarketSenseRendererHelper.addTextView(stockViewHolder.diffView, stock.getDiffPercentage());
+            } else if(newPrice < oldPrice) {
+                MSLog.d("updatePriceOnly: " + stock.getName() + " go down");
+                MarketSenseRendererHelper.addTextView(stockViewHolder.priceView, stock.getPrice());
+                MarketSenseRendererHelper.addTextView(stockViewHolder.diffView, stock.getDiffPercentage());
+            }
+        } catch (Exception e) {
+            MSLog.e("Exception in updatePriceOnly: " + e.toString());
+        }
     }
 
     private void update(final Context context, final StockViewHolder stockViewHolder, Stock content) {

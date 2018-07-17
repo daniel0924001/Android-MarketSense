@@ -206,4 +206,28 @@ public class MarketSenseCommentsFetcher {
 
         MSLog.d("Comment network query success, so we save this network url to cache: " + cacheKey + ", " + url);
     }
+
+    public static void prefetchGeneralComments(final Context context) {
+        final Context applicationContext = context.getApplicationContext();
+        final String url = CommentAndVoteRequest.queryCommentsEvent();
+        CommentAndVoteRequest commentAndVoteRequest = new CommentAndVoteRequest(Request.Method.GET, url, new Response.Listener<CommentAndVote>() {
+            @Override
+            public void onResponse(CommentAndVote response) {
+                if(applicationContext != null) {
+                    SharedPreferences.Editor editor =
+                            applicationContext.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE).edit();
+                    editor.putString(CommentAndVoteRequest.COMMENT_CACHE_KEY_GENERAL, url);
+                    SharedPreferencesCompat.apply(editor);
+                    MSLog.d("Prefetch comment network query success, so we save this network url to cache: " + CommentAndVoteRequest.COMMENT_CACHE_KEY_GENERAL + ", " + url);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+            }
+        });
+
+        commentAndVoteRequest.setShouldCache(true);
+        Networking.getRequestQueue(context).add(commentAndVoteRequest);
+    }
 }

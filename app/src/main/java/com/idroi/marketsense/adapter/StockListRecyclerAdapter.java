@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,8 @@ import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.datasource.StockListPlacer;
 
+import java.util.List;
+
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 import static com.idroi.marketsense.fragments.StockListFragment.SELF_CHOICES_ID;
 
@@ -24,6 +27,8 @@ import static com.idroi.marketsense.fragments.StockListFragment.SELF_CHOICES_ID;
  */
 
 public class StockListRecyclerAdapter extends RecyclerView.Adapter {
+
+    private static final int ADAPTER_UPDATE_PRICE_ONLY = 1;
 
     public interface OnItemClickListener {
         void onItemClick(Stock stock);
@@ -44,12 +49,15 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
     private int mTaskId;
     private AlertDialog mDeleteCodeAlertDialog;
 
-    public StockListRecyclerAdapter(final Activity activity, int taskId, int field, int direction) {
+    private RecyclerView mStockListRecyclerView;
+
+    public StockListRecyclerAdapter(final Activity activity, RecyclerView recyclerView, int taskId, int field, int direction) {
         mActivity = activity;
         mStockListPlacer = new StockListPlacer(activity, taskId, field, direction);
         mStockListRenderer = new StockListRenderer();
         mTaskId = taskId;
         mHandler = new Handler();
+        mStockListRecyclerView = recyclerView;
         mStockListPlacer.setStockListListener(new StockListPlacer.StockListListener() {
             @Override
             public void onStockListLoaded() {
@@ -68,6 +76,14 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
                 });
             }
         });
+    }
+
+    public void updatePriceInVisibleItems() {
+        LinearLayoutManager linearLayoutManager =
+                (LinearLayoutManager) mStockListRecyclerView.getLayoutManager();
+        int start = linearLayoutManager.findFirstVisibleItemPosition();
+        int end = linearLayoutManager.findLastVisibleItemPosition();
+        notifyItemRangeChanged(start, end + 1, ADAPTER_UPDATE_PRICE_ONLY);
     }
 
     public void sortByTask(int field, int direction) {
@@ -90,6 +106,23 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new MarketSenseViewHolder(mStockListRenderer.createView(mActivity, parent));
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payloads) {
+        if(payloads.isEmpty()) {
+            onBindViewHolder(holder, position);
+        } else {
+            int type = (int) payloads.get(0);
+            switch (type) {
+                case ADAPTER_UPDATE_PRICE_ONLY:
+                    final Stock stock = mStockListPlacer.getStockData(position);
+                    if(stock != null) {
+                        MSLog.e("onBindViewHolder with payload: " + position + ", name: " + stock.getName());
+                        mStockListRenderer.updatePriceOnly(holder.itemView, stock);
+                    }
+            }
+        }
     }
 
     @Override

@@ -29,10 +29,12 @@ import com.idroi.marketsense.request.StockRequest;
 import java.util.HashMap;
 
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_PRICE_CHANGED;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_DIFF;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_NAME;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_NEWS;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_PEOPLE;
+import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_PREDICTION;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_PRICE;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_DOWNWARD;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_UPWARD;
@@ -88,6 +90,8 @@ public class StockListFragment extends Fragment {
 
     private ConstraintLayout mNoDataRefreshLayout;
 
+    private boolean mIsRecyclerViewIdle;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -109,7 +113,7 @@ public class StockListFragment extends Fragment {
         }
         mNoDataTextView = view.findViewById(R.id.no_stock_tv);
 
-        mStockListRecyclerAdapter = new StockListRecyclerAdapter(getActivity(), mTaskId, SORT_BY_NEWS, SORT_DOWNWARD);
+        mStockListRecyclerAdapter = new StockListRecyclerAdapter(getActivity(), mRecyclerView, mTaskId, SORT_BY_PREDICTION, SORT_DOWNWARD);
         mRecyclerView.setAdapter(mStockListRecyclerAdapter);
 
         mLoadingProgressBar = view.findViewById(R.id.loading_progress_bar);
@@ -120,20 +124,32 @@ public class StockListFragment extends Fragment {
                 .show();
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mIsRecyclerViewIdle = true;
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                mIsRecyclerViewIdle = (newState == RecyclerView.SCROLL_STATE_IDLE);
+            }
 
-        if(mTaskId == SELF_CHOICES_ID) {
-            mGlobalBroadcastListener = new UserProfile.GlobalBroadcastListener() {
-                @Override
-                public void onGlobalBroadcast(int notifyId, Object payload) {
-                    if(notifyId == NOTIFY_ID_FAVORITE_LIST) {
-                        MSLog.d("onUserProfileChange in StockListFragment: " + generateNetworkURL());
-                        mStockListRecyclerAdapter.loadStockList(generateNetworkURL(), generateCacheUrl());
-                    }
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+            }
+        });
+
+        mGlobalBroadcastListener = new UserProfile.GlobalBroadcastListener() {
+            @Override
+            public void onGlobalBroadcast(int notifyId, Object payload) {
+                if(notifyId == NOTIFY_ID_FAVORITE_LIST && mTaskId == SELF_CHOICES_ID) {
+                    MSLog.d("onUserProfileChange in StockListFragment: " + generateNetworkURL());
+                    mStockListRecyclerAdapter.loadStockList(generateNetworkURL(), generateCacheUrl());
+                } else if(notifyId == NOTIFY_ID_PRICE_CHANGED && mIsRecyclerViewIdle) {
+                    mStockListRecyclerAdapter.updatePriceInVisibleItems();
                 }
-            };
-            ClientData.getInstance().getUserProfile()
-                    .addGlobalBroadcastListener(mGlobalBroadcastListener);
-        }
+            }
+        };
+        ClientData.getInstance().getUserProfile().addGlobalBroadcastListener(mGlobalBroadcastListener);
 
         view.setBackgroundColor(getResources().getColor(R.color.bottom_navigation_item_checked_false_bg));
         return view;
@@ -227,10 +243,9 @@ public class StockListFragment extends Fragment {
     @Override
     public void onDestroyView() {
         mStockListRecyclerAdapter.destroy();
-        if(mTaskId == SELF_CHOICES_ID) {
-            ClientData.getInstance().getUserProfile()
-                    .deleteGlobalBroadcastListener(mGlobalBroadcastListener);
-        }
+        mRecyclerView.clearOnScrollListeners();
+        ClientData.getInstance().getUserProfile()
+                .deleteGlobalBroadcastListener(mGlobalBroadcastListener);
         super.onDestroyView();
     }
 

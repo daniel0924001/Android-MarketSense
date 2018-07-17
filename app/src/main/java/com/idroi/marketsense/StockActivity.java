@@ -75,6 +75,7 @@ import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_ID;
 import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_TYPE;
 import static com.idroi.marketsense.RichEditorActivity.sEditorRequestCode;
 import static com.idroi.marketsense.RichEditorActivity.sReplyEditorRequestCode;
+import static com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter.ADAPTER_CHANGE_LIKE_ONLY;
 import static com.idroi.marketsense.adapter.NewsRecyclerAdapter.NEWS_SINGLE_LAYOUT;
 import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_EVENT_LIST;
@@ -379,7 +380,7 @@ public class StockActivity extends AppCompatActivity {
                                 mTempComment.increaseLike();
                                 mTempComment.setLike(true);
                                 PostEvent.sendLike(StockActivity.this, mTempComment.getCommentId());
-                                mCommentsRecyclerViewAdapter.notifyItemChanged(mTempPosition);
+                                mCommentsRecyclerViewAdapter.notifyItemChanged(mTempPosition, ADAPTER_CHANGE_LIKE_ONLY);
                             }
                     }
                 } else if(notifyId == NOTIFY_ID_EVENT_LIST) {
@@ -612,7 +613,7 @@ public class StockActivity extends AppCompatActivity {
                     comment.increaseLike();
                     comment.setLike(true);
                     PostEvent.sendLike(StockActivity.this, comment.getCommentId());
-                    mCommentsRecyclerViewAdapter.notifyItemChanged(position);
+                    mCommentsRecyclerViewAdapter.notifyItemChanged(position, ADAPTER_CHANGE_LIKE_ONLY);
                 } else {
                     showLoginAlertDialog(CLICK_LIKE_BEFORE_LOGIN);
                 }
@@ -1007,7 +1008,7 @@ public class StockActivity extends AppCompatActivity {
                     MSLog.d("comment with position " + position + " is needed to change");
                     Comment comment = (Comment) serializable;
                     mCommentsRecyclerViewAdapter.cloneSocialContent(position, comment);
-                    mCommentsRecyclerViewAdapter.notifyItemChanged(position);
+                    mCommentsRecyclerViewAdapter.notifyItemChanged(position, ADAPTER_CHANGE_LIKE_ONLY);
                 }
             }
         }

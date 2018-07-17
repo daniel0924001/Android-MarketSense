@@ -117,6 +117,7 @@ public class CommentsPlacer {
     public void setCommentArrayList(ArrayList<Comment> arrayList) {
         if(arrayList != null) {
             mCommentArrayList = new ArrayList<Comment>(arrayList);
+            Collections.sort(mCommentArrayList, genComparator());
         }
     }
 

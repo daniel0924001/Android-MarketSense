@@ -79,18 +79,7 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
         commentViewHolder.commentBodyView.
                 loadDataWithBaseURL("file:///android_asset/", htmlData, "text/html", "UTF-8", null);
 
-        int likeNum = content.getLikeNumber();
-        int replyNum = content.getReplyNumber();
-
-        commentViewHolder.replyView.setText(String.valueOf(replyNum));
-
-        commentViewHolder.likeView.setText(String.valueOf(likeNum));
-        if(content.isLiked()) {
-            commentViewHolder.likeBlock.setOnClickListener(null);
-            commentViewHolder.likeImageView.setImageResource(R.mipmap.ic_like_on);
-        } else {
-            commentViewHolder.likeImageView.setImageResource(R.mipmap.ic_like_off);
-        }
+        setLikeAndReplyBlock(commentViewHolder, content);
 
         if(mIsLargeBorder) {
             News news = content.getNews();
@@ -104,6 +93,28 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
         }
 
         setViewVisibility(commentViewHolder, View.VISIBLE);
+    }
+
+    public void updateLikeAndReplyBlock(View view, Comment comment) {
+        CommentViewHolder commentViewHolder = mViewHolderMap.get(view);
+        if(commentViewHolder != null) {
+            setLikeAndReplyBlock(commentViewHolder, comment);
+        }
+    }
+
+    private void setLikeAndReplyBlock(CommentViewHolder commentViewHolder, Comment content) {
+        int likeNum = content.getLikeNumber();
+        int replyNum = content.getReplyNumber();
+
+        commentViewHolder.replyView.setText(String.valueOf(replyNum));
+
+        commentViewHolder.likeView.setText(String.valueOf(likeNum));
+        if(content.isLiked()) {
+            commentViewHolder.likeBlock.setOnClickListener(null);
+            commentViewHolder.likeImageView.setImageResource(R.mipmap.ic_like_on);
+        } else {
+            commentViewHolder.likeImageView.setImageResource(R.mipmap.ic_like_off);
+        }
     }
 
     private void setNewsBlock(CommentViewHolder commentViewHolder, final News news) {

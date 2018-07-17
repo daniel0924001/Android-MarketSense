@@ -1,26 +1,37 @@
 package com.idroi.marketsense.adapter;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.NewsWebView;
+import com.idroi.marketsense.common.SharedPreferencesCompat;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.datasource.CommentsPlacer;
+import com.idroi.marketsense.datasource.MarketSenseCommentsFetcher;
+import com.idroi.marketsense.request.CommentAndVoteRequest;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_REQUEST_NAME;
+import static com.idroi.marketsense.data.Comment.VIEW_TYPE_COMMENT;
 import static com.idroi.marketsense.data.Comment.VIEW_TYPE_REPLY;
+import static com.idroi.marketsense.request.CommentAndVoteRequest.COMMENT_CACHE_KEY_GENERAL;
 
 /**
  * Created by daniel.hsieh on 2018/5/8.
  */
 
 public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
+
+    public static final int ADAPTER_CHANGE_LIKE_ONLY = 1;
 
     public interface OnItemClickListener {
         void onSayLikeItemClick(Comment comment, int position);
@@ -142,6 +153,23 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
         }
     }
 
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, List payloads) {
+        if(payloads.isEmpty()) {
+            onBindViewHolder(holder, position);
+        } else {
+            Comment comment = mCommentsPlacer.getCommentData(position);
+            int viewType = comment.getViewType();
+            if(viewType == VIEW_TYPE_COMMENT) {
+                int type = (int) payloads.get(0);
+                switch (type) {
+                    case ADAPTER_CHANGE_LIKE_ONLY:
+                        mCommentsRenderer.updateLikeAndReplyBlock(holder.itemView, comment);
+                }
+            }
+        }
+    }
+
     public void cloneSocialContent(int position, Comment other) {
         Comment comment = getComment(position);
         comment.setLikeNumber(other.getLikeNumber());
@@ -161,6 +189,17 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemCount() {
         return mCommentsPlacer.getItemCount();
+    }
+
+    public void removeCommentGeneralCache(Context context) {
+        // clear cache url and reload comments since user had inserted a new comment
+        if(context != null) {
+            SharedPreferences.Editor editor =
+                    context.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE).edit();
+            editor.remove(COMMENT_CACHE_KEY_GENERAL);
+            SharedPreferencesCompat.apply(editor);
+        }
+        MarketSenseCommentsFetcher.prefetchGeneralComments(context);
     }
 
     public void destroy() {

@@ -260,6 +260,16 @@ public class DateUtils {
     public static Date MAX_DATE = new Date(Long.MAX_VALUE);
 
     /* stock transaction related methods part */
+    private static boolean isWorkDay(Date now) {
+        if(now == null) {
+            throw new IllegalArgumentException("The dates must not be null");
+        }
+        Calendar c = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei"));
+        c.setTime(now);
+        int day = c.get(Calendar.DAY_OF_WEEK);
+        return !(day == Calendar.SUNDAY || day == Calendar.SATURDAY);
+    }
+
     private static Date getTodaySpecificTime(Date now, int hour, int minute) {
         if(now == null) {
             return null;
@@ -283,7 +293,7 @@ public class DateUtils {
     public static boolean isAfterStockClosed() {
         Date now = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei")).getTime();
         Date close = getTodayStockClosedTime(now);
-        return now.after(close);
+        return !isWorkDay(now) || now.after(close);
     }
 
     public static boolean doesUseTodayPredictionValue() {

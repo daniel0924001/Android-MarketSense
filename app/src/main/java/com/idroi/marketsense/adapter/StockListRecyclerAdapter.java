@@ -118,7 +118,6 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
                 case ADAPTER_UPDATE_PRICE_ONLY:
                     final Stock stock = mStockListPlacer.getStockData(position);
                     if(stock != null) {
-                        MSLog.e("onBindViewHolder with payload: " + position + ", name: " + stock.getName());
                         mStockListRenderer.updatePriceOnly(holder.itemView, stock);
                     }
             }

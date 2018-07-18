@@ -15,10 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import static com.idroi.marketsense.fragments.StockListFragment.ACTUAL_LOSE_ID;
-import static com.idroi.marketsense.fragments.StockListFragment.ACTUAL_WIN_ID;
-import static com.idroi.marketsense.fragments.StockListFragment.PREDICT_LOSE_ID;
-import static com.idroi.marketsense.fragments.StockListFragment.PREDICT_WIN_ID;
+import static com.idroi.marketsense.fragments.StockListFragment.MAIN_ID;
 import static com.idroi.marketsense.fragments.StockListFragment.SELF_CHOICES_ID;
 
 /**
@@ -58,12 +55,10 @@ public class StockListPlacer {
 
     private Handler mRefreshHandler;
     private Runnable mRefreshRunnable;
-    private static final int REFRESH_TIME = 2 * 60 * 1000;
-    // TODO
-//    private static final int REFRESH_TIME = 7 * 1000;
+    private static final int REFRESH_TIME = 30 * 1000;
 
-    public StockListPlacer(Activity activity) {
-        this(activity, PREDICT_WIN_ID, SORT_BY_NEWS, SORT_DOWNWARD);
+    public StockListPlacer(Activity activity, int taskId) {
+        this(activity, taskId, SORT_BY_NEWS, SORT_DOWNWARD);
     }
 
     public StockListPlacer(Activity activity, int taskId, int field, int direction) {
@@ -169,9 +164,11 @@ public class StockListPlacer {
             for (Stock stock : stockPrices) {
                 clientData.setRealTimeStockPriceHashMap(stock);
             }
-            clientData.getUserProfile().globalBroadcast(UserProfile.NOTIFY_ID_PRICE_CHANGED);
+            if(mTask == MAIN_ID) {
+                clientData.getUserProfile().globalBroadcast(UserProfile.NOTIFY_ID_PRICE_CHANGED);
+            }
         }
-        MSLog.i("refresh real time stock price");
+        MSLog.i("refresh real time stock price with task id: " + mTask);
     }
 
     private boolean isRetry() {

@@ -26,18 +26,10 @@ import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.StockRequest;
 
-import java.util.HashMap;
-
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_PRICE_CHANGED;
-import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_DIFF;
-import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_NAME;
-import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_NEWS;
-import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_PEOPLE;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_PREDICTION;
-import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_PRICE;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_DOWNWARD;
-import static com.idroi.marketsense.datasource.StockListPlacer.SORT_UPWARD;
 
 /**
  * Created by daniel.hsieh on 2018/4/23.
@@ -46,18 +38,12 @@ import static com.idroi.marketsense.datasource.StockListPlacer.SORT_UPWARD;
 public class StockListFragment extends Fragment {
 
     public final static String TASK_NAME = "TASK_NAME";
-    public final static int PREDICT_WIN_ID = 1;
-    public final static int PREDICT_LOSE_ID = 2;
-    public final static int ACTUAL_WIN_ID = 3;
-    public final static int ACTUAL_LOSE_ID = 4;
+    public final static int MAIN_ID = 1;
     public final static int SELF_CHOICES_ID = 5;
     public final static int WPCT_ID = 6;
 
     public enum TASK {
-        PREDICT_WIN(PREDICT_WIN_ID),
-        PREDICT_LOSE(PREDICT_LOSE_ID),
-        ACTUAL_WIN(ACTUAL_WIN_ID),
-        ACTUAL_LOSE(ACTUAL_LOSE_ID),
+        MAIN(MAIN_ID),
         SELF_CHOICES(SELF_CHOICES_ID),
         WPCT(WPCT_ID);
 
@@ -100,7 +86,7 @@ public class StockListFragment extends Fragment {
         if(getArguments() != null) {
             mTaskId = getArguments().getInt(TASK_NAME);
         } else {
-            mTaskId = PREDICT_WIN_ID; // default
+            mTaskId = MAIN_ID; // default
         }
 
         final View view = inflater.inflate(R.layout.stock_list_fragment, container, false);

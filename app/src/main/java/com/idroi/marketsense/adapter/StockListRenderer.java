@@ -1,11 +1,13 @@
 package com.idroi.marketsense.adapter;
 
 import android.content.Context;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.R;
@@ -49,31 +51,48 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
         setViewVisibility(stockViewHolder, View.VISIBLE);
     }
 
-    public void updatePriceOnly(View view, Stock stock) {
-        StockViewHolder stockViewHolder = mViewHolderMap.get(view);
+    public void updatePriceOnly(final View view, final Stock stock) {
+        final StockViewHolder stockViewHolder = mViewHolderMap.get(view);
         if(stockViewHolder == null) {
             MSLog.e("stockViewHolder is null in updatePriceOnly");
             return;
         }
 
-        // TODO
         try {
             float oldPrice = Float.valueOf(stockViewHolder.priceView.getText().toString());
-//            float newPrice = Float.valueOf(stock.getPrice());
-            float newPrice = oldPrice + 1;
-            MSLog.e("oldPrice: " + oldPrice + ", newPrice: " + Float.valueOf(stock.getPrice()) + ", result: " + (oldPrice == Float.valueOf(stock.getPrice())));
+            float newPrice = Float.valueOf(stock.getPrice());
+
             if(newPrice > oldPrice) {
-                MSLog.d("updatePriceOnly: " + stock.getName() + " go up");
+                MSLog.i(oldPrice + " -> " + Float.valueOf(stock.getPrice()) + ", name: " + stock.getName());
                 MarketSenseRendererHelper.addTextView(stockViewHolder.priceView, stock.getPrice());
                 MarketSenseRendererHelper.addTextView(stockViewHolder.diffView, stock.getDiffPercentage());
+                animationForPriceChange(stockViewHolder.diffView, stock, true);
             } else if(newPrice < oldPrice) {
-                MSLog.d("updatePriceOnly: " + stock.getName() + " go down");
+                MSLog.i(oldPrice + " -> " + Float.valueOf(stock.getPrice()) + ", name: " + stock.getName());
                 MarketSenseRendererHelper.addTextView(stockViewHolder.priceView, stock.getPrice());
                 MarketSenseRendererHelper.addTextView(stockViewHolder.diffView, stock.getDiffPercentage());
+                animationForPriceChange(stockViewHolder.diffView, stock, false);
             }
         } catch (Exception e) {
             MSLog.e("Exception in updatePriceOnly: " + e.toString());
         }
+    }
+
+    private void animationForPriceChange(final TextView textView, final Stock stock, boolean goUp) {
+        if(goUp) {
+            textView.setBackgroundColor(textView.getContext().getResources().getColor(R.color.colorTrendUp));
+            textView.setTextColor(textView.getContext().getResources().getColor(R.color.text_white));
+        } else {
+            textView.setBackgroundColor(textView.getResources().getColor(R.color.colorTrendDown));
+            textView.setTextColor(textView.getResources().getColor(R.color.text_white));
+        }
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                textView.setBackgroundColor(textView.getResources().getColor(R.color.text_white));
+                textView.setTextColor(textView.getResources().getColor(stock.getDiffColorResourceId()));
+            }
+        }, 100);
     }
 
     private void update(final Context context, final StockViewHolder stockViewHolder, Stock content) {

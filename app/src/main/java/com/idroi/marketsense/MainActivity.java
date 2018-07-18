@@ -45,6 +45,8 @@ import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.UserProfile;
+import com.idroi.marketsense.datasource.MarketSenseCommentsFetcher;
+import com.idroi.marketsense.datasource.MarketSenseNewsFetcher;
 import com.idroi.marketsense.fragments.MainFragment;
 import com.idroi.marketsense.util.MarketSenseUtils;
 
@@ -183,6 +185,8 @@ public class MainActivity extends AppCompatActivity {
         clientData.setScreenSizeInPixels(metrics.widthPixels, metrics.heightPixels);
         clientData.setScreenSize(width, height);
 
+        prefetchData();
+
         mGlobalBroadcastListener = new UserProfile.GlobalBroadcastListener() {
             @Override
             public void onGlobalBroadcast(int notifyId, Object payload) {
@@ -259,6 +263,11 @@ public class MainActivity extends AppCompatActivity {
             setActionBar();
             setActionBarTwoButton(mClickable, mSwitchable, mIsDiscussion);
         }
+    }
+
+    private void prefetchData() {
+        MarketSenseCommentsFetcher.prefetchGeneralComments(this);
+        MarketSenseNewsFetcher.prefetchNewsFirstPage(this);
     }
 
     private void setAvatarImage() {

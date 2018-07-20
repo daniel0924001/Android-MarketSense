@@ -67,6 +67,8 @@ public class RichEditorActivity extends AppCompatActivity {
     private AlertDialog mImageAlertDialog;
     private AlertDialog mUrlAlertDialog;
 
+    private TextView mCompletedTextView;
+
     public enum TYPE {
         NEWS("news"),
         STOCK("stock"),
@@ -117,6 +119,7 @@ public class RichEditorActivity extends AppCompatActivity {
     }
 
     private void leaveRichEditorActivity(boolean isSuccessful, String html, String eventId) {
+        mCompletedTextView.setClickable(true);
         if(isSuccessful) {
             Intent intent = new Intent();
             intent.putExtra(EXTRA_RES_HTML, html);
@@ -200,9 +203,9 @@ public class RichEditorActivity extends AppCompatActivity {
                 }
             }
 
-            TextView completeTextView = view.findViewById(R.id.action_bar_right_text);
-            if(completeTextView != null) {
-                completeTextView.setOnClickListener(new View.OnClickListener() {
+            mCompletedTextView = view.findViewById(R.id.action_bar_right_text);
+            if(mCompletedTextView != null) {
+                mCompletedTextView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         completeEditComment();
@@ -227,6 +230,7 @@ public class RichEditorActivity extends AppCompatActivity {
                     R.string.title_comment_create_null, Toast.LENGTH_SHORT).show();
             return;
         }
+        mCompletedTextView.setClickable(false);
         ArrayList<String> tags = parseStockCodeTags(html);
         if(mType.equals(TYPE.NEWS.getType())) {
             MSLog.i("send news comment (" + mId + "): " + html);

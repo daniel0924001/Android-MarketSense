@@ -37,6 +37,7 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.CandleStickChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter;
@@ -56,6 +57,7 @@ import com.idroi.marketsense.data.StockTradeData;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.NewsRequest;
 import com.idroi.marketsense.request.CommentAndVoteRequest;
+import com.idroi.marketsense.request.StockChartDataRequest;
 import com.idroi.marketsense.util.MarketSenseUtils;
 
 import org.json.JSONObject;
@@ -184,6 +186,7 @@ public class StockActivity extends AppCompatActivity {
         mCommentsRecyclerViewAdapter.destroy();
         mUserProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
         mStockAIWebView.destroy();
+        mYahooStxChartCrawler.destroy();
         super.onDestroy();
     }
 
@@ -708,13 +711,16 @@ public class StockActivity extends AppCompatActivity {
     }
 
     private void setPriceBlock(float price, float diffNum, float diffPercentage) {
+        String diffNumberString = null;
         String diffPercentageString = null;
         if(diffPercentage > 0) {
+            diffNumberString = String.format(Locale.US, "+%s", diffNum);
             diffPercentageString = String.format(Locale.US, "+%.2f%%", diffPercentage);
         } else {
+            diffNumberString = String.format(Locale.US, "%s", diffNum);
             diffPercentageString = String.format(Locale.US, "%.2f%%", diffPercentage);
         }
-        setPriceBlock(String.valueOf(price), String.valueOf(diffNum), diffPercentageString);
+        setPriceBlock(String.valueOf(price), diffNumberString, diffPercentageString);
     }
 
     private void setPriceBlock(String price, String diffNum, String diffPercentage) {
@@ -728,10 +734,13 @@ public class StockActivity extends AppCompatActivity {
         try {
             float diffPercentageFloat = Float.valueOf(diffNum);
             if(diffPercentageFloat > 0) {
+                priceTextView.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_red_s, 0, 0, 0);
                 diffTextView.setTextColor(getResources().getColor(R.color.colorTrendUp));
             } else if(diffPercentageFloat < 0) {
+                priceTextView.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_green_s, 0, 0, 0);
                 diffTextView.setTextColor(getResources().getColor(R.color.colorTrendDown));
             } else {
+                priceTextView.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_none, 0, 0, 0);
                 diffTextView.setTextColor(getResources().getColor(R.color.colorTrendFlat));
             }
         } catch (NumberFormatException e) {
@@ -767,8 +776,19 @@ public class StockActivity extends AppCompatActivity {
 
         LineChart lineChart = findViewById(R.id.stock_chart_price);
         BarChart barChart = findViewById(R.id.stock_chart_volume);
+        CandleStickChart candleStickChart = findViewById(R.id.stock_candle_chart_price);
         mYahooStxChartCrawler =
-                new YahooStxChartCrawler(this, mStockName, mCode, lineChart, barChart);
+                new YahooStxChartCrawler(this, mStockName, mCode, lineChart, barChart, candleStickChart);
+
+        mYahooStxChartCrawler.setInformationTextView(
+                (TextView) findViewById(R.id.stock_price_tv),
+                (TextView) findViewById(R.id.stock_diff_tv),
+                (TextView) findViewById(R.id.stock_price_open),
+                (TextView) findViewById(R.id.stock_price_high),
+                (TextView) findViewById(R.id.stock_price_low),
+                (TextView) findViewById(R.id.stock_price_yesterday_close),
+                (TextView) findViewById(R.id.stock_date_tv),
+                (TextView) findViewById(R.id.stock_volume_tv));
         mYahooStxChartCrawler.setYahooStxChartListener(new YahooStxChartCrawler.YahooStxChartListener() {
             @Override
             public void onStxChartDataLoad() {
@@ -800,6 +820,55 @@ public class StockActivity extends AppCompatActivity {
                 .shimmer(false)
                 .load(R.layout.skeleton_webview)
                 .show();
+
+        final TextView chartType1M = findViewById(R.id.chart_type_1m);
+        final TextView chartTypeD = findViewById(R.id.chart_type_d);
+        final TextView chartTypeW = findViewById(R.id.chart_type_w);
+        final TextView chartTypeM = findViewById(R.id.chart_type_m);
+        chartType1M.setTextColor(getResources().getColor(R.color.color_price_line));
+
+        chartType1M.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeChartSelectorUI(chartType1M, chartTypeD, chartTypeW, chartTypeM);
+                mYahooStxChartCrawler.loadStockChartData();
+            }
+        });
+
+        chartTypeD.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeChartSelectorUI(chartTypeD, chartType1M, chartTypeW, chartTypeM);
+                mYahooStxChartCrawler.loadTaStockChartData(StockChartDataRequest.TA_TYPE_DAY);
+            }
+        });
+
+        chartTypeW.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeChartSelectorUI(chartTypeW, chartTypeD, chartType1M, chartTypeM);
+                mYahooStxChartCrawler.loadTaStockChartData(StockChartDataRequest.TA_TYPE_WEEK);
+            }
+        });
+
+        chartTypeM.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeChartSelectorUI(chartTypeM, chartTypeD, chartTypeW, chartType1M);
+                mYahooStxChartCrawler.loadTaStockChartData(StockChartDataRequest.TA_TYPE_MONTH);
+            }
+        });
+    }
+
+    private void changeChartSelectorUI(TextView selected, TextView ... others) {
+        for (TextView other : others) {
+            other.setTextColor(getResources().getColor(R.color.text_gray));
+        }
+        selected.setTextColor(getResources().getColor(R.color.color_price_line));
+        mSkeletonScreen.show();
+        if(mLoadingProgressBar != null) {
+            mLoadingProgressBar.setVisibility(View.VISIBLE);
+        }
     }
 
     private void setInformation() {

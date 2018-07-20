@@ -14,7 +14,15 @@ public class StockPriceFormatter implements IAxisValueFormatter {
     private DecimalFormat mPriceFormat;
 
     public StockPriceFormatter() {
-        mPriceFormat = new DecimalFormat("#,###,###.###");
+        this(false);
+    }
+
+    public StockPriceFormatter(boolean taType) {
+        if(taType) {
+            mPriceFormat = new DecimalFormat("#,###,###.#");
+        } else {
+            mPriceFormat = new DecimalFormat("#,###,###.###");
+        }
     }
 
     @Override

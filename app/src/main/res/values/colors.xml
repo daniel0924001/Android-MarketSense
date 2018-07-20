@@ -35,11 +35,12 @@
 
     <color name="marketsense_rich_edit_black_background">#4a4a4a</color>
 
-    <color name="colorTrendUp">#F20060</color>
-    <color name="colorTrendDown">#00BE9F</color>
+    <color name="colorTrendUp">#e64a19</color>
+    <color name="colorTrendDown">#0f9d58</color>
     <color name="colorTrendFlat">#4a4a4a</color>
+    <color name="colorTrendFlatGray">#dfdfdf</color>
 
-    <color name="color_volume_line">#e7f11b1b</color>
+    <color name="color_volume_line">#e64a19</color>
     <color name="color_price_line">#e73b76ec</color>
     <color name="color_yellow">#E9C46A</color>
 

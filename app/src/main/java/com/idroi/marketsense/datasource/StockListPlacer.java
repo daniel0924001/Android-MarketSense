@@ -97,19 +97,11 @@ public class StockListPlacer {
                         }
                     } else {
                         mStockArrayList = new ArrayList<>(stockArrayList);
-
-                        // There are four fragments in PredictionScreenSlidePagerAdapter
-                        // 1st: sort by prediction confidence in descending
-                        // 2nd: sort by prediction confidence in ascending
-                        // 3rd: sort by stock difference in descending
-                        // 4th: sort by stock difference in ascending
-                        // 5th: filter by user favorite stock array
-
+                        MSLog.d("We first time get stock list, so we need to sort it. size: " + mStockArrayList.size());
                     }
 
                     Comparator<Stock> comparator = genComparator(mSortedField, mSortedDirection);
                     Collections.sort(mStockArrayList, comparator);
-                    MSLog.d("We first time get stock list, so we need to sort it.");
 
                     if (mStockListListener != null) {
                         mStockListListener.onStockListLoaded();

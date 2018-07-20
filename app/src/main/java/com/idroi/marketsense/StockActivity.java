@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.Guideline;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -110,7 +111,6 @@ public class StockActivity extends AppCompatActivity {
     private static final float CONST_DISABLE_ALPHA = 0.7f;
 
     private YahooStxChartCrawler mYahooStxChartCrawler;
-    private ViewSkeletonScreen mSkeletonScreen;
     private ProgressBar mLoadingProgressBar, mLoadingProgressBarMore;
     private boolean mIsMoreLoadFinished = false;
     private String mStockName;
@@ -128,6 +128,9 @@ public class StockActivity extends AppCompatActivity {
     private CallbackManager mFBCallbackManager;
     private UserProfile mUserProfile;
     private boolean mIsFavorite;
+
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private TextView mSelectedChartTextView, mChartType1M;
 
     private RecyclerView mCommentRecyclerView;
     private CommentsRecyclerViewAdapter mCommentsRecyclerViewAdapter;
@@ -753,6 +756,7 @@ public class StockActivity extends AppCompatActivity {
 
         mLoadingProgressBar = findViewById(R.id.loading_progress_bar_1);
         mLoadingProgressBarMore = findViewById(R.id.loading_progress_bar_2);
+        mSwipeRefreshLayout = findViewById(R.id.swipe_to_refresh);
 
         setPriceBlock(mPrice, mDiffNum, mDiffPercentage);
 
@@ -799,7 +803,7 @@ public class StockActivity extends AppCompatActivity {
                             stockTradeData.getDiffPrice(),
                             stockTradeData.getDiffPercentage());
                 }
-                mSkeletonScreen.hide();
+                mSwipeRefreshLayout.setRefreshing(false);
                 if(mLoadingProgressBar != null) {
                     mLoadingProgressBar.setVisibility(View.GONE);
                 }
@@ -808,29 +812,24 @@ public class StockActivity extends AppCompatActivity {
             @Override
             public void onStxChartDataFail(MarketSenseError marketSenseError) {
                 mYahooStxChartCrawler.renderStockChartData();
-                mSkeletonScreen.hide();
+                mSwipeRefreshLayout.setRefreshing(false);
                 if(mLoadingProgressBar != null) {
                     mLoadingProgressBar.setVisibility(View.GONE);
                 }
-                MSLog.e("onStxChartDataFail: " + marketSenseError.toString());
             }
         });
         mYahooStxChartCrawler.loadStockChartData();
-        mSkeletonScreen = Skeleton.bind(lineChart)
-                .shimmer(false)
-                .load(R.layout.skeleton_webview)
-                .show();
 
-        final TextView chartType1M = findViewById(R.id.chart_type_1m);
+        mChartType1M = findViewById(R.id.chart_type_1m);
         final TextView chartTypeD = findViewById(R.id.chart_type_d);
         final TextView chartTypeW = findViewById(R.id.chart_type_w);
         final TextView chartTypeM = findViewById(R.id.chart_type_m);
-        chartType1M.setTextColor(getResources().getColor(R.color.color_price_line));
+        mChartType1M.setTextColor(getResources().getColor(R.color.color_price_line));
 
-        chartType1M.setOnClickListener(new View.OnClickListener() {
+        mChartType1M.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changeChartSelectorUI(chartType1M, chartTypeD, chartTypeW, chartTypeM);
+                changeChartSelectorUI(mChartType1M, chartTypeD, chartTypeW, chartTypeM);
                 mYahooStxChartCrawler.loadStockChartData();
             }
         });
@@ -838,7 +837,7 @@ public class StockActivity extends AppCompatActivity {
         chartTypeD.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changeChartSelectorUI(chartTypeD, chartType1M, chartTypeW, chartTypeM);
+                changeChartSelectorUI(chartTypeD, mChartType1M, chartTypeW, chartTypeM);
                 mYahooStxChartCrawler.loadTaStockChartData(StockChartDataRequest.TA_TYPE_DAY);
             }
         });
@@ -846,7 +845,7 @@ public class StockActivity extends AppCompatActivity {
         chartTypeW.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changeChartSelectorUI(chartTypeW, chartTypeD, chartType1M, chartTypeM);
+                changeChartSelectorUI(chartTypeW, chartTypeD, mChartType1M, chartTypeM);
                 mYahooStxChartCrawler.loadTaStockChartData(StockChartDataRequest.TA_TYPE_WEEK);
             }
         });
@@ -854,8 +853,22 @@ public class StockActivity extends AppCompatActivity {
         chartTypeM.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changeChartSelectorUI(chartTypeM, chartTypeD, chartTypeW, chartType1M);
+                changeChartSelectorUI(chartTypeM, chartTypeD, chartTypeW, mChartType1M);
                 mYahooStxChartCrawler.loadTaStockChartData(StockChartDataRequest.TA_TYPE_MONTH);
+            }
+        });
+
+        final DisplayMetrics metrics = getResources().getDisplayMetrics();
+        int start = (int) (74 * metrics.density);
+        int end = (int) (94 * metrics.density);
+        mSelectedChartTextView = mChartType1M;
+        mSwipeRefreshLayout.setProgressViewOffset(false, start, end);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if(mSelectedChartTextView != null) {
+                    mSelectedChartTextView.performClick();
+                }
             }
         });
     }
@@ -865,7 +878,12 @@ public class StockActivity extends AppCompatActivity {
             other.setTextColor(getResources().getColor(R.color.text_gray));
         }
         selected.setTextColor(getResources().getColor(R.color.color_price_line));
-        mSkeletonScreen.show();
+        mSelectedChartTextView = selected;
+        if(mSelectedChartTextView == mChartType1M) {
+            mSwipeRefreshLayout.setEnabled(true);
+        } else {
+            mSwipeRefreshLayout.setEnabled(false);
+        }
         if(mLoadingProgressBar != null) {
             mLoadingProgressBar.setVisibility(View.VISIBLE);
         }

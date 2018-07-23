@@ -280,7 +280,10 @@ public class Stock {
 
     private void computeCustomizeError() {
         double error = (mPredictionDiffDirection != mDiffDirection) ? 10 : 0;
-        error += Math.abs(mPredictionDiffDirection * mPredictionDiffPercentage - mDiffDirection * mDiffNumber);
+        if(mPredictionDiffDirection == TREND_FLAT && mDiffDirection == TREND_FLAT) {
+            error += 1;
+        }
+        error += Math.abs(mPredictionDiffDirection * mPredictionDiffPercentage - mDiffDirection * mDiffPercentage);
         mPredictionError = -error;
     }
 

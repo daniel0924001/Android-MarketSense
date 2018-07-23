@@ -85,10 +85,13 @@ public class ClientData {
         mUserProfile = new UserProfile(context, true);
         mRealTimePricesHashMap = new HashMap<>();
 
+        updateClockInformation();
+        loadAllStocksListTask(true);
+    }
+
+    public void updateClockInformation() {
         mIsAfterStockClosed = DateUtils.isAfterStockClosed();
         mDoesUseTodayPredictionValue = DateUtils.doesUseTodayPredictionValue();
-
-        loadAllStocksListTask(true);
     }
 
     public void setScreenSizeInPixels(int widthPixels, int heightPixels) {

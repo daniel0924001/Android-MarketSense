@@ -233,6 +233,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        ClientData clientData = ClientData.getInstance(this);
+        if(clientData != null) {
+            clientData.updateClockInformation();
+        }
+
         if(!mCanReturn) {
             setAvatarImage();
         }

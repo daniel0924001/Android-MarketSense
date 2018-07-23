@@ -55,7 +55,7 @@ public class Stock {
     private int mVotingDirection;
 
     private int mTodayPredictionDiffDirection, mTomorrowPredictionDiffDirection, mPredictionDiffDirection;
-    private double mTodayPredictionDiff, mTomorrowPredictionDiff, mPredictionDiff;
+    private double mTodayPredictionDiffPercentage, mTomorrowPredictionDiffPercentage, mPredictionDiffPercentage;
     private double mPredictionError;
 
     public Stock() {
@@ -134,7 +134,7 @@ public class Stock {
     }
 
     public void setTodayPrediction(double prediction) {
-        mTodayPredictionDiff = Math.abs(prediction) * 100;
+        mTodayPredictionDiffPercentage = Math.abs(prediction) * 100;
         if(prediction > 0) {
             mTodayPredictionDiffDirection = Stock.TREND_UP;
         } else if(prediction == 0) {
@@ -144,13 +144,13 @@ public class Stock {
         }
         ClientData clientData = ClientData.getInstance();
         if(clientData != null && clientData.doesUseTodayPredictionValue()) {
-            mPredictionDiff = mTodayPredictionDiff;
+            mPredictionDiffPercentage = mTodayPredictionDiffPercentage;
             mPredictionDiffDirection = mTodayPredictionDiffDirection;
         }
     }
 
     public void setTomorrowPrediction(double prediction) {
-        mTomorrowPredictionDiff = Math.abs(prediction) * 100;
+        mTomorrowPredictionDiffPercentage = Math.abs(prediction) * 100;
         if(prediction > 0) {
             mTomorrowPredictionDiffDirection = Stock.TREND_UP;
         } else if(prediction == 0) {
@@ -160,7 +160,7 @@ public class Stock {
         }
         ClientData clientData = ClientData.getInstance();
         if(clientData != null &&!ClientData.getInstance().doesUseTodayPredictionValue()) {
-            mPredictionDiff = mTomorrowPredictionDiff;
+            mPredictionDiffPercentage = mTomorrowPredictionDiffPercentage;
             mPredictionDiffDirection = mTomorrowPredictionDiffDirection;
         }
     }
@@ -280,8 +280,30 @@ public class Stock {
 
     private void computeCustomizeError() {
         double error = (mPredictionDiffDirection != mDiffDirection) ? 10 : 0;
-        error += Math.abs(mPredictionDiffDirection*mPredictionDiff - mDiffDirection*mDiffNumber);
+        error += Math.abs(mPredictionDiffDirection * mPredictionDiffPercentage - mDiffDirection * mDiffNumber);
         mPredictionError = -error;
+    }
+
+    public boolean isHitPredictionDirection(boolean isCountZero) {
+        return (isCountZero && mDiffDirection == TREND_FLAT)
+                || mPredictionDiffDirection == mDiffDirection;
+    }
+
+    public double getEarnInPrediction(boolean simple) {
+        if(mPredictionDiffDirection == TREND_FLAT) {
+            return 0;
+        }
+        double weight;
+        if(simple) {
+            weight = 1;
+        } else {
+            weight = 1 + (mPredictionDiffPercentage / 10);
+        }
+        if(mPredictionDiffDirection == mDiffDirection) {
+            return weight * (1 + Math.abs(mDiffPercentage/100));
+        } else {
+            return weight * (1 - Math.abs(mDiffPercentage/100));
+        }
     }
 
     public double getCustomizeError() {
@@ -305,21 +327,21 @@ public class Stock {
         switch (mPredictionDiffDirection) {
             case TREND_UP:
                 predictionBlock.setBackground(resources.getDrawable(R.drawable.block_predict_up_background));
-                valueTextView.setText(String.format(Locale.US, "+%.2f%%", mPredictionDiff));
+                valueTextView.setText(String.format(Locale.US, "+%.2f%%", mPredictionDiffPercentage));
                 break;
             case TREND_FLAT:
                 predictionBlock.setBackgroundColor(resources.getColor(R.color.card_gray_background));
-                valueTextView.setText(String.format(Locale.US, "%.2f%%", mPredictionDiff));
+                valueTextView.setText(String.format(Locale.US, "%.2f%%", mPredictionDiffPercentage));
                 valueTextView.setTextColor(resources.getColor(R.color.text_dark_gray));
                 titleTextView.setTextColor(resources.getColor(R.color.text_dark_gray));
                 break;
             case TREND_DOWN:
                 predictionBlock.setBackground(resources.getDrawable(R.drawable.block_predict_down_background));
-                valueTextView.setText(String.format(Locale.US, "-%.2f%%", mPredictionDiff));
+                valueTextView.setText(String.format(Locale.US, "-%.2f%%", mPredictionDiffPercentage));
                 break;
             default:
                 predictionBlock.setBackgroundColor(resources.getColor(R.color.card_gray_background));
-                valueTextView.setText(String.format(Locale.US, "%.2f%%", mPredictionDiff));
+                valueTextView.setText(String.format(Locale.US, "%.2f%%", mPredictionDiffPercentage));
                 valueTextView.setTextColor(resources.getColor(R.color.text_dark_gray));
                 titleTextView.setTextColor(resources.getColor(R.color.text_dark_gray));
                 break;

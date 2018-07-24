@@ -116,6 +116,7 @@ public class StockActivity extends AppCompatActivity {
     private String mStockName;
     private String mCode;
     private String mPrice, mDiffNum, mDiffPercentage;
+    private ConstraintLayout mCommentBlock, mNewsBlock;
     private ConstraintLayout mVoteTopBlock, mBottomFixedBlock;
 
     private NewsWebView mStockAIWebView;
@@ -449,74 +450,68 @@ public class StockActivity extends AppCompatActivity {
     }
 
     private void initSelector() {
-        final ConstraintLayout commentBlock = findViewById(R.id.marketsense_stock_comment);
-        final ConstraintLayout newsBlock = findViewById(R.id.marketsense_stock_news);
+        mCommentBlock = findViewById(R.id.marketsense_stock_comment);
+        mNewsBlock = findViewById(R.id.marketsense_stock_news);
         mSelectorComment = findViewById(R.id.selector_comment_block);
         mSelectorNews = findViewById(R.id.selector_news_block);
         mSelectorComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                chooseBottomBlock(0, commentBlock, newsBlock);
+                chooseBottomBlock(0);
             }
         });
         mSelectorNews.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                chooseBottomBlock(1, commentBlock, newsBlock);
+                chooseBottomBlock(1);
             }
         });
 
-        final DisplayMetrics metrics = getResources().getDisplayMetrics();
         mNestedScrollView = findViewById(R.id.body_scroll_view);
         final ConstraintLayout voteInformationBlock = findViewById(R.id.stock_people_vote_information);
         final ConstraintLayout newsInformationBlock = findViewById(R.id.stock_news_vote_information);
         voteInformationBlock.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                chooseBottomBlock(0, commentBlock, newsBlock);
-                mNestedScrollView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Point childOffset = new Point();
-                        MarketSenseUtils.getDeepChildOffset(mNestedScrollView, mSelectorComment.getParent(), mSelectorComment, childOffset);
-                        if(mUserProfile.canVoteAgain(mCode)) {
-                            childOffset.y = childOffset.y - (int)(56 * metrics.density);
-                        }
-                        mNestedScrollView.scrollTo(0, childOffset.y);
-                    }
-                });
+                chooseBottomBlock(0);
+                slideToView(mSelectorComment);
             }
         });
         newsInformationBlock.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                chooseBottomBlock(1, commentBlock, newsBlock);
-                mNestedScrollView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Point childOffset = new Point();
-                        MarketSenseUtils.getDeepChildOffset(mNestedScrollView, mSelectorNews.getParent(), mSelectorNews, childOffset);
-                        if(mUserProfile.canVoteAgain(mCode)) {
-                            childOffset.y = childOffset.y - (int)(56 * metrics.density);
-                        }
-                        mNestedScrollView.scrollTo(0, childOffset.y);
-                    }
-                });
+                chooseBottomBlock(1);
+                slideToView(mSelectorNews);
             }
         });
     }
 
-    private void chooseBottomBlock(int position, ConstraintLayout commentBlock, ConstraintLayout newsBlock) {
+    private void slideToView(final View child) {
+        mNestedScrollView.post(new Runnable() {
+            @Override
+            public void run() {
+                final DisplayMetrics metrics = getResources().getDisplayMetrics();
+                Point childOffset = new Point();
+                MarketSenseUtils.getDeepChildOffset(mNestedScrollView, child.getParent(), child, childOffset);
+                if(mUserProfile.canVoteAgain(mCode)) {
+                    childOffset.y = childOffset.y - (int)(56 * metrics.density);
+                }
+                mNestedScrollView.scrollTo(0, childOffset.y);
+            }
+        });
+    }
+
+    private void chooseBottomBlock(int position) {
         switch (position) {
             case 0:
-                commentBlock.setVisibility(View.VISIBLE);
-                newsBlock.setVisibility(View.GONE);
+                mCommentBlock.setVisibility(View.VISIBLE);
+                mNewsBlock.setVisibility(View.GONE);
                 mSelectorComment.setBackground(getDrawable(R.drawable.border_selector_selected));
                 mSelectorNews.setBackground(getDrawable(R.drawable.border_selector));
                 break;
             case 1:
-                commentBlock.setVisibility(View.GONE);
-                newsBlock.setVisibility(View.VISIBLE);
+                mCommentBlock.setVisibility(View.GONE);
+                mNewsBlock.setVisibility(View.VISIBLE);
                 mSelectorComment.setBackground(getDrawable(R.drawable.border_selector));
                 mSelectorNews.setBackground(getDrawable(R.drawable.border_selector_selected));
                 break;
@@ -1098,6 +1093,9 @@ public class StockActivity extends AppCompatActivity {
                 newComment.setCommentHtml(html);
                 mCommentsRecyclerViewAdapter.addOneComment(newComment);
                 showCommentBlock();
+
+                chooseBottomBlock(0);
+                slideToView(mSelectorComment);
 
                 MSLog.d(String.format("user send a comment on (%s, %s, %s): %s", type, id, eventId, html));
             }

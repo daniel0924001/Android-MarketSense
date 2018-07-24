@@ -336,7 +336,10 @@ public class Comment implements Serializable {
                         comment.setLikeUserProfile(jsonObject.optJSONArray(LIKE_LIST));
                         break;
                     case TARGET_PROFILE:
-                        comment.setNews(jsonObject.optJSONObject(TARGET_PROFILE));
+                        String target = jsonObject.optString(COMMENT_TARGET);
+                        if(target != null && target.equals(Event.EVENT_TARGET_NEWS)) {
+                            comment.setNews(jsonObject.optJSONObject(TARGET_PROFILE));
+                        }
                         break;
                     default:
                         break;

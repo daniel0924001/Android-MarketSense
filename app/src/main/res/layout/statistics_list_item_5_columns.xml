@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginBottom="1dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/news_layout_border">
+
+    <TextView
+        android:id="@+id/statistics_key"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/marketsense_text_black"
+        android:textSize="14sp"
+        android:fontFamily="Roboto-Regular"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:text="@string/title_comment_user_name"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guideline_1"/>
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.3"/>
+
+    <TextView
+        android:id="@+id/statistics_value1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/marketsense_text_black"
+        android:textSize="14sp"
+        android:fontFamily="Roboto-Regular"
+        android:textStyle="bold"
+        android:text="@string/title_unavailable_number"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline_1"
+        app:layout_constraintEnd_toEndOf="@id/guideline_2"/>
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.475"/>
+
+    <TextView
+        android:id="@+id/statistics_value2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/marketsense_text_black"
+        android:textSize="14sp"
+        android:fontFamily="Roboto-Regular"
+        android:textStyle="bold"
+        android:text="@string/title_unavailable_number"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline_2"
+        app:layout_constraintEnd_toEndOf="@id/guideline_3"/>
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.65"/>
+
+    <TextView
+        android:id="@+id/statistics_value3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/marketsense_text_black"
+        android:textSize="14sp"
+        android:fontFamily="Roboto-Regular"
+        android:textStyle="bold"
+        android:text="@string/title_unavailable_number"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline_3"
+        app:layout_constraintEnd_toEndOf="@id/guideline_4"/>
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.825"/>
+
+    <TextView
+        android:id="@+id/statistics_value4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/marketsense_text_black"
+        android:textSize="14sp"
+        android:fontFamily="Roboto-Regular"
+        android:textStyle="bold"
+        android:text="@string/title_unavailable_number"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline_4"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</android.support.constraint.ConstraintLayout>

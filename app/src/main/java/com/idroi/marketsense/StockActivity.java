@@ -28,8 +28,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ethanhua.skeleton.Skeleton;
-import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -42,6 +40,7 @@ import com.github.mikephil.charting.charts.CandleStickChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter;
+import com.idroi.marketsense.adapter.CriticalStatisticsAdapter;
 import com.idroi.marketsense.adapter.NewsRecyclerAdapter;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
@@ -56,6 +55,7 @@ import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.StockTradeData;
 import com.idroi.marketsense.data.UserProfile;
+import com.idroi.marketsense.request.CriticalStatisticsRequest;
 import com.idroi.marketsense.request.NewsRequest;
 import com.idroi.marketsense.request.CommentAndVoteRequest;
 import com.idroi.marketsense.request.StockChartDataRequest;
@@ -147,6 +147,9 @@ public class StockActivity extends AppCompatActivity {
     private ConstraintLayout mSelectorComment, mSelectorNews;
     private NestedScrollView mNestedScrollView;
 
+    private RecyclerView mCriticalStatisticsRecyclerView;
+    private CriticalStatisticsAdapter mCriticalStatisticsAdapter;
+
     private Comment mTempComment;
     private int mTempPosition;
 
@@ -161,6 +164,7 @@ public class StockActivity extends AppCompatActivity {
         initFBLogin();
         setInformation();
         setActionBar();
+        initCriticalStatistics();
         initStockChart();
         setSelector();
         initStockAIWebView();
@@ -517,6 +521,16 @@ public class StockActivity extends AppCompatActivity {
                 mSelectorNews.setBackground(getDrawable(R.drawable.border_selector_selected));
                 break;
         }
+    }
+
+
+    private void initCriticalStatistics() {
+        mCriticalStatisticsRecyclerView = findViewById(R.id.critical_statistics_list_view);
+        mCriticalStatisticsAdapter = new CriticalStatisticsAdapter(this);
+        mCriticalStatisticsRecyclerView.setAdapter(mCriticalStatisticsAdapter);
+        mCriticalStatisticsRecyclerView.setNestedScrollingEnabled(false);
+        mCriticalStatisticsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mCriticalStatisticsAdapter.loadCriticalStatistics(CriticalStatisticsRequest.getUrlStockCriticalStatistics(mCode));
     }
 
     private void initNews() {

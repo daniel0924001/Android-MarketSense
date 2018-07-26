@@ -142,7 +142,7 @@ public class StockActivity extends AppCompatActivity {
 
     private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
     private int mLastClickedButton;
-    private AlertDialog mLoginAlertDialog;
+    private AlertDialog mLoginAlertDialog, mStarAlertDialog;
     private LoginButton mFBLoginBtn;
     private ImageView mAddFavorite;
     private ConstraintLayout mSelectorComment, mSelectorNews;
@@ -205,6 +205,11 @@ public class StockActivity extends AppCompatActivity {
         if(mLoginAlertDialog != null) {
             mLoginAlertDialog.dismiss();
             mLoginAlertDialog = null;
+        }
+
+        if(mStarAlertDialog != null) {
+            mStarAlertDialog.dismiss();
+            mStarAlertDialog = null;
         }
     }
 
@@ -587,7 +592,7 @@ public class StockActivity extends AppCompatActivity {
                         StockActivity.this, news.getId(), news.getTitle(),
                         news.getUrlImage(), news.getDate(),
                         news.getPageLink(), news.getOriginLink(),
-                        news.getVoteRaiseNum(), news.getVoteFallNum(), news.getStockKeywords()));
+                        news.getVoteRaiseNum(), news.getVoteFallNum(), news.getStockKeywords(), news.getLevel()));
                 overridePendingTransition(R.anim.enter, R.anim.stop);
             }
         });
@@ -1010,6 +1015,10 @@ public class StockActivity extends AppCompatActivity {
             String format = getResources().getString(R.string.title_add_complete);
             Toast.makeText(this, String.format(format, mStockName, mCode), Toast.LENGTH_SHORT).show();
             imageView.setImageResource(R.drawable.ic_star_yellow_24px);
+
+            if(mUserProfile.canShowStarDialog(this)) {
+                showStarAlertDialog();
+            }
         }
         mIsFavorite = mUserProfile.isFavoriteStock(mCode);
         mUserProfile.globalBroadcast(NOTIFY_ID_FAVORITE_LIST);
@@ -1112,5 +1121,37 @@ public class StockActivity extends AppCompatActivity {
             }
         }
         mFBCallbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void showStarAlertDialog() {
+        if(mStarAlertDialog != null) {
+            mStarAlertDialog.dismiss();
+            mStarAlertDialog = null;
+        }
+
+        mStarAlertDialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.star_title)
+                .setMessage(R.string.star_description_simple)
+                .setPositiveButton(R.string.star_positive, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+                        try {
+                            MSLog.d("go to: " + Uri.parse("market://details?id=" + appPackageName));
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                        } catch (android.content.ActivityNotFoundException e) {
+                            MSLog.d("go to: " + Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName));
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                        }
+                        mStarAlertDialog.dismiss();
+                    }
+                })
+                .setNegativeButton(R.string.star_negative_cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        mStarAlertDialog.dismiss();
+                    }
+                })
+                .show();
     }
 }

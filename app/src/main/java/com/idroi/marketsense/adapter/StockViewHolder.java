@@ -23,11 +23,11 @@ public class StockViewHolder {
     TextView diffView;
 
     ImageView predictNewsImageView;
-    ImageView predictPeopleImageView;
+    ImageView predictTechImageView;
     ImageView predictFundamentalImageView;
 
     TextView predictNewsAttitude;
-    TextView predictPeopleAttitude;
+    TextView predictTechAttitude;
     TextView predictFundamentalAttitude;
 
     ConstraintLayout rightBlock;
@@ -48,11 +48,11 @@ public class StockViewHolder {
             stockViewHolder.diffView = view.findViewById(R.id.marketsense_stock_diff_tv);
 
             stockViewHolder.predictNewsImageView = view.findViewById(R.id.marketsense_stock_news_iv);
-            stockViewHolder.predictPeopleImageView = view.findViewById(R.id.marketsense_stock_people_iv);
+            stockViewHolder.predictTechImageView = view.findViewById(R.id.marketsense_stock_tech_iv);
             stockViewHolder.predictFundamentalImageView = view.findViewById(R.id.marketsense_stock_fundamental_iv);
 
             stockViewHolder.predictNewsAttitude = view.findViewById(R.id.marketsense_stock_news_attitude_tv);
-            stockViewHolder.predictPeopleAttitude = view.findViewById(R.id.marketsense_stock_people_attitude_tv);
+            stockViewHolder.predictTechAttitude = view.findViewById(R.id.marketsense_stock_people_attitude_tv);
             stockViewHolder.predictFundamentalAttitude = view.findViewById(R.id.marketsense_stock_fundamental_attitude_tv);
 
             stockViewHolder.rightBlock = view.findViewById(R.id.predict_block);

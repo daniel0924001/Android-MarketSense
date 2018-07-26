@@ -89,6 +89,13 @@ public class SettingSource {
         );
         mSettingItemList.add(
                 new SettingItem
+                        .Builder(SettingItem.SettingType.TYPE_NO_DRAWABLE, R.string.preference_email)
+                        .title(mContext.getResources().getString(R.string.preference_email))
+                        .build()
+
+        );
+        mSettingItemList.add(
+                new SettingItem
                         .Builder(SettingItem.SettingType.TYPE_NO_DRAWABLE, R.string.preference_version)
                         .title(String.format(mContext.getResources().getString(R.string.preference_version), BuildConfig.VERSION_NAME))
                         .isClickable(false)

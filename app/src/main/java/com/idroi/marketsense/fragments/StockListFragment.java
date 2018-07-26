@@ -128,8 +128,7 @@ public class StockListFragment extends Fragment {
             @Override
             public void onGlobalBroadcast(int notifyId, Object payload) {
                 if(notifyId == NOTIFY_ID_FAVORITE_LIST && mTaskId == SELF_CHOICES_ID) {
-                    MSLog.d("onUserProfileChange in StockListFragment: " + generateNetworkURL());
-                    mStockListRecyclerAdapter.loadStockList(generateNetworkURL(), generateCacheUrl());
+                    loadStockList();
                 } else if(notifyId == NOTIFY_ID_PRICE_CHANGED && mIsRecyclerViewIdle) {
                     mStockListRecyclerAdapter.updatePriceInVisibleItems();
                 }
@@ -174,7 +173,7 @@ public class StockListFragment extends Fragment {
                 setVisibilityForEmptyData(true);
             }
         });
-        mStockListRecyclerAdapter.loadStockList(generateNetworkURL(), generateCacheUrl());
+        loadStockList();
 
         mStockListRecyclerAdapter.setOnItemClickListener(new StockListRecyclerAdapter.OnItemClickListener() {
             @Override
@@ -192,7 +191,7 @@ public class StockListFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mStockListRecyclerAdapter.loadStockList(generateNetworkURL(), generateCacheUrl());
+                loadStockList();
             }
         });
 
@@ -203,26 +202,26 @@ public class StockListFragment extends Fragment {
                     mSkeletonScreen.show();
                 }
                 setVisibilityForEmptyData(false);
-                mStockListRecyclerAdapter.loadStockList(generateNetworkURL(), generateCacheUrl());
+                loadStockList();
             }
         });
 
 //        setSortBlock(view);
     }
 
-    public String generateNetworkURL() {
-        if(mTaskId == WPCT_ID) {
-            return StockRequest.queryStockListWithMode(getContext(), true, StockRequest.MODE_WPCT);
-        } else {
-            return StockRequest.queryStockList(getContext(), true);
-        }
-    }
-
-    public String generateCacheUrl() {
-        if(mTaskId == WPCT_ID) {
-            return StockRequest.queryStockListWithMode(getContext(), false, StockRequest.MODE_WPCT);
-        } else {
-            return StockRequest.queryStockList(getContext(), false);
+    private void loadStockList() {
+        if(mStockListRecyclerAdapter != null) {
+            if(mTaskId == WPCT_ID) {
+                mStockListRecyclerAdapter.loadStockList(
+                        StockRequest.queryStockListWithMode(getContext(), true, StockRequest.MODE_WPCT),
+                        StockRequest.queryStockListWithMode(getContext(), false, StockRequest.MODE_WPCT),
+                        StockRequest.MODE_WPCT
+                );
+            } else {
+                mStockListRecyclerAdapter.loadStockList(
+                        StockRequest.queryStockList(getContext(), true),
+                        StockRequest.queryStockList(getContext(), false));
+            }
         }
     }
 

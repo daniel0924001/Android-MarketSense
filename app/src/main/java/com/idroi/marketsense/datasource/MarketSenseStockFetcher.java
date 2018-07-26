@@ -54,9 +54,11 @@ public class MarketSenseStockFetcher {
     private WeakReference<Context> mContext;
     private MarketSenseStockNetworkListener mMarketSenseStockNetworkListener;
     private StockRequest mStockRequest;
+    private String mMode;
 
     MarketSenseStockFetcher(Context context,
-            MarketSenseStockNetworkListener marketSenseStockNetworkListener) {
+                            MarketSenseStockNetworkListener marketSenseStockNetworkListener,
+                            @Nullable String mode) {
         mContext = new WeakReference<Context>(context);
         mMarketSenseStockNetworkListener = marketSenseStockNetworkListener;
         mTimeoutHandler = new Handler();
@@ -71,6 +73,7 @@ public class MarketSenseStockFetcher {
                 mMarketSenseStockNetworkListener.onStockListFail(MarketSenseError.NETWORK_CONNECTION_TIMEOUT);
             }
         };
+        mMode = mode;
     }
 
     void makeRequest(@NonNull String networkUrl, @Nullable String cacheUrl) {
@@ -125,9 +128,15 @@ public class MarketSenseStockFetcher {
 
                 SharedPreferences.Editor editor =
                         context.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE).edit();
-                editor.putString(StockRequest.API_URL, networkUrl);
+                if(mMode == null) {
+                    editor.putString(StockRequest.API_URL, networkUrl);
+                    MSLog.d("Stock price network query success, so we save this network url to cache: " + StockRequest.API_URL + " " + networkUrl);
+                } else {
+                    String key = String.format(StockRequest.API_URL_WITH_MODE, mMode);
+                    editor.putString(key, networkUrl);
+                    MSLog.d("Stock price network query success, so we save this network url to cache: " + key + " " + networkUrl);
+                }
                 SharedPreferencesCompat.apply(editor);
-                MSLog.d("Stock price network query success, so we save this network url to cache: " + networkUrl);
 
                 final Context context = getContextOrDestroy();
                 if(context == null) {
@@ -183,5 +192,31 @@ public class MarketSenseStockFetcher {
         if(mTimeoutHandler != null) {
             mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
         }
+    }
+
+    public static void prefetchWPCTStockList(final Context context) {
+        final Context applicationContext = context.getApplicationContext();
+        final String networkUrl = StockRequest.queryStockListWithMode(applicationContext, true, StockRequest.MODE_WPCT);
+        StockRequest stockRequest = new StockRequest(Request.Method.GET, networkUrl, null, new Response.Listener<ArrayList<Stock>>() {
+            @Override
+            public void onResponse(ArrayList<Stock> response) {
+                if(applicationContext != null) {
+                    SharedPreferences.Editor editor =
+                            applicationContext.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE).edit();
+                    String key = String.format(StockRequest.API_URL_WITH_MODE, StockRequest.MODE_WPCT);
+                    editor.putString(key, networkUrl);
+                    SharedPreferencesCompat.apply(editor);
+                    MSLog.d("Prefetch WPCT network query success, so we save this network url to cache: " +  key + ", " + networkUrl);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                MSLog.e("Prefetch WPCT error: " + error.getMessage(), error);
+            }
+        });
+
+        stockRequest.setShouldCache(true);
+        Networking.getRequestQueue(applicationContext).add(stockRequest);
     }
 }

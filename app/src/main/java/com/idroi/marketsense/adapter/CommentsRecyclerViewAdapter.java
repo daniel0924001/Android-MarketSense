@@ -192,14 +192,23 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
     }
 
     public void removeCommentGeneralCache(Context context) {
+        final Context applicationContext = context.getApplicationContext();
         // clear cache url and reload comments since user had inserted a new comment
-        if(context != null) {
+        if(applicationContext != null) {
             SharedPreferences.Editor editor =
                     context.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE).edit();
             editor.remove(COMMENT_CACHE_KEY_GENERAL);
             SharedPreferencesCompat.apply(editor);
+            MSLog.d("try to remove COMMENT_CACHE_KEY_GENERAL");
         }
-        MarketSenseCommentsFetcher.prefetchGeneralComments(context);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(applicationContext != null) {
+                    MarketSenseCommentsFetcher.prefetchGeneralComments(applicationContext);
+                }
+            }
+        }, 1000);
     }
 
     public void destroy() {

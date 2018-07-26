@@ -99,6 +99,10 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
         mOnItemClickListener = listener;
     }
 
+    public void loadStockList(String networkUrl, String cacheUrl, String mode) {
+        mStockListPlacer.loadStockList(networkUrl, cacheUrl, mode);
+    }
+
     public void loadStockList(String networkUrl, String cacheUrl) {
         mStockListPlacer.loadStockList(networkUrl, cacheUrl);
     }

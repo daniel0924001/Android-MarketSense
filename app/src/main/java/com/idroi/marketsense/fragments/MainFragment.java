@@ -118,7 +118,7 @@ public class MainFragment extends Fragment {
                 ((ConstraintLayout.LayoutParams) thirdTitle.getLayoutParams()).topToBottom = R.id.grid_ranking_news;
                 ((ConstraintLayout.LayoutParams) thirdTitle.getLayoutParams()).topMargin = 0;
 
-                mPeopleGridViewAdapter = new RankingGridViewAdapter(getActivity(), mStockListPlacer.getStocks(), RankingGridViewAdapter.RANKING_BY_PEOPLE);
+                mPeopleGridViewAdapter = new RankingGridViewAdapter(getActivity(), mStockListPlacer.getStocks(), RankingGridViewAdapter.RANKING_BY_TECH);
                 mNewsGridViewAdapter = new RankingGridViewAdapter(getActivity(), mStockListPlacer.getStocks(), RankingGridViewAdapter.RANKING_BY_NEWS);
 
                 mPeopleGridView.setAdapter(mPeopleGridViewAdapter);
@@ -180,7 +180,7 @@ public class MainFragment extends Fragment {
                         getContext(), news.getId(), news.getTitle(),
                         news.getUrlImage(), news.getDate(),
                         news.getPageLink(), news.getOriginLink(),
-                        news.getVoteRaiseNum(), news.getVoteFallNum(), news.getStockKeywords()));
+                        news.getVoteRaiseNum(), news.getVoteFallNum(), news.getStockKeywords(), news.getLevel()));
                 getActivity().overridePendingTransition(R.anim.enter, R.anim.stop);
             }
         });

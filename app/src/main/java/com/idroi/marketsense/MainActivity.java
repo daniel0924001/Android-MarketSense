@@ -2,6 +2,7 @@ package com.idroi.marketsense;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -47,6 +48,7 @@ import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.datasource.MarketSenseCommentsFetcher;
 import com.idroi.marketsense.datasource.MarketSenseNewsFetcher;
+import com.idroi.marketsense.datasource.MarketSenseStockFetcher;
 import com.idroi.marketsense.fragments.MainFragment;
 import com.idroi.marketsense.util.MarketSenseUtils;
 
@@ -92,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
     private SimpleDraweeView mAvatarImageView;
 
     // fb login part when the user click fab
-    private AlertDialog mLoginAlertDialog;
+    private AlertDialog mLoginAlertDialog, mStarAlertDialog;
     private LoginButton mFBLoginBtn;
     private CallbackManager mFBCallbackManager;
 
@@ -252,6 +254,11 @@ public class MainActivity extends AppCompatActivity {
             mLoginAlertDialog.dismiss();
             mLoginAlertDialog = null;
         }
+
+        if(mStarAlertDialog != null) {
+            mStarAlertDialog.dismiss();
+            mStarAlertDialog = null;
+        }
     }
 
     @Override
@@ -274,6 +281,7 @@ public class MainActivity extends AppCompatActivity {
     private void prefetchData() {
         MarketSenseCommentsFetcher.prefetchGeneralComments(this);
         MarketSenseNewsFetcher.prefetchNewsFirstPage(this);
+        MarketSenseStockFetcher.prefetchWPCTStockList(this);
     }
 
     private void setAvatarImage() {
@@ -670,12 +678,20 @@ public class MainActivity extends AppCompatActivity {
     private void addFavoriteStock(String code) {
         PostEvent.sendFavoriteStocksAdd(this, code);
         UserProfile userProfile = ClientData.getInstance(this).getUserProfile();
-        userProfile.addFavoriteStock(code);
-        userProfile.globalBroadcast(NOTIFY_ID_FAVORITE_LIST);
-
-        String format = getResources().getString(R.string.title_add_complete);
+        boolean isSuccessful = userProfile.addFavoriteStock(code);
         String name = ClientData.getInstance(this).getNameFromCode(code);
-        Toast.makeText(this, String.format(format, name, code), Toast.LENGTH_SHORT).show();
+        if(isSuccessful) {
+            userProfile.globalBroadcast(NOTIFY_ID_FAVORITE_LIST);
+            String format = getResources().getString(R.string.title_add_complete);
+            Toast.makeText(this, String.format(format, name, code), Toast.LENGTH_SHORT).show();
+
+            if(userProfile.canShowStarDialog(this)) {
+                showStarAlertDialog();
+            }
+        } else {
+            String format = getResources().getString(R.string.title_add_duplicated);
+            Toast.makeText(this, String.format(format, name, code), Toast.LENGTH_SHORT).show();
+        }
     }
 
     // fb login part when the user click fab
@@ -752,4 +768,36 @@ public class MainActivity extends AppCompatActivity {
         mLoginAlertDialog.show();
     }
     // end of fb login
+
+    private void showStarAlertDialog() {
+        if(mStarAlertDialog != null) {
+            mStarAlertDialog.dismiss();
+            mStarAlertDialog = null;
+        }
+
+        mStarAlertDialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.star_title)
+                .setMessage(R.string.star_description_simple)
+                .setPositiveButton(R.string.star_positive, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+                        try {
+                            MSLog.d("go to: " + Uri.parse("market://details?id=" + appPackageName));
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                        } catch (android.content.ActivityNotFoundException e) {
+                            MSLog.d("go to: " + Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName));
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                        }
+                        mStarAlertDialog.dismiss();
+                    }
+                })
+                .setNegativeButton(R.string.star_negative_cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        mStarAlertDialog.dismiss();
+                    }
+                })
+                .show();
+    }
 }

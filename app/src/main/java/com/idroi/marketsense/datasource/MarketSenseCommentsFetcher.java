@@ -224,10 +224,11 @@ public class MarketSenseCommentsFetcher {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                MSLog.e("Prefetch comment error: " + error.getMessage(), error);
             }
         });
 
         commentAndVoteRequest.setShouldCache(true);
-        Networking.getRequestQueue(context).add(commentAndVoteRequest);
+        Networking.getRequestQueue(applicationContext).add(commentAndVoteRequest);
     }
 }

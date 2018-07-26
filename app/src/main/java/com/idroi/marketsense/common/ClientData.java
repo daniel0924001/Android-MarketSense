@@ -43,7 +43,9 @@ public class ClientData {
     private int mLoadPreferenceRetryCounter = DEFAULT_RETRY_TIME;
     private int mLoadAllStockListRetryCounter = DEFAULT_RETRY_TIME;
 
-    private boolean mIsAfterStockClosed, mDoesUseTodayPredictionValue;
+    private boolean mIsWorkDayBeforeStockClosed;
+    private boolean mIsWorkDayAfterStockClosedBeforeAnswerDisclosure;
+    private boolean mDoesUseTodayPredictionValue;;
 
     /**
      * Returns the singleton ClientMetadata object, using the context to obtain data if necessary.
@@ -90,7 +92,8 @@ public class ClientData {
     }
 
     public void updateClockInformation() {
-        mIsAfterStockClosed = DateUtils.isAfterStockClosed();
+        mIsWorkDayBeforeStockClosed = DateUtils.isWorkDayBeforeStockClosed();
+        mIsWorkDayAfterStockClosedBeforeAnswerDisclosure = DateUtils.isWorkDayAfterStockClosedAndBeforeAnswerDisclosure();
         mDoesUseTodayPredictionValue = DateUtils.doesUseTodayPredictionValue();
     }
 
@@ -187,8 +190,12 @@ public class ClientData {
         return (name != null) && (code != null);
     }
 
-    public boolean isAfterStockClosed() {
-        return mIsAfterStockClosed;
+    public boolean isWorkDayBeforeStockClosed() {
+        return mIsWorkDayBeforeStockClosed;
+    }
+
+    public boolean isWorkDayAfterStockClosedBeforeAnswerDisclosure() {
+        return mIsWorkDayAfterStockClosedBeforeAnswerDisclosure;
     }
 
     public boolean doesUseTodayPredictionValue() {

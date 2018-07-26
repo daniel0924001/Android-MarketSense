@@ -23,11 +23,15 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TimeZone;
 
+import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_LAST_STAR_TIMESTAMP;
+import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_USER_SETTING;
 import static com.idroi.marketsense.data.Event.EVENT_TARGET_NEWS;
 import static com.idroi.marketsense.data.Event.EVENT_TARGET_STOCK;
 import static com.idroi.marketsense.data.Event.EVENT_VOTING;
@@ -192,7 +196,7 @@ public class UserProfile implements Serializable {
         }
     }
 
-    public void addFavoriteStock(String code) {
+    public boolean addFavoriteStock(String code) {
         if(!isFavoriteStock(code)) {
             // subscribe FCM topic
             MSLog.d("subscribeToTopic: " + NotificationHelper.getTopicForStockCode(code));
@@ -200,8 +204,10 @@ public class UserProfile implements Serializable {
             if (mFavoriteStocks != null) {
                 mFavoriteStocks.add(code);
             }
+            return true;
         } else {
             MSLog.w("already add favorite stock of this code in UserProfile: " + code);
+            return false;
         }
     }
 
@@ -211,6 +217,31 @@ public class UserProfile implements Serializable {
         FirebaseMessaging.getInstance().unsubscribeFromTopic(NotificationHelper.getTopicForStockCode(code));
         if(mFavoriteStocks != null) {
             mFavoriteStocks.remove(code);
+        }
+    }
+
+    public boolean canShowStarDialog(Context context) {
+        Date date = new Date(System.currentTimeMillis());
+
+        SharedPreferences sharedPreferences =
+                context.getSharedPreferences(SHARED_PREFERENCE_USER_SETTING, Context.MODE_PRIVATE);
+        boolean show;
+        if(!sharedPreferences.contains(SHARED_PREFERENCE_LAST_STAR_TIMESTAMP)) {
+            show = true;
+        } else {
+            Date lastDate = new Date(sharedPreferences.getLong(SHARED_PREFERENCE_LAST_STAR_TIMESTAMP, 0));
+            show = !(DateUtils.isWithinDaysFuture(lastDate, 7) || DateUtils.isToday(lastDate));
+        }
+
+        if(mFavoriteStocks != null && mFavoriteStocks.size() >= 2 && show) {
+            SharedPreferences.Editor editor =
+                    context.getSharedPreferences(SHARED_PREFERENCE_USER_SETTING, Context.MODE_PRIVATE).edit();
+            editor.putLong(SHARED_PREFERENCE_LAST_STAR_TIMESTAMP, date.getTime());
+            MSLog.d("save SHARED_PREFERENCE_LAST_STAR_TIMESTAMP: " + date.getTime());
+            SharedPreferencesCompat.apply(editor);
+            return true;
+        } else {
+            return false;
         }
     }
 

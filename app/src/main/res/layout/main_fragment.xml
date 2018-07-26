@@ -29,7 +29,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/tv_people_ranking">
+                app:layout_constraintBottom_toTopOf="@id/tv_tech_ranking">
 
                 <!--<android.support.constraint.ConstraintLayout-->
                 <!--android:id="@+id/top_banner_left_arrow"-->
@@ -60,7 +60,7 @@
             </android.support.constraint.ConstraintLayout>
 
             <TextView
-                android:id="@+id/tv_people_ranking"
+                android:id="@+id/tv_tech_ranking"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:paddingStart="16dp"
@@ -71,7 +71,7 @@
                 android:textColor="@color/text_gray"
                 android:textSize="12sp"
                 android:fontFamily="Roboto-Regular"
-                android:text="@string/main_page_people_ranking"
+                android:text="@string/main_page_tech_ranking"
                 android:background="@color/text_light_gray"
                 app:layout_constraintTop_toBottomOf="@id/top_banner"
                 app:layout_constraintStart_toStartOf="parent"
@@ -83,7 +83,7 @@
                 android:layout_height="wrap_content"
                 android:indeterminate="true"
                 android:layout_marginTop="10dp"
-                app:layout_constraintTop_toBottomOf="@id/tv_people_ranking"
+                app:layout_constraintTop_toBottomOf="@id/tv_tech_ranking"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
@@ -92,7 +92,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:numColumns="3"
-                app:layout_constraintTop_toBottomOf="@id/tv_people_ranking"
+                app:layout_constraintTop_toBottomOf="@id/tv_tech_ranking"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 

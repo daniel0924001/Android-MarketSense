@@ -111,29 +111,29 @@
         app:layout_constraintGuide_percent="0.2" />
 
     <ImageView
-        android:id="@+id/marketsense_stock_people_iv"
+        android:id="@+id/marketsense_stock_tech_iv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@mipmap/ic_bar3_overview_green"
-        android:contentDescription="@string/title_company_predict_people_title"
+        android:contentDescription="@string/title_company_predict_tech_title"
         android:layout_marginBottom="16dp"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@id/guideline_1"
-        app:layout_constraintEnd_toStartOf="@id/marketsense_stock_people_title_tv" />
+        app:layout_constraintEnd_toStartOf="@id/marketsense_stock_tech_title_tv" />
 
     <TextView
-        android:id="@+id/marketsense_stock_people_title_tv"
+        android:id="@+id/marketsense_stock_tech_title_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="Roboto-Regular"
-        android:text="@string/title_people"
+        android:text="@string/title_tech"
         android:textColor="@color/text_middle_gray"
         android:textSize="12sp"
         android:textStyle="normal"
         android:layout_marginStart="8dp"
-        app:layout_constraintStart_toEndOf="@id/marketsense_stock_people_iv"
-        app:layout_constraintBottom_toBottomOf="@id/marketsense_stock_people_iv"
+        app:layout_constraintStart_toEndOf="@id/marketsense_stock_tech_iv"
+        app:layout_constraintBottom_toBottomOf="@id/marketsense_stock_tech_iv"
         app:layout_constraintEnd_toEndOf="@id/guideline_2"/>
 
     <TextView
@@ -145,8 +145,8 @@
         android:textColor="@color/text_black"
         android:textSize="12sp"
         android:textStyle="normal"
-        app:layout_constraintStart_toStartOf="@id/marketsense_stock_people_title_tv"
-        app:layout_constraintBottom_toTopOf="@id/marketsense_stock_people_title_tv" />
+        app:layout_constraintStart_toStartOf="@id/marketsense_stock_tech_title_tv"
+        app:layout_constraintBottom_toTopOf="@id/marketsense_stock_tech_title_tv" />
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline_2"
@@ -178,7 +178,7 @@
         android:textStyle="normal"
         android:layout_marginStart="8dp"
         app:layout_constraintStart_toEndOf="@id/marketsense_stock_news_iv"
-        app:layout_constraintBottom_toBottomOf="@id/marketsense_stock_people_iv"
+        app:layout_constraintBottom_toBottomOf="@id/marketsense_stock_tech_iv"
         app:layout_constraintEnd_toEndOf="@id/guideline_plot"/>
 
     <TextView

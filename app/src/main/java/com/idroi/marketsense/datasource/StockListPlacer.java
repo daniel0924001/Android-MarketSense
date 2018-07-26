@@ -2,6 +2,7 @@ package com.idroi.marketsense.datasource;
 
 import android.app.Activity;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.ClientData;
@@ -189,6 +190,10 @@ public class StockListPlacer {
     }
 
     public void loadStockList(String networkUrl, String cacheUrl) {
+        loadStockList(networkUrl, cacheUrl, null);
+    }
+
+    public void loadStockList(String networkUrl, String cacheUrl, @Nullable String mode) {
         Activity activity = mActivity.get();
         if(activity == null) {
             return;
@@ -196,7 +201,7 @@ public class StockListPlacer {
 
         mNetworkUrl = networkUrl;
         mCacheUrl = cacheUrl;
-        loadStockList(new MarketSenseStockFetcher(activity, mMarketSenseStockNetworkListener));
+        loadStockList(new MarketSenseStockFetcher(activity, mMarketSenseStockNetworkListener, mode));
     }
 
     private void loadStockList(MarketSenseStockFetcher stockFetcher) {
@@ -287,7 +292,7 @@ public class StockListPlacer {
                         return compareValue(stock1.getConfidenceDirection() * stock1.getConfidence(),
                                 stock2.getConfidenceDirection() * stock2.getConfidence());
                     case SORT_BY_PREDICTION:
-                        return compareValue(stock1.getCustomizeError(), stock2.getCustomizeError());
+                        return compareValue(stock1.getPredictionSortScore(), stock2.getPredictionSortScore());
                 }
 
                 return 0;

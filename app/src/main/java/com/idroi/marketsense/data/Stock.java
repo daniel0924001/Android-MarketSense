@@ -26,6 +26,8 @@ public class Stock {
     private static final String DIFF = "diff";
     private static final String PRED = "prediction";
     private static final String VOTING = "voting";
+    private static final String FOUND_PREDICT = "found_predict";
+    private static final String TECH_PREDICT = "tech_predict";
     private static final String PRICE = "price";
     private static final String RAISE = "raise";
     private static final String FALL = "fall";
@@ -53,6 +55,10 @@ public class Stock {
     private int mConfidenceDirection;
     private double mVoting;
     private int mVotingDirection;
+    private double mFoundation;
+    private int mFoundationDirection;
+    private double mTech;
+    private int mTechDirection;
 
     private int mTodayPredictionDiffDirection, mTomorrowPredictionDiffDirection, mPredictionDiffDirection;
     private double mTodayPredictionDiffPercentage, mTomorrowPredictionDiffPercentage, mPredictionDiffPercentage;
@@ -123,6 +129,34 @@ public class Stock {
 
     public void setVoting(double voting) {
         mVoting = Math.abs(voting);
+    }
+
+    public void setFoundationDirection(double direction) {
+        if(direction > 0) {
+            mFoundationDirection = Stock.TREND_UP;
+        } else if(direction == 0) {
+            mFoundationDirection = Stock.TREND_FLAT;
+        } else {
+            mFoundationDirection = Stock.TREND_DOWN;
+        }
+    }
+
+    public void setFoundation(double foundation) {
+        mFoundation = Math.abs(foundation);
+    }
+
+    public void setTech(double tech) {
+        mTech = Math.abs(tech);
+    }
+
+    public void setTechDirection(double tech) {
+        if(tech > 0) {
+            mTechDirection = Stock.TREND_UP;
+        } else if(tech == 0) {
+            mTechDirection = Stock.TREND_FLAT;
+        } else {
+            mTechDirection = Stock.TREND_DOWN;
+        }
     }
 
     public void setRaiseNum(int number) {
@@ -254,7 +288,8 @@ public class Stock {
     }
 
     public float getPredictNewsScore() {
-        return (float) mConfidence * 3 / 100;
+//        return (float) mConfidence * 3 / 100;
+        return (float) mConfidence;
     }
 
     public int getPredictPeopleLevel() {
@@ -271,19 +306,59 @@ public class Stock {
     }
 
     public float getPredictPeopleScore() {
-        return (float) mVoting * 3 / 100;
+//        return (float) mVoting * 3 / 100;
+        return (float) mVoting;
     }
 
     public int getPredictPeopleDirection() {
         return mVotingDirection;
     }
 
+    public int getPredictFoundationLevel() {
+        if(mFoundation >= 0 && mFoundation <= 1) {
+            return LEVEL_LOW;
+        } else if(mFoundation > 1 && mFoundation <= 2) {
+            return LEVEL_HIGH;
+        } else if(mFoundation > 2) {
+            return LEVEL_HIGHEST;
+        } else {
+            MSLog.e("invalid value: " + mFoundation);
+            return LEVEL_INVALID;
+        }
+    }
+
+    public int getPredictFoundationDirection() {
+        return mFoundationDirection;
+    }
+
+    public int getPredictTechLevel() {
+        if(mTech >= 0 && mTech <= 1) {
+            return LEVEL_LOW;
+        } else if(mTech > 1 && mTech <= 2) {
+            return LEVEL_HIGH;
+        } else if(mTech > 2) {
+            return LEVEL_HIGHEST;
+        } else {
+            MSLog.e("invalid value: " + mTech);
+            return LEVEL_INVALID;
+        }
+    }
+
+    public float getPredictionTechScore() {
+        return (float) mTech;
+    }
+
+    public int getPredictTechDirection() {
+        return mTechDirection;
+    }
+
     private void computeCustomizeError() {
-        double error = (mPredictionDiffDirection != mDiffDirection) ? 10 : 0;
-        if(mPredictionDiffDirection == TREND_FLAT && mDiffDirection == TREND_FLAT) {
+        // we user today prediction
+        double error = (mTodayPredictionDiffDirection != mDiffDirection) ? 10 : 0;
+        if(mTodayPredictionDiffDirection == TREND_FLAT && mDiffDirection == TREND_FLAT) {
             error += 1;
         }
-        error += Math.abs(mPredictionDiffDirection * mPredictionDiffPercentage - mDiffDirection * mDiffPercentage);
+        error += Math.abs(mTodayPredictionDiffDirection * mTodayPredictionDiffPercentage - mDiffDirection * mDiffPercentage);
         mPredictionError = -error;
     }
 
@@ -309,8 +384,14 @@ public class Stock {
         }
     }
 
-    public double getCustomizeError() {
-        return mPredictionError;
+    public double getPredictionSortScore() {
+        ClientData clientData = ClientData.getInstance();
+        if(clientData.isWorkDayBeforeStockClosed() ||
+                clientData.isWorkDayAfterStockClosedBeforeAnswerDisclosure()) {
+            return mPredictionError;
+        } else {
+            return mPredictionDiffDirection * mPredictionDiffPercentage;
+        }
     }
 
     public void setRightPredictionBlock(Context context,
@@ -319,10 +400,12 @@ public class Stock {
                                         TextView valueTextView) {
         Resources resources = context.getResources();
         ClientData clientData = ClientData.getInstance(context);
-        if(clientData.isAfterStockClosed()) {
-            titleTextView.setText(resources.getString(R.string.title_predict_tomorrow));
-        } else {
+        if(clientData.isWorkDayBeforeStockClosed()) {
             titleTextView.setText(resources.getString(R.string.title_predict_today));
+        } else if(clientData.isWorkDayAfterStockClosedBeforeAnswerDisclosure()) {
+            titleTextView.setText(resources.getString(R.string.title_predict_today_answer_disclosure));
+        } else {
+            titleTextView.setText(resources.getString(R.string.title_predict_tomorrow));
         }
 
         valueTextView.setTextColor(resources.getColor(R.color.text_white));
@@ -374,6 +457,17 @@ public class Stock {
                         double voting = jsonObject.optDouble(VOTING);
                         stock.setVoting(voting);
                         stock.setVotingDirection(voting);
+                        break;
+                    case FOUND_PREDICT:
+                        double foundPrediction = jsonObject.optDouble(FOUND_PREDICT);
+                        stock.setFoundation(foundPrediction);
+                        stock.setFoundationDirection(foundPrediction);
+                        break;
+                    case TECH_PREDICT:
+                        double techPrediction = jsonObject.optDouble(TECH_PREDICT);
+                        stock.setTech(techPrediction);
+                        stock.setTechDirection(techPrediction);
+                        break;
                     case DIFF:
                         double diff = jsonObject.optDouble(DIFF);
                         double price = jsonObject.optDouble(PRICE);

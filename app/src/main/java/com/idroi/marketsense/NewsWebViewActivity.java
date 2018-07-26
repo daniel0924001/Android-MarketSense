@@ -88,6 +88,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
     public static final String EXTRA_VOTE_RAISE_NUM = "EXTRA_VOTE_RAISE_NUM";
     public static final String EXTRA_VOTE_FALL_NUM = "EXTRA_VOTE_FALL_NUM";
     public static final String EXTRA_STOCK_KEYWORDS = "EXTRA_STOCK_KEYWORDS";
+    public static final String EXTRA_NEWS_LEVEL = "EXTRA_NEWS_LEVEL";
 
     private static final float CONST_ENABLE_ALPHA = 0.4f;
     private static final float CONST_DISABLE_ALPHA = 1.0f;
@@ -102,6 +103,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
     private String mOriginalPageUrl;
     private String mPageLink;
     private int mVoteRaiseNum, mVoteFallNum;
+    private int mLevel;
     private String[] mStockKeywords;
 
     private View mImageMask;
@@ -173,16 +175,18 @@ public class NewsWebViewActivity extends AppCompatActivity {
     }
 
     private void setInformation() {
-        mId = getIntent().getStringExtra(EXTRA_MIDDLE_ID);
-        mMiddlePageUrl = getIntent().getStringExtra(EXTRA_MIDDLE_PAGE_URL);
-        mOriginalPageUrl = getIntent().getStringExtra(EXTRA_ORIGINAL_PAGE_URL);
-        mTitle = getIntent().getStringExtra(EXTRA_MIDDLE_TITLE);
-        mImageUrl = getIntent().getStringExtra(EXTRA_MIDDLE_IMAGE_URL);
-        mSourceDate = getIntent().getStringExtra(EXTRA_MIDDLE_DATE);
-        mStockKeywords = getIntent().getStringArrayExtra(EXTRA_STOCK_KEYWORDS);
+        Intent intent = getIntent();
+        mId = intent.getStringExtra(EXTRA_MIDDLE_ID);
+        mMiddlePageUrl = intent.getStringExtra(EXTRA_MIDDLE_PAGE_URL);
+        mOriginalPageUrl = intent.getStringExtra(EXTRA_ORIGINAL_PAGE_URL);
+        mTitle = intent.getStringExtra(EXTRA_MIDDLE_TITLE);
+        mImageUrl = intent.getStringExtra(EXTRA_MIDDLE_IMAGE_URL);
+        mSourceDate = intent.getStringExtra(EXTRA_MIDDLE_DATE);
+        mStockKeywords = intent.getStringArrayExtra(EXTRA_STOCK_KEYWORDS);
 
-        mVoteRaiseNum = getIntent().getIntExtra(EXTRA_VOTE_RAISE_NUM, 0);
-        mVoteFallNum = getIntent().getIntExtra(EXTRA_VOTE_FALL_NUM, 0);
+        mVoteRaiseNum = intent.getIntExtra(EXTRA_VOTE_RAISE_NUM, 0);
+        mVoteFallNum = intent.getIntExtra(EXTRA_VOTE_FALL_NUM, 0);
+        mLevel = intent.getIntExtra(EXTRA_NEWS_LEVEL, 0);
     }
 
     private void initComments() {
@@ -259,7 +263,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if(FBHelper.checkFBLogin()) {
                     startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
-                            NewsWebViewActivity.this, RichEditorActivity.TYPE.NEWS, mId, mStockKeywords),
+                            NewsWebViewActivity.this, RichEditorActivity.TYPE.NEWS, mId, mStockKeywords, mTitle, mLevel),
                             sEditorRequestCode);
                     overridePendingTransition(R.anim.enter, R.anim.stop);
                 } else {
@@ -318,7 +322,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
                 if(notifyId == NOTIFY_ID_NEWS_COMMENT_CLICK && FBHelper.checkFBLogin()) {
                     if(mLastClickAction == LAST_CLICK_IS_COMMENT) {
                         startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
-                                NewsWebViewActivity.this, RichEditorActivity.TYPE.NEWS, mId, mStockKeywords),
+                                NewsWebViewActivity.this, RichEditorActivity.TYPE.NEWS, mId, mStockKeywords, mTitle, mLevel),
                                 sEditorRequestCode);
                         overridePendingTransition(R.anim.enter, R.anim.stop);
                     } else if(mLastClickAction == LAST_CLICK_IS_LIKE) {
@@ -569,12 +573,12 @@ public class NewsWebViewActivity extends AppCompatActivity {
         return generateNewsWebViewActivityIntent(context, news.getId(),
                 news.getTitle(), news.getUrlImage(), news.getDate(),
                 news.getPageLink(), news.getOriginLink(),
-                news.getVoteRaiseNum(), news.getVoteFallNum(), news.getStockKeywords());
+                news.getVoteRaiseNum(), news.getVoteFallNum(), news.getStockKeywords(), news.getLevel());
     }
 
     public static Intent generateNewsWebViewActivityIntent(
             Context context, String id, String title, String imageUrl, String sourceDate,
-            String middleUrl, String originalUrl, int voteRaiseNum, int voteFallNum, String[] stockKeywords) {
+            String middleUrl, String originalUrl, int voteRaiseNum, int voteFallNum, String[] stockKeywords, int level) {
         Intent intent = new Intent(context, NewsWebViewActivity.class);
         intent.putExtra(EXTRA_MIDDLE_ID, id);
         intent.putExtra(EXTRA_MIDDLE_TITLE, title);
@@ -585,6 +589,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
         intent.putExtra(EXTRA_VOTE_RAISE_NUM, voteRaiseNum);
         intent.putExtra(EXTRA_VOTE_FALL_NUM, voteFallNum);
         intent.putExtra(EXTRA_STOCK_KEYWORDS, stockKeywords);
+        intent.putExtra(EXTRA_NEWS_LEVEL, level);
         return intent;
     }
 

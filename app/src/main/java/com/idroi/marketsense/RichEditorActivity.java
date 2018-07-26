@@ -1,21 +1,18 @@
 package com.idroi.marketsense;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,6 +50,9 @@ public class RichEditorActivity extends AppCompatActivity {
     public static final String EXTRA_REQ_TYPE = "extra_type";
     public static final String EXTRA_REQ_ID = "extra_id";
     public static final String EXTRA_REQ_STOCK_KEYWORDS = "extra_stock_keywords";
+    public static final String EXTRA_REQ_NEWS_TITLE = "extra_news_title";
+    public static final String EXTRA_REQ_NEWS_FIRE_IMAGE_ID = "extra_news_fire_image_id";
+    public static final String EXTRA_REQ_NEWS_FIRE_TEXT_ID = "extra_news_fire_text";
     public static final String EXTRA_RES_HTML = "extra_response_html";
     public static final String EXTRA_RES_TYPE = EXTRA_REQ_TYPE;
     public static final String EXTRA_RES_ID = EXTRA_REQ_ID;
@@ -68,6 +68,10 @@ public class RichEditorActivity extends AppCompatActivity {
     private AlertDialog mUrlAlertDialog;
 
     private TextView mCompletedTextView;
+
+    private String mNewsTitle;
+    private int mNewsTitleStringResourceId;
+    private int mNewsFireImageResourceId;
 
     public enum TYPE {
         NEWS("news"),
@@ -113,9 +117,14 @@ public class RichEditorActivity extends AppCompatActivity {
     }
 
     private void setInformation() {
-        mId = getIntent().getStringExtra(EXTRA_REQ_ID);
-        mType = getIntent().getStringExtra(EXTRA_REQ_TYPE);
-        mStockKeywords = getIntent().getStringArrayExtra(EXTRA_REQ_STOCK_KEYWORDS);
+        Intent intent = getIntent();
+        mId = intent.getStringExtra(EXTRA_REQ_ID);
+        mType = intent.getStringExtra(EXTRA_REQ_TYPE);
+        mStockKeywords = intent.getStringArrayExtra(EXTRA_REQ_STOCK_KEYWORDS);
+
+        mNewsTitle = intent.getStringExtra(EXTRA_REQ_NEWS_TITLE);
+        mNewsTitleStringResourceId = intent.getIntExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, 0);
+        mNewsFireImageResourceId = intent.getIntExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, 0);
     }
 
     private void leaveRichEditorActivity(boolean isSuccessful, String html, String eventId) {
@@ -172,6 +181,19 @@ public class RichEditorActivity extends AppCompatActivity {
                     insertLink(code, name);
                 }
             }
+
+            ConstraintLayout newsBlock = findViewById(R.id.comment_news_block);
+            newsBlock.setVisibility(View.VISIBLE);
+            TextView titleTextView = findViewById(R.id.comment_news_title_tv);
+            titleTextView.setText(mNewsTitle);
+            TextView fireTextView = findViewById(R.id.comment_news_fire_tv);
+            fireTextView.setText(mNewsTitleStringResourceId);
+            ImageView fireImageView = findViewById(R.id.comment_news_fire_iv);
+            fireImageView.setImageResource(mNewsFireImageResourceId);
+
+            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) mEditor.getLayoutParams();
+            params.bottomToTop = R.id.comment_news_block;
+            params.bottomToBottom = 0;
         }
     }
 
@@ -337,14 +359,46 @@ public class RichEditorActivity extends AppCompatActivity {
     }
 
     public static Intent generateRichEditorActivityIntent(Context context, TYPE type, String id) {
-        return generateRichEditorActivityIntent(context, type, id, null);
+        return generateRichEditorActivityIntent(context, type, id, null, null, 0);
     }
 
-    public static Intent generateRichEditorActivityIntent(Context context, TYPE type, String id, String[] stockKeywords) {
+    public static Intent generateRichEditorActivityIntent(Context context, TYPE type, String id, String[] stockKeywords, String title, int level) {
         Intent intent = new Intent(context, RichEditorActivity.class);
         intent.putExtra(EXTRA_REQ_TYPE, type.getType());
         intent.putExtra(EXTRA_REQ_ID, id);
         intent.putExtra(EXTRA_REQ_STOCK_KEYWORDS, stockKeywords);
+        intent.putExtra(EXTRA_REQ_NEWS_TITLE, title);
+
+        switch (level) {
+            case 3:
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_fire_red3);
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_good);
+                break;
+            case 2:
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_fire_red2);
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_good);
+                break;
+            case 1:
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_fire_red1);
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_good);
+                break;
+            case -1:
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_fire_green1);
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_bad);
+                break;
+            case -2:
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_fire_green2);
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_bad);
+                break;
+            case -3:
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_fire_green3);
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_bad);
+                break;
+            default:
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, 0);
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, 0);
+        }
+
         return intent;
     }
 

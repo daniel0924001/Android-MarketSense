@@ -130,7 +130,7 @@ public class SearchAndResponseActivity extends AppCompatActivity {
                         SearchAndResponseActivity.this, news.getId(), news.getTitle(),
                         news.getUrlImage(), news.getDate(),
                         news.getPageLink(), news.getOriginLink(),
-                        news.getVoteRaiseNum(), news.getVoteFallNum(), news.getStockKeywords()));
+                        news.getVoteRaiseNum(), news.getVoteFallNum(), news.getStockKeywords(), news.getLevel()));
                 overridePendingTransition(R.anim.enter, R.anim.stop);
             }
         });

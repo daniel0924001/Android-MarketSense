@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
@@ -303,6 +304,7 @@ public class SettingActivity extends AppCompatActivity {
                             MSLog.d("go to: " + Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName));
                             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
                         }
+                        mStarAlertDialog.dismiss();
                     }
                 })
                 .setNegativeButton(R.string.star_negative, new DialogInterface.OnClickListener() {
@@ -317,6 +319,24 @@ public class SettingActivity extends AppCompatActivity {
                     }
                 })
                 .show();
+    }
+
+    private void sendEmail() {
+
+        String title = getResources().getString(R.string.preference_feedback);
+        String format = "MANUFACTURER: %s\nMODEL: %s\nPRODUCT: %s\nVERSION: %s\nSDK_VERSION: %s\n================\n意見回饋：";
+
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setType("message/rfc822");
+        intent.setData(Uri.parse("mailto:"));
+        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"bigbirdgeeks@gmail.com"});
+        intent.putExtra(Intent.EXTRA_SUBJECT, title);
+        intent.putExtra(Intent.EXTRA_TEXT, String.format(format, Build.MANUFACTURER, Build.MODEL, Build.PRODUCT, BuildConfig.VERSION_NAME, Build.VERSION.SDK_INT));
+        try {
+            startActivity(Intent.createChooser(intent, "寄信給開發者"));
+        } catch (android.content.ActivityNotFoundException ex) {
+            // pass
+        }
     }
 
     private void handleListClick(int position) {
@@ -352,6 +372,9 @@ public class SettingActivity extends AppCompatActivity {
             case R.string.preference_disclaimer:
                 startActivity(WebViewActivity.generateWebViewActivityIntent(
                         this, id, title, "http://www.infohubapp.com/marketsense/documents/disclaimer.html"));
+                break;
+            case R.string.preference_email:
+                sendEmail();
                 break;
             default:
                 Toast.makeText(this, R.string.preference_sorry, Toast.LENGTH_SHORT).show();

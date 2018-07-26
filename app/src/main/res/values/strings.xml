@@ -20,7 +20,7 @@
     <string name="title_no_comment">目前暫無評論</string>
     <string name="title_send_first">立馬搶頭香</string>
 
-    <string name="main_page_people_ranking">鄉民風向榜</string>
+    <string name="main_page_tech_ranking">技術風向榜</string>
     <string name="main_page_news_ranking">新聞風向榜</string>
     <string name="main_page_news">最新消息</string>
     <string name="main_page_card_title">本週市覺評選</string>
@@ -48,6 +48,7 @@
     <string name="title_search_hint_stock">輸入股票名稱/代碼</string>
     <string name="title_search_add">加入自選</string>
     <string name="title_add_complete">已加入自選股 %s(%s)</string>
+    <string name="title_add_duplicated">%s(%s) 已在您的自選股清單</string>
     <string name="title_delete_complete">已刪除自選股 %s(%s)</string>
     <string name="title_search">搜尋</string>
     <string name="title_search_cancel">取消</string>
@@ -90,14 +91,17 @@
     <string name="title_company_predict_fluctuation">漲跌幅</string>
     <string name="title_company_predict_news_title">新聞</string>
     <string name="title_company_predict_people_title">鄉民</string>
+    <string name="title_company_predict_tech_title">技術</string>
 
     <string name="title_predict_today">今日預測</string>
+    <string name="title_predict_today_answer_disclosure">今日收盤預測</string>
     <string name="title_predict_tomorrow">次交易日預測</string>
     <string name="title_predict_none">無法預測</string>
 
     <string name="title_fundamental">基本面</string>
     <string name="title_people">鄉民面</string>
     <string name="title_news">新聞面</string>
+    <string name="title_tech">技術面</string>
 
     <string name="title_level_flat">？？？</string>
     <string name="title_level_up_highest">超看漲</string>
@@ -106,10 +110,10 @@
     <string name="title_level_down_high">看跌</string>
 
     <string name="title_news_look_good">新聞看漲</string>
-    <string name="title_news_look_flat">新聞無定論</string>
+    <string name="title_news_look_flat">近期無重大新聞</string>
     <string name="title_news_look_bad">新聞看跌</string>
     <string name="title_people_look_good">鄉民看漲</string>
-    <string name="title_people_look_flat">鄉民討論中</string>
+    <string name="title_people_look_flat">快來底下留言！</string>
     <string name="title_people_look_bad">鄉民看跌</string>
     <string name="title_no_prediction">無預測</string>
     <string name="title_news_join">%d則相關新聞報導</string>
@@ -199,18 +203,15 @@
     <string name="preference_term_of_service">服務條款</string>
     <string name="preference_disclaimer">免責聲明</string>
     <string name="preference_version">版本資訊： %s</string>
+    <string name="preference_email">開發者信箱： bigbirdgeeks@gmail.com</string>
     <string name="preference_sorry">不好意思，功能尚未開放</string>
 
     <string name="star_title">給予鼓勵</string>
-    <string name="star_description">
-        如果您喜歡本程式，\n
-        敬請你給予我們五顆星的評價！\n
-        若有任何的建議與想法，\n
-        煩請利用 意見回饋 功能，\n
-        提供意見給我們，感謝您，\n
-        期許能帶給你更好的使用者體驗。</string>
-    <string name="star_positive">確定</string>
+    <string name="star_description">如果您喜歡本程式，\n敬請你給予我們五顆星的評價！\n若有任何的建議與想法，\n煩請利用 意見回饋 功能，\n提供意見給我們，感謝您，\n期許能帶給你更好的使用者體驗。</string>
+    <string name="star_description_simple">感謝您使用市覺，\n如果您喜歡本程式，\n敬請你給予我們五顆星的評價！\n</string>
+    <string name="star_positive">五顆星好評</string>
     <string name="star_negative">意見回饋</string>
+    <string name="star_negative_cancel">已經評過了</string>
 
     <string name="hello">Hello, 市覺使用者</string>
     <string name="login">登入</string>

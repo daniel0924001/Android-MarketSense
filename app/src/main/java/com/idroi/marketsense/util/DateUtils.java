@@ -290,10 +290,17 @@ public class DateUtils {
         return getTodaySpecificTime(now, 13, 30);
     }
 
-    public static boolean isAfterStockClosed() {
+    public static boolean isWorkDayBeforeStockClosed() {
         Date now = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei")).getTime();
         Date close = getTodayStockClosedTime(now);
-        return !isWorkDay(now) || now.after(close);
+        return isWorkDay(now) && now.before(close);
+    }
+
+    public static boolean isWorkDayAfterStockClosedAndBeforeAnswerDisclosure() {
+        Date now = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei")).getTime();
+        Date close = getTodayStockClosedTime(now);
+        Date disclosureEnd = getTodaySpecificTime(now, 15, 0);
+        return isWorkDay(now) && now.after(close) && now.before(disclosureEnd);
     }
 
     public static boolean doesUseTodayPredictionValue() {

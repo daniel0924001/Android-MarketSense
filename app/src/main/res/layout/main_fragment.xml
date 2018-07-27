@@ -59,22 +59,81 @@
 
             </android.support.constraint.ConstraintLayout>
 
+            <android.support.constraint.Guideline
+                android:id="@+id/guideline_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.6"/>
+
+            <android.support.constraint.Guideline
+                android:id="@+id/guideline_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.9"/>
+
             <TextView
                 android:id="@+id/tv_tech_ranking"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp"
+                android:paddingTop="25dp"
+                android:paddingBottom="16dp"
                 android:maxLines="1"
-                android:textColor="@color/text_gray"
-                android:textSize="12sp"
+                android:textColor="#000000"
+                android:textSize="20sp"
                 android:fontFamily="sans-serif"
                 android:text="@string/main_page_tech_ranking"
                 android:background="@color/text_light_gray"
                 app:layout_constraintTop_toBottomOf="@id/top_banner"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                android:id="@+id/tv_tech_ranking_subtitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp"
+                android:maxLines="1"
+                android:textColor="@color/text_gray"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif"
+                android:text="@string/main_stock_name"
+                android:background="@color/text_light_gray"
+                app:layout_constraintTop_toBottomOf="@id/tv_tech_ranking"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/guideline_1"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:maxLines="1"
+                android:textColor="@color/text_gray"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif"
+                android:text="@string/main_stock_price"
+                android:background="@color/text_light_gray"
+                app:layout_constraintTop_toBottomOf="@id/tv_tech_ranking"
+                app:layout_constraintStart_toStartOf="@id/guideline_1"
+                app:layout_constraintEnd_toEndOf="@id/guideline_2"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:maxLines="1"
+                android:textColor="@color/text_gray"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif"
+                android:text="@string/main_stock_prediction"
+                android:background="@color/text_light_gray"
+                app:layout_constraintTop_toBottomOf="@id/tv_tech_ranking"
+                app:layout_constraintStart_toStartOf="@id/guideline_2"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <ProgressBar
@@ -83,18 +142,17 @@
                 android:layout_height="wrap_content"
                 android:indeterminate="true"
                 android:layout_marginTop="10dp"
-                app:layout_constraintTop_toBottomOf="@id/tv_tech_ranking"
+                app:layout_constraintTop_toBottomOf="@id/tv_tech_ranking_subtitle"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <com.idroi.marketsense.WrapGridView
-                android:id="@+id/grid_ranking_people"
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/list_ranking_tech"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:numColumns="3"
-                app:layout_constraintTop_toBottomOf="@id/tv_tech_ranking"
+                app:layout_constraintTop_toBottomOf="@id/tv_tech_ranking_subtitle"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintEnd_toEndOf="parent" />
 
             <TextView
                 android:id="@+id/tv_news_ranking"
@@ -102,11 +160,11 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp"
+                android:paddingTop="25dp"
+                android:paddingBottom="16dp"
                 android:maxLines="1"
-                android:textColor="@color/text_gray"
-                android:textSize="12sp"
+                android:textColor="#000000"
+                android:textSize="20sp"
                 android:fontFamily="sans-serif"
                 android:text="@string/main_page_news_ranking"
                 android:background="@color/text_light_gray"
@@ -115,24 +173,68 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
+            <TextView
+                android:id="@+id/tv_news_ranking_subtitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp"
+                android:maxLines="1"
+                android:textColor="@color/text_gray"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif"
+                android:text="@string/main_stock_name"
+                android:background="@color/text_light_gray"
+                app:layout_constraintTop_toBottomOf="@id/tv_news_ranking"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/guideline_1"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:maxLines="1"
+                android:textColor="@color/text_gray"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif"
+                android:text="@string/main_stock_price"
+                android:background="@color/text_light_gray"
+                app:layout_constraintTop_toBottomOf="@id/tv_news_ranking"
+                app:layout_constraintStart_toStartOf="@id/guideline_1"
+                app:layout_constraintEnd_toEndOf="@id/guideline_2"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:maxLines="1"
+                android:textColor="@color/text_gray"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif"
+                android:text="@string/main_stock_prediction"
+                android:background="@color/text_light_gray"
+                app:layout_constraintTop_toBottomOf="@id/tv_news_ranking"
+                app:layout_constraintStart_toStartOf="@id/guideline_2"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
             <ProgressBar
                 android:id="@+id/loading_progress_bar_rank_news"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:indeterminate="true"
                 android:layout_marginTop="10dp"
-                app:layout_constraintTop_toBottomOf="@id/tv_news_ranking"
+                app:layout_constraintTop_toBottomOf="@id/tv_news_ranking_subtitle"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <com.idroi.marketsense.WrapGridView
-                android:id="@+id/grid_ranking_news"
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/list_ranking_news"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:numColumns="3"
-                app:layout_constraintTop_toBottomOf="@id/tv_news_ranking"
+                app:layout_constraintTop_toBottomOf="@id/tv_news_ranking_subtitle"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintEnd_toEndOf="parent" />
 
             <TextView
                 android:id="@+id/tv_news"
@@ -141,10 +243,10 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:paddingTop="12dp"
-                android:paddingBottom="12dp"
+                android:paddingBottom="16dp"
                 android:maxLines="1"
-                android:textColor="@color/text_gray"
-                android:textSize="12sp"
+                android:textColor="#000000"
+                android:textSize="20sp"
                 android:fontFamily="sans-serif"
                 android:text="@string/main_page_news"
                 android:background="@color/text_light_gray"

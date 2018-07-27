@@ -20,11 +20,15 @@
     <string name="title_no_comment">目前暫無評論</string>
     <string name="title_send_first">立馬搶頭香</string>
 
-    <string name="main_page_tech_ranking">技術風向榜</string>
-    <string name="main_page_news_ranking">新聞風向榜</string>
+    <string name="main_page_tech_ranking">技術面排行</string>
+    <string name="main_page_news_ranking">新聞面排行</string>
     <string name="main_page_news">最新消息</string>
     <string name="main_page_card_title">本週市覺評選</string>
     <string name="main_page_card_sub_title">十大焦點個股</string>
+    <string name="main_stock_name_is_too_long">股票名稱真的很長</string>
+    <string name="main_stock_name">股票名稱</string>
+    <string name="main_stock_price">現值</string>
+    <string name="main_stock_prediction">風向</string>
 
     <string name="title_news_title">新聞標題</string>
     <string name="title_news_date">新聞時間</string>

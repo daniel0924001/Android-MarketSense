@@ -20,9 +20,9 @@ import android.widget.TextView;
 import com.idroi.marketsense.NewsWebViewActivity;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.StockActivity;
-import com.idroi.marketsense.WrapGridView;
 import com.idroi.marketsense.adapter.NewsRecyclerAdapter;
-import com.idroi.marketsense.adapter.RankingGridViewAdapter;
+import com.idroi.marketsense.adapter.StockRankingRecyclerAdapter;
+import com.idroi.marketsense.adapter.StockRankingRenderer;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.data.Stock;
@@ -57,8 +57,8 @@ public class MainFragment extends Fragment {
     private TextView mNoDataTextView;
     private ProgressBar mLoadingProgressBar, mLoadingProgressBarRankingPeople, mLoadingProgressBarRankingNews;
 
-    private WrapGridView mPeopleGridView, mNewsGridView;
-    private RankingGridViewAdapter mPeopleGridViewAdapter, mNewsGridViewAdapter;
+    private RecyclerView mTechRankingRecyclerView, mNewsRankingRecyclerView;
+    private StockRankingRecyclerAdapter mTechRankingRecyclerAdapter, mNewsRankingRecyclerAdapter;
 
     private StockListPlacer mStockListPlacer;
 
@@ -87,8 +87,8 @@ public class MainFragment extends Fragment {
         mLoadingProgressBarRankingNews = view.findViewById(R.id.loading_progress_bar_rank_news);
         mLoadingProgressBarRankingPeople = view.findViewById(R.id.loading_progress_bar_rank_people);
 
-        mPeopleGridView = view.findViewById(R.id.grid_ranking_people);
-        mNewsGridView = view.findViewById(R.id.grid_ranking_news);
+        mTechRankingRecyclerView = view.findViewById(R.id.list_ranking_tech);
+        mNewsRankingRecyclerView = view.findViewById(R.id.list_ranking_news);
 
         mNestedScrollView = view.findViewById(R.id.body_scroll_view);
 
@@ -112,26 +112,31 @@ public class MainFragment extends Fragment {
                     mLoadingProgressBarRankingPeople.setVisibility(View.GONE);
                 }
                 TextView secondTitle = view.findViewById(R.id.tv_news_ranking);
-                ((ConstraintLayout.LayoutParams) secondTitle.getLayoutParams()).topToBottom = R.id.grid_ranking_people;
+                ((ConstraintLayout.LayoutParams) secondTitle.getLayoutParams()).topToBottom = R.id.list_ranking_tech;
                 ((ConstraintLayout.LayoutParams) secondTitle.getLayoutParams()).topMargin = 0;
                 TextView thirdTitle = view.findViewById(R.id.tv_news);
-                ((ConstraintLayout.LayoutParams) thirdTitle.getLayoutParams()).topToBottom = R.id.grid_ranking_news;
+                ((ConstraintLayout.LayoutParams) thirdTitle.getLayoutParams()).topToBottom = R.id.list_ranking_news;
                 ((ConstraintLayout.LayoutParams) thirdTitle.getLayoutParams()).topMargin = 0;
 
-                mPeopleGridViewAdapter = new RankingGridViewAdapter(getActivity(), mStockListPlacer.getStocks(), RankingGridViewAdapter.RANKING_BY_TECH);
-                mNewsGridViewAdapter = new RankingGridViewAdapter(getActivity(), mStockListPlacer.getStocks(), RankingGridViewAdapter.RANKING_BY_NEWS);
+                mTechRankingRecyclerAdapter = new StockRankingRecyclerAdapter(getActivity(),
+                        mStockListPlacer.getStocks(), StockRankingRenderer.RANKING_BY_TECH);
+                mNewsRankingRecyclerAdapter = new StockRankingRecyclerAdapter(getActivity(),
+                        mStockListPlacer.getStocks(), StockRankingRenderer.RANKING_BY_NEWS);
+                mTechRankingRecyclerView.setAdapter(mTechRankingRecyclerAdapter);
+                mNewsRankingRecyclerView.setAdapter(mNewsRankingRecyclerAdapter);
+                mTechRankingRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                mNewsRankingRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                mTechRankingRecyclerView.setNestedScrollingEnabled(false);
+                mNewsRankingRecyclerView.setNestedScrollingEnabled(false);
 
-                mPeopleGridView.setAdapter(mPeopleGridViewAdapter);
-                mNewsGridView.setAdapter(mNewsGridViewAdapter);
-
-                mPeopleGridViewAdapter.setOnItemClickListener(new RankingGridViewAdapter.OnItemClickListener() {
+                mTechRankingRecyclerAdapter.setOnItemClickListener(new StockRankingRecyclerAdapter.OnItemClickListener() {
                     @Override
                     public void onItemClick(Stock stock) {
                         openStockActivity(stock);
                     }
                 });
 
-                mNewsGridViewAdapter.setOnItemClickListener(new RankingGridViewAdapter.OnItemClickListener() {
+                mNewsRankingRecyclerAdapter.setOnItemClickListener(new StockRankingRecyclerAdapter.OnItemClickListener() {
                     @Override
                     public void onItemClick(Stock stock) {
                         openStockActivity(stock);
@@ -139,6 +144,7 @@ public class MainFragment extends Fragment {
                 });
             }
         });
+
         mStockListPlacer.loadStockList(
                 StockRequest.queryStockList(getActivity(), true),
                 StockRequest.queryStockList(getActivity(), false));

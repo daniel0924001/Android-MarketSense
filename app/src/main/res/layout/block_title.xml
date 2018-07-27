@@ -21,7 +21,7 @@
         android:ellipsize="end"
         android:textColor="@color/marketsense_text_black"
         android:textSize="18sp"
-        android:fontFamily="Roboto-Regular"
+        android:fontFamily="sans-serif"
         android:textStyle="bold"
         android:text="@string/title_comment"
         android:lineSpacingExtra="4dp"

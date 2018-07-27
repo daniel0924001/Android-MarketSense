@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:textColor="@color/marketsense_text_black"
         android:textSize="18sp"
-        android:fontFamily="Roboto-Regular"
+        android:fontFamily="sans-serif"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp"
         android:layout_marginStart="25dp"

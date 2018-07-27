@@ -118,9 +118,9 @@ public class RankingGridViewAdapter extends BaseAdapter {
             public int compare(Stock stock1, Stock stock2) {
                 switch (mRankType) {
                     case RANKING_BY_TECH:
-                        return compareValue(Math.abs(stock2.getPredictionTechScore()), Math.abs(stock1.getPredictionTechScore()));
+                        return compareValue(stock2, stock1, RANKING_BY_TECH);
                     case RANKING_BY_NEWS:
-                        return compareValue(Math.abs(stock2.getPredictNewsScore()), Math.abs(stock1.getPredictNewsScore()));
+                        return compareValue(stock2, stock1, RANKING_BY_NEWS);
                     default:
                         return 0;
                 }
@@ -136,5 +136,24 @@ public class RankingGridViewAdapter extends BaseAdapter {
         } else {
             return -1;
         }
+    }
+
+    private int compareValue(Stock stock1, Stock stock2, int type) {
+        float value1 = 0, value2 = 0;
+        if(type == RANKING_BY_TECH) {
+            value1 = (stock1.getDiffDirection() == stock1.getPredictTechDirection()) ? 10 : -10;
+            value2 = (stock2.getDiffDirection() == stock2.getPredictTechDirection()) ? 10 : -10;
+
+            value1 += Math.abs(stock1.getPredictionTechScore());
+            value2 += Math.abs(stock2.getPredictionTechScore());
+        } else if(type == RANKING_BY_NEWS) {
+            value1 = (stock1.getDiffDirection() == stock1.getConfidenceDirection()) ? 10 : -10;
+            value2 = (stock2.getDiffDirection() == stock2.getConfidenceDirection()) ? 10 : -10;
+
+            value1 += Math.abs(stock1.getPredictNewsScore());
+            value2 += Math.abs(stock2.getPredictNewsScore());
+        }
+
+        return compareValue(value1, value2);
     }
 }

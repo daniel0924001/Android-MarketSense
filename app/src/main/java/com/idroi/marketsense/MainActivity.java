@@ -619,12 +619,13 @@ public class MainActivity extends AppCompatActivity {
             }
         } else if (requestCode == sSearchAndOpenRequestCode) {
             if(resultCode == RESULT_OK) {
-//                String name = data.getStringExtra(EXTRA_SELECTED_COMPANY_NAME_KEY);
+                String name = data.getStringExtra(EXTRA_SELECTED_COMPANY_NAME_KEY);
                 String code = data.getStringExtra(EXTRA_SELECTED_COMPANY_CODE_KEY);
                 Stock stock = ClientData.getInstance(this).getPriceFromCode(code);
 
                 if(stock == null || !MarketSenseUtils.isNetworkAvailable(this)) {
-                    Toast.makeText(this, R.string.title_can_not_open_stock_page, Toast.LENGTH_SHORT).show();
+                    String format = getResources().getString(R.string.title_can_not_open_stock_page);
+                    Toast.makeText(this, String.format(format, name), Toast.LENGTH_SHORT).show();
                     return;
                 }
 

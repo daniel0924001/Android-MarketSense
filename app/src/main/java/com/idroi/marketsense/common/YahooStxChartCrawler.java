@@ -77,7 +77,7 @@ public class YahooStxChartCrawler {
         mRetryRunnable = new Runnable() {
             @Override
             public void run() {
-                makeRequest(mUrl);
+                makeRequest(mUrl, false);
             }
         };
         mTimeoutRunnable = new Runnable() {
@@ -88,7 +88,7 @@ public class YahooStxChartCrawler {
                     mStockChartDataRequest = null;
                 }
                 if(isRetry()) {
-                    makeRequest(mUrl);
+                    makeRequest(mUrl, false);
                 } else {
                     resetRetryTime();
                     mYahooStxChartListener.onStxChartDataFail(MarketSenseError.NETWORK_CONNECTION_TIMEOUT);
@@ -128,33 +128,35 @@ public class YahooStxChartCrawler {
             return;
         }
 
-        if(mStockTradeData.getType().equals(StockTradeData.STOCK_TRADE_DATA_TYPE_TICK)) {
-            mPriceLineChart.setVisibility(View.VISIBLE);
-            mCandleStickChart.setVisibility(View.INVISIBLE);
-            YahooStxChartTickRenderer tickRenderer =
-                    new YahooStxChartTickRenderer(mName, mCode, mPriceLineChart, mVolumeBarChart);
-            tickRenderer.render(context, mStockTradeData);
-            MarketSenseRendererHelper.addTextView(mDateTextView, mStockTradeData.getTickTradeDay());
-            MarketSenseRendererHelper.addTextView(mVolumeTextView, mStockTradeData.getTickTotalVolume());
-            MarketSenseRendererHelper.addTextView(mOpenTextView, String.valueOf(mStockTradeData.getOpenPrice()));
-            MarketSenseRendererHelper.addTextView(mHighTextView, String.valueOf(mStockTradeData.getHighPrice()));
-            MarketSenseRendererHelper.addTextView(mLowTextView, String.valueOf(mStockTradeData.getLowPrice()));
-            MarketSenseRendererHelper.addTextView(mYesterdayCloseTextView, String.valueOf(mStockTradeData.getYesterdayPrice()));
-        } else if(mStockTradeData.getType().equals(StockTradeData.STOCK_TRADE_DATA_TYPE_TA)) {
-            mPriceLineChart.setVisibility(View.INVISIBLE);
-            mCandleStickChart.setVisibility(View.VISIBLE);
-            YahooStxChartTaRenderer taRenderer =
-                    new YahooStxChartTaRenderer(mName, mCode, mCandleStickChart, mVolumeBarChart);
-            taRenderer.setInformationTextView(mPriceTextView, mDiffTextView, mOpenTextView, mHighTextView, mLowTextView, mYesterdayCloseTextView, mDateTextView, mVolumeTextView);
-            StockTaData stockTaData = mStockTradeData.getLastStockTaData(0);
-            StockTaData stockTaDataYesterday = mStockTradeData.getLastStockTaData(1);
-            MarketSenseRendererHelper.addTextView(mDateTextView, StockTradeData.getTaTradeDate(stockTaData.getTime().toString()));
-            MarketSenseRendererHelper.addTextView(mVolumeTextView, StockVolumeFormatter.getFormattedValue(stockTaData.getVolume()));
-            MarketSenseRendererHelper.addTextView(mOpenTextView, String.valueOf(stockTaData.getOpen()));
-            MarketSenseRendererHelper.addTextView(mHighTextView, String.valueOf(stockTaData.getShadowHigh()));
-            MarketSenseRendererHelper.addTextView(mLowTextView, String.valueOf(stockTaData.getShadowLow()));
-            MarketSenseRendererHelper.addTextView(mYesterdayCloseTextView, String.valueOf(stockTaDataYesterday.getClose()));
-            taRenderer.render(context, mStockTradeData);
+        if(mStockTradeData != null) {
+            if (mStockTradeData.getType().equals(StockTradeData.STOCK_TRADE_DATA_TYPE_TICK)) {
+                mPriceLineChart.setVisibility(View.VISIBLE);
+                mCandleStickChart.setVisibility(View.INVISIBLE);
+                YahooStxChartTickRenderer tickRenderer =
+                        new YahooStxChartTickRenderer(mName, mCode, mPriceLineChart, mVolumeBarChart);
+                tickRenderer.render(context, mStockTradeData);
+                MarketSenseRendererHelper.addTextView(mDateTextView, mStockTradeData.getTickTradeDay());
+                MarketSenseRendererHelper.addTextView(mVolumeTextView, mStockTradeData.getTickTotalVolume());
+                MarketSenseRendererHelper.addTextView(mOpenTextView, String.valueOf(mStockTradeData.getOpenPrice()));
+                MarketSenseRendererHelper.addTextView(mHighTextView, String.valueOf(mStockTradeData.getHighPrice()));
+                MarketSenseRendererHelper.addTextView(mLowTextView, String.valueOf(mStockTradeData.getLowPrice()));
+                MarketSenseRendererHelper.addTextView(mYesterdayCloseTextView, String.valueOf(mStockTradeData.getYesterdayPrice()));
+            } else if (mStockTradeData.getType().equals(StockTradeData.STOCK_TRADE_DATA_TYPE_TA)) {
+                mPriceLineChart.setVisibility(View.INVISIBLE);
+                mCandleStickChart.setVisibility(View.VISIBLE);
+                YahooStxChartTaRenderer taRenderer =
+                        new YahooStxChartTaRenderer(mName, mCode, mCandleStickChart, mVolumeBarChart);
+                taRenderer.setInformationTextView(mPriceTextView, mDiffTextView, mOpenTextView, mHighTextView, mLowTextView, mYesterdayCloseTextView, mDateTextView, mVolumeTextView);
+                StockTaData stockTaData = mStockTradeData.getLastStockTaData(0);
+                StockTaData stockTaDataYesterday = mStockTradeData.getLastStockTaData(1);
+                MarketSenseRendererHelper.addTextView(mDateTextView, StockTradeData.getTaTradeDate(stockTaData.getTime().toString()));
+                MarketSenseRendererHelper.addTextView(mVolumeTextView, StockVolumeFormatter.getFormattedValue(stockTaData.getVolume()));
+                MarketSenseRendererHelper.addTextView(mOpenTextView, String.valueOf(stockTaData.getOpen()));
+                MarketSenseRendererHelper.addTextView(mHighTextView, String.valueOf(stockTaData.getShadowHigh()));
+                MarketSenseRendererHelper.addTextView(mLowTextView, String.valueOf(stockTaData.getShadowLow()));
+                MarketSenseRendererHelper.addTextView(mYesterdayCloseTextView, String.valueOf(stockTaDataYesterday.getClose()));
+                taRenderer.render(context, mStockTradeData);
+            }
         }
     }
 
@@ -175,8 +177,15 @@ public class YahooStxChartCrawler {
     }
 
     private void makeRequest(String url) {
+        makeRequest(url, true);
+    }
 
-        clear();
+    private void makeRequest(String url, boolean isClear) {
+
+        if(isClear) {
+            clear();
+        }
+
         final Context context = getContextOrDestroy();
         if(context == null) {
             return;

@@ -54,6 +54,7 @@
             android:textSize="20sp"
             android:text="@string/ops_something_wrong"
             android:textColor="@color/marketsense_text_light_gray"
+            android:fontFamily="sans-serif"
             android:gravity="center"
             app:layout_constraintTop_toBottomOf="@id/no_comment_iv"
             app:layout_constraintStart_toStartOf="parent"

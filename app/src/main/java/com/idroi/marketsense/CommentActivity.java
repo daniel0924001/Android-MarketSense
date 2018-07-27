@@ -162,12 +162,10 @@ public class CommentActivity extends AppCompatActivity {
         // fire text
         if(fireTextView != null) {
             if (news.isOptimistic()) {
-                fireTextView.setText(R.string.title_news_good);
                 fireTextView.setTextColor(
                         fireTextView.getContext().getResources().getColor(R.color.colorTrendUp));
                 fireTextView.setVisibility(View.VISIBLE);
             } else if (news.isPessimistic()) {
-                fireTextView.setText(R.string.title_news_bad);
                 fireTextView.setTextColor(
                         fireTextView.getContext().getResources().getColor(R.color.colorTrendDown));
                 fireTextView.setVisibility(View.VISIBLE);
@@ -177,26 +175,32 @@ public class CommentActivity extends AppCompatActivity {
         }
 
         // fire image
-        if(fireImageView != null) {
+        if(fireImageView != null && fireTextView != null) {
             fireImageView.setVisibility(View.VISIBLE);
             switch (news.getLevel()) {
                 case 3:
-                    fireImageView.setImageResource(R.mipmap.ic_fire_red3);
+                    fireImageView.setImageResource(R.mipmap.ic_news_up3);
+                    fireTextView.setText(R.string.title_news_good3);
                     break;
                 case 2:
-                    fireImageView.setImageResource(R.mipmap.ic_fire_red2);
+                    fireImageView.setImageResource(R.mipmap.ic_news_up2);
+                    fireTextView.setText(R.string.title_news_good2);
                     break;
                 case 1:
-                    fireImageView.setImageResource(R.mipmap.ic_fire_red1);
+                    fireImageView.setImageResource(R.mipmap.ic_news_up1);
+                    fireTextView.setText(R.string.title_news_good1);
                     break;
                 case -1:
-                    fireImageView.setImageResource(R.mipmap.ic_fire_green1);
+                    fireImageView.setImageResource(R.mipmap.ic_news_down1);
+                    fireTextView.setText(R.string.title_news_bad1);
                     break;
                 case -2:
-                    fireImageView.setImageResource(R.mipmap.ic_fire_green2);
+                    fireImageView.setImageResource(R.mipmap.ic_news_down2);
+                    fireTextView.setText(R.string.title_news_bad2);
                     break;
                 case -3:
-                    fireImageView.setImageResource(R.mipmap.ic_fire_green3);
+                    fireImageView.setImageResource(R.mipmap.ic_news_down3);
+                    fireTextView.setText(R.string.title_news_bad3);
                     break;
                 default:
                     fireImageView.setVisibility(View.GONE);

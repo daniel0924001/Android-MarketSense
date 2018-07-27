@@ -52,12 +52,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/colorTrendUp"
-        android:textSize="14sp"
+        android:textSize="12sp"
         android:fontFamily="sans-serif"
-        android:text="@string/title_news_good"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toStartOf="@id/marketsense_news_fire_iv"
-        app:layout_constraintTop_toTopOf="@id/marketsense_news_date_tv" />
+        android:text="@string/title_news_good3"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintEnd_toEndOf="@id/marketsense_news_fire_iv"
+        app:layout_constraintTop_toTopOf="@id/marketsense_news_fire_iv"
+        app:layout_constraintBottom_toBottomOf="@id/marketsense_news_fire_iv"/>
 
     <ImageView
         android:id="@+id/marketsense_news_fire_iv"
@@ -65,9 +66,8 @@
         android:layout_height="wrap_content"
         android:contentDescription="@string/iv_alarm"
         android:layout_marginEnd="16dp"
-        app:srcCompat="@mipmap/ic_fire_red3"
-        app:layout_constraintTop_toTopOf="@id/marketsense_news_fire_tv"
-        app:layout_constraintBottom_toBottomOf="@id/marketsense_news_fire_tv"
+        app:srcCompat="@mipmap/ic_news_up3"
+        app:layout_constraintTop_toTopOf="@id/marketsense_news_date_tv"
         app:layout_constraintEnd_toEndOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

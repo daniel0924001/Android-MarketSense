@@ -371,28 +371,28 @@ public class RichEditorActivity extends AppCompatActivity {
 
         switch (level) {
             case 3:
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_fire_red3);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_good);
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_news_up3);
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_good3);
                 break;
             case 2:
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_fire_red2);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_good);
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_news_up2);
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_good2);
                 break;
             case 1:
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_fire_red1);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_good);
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_news_up1);
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_good1);
                 break;
             case -1:
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_fire_green1);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_bad);
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_news_down1);
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_bad1);
                 break;
             case -2:
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_fire_green2);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_bad);
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_news_down2);
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_bad2);
                 break;
             case -3:
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_fire_green3);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_bad);
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_news_down3);
+                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_bad3);
                 break;
             default:
                 intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, 0);

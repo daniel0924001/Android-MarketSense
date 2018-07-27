@@ -132,12 +132,10 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
         // fire text
         if(commentViewHolder.fireTextView != null) {
             if (news.isOptimistic()) {
-                commentViewHolder.fireTextView.setText(R.string.title_news_good);
                 commentViewHolder.fireTextView.setTextColor(
                         commentViewHolder.fireTextView.getContext().getResources().getColor(R.color.colorTrendUp));
                 commentViewHolder.fireTextView.setVisibility(View.VISIBLE);
             } else if (news.isPessimistic()) {
-                commentViewHolder.fireTextView.setText(R.string.title_news_bad);
                 commentViewHolder.fireTextView.setTextColor(
                         commentViewHolder.fireTextView.getContext().getResources().getColor(R.color.colorTrendDown));
                 commentViewHolder.fireTextView.setVisibility(View.VISIBLE);
@@ -151,22 +149,28 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
             commentViewHolder.fireImageView.setVisibility(View.VISIBLE);
             switch (news.getLevel()) {
                 case 3:
-                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_red3);
+                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_up3);
+                    commentViewHolder.fireTextView.setText(R.string.title_news_good3);
                     break;
                 case 2:
-                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_red2);
+                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_up2);
+                    commentViewHolder.fireTextView.setText(R.string.title_news_good2);
                     break;
                 case 1:
-                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_red1);
+                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_up1);
+                    commentViewHolder.fireTextView.setText(R.string.title_news_good1);
                     break;
                 case -1:
-                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_green1);
+                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_down1);
+                    commentViewHolder.fireTextView.setText(R.string.title_news_bad1);
                     break;
                 case -2:
-                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_green2);
+                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_down2);
+                    commentViewHolder.fireTextView.setText(R.string.title_news_bad2);
                     break;
                 case -3:
-                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_green3);
+                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_down3);
+                    commentViewHolder.fireTextView.setText(R.string.title_news_bad3);
                     break;
                 default:
                     commentViewHolder.fireImageView.setVisibility(View.GONE);

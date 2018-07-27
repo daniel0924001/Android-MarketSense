@@ -49,11 +49,9 @@ public class NewsRenderer implements MarketSenseRenderer<News>{
 
         // fire text
         if(content.isOptimistic()) {
-            newsViewHolder.fireTextView.setText(R.string.title_news_good);
             newsViewHolder.fireTextView.setTextColor(context.getResources().getColor(R.color.colorTrendUp));
             newsViewHolder.fireTextView.setVisibility(View.VISIBLE);
         } else if(content.isPessimistic()) {
-            newsViewHolder.fireTextView.setText(R.string.title_news_bad);
             newsViewHolder.fireTextView.setTextColor(context.getResources().getColor(R.color.colorTrendDown));
             newsViewHolder.fireTextView.setVisibility(View.VISIBLE);
         } else {
@@ -64,22 +62,28 @@ public class NewsRenderer implements MarketSenseRenderer<News>{
         newsViewHolder.fireImageView.setVisibility(View.VISIBLE);
         switch (content.getLevel()) {
             case 3:
-                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_red3);
+                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_up3);
+                newsViewHolder.fireTextView.setText(R.string.title_news_good3);
                 break;
             case 2:
-                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_red2);
+                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_up2);
+                newsViewHolder.fireTextView.setText(R.string.title_news_good2);
                 break;
             case 1:
-                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_red1);
+                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_up1);
+                newsViewHolder.fireTextView.setText(R.string.title_news_good1);
                 break;
             case -1:
-                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_green1);
+                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_down1);
+                newsViewHolder.fireTextView.setText(R.string.title_news_bad1);
                 break;
             case -2:
-                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_green2);
+                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_down2);
+                newsViewHolder.fireTextView.setText(R.string.title_news_bad2);
                 break;
             case -3:
-                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_green3);
+                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_down3);
+                newsViewHolder.fireTextView.setText(R.string.title_news_bad3);
                 break;
             default:
                 newsViewHolder.fireImageView.setVisibility(View.GONE);

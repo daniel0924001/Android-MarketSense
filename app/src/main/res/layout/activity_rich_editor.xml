@@ -370,7 +370,7 @@
             android:textSize="12sp"
             android:textStyle="bold"
             android:fontFamily="sans-serif"
-            android:text="@string/title_news_good"
+            android:text="@string/title_news_good1"
             android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toStartOf="@id/comment_news_fire_iv"
             app:layout_constraintTop_toTopOf="@id/comment_news_fire_iv" />

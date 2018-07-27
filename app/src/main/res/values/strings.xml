@@ -28,8 +28,12 @@
 
     <string name="title_news_title">新聞標題</string>
     <string name="title_news_date">新聞時間</string>
-    <string name="title_news_good">利多</string>
-    <string name="title_news_bad">利空</string>
+    <string name="title_news_good3">超利多</string>
+    <string name="title_news_good2">大利多</string>
+    <string name="title_news_good1">利多</string>
+    <string name="title_news_bad3">超利空</string>
+    <string name="title_news_bad2">大利空</string>
+    <string name="title_news_bad1">利空</string>
 
     <string name="title_news_win_predict">預測漲最多股票</string>
     <string name="title_news_lose_predict">預測跌最多股票</string>

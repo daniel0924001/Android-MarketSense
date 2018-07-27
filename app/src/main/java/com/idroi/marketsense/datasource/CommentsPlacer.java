@@ -59,9 +59,9 @@ public class CommentsPlacer {
                 mRaiseNumber = commentAndVote.getRaiseNumber();
                 mFallNumber = commentAndVote.getFallNumber();
 
-                if(mCommentArrayList != null) {
-                    Collections.sort(mCommentArrayList, genComparator());
-                }
+//                if(mCommentArrayList != null) {
+//                    Collections.sort(mCommentArrayList, genComparator());
+//                }
 
                 if(mCommentsListener != null) {
                     mCommentsListener.onCommentsLoaded(commentAndVote);

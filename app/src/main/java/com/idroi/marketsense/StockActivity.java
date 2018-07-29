@@ -537,7 +537,7 @@ public class StockActivity extends AppCompatActivity {
         Bundle bundle = new Bundle();
         bundle.putString(KEYWORD_NAME, mStockName);
         mNewsRecyclerView = findViewById(R.id.news_recycler_view);
-        mNewsRecyclerAdapter = new NewsRecyclerAdapter(this, KEYWORD_TASK_ID, bundle);
+        mNewsRecyclerAdapter = new NewsRecyclerAdapter(this, KEYWORD_TASK_ID, bundle, false);
         mNewsRecyclerAdapter.setNewsLayoutType(NEWS_SINGLE_LAYOUT);
         mNewsRecyclerView.setAdapter(mNewsRecyclerAdapter);
         mNewsRecyclerView.setNestedScrollingEnabled(false);

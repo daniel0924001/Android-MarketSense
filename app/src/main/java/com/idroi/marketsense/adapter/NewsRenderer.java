@@ -3,6 +3,7 @@ package com.idroi.marketsense.adapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,9 +21,11 @@ import com.idroi.marketsense.data.News;
 public class NewsRenderer implements MarketSenseRenderer<News>{
 
     @NonNull private final WeakHashMap<View, NewsViewHolder> mViewHolderMap;
+    private boolean mIsShowRelatedStockNames;
 
-    NewsRenderer() {
+    NewsRenderer(boolean showRelatedStockNames) {
         mViewHolderMap = new WeakHashMap<View, NewsViewHolder>();
+        mIsShowRelatedStockNames = showRelatedStockNames;
     }
 
     @Override
@@ -88,6 +91,19 @@ public class NewsRenderer implements MarketSenseRenderer<News>{
             default:
                 newsViewHolder.fireImageView.setVisibility(View.GONE);
         }
+
+        // related stock news
+        String[] relatedStockNames = content.getStockKeywords();
+        newsViewHolder.relatedStockNameAdapter.setRelatedStockNames(relatedStockNames);
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) newsViewHolder.dateView.getLayoutParams();
+        if(mIsShowRelatedStockNames && newsViewHolder.relatedStockNameAdapter.hasRelatedStock()) {
+            params.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+            newsViewHolder.relatedRecyclerView.setVisibility(View.VISIBLE);
+        } else {
+            params.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
+            newsViewHolder.relatedRecyclerView.setVisibility(View.GONE);
+        }
+        newsViewHolder.dateView.setLayoutParams(params);
     }
 
     private void setViewVisibility(final NewsViewHolder newsViewHolder, final int visibility) {

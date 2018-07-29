@@ -158,6 +158,16 @@ public class ClientData {
         }
     }
 
+    public Stock getPriceFromName(String name) {
+        if(mRealTimePricesHashMap != null) {
+            String code = getCodeFromName(name);
+            return mRealTimePricesHashMap.get(code);
+        } else {
+            MSLog.e("mRealTimePricesHashMap is null");
+            return null;
+        }
+    }
+
     public ArrayList<Stock> getAllStocksListInfo() {
         return mAllStocksListInfo;
     }

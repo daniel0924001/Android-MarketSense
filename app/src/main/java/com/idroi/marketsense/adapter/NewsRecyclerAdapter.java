@@ -66,11 +66,15 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
     private int mCurrentRetries = 0;
 
     public NewsRecyclerAdapter(final Activity activity, int taskId, Bundle bundle) {
+        this(activity, taskId, bundle, true);
+    }
+
+    public NewsRecyclerAdapter(final Activity activity, int taskId, Bundle bundle, boolean isShowRelatedStockNames) {
         mActivity = activity;
         mHandler = new Handler();
         mNewsStreamPlacer = new NewsStreamPlacer(activity, taskId, bundle);
 
-        mNewsRenderer = new NewsRenderer();
+        mNewsRenderer = new NewsRenderer(isShowRelatedStockNames);
         mNewsFirstRowRenderer = new NewsFirstRowRenderer();
         mNewsSecondRowRenderer = new NewsSecondRowRenderer();
 

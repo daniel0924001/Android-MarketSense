@@ -41,7 +41,7 @@ public class MarketSenseFirebaseMessagingService extends FirebaseMessagingServic
                 MSLog.i("onMessageReceived " + s + ": " + remoteMessage.getData().get(s));
             }
 
-            NotificationHelper.sendNotification(this, remoteMessage.getFrom(), remoteMessage.getData());
+            NotificationHelper.sendNotification(this, remoteMessage.getData());
         }
 
         // Check if message contains a notification payload.

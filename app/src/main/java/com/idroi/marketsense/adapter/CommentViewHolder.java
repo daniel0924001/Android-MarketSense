@@ -37,6 +37,7 @@ public class CommentViewHolder {
     // comment_list_item_large_border
     @Nullable ConstraintLayout newsBlock;
     @Nullable TextView newsTitleView;
+    @Nullable TextView newsDateView;
     @Nullable TextView fireTextView;
     @Nullable ImageView fireImageView;
 
@@ -76,6 +77,7 @@ public class CommentViewHolder {
             // comment_list_item_large_border
             commentViewHolder.newsBlock = view.findViewById(R.id.comment_news_block);
             commentViewHolder.newsTitleView = view.findViewById(R.id.comment_news_title_tv);
+            commentViewHolder.newsDateView = view.findViewById(R.id.comment_news_date_tv);
             commentViewHolder.fireTextView = view.findViewById(R.id.comment_news_fire_tv);
             commentViewHolder.fireImageView = view.findViewById(R.id.comment_news_fire_iv);
 

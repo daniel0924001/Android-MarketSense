@@ -105,6 +105,7 @@
     <string name="title_predict_today_answer_disclosure">今日收盤預測</string>
     <string name="title_predict_tomorrow">次交易日預測</string>
     <string name="title_predict_none">無法預測</string>
+    <string name="title_hit">命中</string>
 
     <string name="title_fundamental">基本面</string>
     <string name="title_people">鄉民面</string>

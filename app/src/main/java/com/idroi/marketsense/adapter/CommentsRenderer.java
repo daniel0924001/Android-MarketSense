@@ -128,6 +128,7 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
             });
         }
         MarketSenseRendererHelper.addTextView(commentViewHolder.newsTitleView, news.getTitle());
+        MarketSenseRendererHelper.addTextView(commentViewHolder.newsDateView, news.getDate());
 
         // fire text
         if(commentViewHolder.fireTextView != null) {

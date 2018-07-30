@@ -43,7 +43,6 @@ public class RelatedStockNameRenderer implements MarketSenseRenderer<Stock> {
 
         MarketSenseRendererHelper.addTextView(viewHolder.titleView, content.getName());
         MarketSenseRendererHelper.addTextView(viewHolder.diffView, content.getDiffPercentage());
-        MSLog.e("name: " + content.getName() + ", diff: " + content.getDiffPercentage());
 
         int colorResourceId = view.getContext().getResources().getColor(content.getDiffColorResourceId());
         viewHolder.diffView.setTextColor(colorResourceId);

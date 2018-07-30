@@ -28,6 +28,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.idroi.marketsense.adapter.DiscussionScreenSlidePagerAdapter;
 import com.idroi.marketsense.adapter.MainPageScreenSlidePagerAdapter;
@@ -71,6 +72,7 @@ import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_MAIN_ACTIVITY_FUN
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_USER_HAS_LOGIN;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_USER_LOGIN_FAILED;
 import static com.idroi.marketsense.notification.NotificationHelper.NEWS_GENERAL_ALL;
+import static com.idroi.marketsense.notification.NotificationHelper.USER_REGISTRATION_TOKEN_PREFIX;
 import static com.idroi.marketsense.notification.NotificationHelper.VOTING_GENERAL_ALL;
 
 public class MainActivity extends AppCompatActivity {
@@ -178,8 +180,10 @@ public class MainActivity extends AppCompatActivity {
 
         FirebaseMessaging.getInstance().subscribeToTopic(NEWS_GENERAL_ALL);
         FirebaseMessaging.getInstance().subscribeToTopic(VOTING_GENERAL_ALL);
+        String userRegistrationTokenTopic = USER_REGISTRATION_TOKEN_PREFIX+FirebaseInstanceId.getInstance().getId();
+        FirebaseMessaging.getInstance().subscribeToTopic(userRegistrationTokenTopic);
 
-        MSLog.i("Initialize ClientData");
+        MSLog.i("Initialize ClientData: " + userRegistrationTokenTopic);
         ClientData clientData = ClientData.getInstance(this);
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         int width = (int)Math.ceil((double)metrics.widthPixels/metrics.density);

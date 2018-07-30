@@ -263,7 +263,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if(FBHelper.checkFBLogin()) {
                     startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
-                            NewsWebViewActivity.this, RichEditorActivity.TYPE.NEWS, mId, mStockKeywords, mTitle, mLevel),
+                            NewsWebViewActivity.this, RichEditorActivity.TYPE.NEWS, mId, mStockKeywords, mTitle, mLevel, mSourceDate),
                             sEditorRequestCode);
                     overridePendingTransition(R.anim.enter, R.anim.stop);
                 } else {
@@ -322,7 +322,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
                 if(notifyId == NOTIFY_ID_NEWS_COMMENT_CLICK && FBHelper.checkFBLogin()) {
                     if(mLastClickAction == LAST_CLICK_IS_COMMENT) {
                         startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
-                                NewsWebViewActivity.this, RichEditorActivity.TYPE.NEWS, mId, mStockKeywords, mTitle, mLevel),
+                                NewsWebViewActivity.this, RichEditorActivity.TYPE.NEWS, mId, mStockKeywords, mTitle, mLevel, mSourceDate),
                                 sEditorRequestCode);
                         overridePendingTransition(R.anim.enter, R.anim.stop);
                     } else if(mLastClickAction == LAST_CLICK_IS_LIKE) {

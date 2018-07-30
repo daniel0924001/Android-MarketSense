@@ -34,6 +34,8 @@ public class StockViewHolder {
     TextView rightTitle;
     TextView rightValue;
 
+    ImageView hitImageView;
+
     static final StockViewHolder EMPTY_VIEW_HOLDER = new StockViewHolder();
 
     private StockViewHolder() {}
@@ -58,6 +60,8 @@ public class StockViewHolder {
             stockViewHolder.rightBlock = view.findViewById(R.id.predict_block);
             stockViewHolder.rightTitle = view.findViewById(R.id.predict_title);
             stockViewHolder.rightValue = view.findViewById(R.id.predict_value);
+
+            stockViewHolder.hitImageView = view.findViewById(R.id.ic_hit);
 
             return stockViewHolder;
         } catch (ClassCastException exception) {

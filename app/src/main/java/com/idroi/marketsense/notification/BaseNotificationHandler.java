@@ -38,9 +38,14 @@ public abstract class BaseNotificationHandler {
 
     public static final String TITLE_KEY = "title";
     public static final String DESCRIPTION_KEY = "description";
+    public static final String TOPICS = "topics";
+    public static final String IMPORTANCE = "importance";
+
+    private int mImportance;
 
     BaseNotificationHandler(Map<String, String> data) {
         mData = data;
+        mImportance = Integer.valueOf(data.get(IMPORTANCE) != null ? data.get(IMPORTANCE) : "3");
     }
 
     public void sendNotification(Context context) {
@@ -50,9 +55,9 @@ public abstract class BaseNotificationHandler {
 
     protected int getImportanceScore() {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            return NotificationManager.IMPORTANCE_DEFAULT;
+            return Math.min(mImportance, NotificationManager.IMPORTANCE_DEFAULT);
         } else {
-            return 3;
+            return Math.min(mImportance, 3);
         }
     }
 
@@ -74,11 +79,11 @@ public abstract class BaseNotificationHandler {
         String channelId = getChannelId(context);
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(context, channelId)
-                        .setSmallIcon(R.drawable.ic_trending_up_red_24px)
+                        .setSmallIcon(R.drawable.ic_notification_logo)
                         .setContentTitle(title)
                         .setContentText(text)
                         .setAutoCancel(true)
-                        .setColor(context.getResources().getColor(R.color.colorPrimary))
+                        .setColor(context.getResources().getColor(R.color.text_pink))
                         .setContentIntent(pendingIntent)
                         .setVibrate(new long[] {0})
                         .setOnlyAlertOnce(true);

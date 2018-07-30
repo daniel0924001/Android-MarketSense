@@ -143,7 +143,10 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
         setColor(context, stockViewHolder, content);
 
         content.setRightPredictionBlock(context,
-                stockViewHolder.rightBlock, stockViewHolder.rightTitle, stockViewHolder.rightValue);
+                stockViewHolder.rightBlock,
+                stockViewHolder.rightTitle,
+                stockViewHolder.rightValue,
+                stockViewHolder.hitImageView);
     }
 
     private void setColor(Context context, StockViewHolder stockViewHolder, Stock content) {

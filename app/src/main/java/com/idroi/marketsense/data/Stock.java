@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.idroi.marketsense.Logging.MSLog;
@@ -364,7 +366,7 @@ public class Stock {
 
     public boolean isHitPredictionDirection(boolean isCountZero) {
         return (isCountZero && mDiffDirection == TREND_FLAT)
-                || mPredictionDiffDirection == mDiffDirection;
+                || mTodayPredictionDiffDirection == mDiffDirection;
     }
 
     public double getEarnInPrediction(boolean simple) {
@@ -397,15 +399,23 @@ public class Stock {
     public void setRightPredictionBlock(Context context,
                                         ConstraintLayout predictionBlock,
                                         TextView titleTextView,
-                                        TextView valueTextView) {
+                                        TextView valueTextView,
+                                        ImageView isHitImageView) {
         Resources resources = context.getResources();
         ClientData clientData = ClientData.getInstance(context);
+        isHitImageView.setVisibility(View.GONE);
         if(clientData.isWorkDayBeforeStockClosed()) {
             titleTextView.setText(resources.getString(R.string.title_predict_today));
         } else if(clientData.isWorkDayAfterStockClosedBeforeAnswerDisclosure()) {
             titleTextView.setText(resources.getString(R.string.title_predict_today_answer_disclosure));
+            if(isHitPredictionDirection(false)) {
+                isHitImageView.setVisibility(View.VISIBLE);
+            }
         } else {
             titleTextView.setText(resources.getString(R.string.title_predict_tomorrow));
+            if(isHitPredictionDirection(false)) {
+                isHitImageView.setVisibility(View.VISIBLE);
+            }
         }
 
         valueTextView.setTextColor(resources.getColor(R.color.text_white));

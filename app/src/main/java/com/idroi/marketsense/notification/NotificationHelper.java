@@ -12,19 +12,22 @@ import java.util.Map;
 
 public class NotificationHelper {
 
+    public static final String USER_REGISTRATION_TOKEN_PREFIX = "user-registration-token-";
     public static final String NEWS_GENERAL_ALL = "news-general-all";
     public static final String VOTING_GENERAL_ALL = "voting-general-all";
     public static final String STOCK_PRICE_SELECTED_SUFFIX = "-price-selected";
 
-    public static void sendNotification(Context context, String from, Map<String, String> data) {
+    public static void sendNotification(Context context, Map<String, String> data) {
 
         BaseNotificationHandler baseNotificationHandler = null;
 
-        if(from.contains(NEWS_GENERAL_ALL)) {
+        String topics = data.get(BaseNotificationHandler.TOPICS) != null
+                ? data.get(BaseNotificationHandler.TOPICS) : "";
+        if(topics.contains(NEWS_GENERAL_ALL)) {
             baseNotificationHandler = new NewsNotification(data);
-        } else if(from.contains(STOCK_PRICE_SELECTED_SUFFIX)) {
+        } else if(topics.contains(STOCK_PRICE_SELECTED_SUFFIX)) {
             baseNotificationHandler = new StockNotification(data);
-        } else if(from.contains(VOTING_GENERAL_ALL)) {
+        } else if(topics.contains(VOTING_GENERAL_ALL)) {
             baseNotificationHandler = new VotingGeneralNotification(data);
         }
 

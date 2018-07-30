@@ -2,304 +2,321 @@
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/text_white"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <HorizontalScrollView
-        android:id="@+id/edit_action_panel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/black"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+    <!--<HorizontalScrollView-->
+        <!--android:id="@+id/edit_action_panel"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:background="@android:color/black"-->
+        <!--app:layout_constraintTop_toTopOf="parent"-->
+        <!--app:layout_constraintLeft_toLeftOf="parent"-->
+        <!--app:layout_constraintRight_toRightOf="parent"-->
+        <!--app:layout_constraintStart_toStartOf="parent"-->
+        <!--app:layout_constraintEnd_toEndOf="parent">-->
+
+        <!--<LinearLayout-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="horizontal">-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_undo"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/undo" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_redo"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/redo" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_bold"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/bold" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_italic"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/italic" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_subscript"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/subscript" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_superscript"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/superscript" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_strikethrough"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/strikethrough" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_underline"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/underline" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_heading1"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/h1" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_heading2"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/h2" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_heading3"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/h3" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_heading4"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/h4" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_heading5"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/h5" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_heading6"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/h6" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_txt_color"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/txt_color" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_bg_color"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/bg_color" />-->
+
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_indent"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/indent" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_outdent"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/outdent" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_align_left"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/justify_left" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_align_center"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/justify_center" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_align_right"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/justify_right" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_blockquote"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/blockquote" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_insert_image"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/insert_image" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_insert_link"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@drawable/insert_link" />-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/action_insert_checkbox"-->
+                <!--android:layout_width="@dimen/rich_edit_action_width"-->
+                <!--android:layout_height="@dimen/rich_edit_action_height"-->
+                <!--android:background="@color/marketsense_rich_edit_black_background"-->
+                <!--android:padding="@dimen/rich_edit_action_padding"-->
+                <!--android:scaleType="fitCenter"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:contentDescription="@null"-->
+                <!--android:src="@android:drawable/checkbox_on_background" />-->
+
+        <!--</LinearLayout>-->
+    <!--</HorizontalScrollView>-->
+    
+    <TextView
+        android:id="@+id/edit_tag_stock"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:background="@color/text_light_gray"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif"
+        android:textStyle="normal"
+        android:text="@string/tag_stock_code"
+        android:textColor="@color/text_black"
+        android:gravity="center"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <ImageButton
-                android:id="@+id/action_undo"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/undo" />
-
-            <ImageButton
-                android:id="@+id/action_redo"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/redo" />
-
-            <ImageButton
-                android:id="@+id/action_bold"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/bold" />
-
-            <ImageButton
-                android:id="@+id/action_italic"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/italic" />
-
-            <ImageButton
-                android:id="@+id/action_subscript"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/subscript" />
-
-            <ImageButton
-                android:id="@+id/action_superscript"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/superscript" />
-
-            <ImageButton
-                android:id="@+id/action_strikethrough"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/strikethrough" />
-
-            <ImageButton
-                android:id="@+id/action_underline"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/underline" />
-
-            <ImageButton
-                android:id="@+id/action_heading1"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/h1" />
-
-            <ImageButton
-                android:id="@+id/action_heading2"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/h2" />
-
-            <ImageButton
-                android:id="@+id/action_heading3"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/h3" />
-
-            <ImageButton
-                android:id="@+id/action_heading4"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/h4" />
-
-            <ImageButton
-                android:id="@+id/action_heading5"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/h5" />
-
-            <ImageButton
-                android:id="@+id/action_heading6"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/h6" />
-
-            <ImageButton
-                android:id="@+id/action_txt_color"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/txt_color" />
-
-            <ImageButton
-                android:id="@+id/action_bg_color"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/bg_color" />
-
-
-            <ImageButton
-                android:id="@+id/action_indent"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/indent" />
-
-            <ImageButton
-                android:id="@+id/action_outdent"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/outdent" />
-
-            <ImageButton
-                android:id="@+id/action_align_left"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/justify_left" />
-
-            <ImageButton
-                android:id="@+id/action_align_center"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/justify_center" />
-
-            <ImageButton
-                android:id="@+id/action_align_right"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/justify_right" />
-
-            <ImageButton
-                android:id="@+id/action_blockquote"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/blockquote" />
-
-            <ImageButton
-                android:id="@+id/action_insert_image"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/insert_image" />
-
-            <ImageButton
-                android:id="@+id/action_insert_link"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@drawable/insert_link" />
-
-            <ImageButton
-                android:id="@+id/action_insert_checkbox"
-                android:layout_width="@dimen/rich_edit_action_width"
-                android:layout_height="@dimen/rich_edit_action_height"
-                android:background="@color/marketsense_rich_edit_black_background"
-                android:padding="@dimen/rich_edit_action_padding"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="@null"
-                android:src="@android:drawable/checkbox_on_background" />
-
-        </LinearLayout>
-    </HorizontalScrollView>
-
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/rich_editor"
+        />
 
     <jp.wasabeef.richeditor.RichEditor
         android:id="@+id/rich_editor"
@@ -309,26 +326,87 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/edit_action_panel"
+        app:layout_constraintTop_toBottomOf="@id/edit_tag_stock"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <Button
-        android:id="@+id/btn_say_comment_send"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:background="@drawable/btn_round_red"
-        android:layout_marginEnd="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="30dp"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        android:drawableTop="@drawable/ic_create_white_24px"
-        android:textColor="@color/marketsense_text_white"
-        android:textSize="12sp"
-        android:text="@string/title_comment_create"
-        android:stateListAnimator="@null"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/comment_news_block"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:background="@color/card_gray_background"
+        android:visibility="visible"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@id/rich_editor"
+        app:layout_constraintBottom_toBottomOf="parent" >
+
+        <TextView
+            android:id="@+id/comment_news_title_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:textColor="@color/marketsense_text_black"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif"
+            android:text="@string/title_news_title"
+            android:paddingLeft="5dp"
+            android:paddingStart="5dp"
+            android:paddingRight="5dp"
+            android:paddingEnd="5dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <TextView
+            android:id="@+id/comment_news_date_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/marketsense_text_gray"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="sans-serif"
+            android:textSize="14sp"
+            android:text="@string/title_news_date"
+            android:paddingLeft="5dp"
+            android:paddingStart="5dp"
+            android:paddingRight="5dp"
+            android:paddingEnd="5dp"
+            app:layout_constraintStart_toStartOf="@id/comment_news_title_tv"
+            app:layout_constraintTop_toBottomOf="@id/comment_news_title_tv"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <TextView
+            android:id="@+id/comment_news_fire_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorTrendUp"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif"
+            android:text="@string/title_news_good3"
+            android:layout_marginEnd="10dp"
+            app:layout_constraintEnd_toEndOf="@id/comment_news_fire_iv"
+            app:layout_constraintTop_toTopOf="@id/comment_news_fire_iv"
+            app:layout_constraintBottom_toBottomOf="@id/comment_news_fire_iv"/>
+
+        <ImageView
+            android:id="@+id/comment_news_fire_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/iv_alarm"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            app:srcCompat="@mipmap/ic_news_up3"
+            app:layout_constraintTop_toTopOf="@id/comment_news_date_tv"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>

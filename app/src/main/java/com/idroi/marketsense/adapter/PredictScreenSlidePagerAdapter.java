@@ -28,7 +28,7 @@ public class PredictScreenSlidePagerAdapter extends BaseScreenSlidePagerAdapter 
         Bundle bundle = new Bundle();
         switch (position) {
             case 0:
-                bundle.putInt(StockListFragment.TASK_NAME, StockListFragment.TASK.PREDICT_WIN.getTaskId());
+                bundle.putInt(StockListFragment.TASK_NAME, StockListFragment.TASK.MAIN.getTaskId());
                 break;
             case 1:
                 bundle.putInt(StockListFragment.TASK_NAME, StockListFragment.TASK.SELF_CHOICES.getTaskId());

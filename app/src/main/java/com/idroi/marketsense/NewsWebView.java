@@ -2,7 +2,9 @@ package com.idroi.marketsense;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Build;
 import android.util.AttributeSet;
+import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 
@@ -11,6 +13,14 @@ import android.webkit.WebView;
  */
 
 public class NewsWebView extends WebView {
+
+    public interface OnReachMaxHeightListener {
+        void onReachMaxHeight();
+    }
+
+    private int mMaxHeight = -1;
+    private OnReachMaxHeightListener mOnReachMaxHeightListener;
+    private boolean mIsReachMaxHeight = false;
 
     public NewsWebView(Context context) {
         super(context);
@@ -29,6 +39,11 @@ public class NewsWebView extends WebView {
         init();
     }
 
+    public void setOnReachMaxHeightListener(OnReachMaxHeightListener listener) {
+        mIsReachMaxHeight = false;
+        mOnReachMaxHeightListener = listener;
+    }
+
     @SuppressLint("SetJavaScriptEnabled")
     private void init() {
 
@@ -38,6 +53,7 @@ public class NewsWebView extends WebView {
         getSettings().setBuiltInZoomControls(true);
         getSettings().setDisplayZoomControls(false);
 
+        setLayerType(View.LAYER_TYPE_HARDWARE, null);
     }
 
     @Override
@@ -58,5 +74,22 @@ public class NewsWebView extends WebView {
         }
         removeAllViews();
         super.destroy();
+    }
+
+    public void setMaxHeight(int height) {
+        mMaxHeight = height;
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        if(mMaxHeight > -1 && getMeasuredHeight() > mMaxHeight) {
+            setMeasuredDimension(getMeasuredWidth(), mMaxHeight);
+            if(mOnReachMaxHeightListener != null && !mIsReachMaxHeight) {
+                mIsReachMaxHeight = true;
+                mOnReachMaxHeightListener.onReachMaxHeight();
+            }
+        }
     }
 }

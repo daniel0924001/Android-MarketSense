@@ -8,11 +8,15 @@
     <color name="text_white">#ffffff</color>
     <color name="text_red">#F20060</color>
     <color name="text_green">#00BE9F</color>
+    <color name="text_dark_gray">#b3b3b3</color>
     <color name="text_gray">#bababa</color>
+    <color name="text_middle_gray">#bebebe</color>
     <color name="text_light_gray">#f5f5f5</color>
+    <color name="text_pink">#ff5448</color>
     <color name="border_gray">#f4f4f4</color>
-    <color name="card_gray_background">#fcfcfc</color>
+    <color name="card_gray_background">#f1f1f1</color>
     <color name="border_dark_gray">#585858</color>
+    <color name="border_light_gray">#eeeeee</color>
 
     <color name="bottom_navigation_item_checked_false">#5B737373</color>
     <color name="bottom_navigation_item_checked_false_bg">#FAFAFA</color>
@@ -31,14 +35,20 @@
 
     <color name="marketsense_rich_edit_black_background">#4a4a4a</color>
 
-    <color name="colorTrendUp">#F20060</color>
-    <color name="colorTrendDown">#00BE9F</color>
+    <color name="colorTrendUp">#e64a19</color>
+    <color name="colorTrendDown">#0f9d58</color>
     <color name="colorTrendFlat">#4a4a4a</color>
+    <color name="colorTrendFlatGray">#dfdfdf</color>
 
-    <color name="color_volume_line">#e7f11b1b</color>
+    <color name="color_volume_line">#e64a19</color>
     <color name="color_price_line">#e73b76ec</color>
     <color name="color_yellow">#E9C46A</color>
 
-    <color name="card_top_color">#ffdb62</color>
-    <color name="card_bottom_color">#ff8185</color>
+    <color name="card_top_color">#ff6a00</color>
+    <color name="card_bottom_color">#ee0979</color>
+
+    <color name="background_predict_up_top">#ff8862</color>
+    <color name="background_predict_up_bottom">#ff4248</color>
+    <color name="background_predict_down_top">#21d7c2</color>
+    <color name="background_predict_down_bottom">#03cab3</color>
 </resources>

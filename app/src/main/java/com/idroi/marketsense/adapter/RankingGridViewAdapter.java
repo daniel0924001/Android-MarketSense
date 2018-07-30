@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
+import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.data.Stock;
 
@@ -24,7 +25,7 @@ public class RankingGridViewAdapter extends BaseAdapter {
         void onItemClick(Stock stock);
     }
 
-    public static final int RANKING_BY_PEOPLE = 1;
+    public static final int RANKING_BY_TECH = 1;
     public static final int RANKING_BY_NEWS = 2;
 
     private Context mContext;
@@ -96,18 +97,18 @@ public class RankingGridViewAdapter extends BaseAdapter {
     private void setRankingIcon(ImageView imageView, Stock stock) {
         int direction = Stock.TREND_UP;
         switch (mRankType) {
-            case RANKING_BY_PEOPLE:
-                direction = stock.getPredictPeopleDirection();
+            case RANKING_BY_TECH:
+                direction = stock.getPredictTechDirection();
                 break;
             case RANKING_BY_NEWS:
                 direction = stock.getConfidenceDirection();
                 break;
         }
 
-        if(direction == Stock.TREND_UP) {
-            imageView.setImageResource(R.mipmap.ic_direction_up);
-        } else {
+        if(direction == Stock.TREND_DOWN) {
             imageView.setImageResource(R.mipmap.ic_direction_down);
+        } else {
+            imageView.setImageResource(R.mipmap.ic_direction_up);
         }
     }
 
@@ -116,10 +117,10 @@ public class RankingGridViewAdapter extends BaseAdapter {
             @Override
             public int compare(Stock stock1, Stock stock2) {
                 switch (mRankType) {
-                    case RANKING_BY_PEOPLE:
-                        return compareValue(Math.abs(stock2.getPredictPeopleScore()), Math.abs(stock1.getPredictPeopleScore()));
+                    case RANKING_BY_TECH:
+                        return compareValue(stock2, stock1, RANKING_BY_TECH);
                     case RANKING_BY_NEWS:
-                        return compareValue(Math.abs(stock2.getPredictNewsScore()), Math.abs(stock1.getPredictNewsScore()));
+                        return compareValue(stock2, stock1, RANKING_BY_NEWS);
                     default:
                         return 0;
                 }
@@ -135,5 +136,24 @@ public class RankingGridViewAdapter extends BaseAdapter {
         } else {
             return -1;
         }
+    }
+
+    private int compareValue(Stock stock1, Stock stock2, int type) {
+        float value1 = 0, value2 = 0;
+        if(type == RANKING_BY_TECH) {
+            value1 = (stock1.getDiffDirection() == stock1.getPredictTechDirection()) ? 10 : -10;
+            value2 = (stock2.getDiffDirection() == stock2.getPredictTechDirection()) ? 10 : -10;
+
+            value1 += Math.abs(stock1.getPredictionTechScore());
+            value2 += Math.abs(stock2.getPredictionTechScore());
+        } else if(type == RANKING_BY_NEWS) {
+            value1 = (stock1.getDiffDirection() == stock1.getConfidenceDirection()) ? 10 : -10;
+            value2 = (stock2.getDiffDirection() == stock2.getConfidenceDirection()) ? 10 : -10;
+
+            value1 += Math.abs(stock1.getPredictNewsScore());
+            value2 += Math.abs(stock2.getPredictNewsScore());
+        }
+
+        return compareValue(value1, value2);
     }
 }

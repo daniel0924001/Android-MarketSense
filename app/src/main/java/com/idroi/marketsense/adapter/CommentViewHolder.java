@@ -1,6 +1,9 @@
 package com.idroi.marketsense.adapter;
 
+import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -14,11 +17,29 @@ import com.idroi.marketsense.R;
 
 public class CommentViewHolder {
 
+    private final static int MAX_COMMENT_HEIGHT = 120;
+
     View mainView;
     SimpleDraweeView avatarView;
     TextView userNameView;
     TextView createTimeView;
     NewsWebView commentBodyView;
+
+    ConstraintLayout replyBlock;
+    ConstraintLayout likeBlock;
+    TextView replyView;
+    TextView likeView;
+    ImageView likeImageView;
+
+    View horizontalLineView;
+    TextView readMoreView;
+
+    // comment_list_item_large_border
+    @Nullable ConstraintLayout newsBlock;
+    @Nullable TextView newsTitleView;
+    @Nullable TextView newsDateView;
+    @Nullable TextView fireTextView;
+    @Nullable ImageView fireImageView;
 
     static final CommentViewHolder EMPTY_VIEW_HOLDER = new CommentViewHolder();
 
@@ -40,6 +61,25 @@ public class CommentViewHolder {
             commentViewHolder.commentBodyView = view.findViewById(R.id.comment_body);
             commentViewHolder.commentBodyView.getSettings().setLoadWithOverviewMode(false);
             commentViewHolder.commentBodyView.getSettings().setUseWideViewPort(false);
+            commentViewHolder.commentBodyView.getSettings().setJavaScriptEnabled(false);
+            float density = view.getContext().getResources().getDisplayMetrics().density;
+            commentViewHolder.commentBodyView.setMaxHeight((int)(MAX_COMMENT_HEIGHT * density));
+
+            commentViewHolder.replyBlock = view.findViewById(R.id.social_reply_block);
+            commentViewHolder.likeBlock = view.findViewById(R.id.social_like_block);
+            commentViewHolder.replyView = view.findViewById(R.id.tv_reply);
+            commentViewHolder.likeView = view.findViewById(R.id.tv_like);
+            commentViewHolder.likeImageView = view.findViewById(R.id.iv_like);
+
+            commentViewHolder.horizontalLineView = view.findViewById(R.id.social_horizontal_line);
+            commentViewHolder.readMoreView = view.findViewById(R.id.tv_read_more);
+
+            // comment_list_item_large_border
+            commentViewHolder.newsBlock = view.findViewById(R.id.comment_news_block);
+            commentViewHolder.newsTitleView = view.findViewById(R.id.comment_news_title_tv);
+            commentViewHolder.newsDateView = view.findViewById(R.id.comment_news_date_tv);
+            commentViewHolder.fireTextView = view.findViewById(R.id.comment_news_fire_tv);
+            commentViewHolder.fireImageView = view.findViewById(R.id.comment_news_fire_iv);
 
             return commentViewHolder;
         } catch (ClassCastException exception) {

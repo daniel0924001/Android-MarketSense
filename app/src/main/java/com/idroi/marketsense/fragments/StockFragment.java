@@ -26,7 +26,7 @@ import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
-import com.idroi.marketsense.request.SingleNewsRequest;
+import com.idroi.marketsense.request.CommentAndVoteRequest;
 
 import java.util.Locale;
 
@@ -39,6 +39,7 @@ import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_STOCK_COMMENT_CLI
  * Created by daniel.hsieh on 2018/5/6.
  */
 
+@Deprecated
 public class StockFragment extends Fragment {
 
     public final static String STOCK_CODE = "STOCK_CODE";
@@ -63,7 +64,7 @@ public class StockFragment extends Fragment {
 
     private AlertDialog mLoginAlertDialog;
     private LoginButton mFBLoginBtn;
-    private UserProfile.UserProfileChangeListener mUserProfileChangeListener;
+    private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
 
     @Nullable
     @Override
@@ -93,17 +94,19 @@ public class StockFragment extends Fragment {
         mCommentsRecyclerViewAdapter.setCommentsAvailableListener(new CommentsRecyclerViewAdapter.CommentsAvailableListener() {
             @Override
             public void onCommentsAvailable(CommentAndVote commentAndVote) {
-                if(commentAndVote.getCommentSize() > 0) {
-                    showCommentBlock(view);
+                if(commentAndVote != null) {
+                    if (commentAndVote.getCommentSize() > 0) {
+                        showCommentBlock(view);
+                    }
+                    mVoteRaiseNum = commentAndVote.getRaiseNumber();
+                    mVoteFallNum = commentAndVote.getFallNumber();
+                    setButtonStatus();
+                    MSLog.d("raise number: " + commentAndVote.getRaiseNumber());
+                    MSLog.d("fall number: " + commentAndVote.getFallNumber());
                 }
-                mVoteRaiseNum = commentAndVote.getRaiseNumber();
-                mVoteFallNum = commentAndVote.getFallNumber();
-                setButtonStatus();
-                MSLog.d("raise number: " + commentAndVote.getRaiseNumber());
-                MSLog.d("fall number: " + commentAndVote.getFallNumber());
             }
         });
-        mCommentsRecyclerViewAdapter.loadCommentsList(SingleNewsRequest.querySingleNewsUrl(mStockId, SingleNewsRequest.TASK.STOCK_COMMENT));
+        mCommentsRecyclerViewAdapter.loadCommentsList(CommentAndVoteRequest.querySingleNewsUrl(mStockId, CommentAndVoteRequest.TASK.STOCK_COMMENT));
     }
 
     private void showCommentBlock(View view) {
@@ -226,9 +229,9 @@ public class StockFragment extends Fragment {
         });
 
         UserProfile userProfile = ClientData.getInstance(getActivity()).getUserProfile();
-        mUserProfileChangeListener = new UserProfile.UserProfileChangeListener() {
+        mGlobalBroadcastListener = new UserProfile.GlobalBroadcastListener() {
             @Override
-            public void onUserProfileChange(int notifyId) {
+            public void onGlobalBroadcast(int notifyId, Object payload) {
                 if(notifyId == NOTIFY_ID_STOCK_COMMENT_CLICK && mLastClickedButtonIsComment) {
                     if(FBHelper.checkFBLogin() && getActivity() != null) {
                         startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
@@ -239,7 +242,7 @@ public class StockFragment extends Fragment {
                 }
             }
         };
-        userProfile.addUserProfileChangeListener(mUserProfileChangeListener);
+        userProfile.addGlobalBroadcastListener(mGlobalBroadcastListener);
     }
 
     private void setButtonStatus() {
@@ -277,7 +280,7 @@ public class StockFragment extends Fragment {
     @Override
     public void onDestroy() {
         UserProfile userProfile = ClientData.getInstance(getActivity()).getUserProfile();
-        userProfile.deleteUserProfileChangeListener(mUserProfileChangeListener);
+        userProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
         super.onDestroy();
     }
 

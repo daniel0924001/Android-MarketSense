@@ -36,15 +36,6 @@ public class StockNotification extends BaseNotificationHandler {
     }
 
     @Override
-    protected int getImportanceScore() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            return NotificationManager.IMPORTANCE_LOW;
-        } else {
-            return 3;
-        }
-    }
-
-    @Override
     protected String getTitle() {
         if(mTitle != null) {
             return mTitle;

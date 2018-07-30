@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -21,7 +22,7 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -44,18 +45,27 @@ import com.idroi.marketsense.common.FrescoHelper;
 import com.idroi.marketsense.common.FrescoImageHelper;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
+import com.idroi.marketsense.data.Event;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
-import com.idroi.marketsense.request.SingleNewsRequest;
+import com.idroi.marketsense.request.CommentAndVoteRequest;
 
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
-import java.util.Locale;
+import java.io.Serializable;
 
+import static com.idroi.marketsense.CommentActivity.EXTRA_COMMENT;
+import static com.idroi.marketsense.CommentActivity.EXTRA_NEED_TO_CHANGE;
+import static com.idroi.marketsense.CommentActivity.EXTRA_POSITION;
+import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_EVENT_ID;
 import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_HTML;
+import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_ID;
+import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_TYPE;
 import static com.idroi.marketsense.RichEditorActivity.sEditorRequestCode;
+import static com.idroi.marketsense.RichEditorActivity.sReplyEditorRequestCode;
+import static com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter.ADAPTER_CHANGE_LIKE_ONLY;
 import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_NEWS_COMMENT_CLICK;
 
@@ -77,16 +87,24 @@ public class NewsWebViewActivity extends AppCompatActivity {
     public static final String EXTRA_ORIGINAL_PAGE_URL = "EXTRA_ORIGINAL_PAGE_URL";
     public static final String EXTRA_VOTE_RAISE_NUM = "EXTRA_VOTE_RAISE_NUM";
     public static final String EXTRA_VOTE_FALL_NUM = "EXTRA_VOTE_FALL_NUM";
+    public static final String EXTRA_STOCK_KEYWORDS = "EXTRA_STOCK_KEYWORDS";
+    public static final String EXTRA_NEWS_LEVEL = "EXTRA_NEWS_LEVEL";
 
-    private static final float CONST_ENABLE_ALPHA = 1.0f;
-    private static final float CONST_DISABLE_ALPHA = 0.8f;
+    private static final float CONST_ENABLE_ALPHA = 0.4f;
+    private static final float CONST_DISABLE_ALPHA = 1.0f;
+
+    private static final int LAST_CLICK_IS_COMMENT = 1;
+    private static final int LAST_CLICK_IS_LIKE = 2;
+    private static final int LAST_CLICK_IS_VOTE_UP = 3;
+    private static final int LAST_CLICK_IS_VOTE_DOWN = 4;
 
     private String mId, mTitle, mImageUrl, mSourceDate;
     private String mMiddlePageUrl;
     private String mOriginalPageUrl;
     private String mPageLink;
     private int mVoteRaiseNum, mVoteFallNum;
-    private String mVoteRaisePercentageString, mVoteFallPercentageString;
+    private int mLevel;
+    private String[] mStockKeywords;
 
     private View mImageMask;
     private ScrollView mUpperBlock;
@@ -99,15 +117,18 @@ public class NewsWebViewActivity extends AppCompatActivity {
     private RecyclerView mCommentRecyclerView;
     private ProgressBar mLoadingProgressBar, mLoadingProgressBarOriginal;
 
-    private Button mReadOriginalButton, mReadMiddleButton,
-            mMiddleRaiseBtn, mMiddleFallBtn, mMiddleCommentBtn, mMiddleSendFirstBtn,
-            mOriginalRaiseBtn, mOriginalFallBtn, mOriginalCommentBtn;
+    private ConstraintLayout mVoteUpBlock, mVoteDownBlock;
+    private TextView mVoteUpTextView, mVoteDownTextView;
+    private ImageView mVoteUpImageView, mVoteDownImageView;
 
     private AlertDialog mLoginAlertDialog;
     private LoginButton mFBLoginBtn;
-    private UserProfile.UserProfileChangeListener mUserProfileChangeListener;
+    private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
     private CallbackManager mFBCallbackManager;
-    private boolean mLastClickedButtonIsComment;
+
+    private int mLastClickAction;
+    private Comment mTempComment;
+    private int mTempPosition;
 
     public static final int sPostDelayMilliSeconds = 2000;
     private boolean mIsOriginalVisible = false;
@@ -146,7 +167,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if(mIsOriginalVisible) {
-            changeVisibility();
+            changeWebViewVisibility();
         } else {
             super.onBackPressed();
             overridePendingTransition(R.anim.stop, R.anim.right_to_left);
@@ -154,206 +175,190 @@ public class NewsWebViewActivity extends AppCompatActivity {
     }
 
     private void setInformation() {
-        mId = getIntent().getStringExtra(EXTRA_MIDDLE_ID);
-        mMiddlePageUrl = getIntent().getStringExtra(EXTRA_MIDDLE_PAGE_URL);
-        mOriginalPageUrl = getIntent().getStringExtra(EXTRA_ORIGINAL_PAGE_URL);
-        mTitle = getIntent().getStringExtra(EXTRA_MIDDLE_TITLE);
-        mImageUrl = getIntent().getStringExtra(EXTRA_MIDDLE_IMAGE_URL);
-        mSourceDate = getIntent().getStringExtra(EXTRA_MIDDLE_DATE);
-        mVoteRaiseNum = getIntent().getIntExtra(EXTRA_VOTE_RAISE_NUM, 0);
-        mVoteFallNum = getIntent().getIntExtra(EXTRA_VOTE_FALL_NUM, 0);
+        Intent intent = getIntent();
+        mId = intent.getStringExtra(EXTRA_MIDDLE_ID);
+        mMiddlePageUrl = intent.getStringExtra(EXTRA_MIDDLE_PAGE_URL);
+        mOriginalPageUrl = intent.getStringExtra(EXTRA_ORIGINAL_PAGE_URL);
+        mTitle = intent.getStringExtra(EXTRA_MIDDLE_TITLE);
+        mImageUrl = intent.getStringExtra(EXTRA_MIDDLE_IMAGE_URL);
+        mSourceDate = intent.getStringExtra(EXTRA_MIDDLE_DATE);
+        mStockKeywords = intent.getStringArrayExtra(EXTRA_STOCK_KEYWORDS);
+
+        mVoteRaiseNum = intent.getIntExtra(EXTRA_VOTE_RAISE_NUM, 0);
+        mVoteFallNum = intent.getIntExtra(EXTRA_VOTE_FALL_NUM, 0);
+        mLevel = intent.getIntExtra(EXTRA_NEWS_LEVEL, 0);
     }
 
     private void initComments() {
-        TextView commentTitle = findViewById(R.id.marketsense_block_title_tv);
-        commentTitle.setText(getResources().getString(R.string.title_comment));
         mCommentRecyclerView = findViewById(R.id.marketsense_webview_comment_rv);
 
-        mCommentsRecyclerViewAdapter = new CommentsRecyclerViewAdapter(this);
+        mCommentsRecyclerViewAdapter = new CommentsRecyclerViewAdapter(this, new CommentsRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onSayLikeItemClick(Comment comment, int position) {
+                if(FBHelper.checkFBLogin()) {
+                    MSLog.d("say like at position: " + position);
+                    comment.increaseLike();
+                    comment.setLike(true);
+                    PostEvent.sendLike(NewsWebViewActivity.this, comment.getCommentId());
+                    mCommentsRecyclerViewAdapter.notifyItemChanged(position, ADAPTER_CHANGE_LIKE_ONLY);
+                } else {
+                    mTempComment = comment;
+                    mTempPosition = position;
+                    showLoginAlertDialog(LAST_CLICK_IS_LIKE);
+                }
+            }
+
+            @Override
+            public void onReplyItemClick(Comment comment, int position) {
+                MSLog.d("reply at position: " + position);
+                startActivityForResult(CommentActivity.generateCommentActivityIntent(
+                        NewsWebViewActivity.this, comment, position), sReplyEditorRequestCode);
+                overridePendingTransition(R.anim.enter, R.anim.stop);
+            }
+        });
         mCommentRecyclerView.setAdapter(mCommentsRecyclerViewAdapter);
 
         mCommentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mCommentsRecyclerViewAdapter.setCommentsAvailableListener(new CommentsRecyclerViewAdapter.CommentsAvailableListener() {
             @Override
             public void onCommentsAvailable(CommentAndVote commentAndVote) {
-                if(commentAndVote.getCommentSize() > 0) {
-                    showCommentBlock();
+                if(commentAndVote != null) {
+                    if (commentAndVote.getCommentSize() > 0) {
+                        showCommentBlock();
+                    }
+                    mVoteRaiseNum = commentAndVote.getRaiseNumber();
+                    mVoteFallNum = commentAndVote.getFallNumber();
+                    setButtonStatus();
+                    MSLog.d("raise number: " + commentAndVote.getRaiseNumber());
+                    MSLog.d("fall number: " + commentAndVote.getFallNumber());
                 }
-                mVoteRaiseNum = commentAndVote.getRaiseNumber();
-                mVoteFallNum = commentAndVote.getFallNumber();
-                setButtonStatus();
-                MSLog.d("raise number: " + commentAndVote.getRaiseNumber());
-                MSLog.d("fall number: " + commentAndVote.getFallNumber());
             }
         });
-        mCommentsRecyclerViewAdapter.loadCommentsList(SingleNewsRequest.querySingleNewsUrl(mId, SingleNewsRequest.TASK.NEWS_COMMENT));
+        mCommentsRecyclerViewAdapter.loadCommentsList(CommentAndVoteRequest.querySingleNewsUrl(mId, CommentAndVoteRequest.TASK.NEWS_COMMENT));
     }
 
     private void showCommentBlock() {
         findViewById(R.id.marketsense_webview_no_comment_iv).setVisibility(View.GONE);
         findViewById(R.id.marketsense_webview_no_comment_tv).setVisibility(View.GONE);
-        findViewById(R.id.btn_send_first).setVisibility(View.GONE);
         mCommentRecyclerView.setVisibility(View.VISIBLE);
+
+        TextView commentTitle = findViewById(R.id.comment_title);
+        int size = mCommentsRecyclerViewAdapter.getItemCount();
+        commentTitle.setText(String.format(getString(R.string.title_comment_format), size));
     }
 
     private void initBtn() {
 
-        mReadMiddleButton = (Button) findViewById(R.id.btn_convert_webview);
-        mReadOriginalButton = (Button) findViewById(R.id.btn_convert_webview_original);
-        mReadMiddleButton.setOnClickListener(new View.OnClickListener() {
+        TextView readMoreTextView = findViewById(R.id.tv_read_more);
+        readMoreTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changeVisibility();
-            }
-        });
-        mReadOriginalButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                changeVisibility();
+                changeWebViewVisibility();
             }
         });
 
-        mMiddleRaiseBtn = findViewById(R.id.btn_say_good);
-        mMiddleFallBtn = findViewById(R.id.btn_say_bad);
-        mMiddleCommentBtn = findViewById(R.id.btn_say_comment);
-        mMiddleSendFirstBtn = findViewById(R.id.btn_send_first);
-        mOriginalRaiseBtn = findViewById(R.id.btn_say_good_original);
-        mOriginalFallBtn = findViewById(R.id.btn_say_bad_original);
-        mOriginalCommentBtn = findViewById(R.id.btn_say_comment_original);
+        TextView writeCommentTextView = findViewById(R.id.social_write_comment);
+        writeCommentTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(FBHelper.checkFBLogin()) {
+                    startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
+                            NewsWebViewActivity.this, RichEditorActivity.TYPE.NEWS, mId, mStockKeywords, mTitle, mLevel, mSourceDate),
+                            sEditorRequestCode);
+                    overridePendingTransition(R.anim.enter, R.anim.stop);
+                } else {
+                    showLoginAlertDialog(LAST_CLICK_IS_COMMENT);
+                }
+            }
+        });
 
-        mLastClickedButtonIsComment = false;
+        mVoteUpBlock = findViewById(R.id.social_vote_up);
+        mVoteDownBlock = findViewById(R.id.social_vote_down);
+        mVoteUpTextView = findViewById(R.id.social_vote_up_tv);
+        mVoteDownTextView = findViewById(R.id.social_vote_down_tv);
+        mVoteUpImageView = findViewById(R.id.social_vote_up_iv);
+        mVoteDownImageView = findViewById(R.id.social_vote_down_iv);
+        mVoteUpBlock.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(FBHelper.checkFBLogin()) {
+                    MSLog.d("click good in news: " + mId);
+                    PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.EventVars.VOTE_RAISE, 1);
+                    mVoteRaiseNum += 1;
+                    setButtonStatus();
+                } else {
+                    showLoginAlertDialog(LAST_CLICK_IS_VOTE_UP);
+                }
+            }
+        });
+        mVoteDownBlock.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(FBHelper.checkFBLogin()) {
+                    MSLog.d("click bad in news: " + mId);
+                    PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.EventVars.VOTE_FALL, 1);
+                    mVoteFallNum += 1;
+                    setButtonStatus();
+                } else {
+                    showLoginAlertDialog(LAST_CLICK_IS_VOTE_DOWN);
+                }
+            }
+        });
+
+        ImageView goBackImageView = findViewById(R.id.iv_go_back);
+        goBackImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+
         setButtonStatus();
 
-        mMiddleRaiseBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mLastClickedButtonIsComment = false;
-                if(FBHelper.checkFBLogin()) {
-                    MSLog.e("click good in news: " + mId);
-                    PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.EventVars.VOTE_RAISE, 1);
-                    mVoteRaiseNum += 1;
-                    setButtonStatus();
-                } else {
-                    showLoginAlertDialog();
-                }
-            }
-        });
-
-        mMiddleFallBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mLastClickedButtonIsComment = false;
-                if(FBHelper.checkFBLogin()) {
-                    MSLog.e("click bad in news: " + mId);
-                    PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.EventVars.VOTE_FALL, 1);
-                    mVoteFallNum += 1;
-                    setButtonStatus();
-                } else {
-                    showLoginAlertDialog();
-                }
-            }
-        });
-
-        mOriginalRaiseBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mLastClickedButtonIsComment = false;
-                if(FBHelper.checkFBLogin()) {
-                    MSLog.e("click good in news: " + mId);
-                    PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.EventVars.VOTE_RAISE, 1);
-                    mVoteRaiseNum += 1;
-                    setButtonStatus();
-                } else {
-                    showLoginAlertDialog();
-                }
-            }
-        });
-
-        mOriginalFallBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mLastClickedButtonIsComment = false;
-                if(FBHelper.checkFBLogin()) {
-                    MSLog.e("click bad in news: " + mId);
-                    PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.EventVars.VOTE_FALL, 1);
-                    mVoteFallNum += 1;
-                    setButtonStatus();
-                } else {
-                    showLoginAlertDialog();
-                }
-            }
-        });
-
-        mMiddleCommentBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mLastClickedButtonIsComment = true;
-                if(FBHelper.checkFBLogin()) {
-                    startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
-                            NewsWebViewActivity.this, RichEditorActivity.TYPE.NEWS, mId),
-                            sEditorRequestCode);
-                    overridePendingTransition(R.anim.enter, R.anim.stop);
-                } else {
-                    showLoginAlertDialog();
-                }
-            }
-        });
-
-        mOriginalCommentBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mLastClickedButtonIsComment = true;
-                if(FBHelper.checkFBLogin()) {
-                    startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
-                            NewsWebViewActivity.this, RichEditorActivity.TYPE.NEWS, mId),
-                            sEditorRequestCode);
-                    overridePendingTransition(R.anim.enter, R.anim.stop);
-                } else {
-                    showLoginAlertDialog();
-                }
-            }
-        });
-
-        mMiddleSendFirstBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mLastClickedButtonIsComment = true;
-                if(FBHelper.checkFBLogin()) {
-                    startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
-                            NewsWebViewActivity.this, RichEditorActivity.TYPE.NEWS, mId),
-                            sEditorRequestCode);
-                    overridePendingTransition(R.anim.enter, R.anim.stop);
-                } else {
-                    showLoginAlertDialog();
-                }
-            }
-        });
-
         UserProfile userProfile = ClientData.getInstance(this).getUserProfile();
-        mUserProfileChangeListener = new UserProfile.UserProfileChangeListener() {
+        mGlobalBroadcastListener = new UserProfile.GlobalBroadcastListener() {
             @Override
-            public void onUserProfileChange(int notifyId) {
-                if(notifyId == NOTIFY_ID_NEWS_COMMENT_CLICK && mLastClickedButtonIsComment) {
-                    if(FBHelper.checkFBLogin() ) {
+            public void onGlobalBroadcast(int notifyId, Object payload) {
+                if(notifyId == NOTIFY_ID_NEWS_COMMENT_CLICK && FBHelper.checkFBLogin()) {
+                    if(mLastClickAction == LAST_CLICK_IS_COMMENT) {
                         startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
-                                NewsWebViewActivity.this, RichEditorActivity.TYPE.NEWS, mId),
+                                NewsWebViewActivity.this, RichEditorActivity.TYPE.NEWS, mId, mStockKeywords, mTitle, mLevel, mSourceDate),
                                 sEditorRequestCode);
                         overridePendingTransition(R.anim.enter, R.anim.stop);
+                    } else if(mLastClickAction == LAST_CLICK_IS_LIKE) {
+                        mCommentsRecyclerViewAdapter.updateCommentsLike();
+                        MSLog.d("is like: " + mTempComment.isLiked());
+                        if(!mTempComment.isLiked()) {
+                            MSLog.d("say like at position: " + mTempPosition);
+                            mTempComment.increaseLike();
+                            mTempComment.setLike(true);
+                            PostEvent.sendLike(NewsWebViewActivity.this, mTempComment.getCommentId());
+                            mCommentsRecyclerViewAdapter.notifyItemChanged(mTempPosition, ADAPTER_CHANGE_LIKE_ONLY);
+                        }
+                    } else if(mLastClickAction == LAST_CLICK_IS_VOTE_UP) {
+                        MSLog.d("click good in news: " + mId);
+                        PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.EventVars.VOTE_RAISE, 1);
+                        mVoteRaiseNum += 1;
+                        setButtonStatus();
+                    } else if(mLastClickAction == LAST_CLICK_IS_VOTE_DOWN) {
+                        MSLog.d("click bad in news: " + mId);
+                        PostEvent.sendNewsVote(getBaseContext(), mId, PostEvent.EventVars.VOTE_FALL, 1);
+                        mVoteFallNum += 1;
+                        setButtonStatus();
                     }
                 }
             }
         };
-        userProfile.addUserProfileChangeListener(mUserProfileChangeListener);
+        userProfile.addGlobalBroadcastListener(mGlobalBroadcastListener);
     }
 
-    private void changeVisibility() {
+    private void changeWebViewVisibility() {
         if(mIsOriginalVisible) {
             // show our webview
             mIsOriginalVisible = false;
             mNewsWebViewMiddle.setVisibility(View.VISIBLE);
             mNewsWebViewOriginal.setVisibility(View.GONE);
             mUpperBlock.setVisibility(View.VISIBLE);
-            setOriginalBtnVisibility(View.GONE);
             if(mLoadingProgressBarOriginal != null) {
                 mLoadingProgressBarOriginal.setVisibility(View.GONE);
             }
@@ -363,62 +368,35 @@ public class NewsWebViewActivity extends AppCompatActivity {
             mNewsWebViewMiddle.setVisibility(View.GONE);
             mNewsWebViewOriginal.setVisibility(View.VISIBLE);
             mUpperBlock.setVisibility(View.GONE);
-            setOriginalBtnVisibility(View.VISIBLE);
             if(!mIsOriginalCompleted && mLoadingProgressBarOriginal != null) {
                 mLoadingProgressBarOriginal.setVisibility(View.VISIBLE);
             }
         }
     }
 
-    private void setOriginalBtnVisibility(int visibility) {
-        mOriginalCommentBtn.setVisibility(visibility);
-        mOriginalFallBtn.setVisibility(visibility);
-        mOriginalRaiseBtn.setVisibility(visibility);
-        mReadOriginalButton.setVisibility(visibility);
-    }
-
     private void setButtonStatus() {
-        if(ClientData.getInstance(this).getUserProfile().hasVoteForNews(mId)) {
-            mMiddleFallBtn.setEnabled(false);
-            mMiddleRaiseBtn.setEnabled(false);
-            mOriginalRaiseBtn.setEnabled(false);
-            mOriginalFallBtn.setEnabled(false);
+        UserProfile userProfile = ClientData.getInstance(this).getUserProfile();
+        if(userProfile.hasVoteForNews(mId)) {
+            mVoteUpBlock.setEnabled(false);
+            mVoteDownBlock.setEnabled(false);
 
-            updateVotePercentageString();
-            mMiddleRaiseBtn.setText(mVoteRaisePercentageString);
-            mMiddleFallBtn.setText(mVoteFallPercentageString);
-            mOriginalRaiseBtn.setText(mVoteRaisePercentageString);
-            mOriginalFallBtn.setText(mVoteFallPercentageString);
-
-            mMiddleRaiseBtn.setAlpha(CONST_DISABLE_ALPHA);
-            mMiddleFallBtn.setAlpha(CONST_DISABLE_ALPHA);
-            mOriginalRaiseBtn.setAlpha(CONST_DISABLE_ALPHA);
-            mOriginalFallBtn.setAlpha(CONST_DISABLE_ALPHA);
-
+            Event event = userProfile.getRecentVoteForNewsEvent(mId);
+            if(event.getEventType().equals(PostEvent.EventVars.VOTE_RAISE.getEventVar())) {
+                mVoteUpTextView.setTextColor(getResources().getColor(R.color.text_black));
+                mVoteUpImageView.setAlpha(CONST_DISABLE_ALPHA);
+            } else {
+                mVoteDownTextView.setTextColor(getResources().getColor(R.color.text_black));
+                mVoteDownImageView.setAlpha(CONST_DISABLE_ALPHA);
+            }
         } else {
-            mMiddleFallBtn.setEnabled(true);
-            mMiddleRaiseBtn.setEnabled(true);
-            mOriginalRaiseBtn.setEnabled(true);
-            mOriginalFallBtn.setEnabled(true);
+            mVoteUpBlock.setEnabled(true);
+            mVoteDownBlock.setEnabled(true);
 
-            mMiddleRaiseBtn.setText(R.string.title_vote);
-            mMiddleFallBtn.setText(R.string.title_vote);
-            mOriginalRaiseBtn.setText(R.string.title_vote);
-            mOriginalFallBtn.setText(R.string.title_vote);
-
-            mMiddleRaiseBtn.setAlpha(CONST_ENABLE_ALPHA);
-            mMiddleFallBtn.setAlpha(CONST_ENABLE_ALPHA);
-            mOriginalRaiseBtn.setAlpha(CONST_ENABLE_ALPHA);
-            mOriginalFallBtn.setAlpha(CONST_ENABLE_ALPHA);
+            mVoteUpTextView.setTextColor(getResources().getColor(R.color.text_gray));
+            mVoteDownTextView.setTextColor(getResources().getColor(R.color.text_gray));
+            mVoteUpImageView.setAlpha(CONST_ENABLE_ALPHA);
+            mVoteDownImageView.setAlpha(CONST_ENABLE_ALPHA);
         }
-    }
-
-    private void updateVotePercentageString() {
-        int total = mVoteFallNum + mVoteRaiseNum;
-        mVoteRaisePercentageString =
-                String.format(Locale.US, "%d%%", (int)(((float) mVoteRaiseNum/total)*100));
-        mVoteFallPercentageString =
-                String.format(Locale.US, "%d%%", (int)(((float) mVoteFallNum/total)*100));
     }
 
     @Override
@@ -427,12 +405,28 @@ public class NewsWebViewActivity extends AppCompatActivity {
         if(requestCode == sEditorRequestCode) {
             if(resultCode == RESULT_OK) {
                 String html = data.getStringExtra(EXTRA_RES_HTML);
-                Comment comment = new Comment();
-                comment.setCommentHtml(html);
-                mCommentsRecyclerViewAdapter.addOneComment(comment);
+                String type = data.getStringExtra(EXTRA_RES_TYPE);
+                String id = data.getStringExtra(EXTRA_RES_ID);
+                String eventId = data.getStringExtra(EXTRA_RES_EVENT_ID);
+
+                Comment newComment = new Comment();
+                newComment.setCommentId(eventId);
+                newComment.setCommentHtml(html);
+                mCommentsRecyclerViewAdapter.addOneComment(newComment);
                 showCommentBlock();
-                MSLog.d("user send a comment on id: " + mId);
-                MSLog.d("user send a comment of html: " + html);
+
+                MSLog.d(String.format("user send a comment on (%s, %s, %s): %s", type, id, eventId, html));
+            }
+        } else if(requestCode == sReplyEditorRequestCode) {
+            if(resultCode == RESULT_OK && data.getBooleanExtra(EXTRA_NEED_TO_CHANGE, false)) {
+                Serializable serializable = data.getSerializableExtra(EXTRA_COMMENT);
+                int position = data.getIntExtra(EXTRA_POSITION, -1);
+                if (serializable != null && serializable instanceof Comment && position != -1) {
+                    MSLog.d("comment with position " + position + " is needed to change");
+                    Comment comment = (Comment) serializable;
+                    mCommentsRecyclerViewAdapter.cloneSocialContent(position, comment);
+                    mCommentsRecyclerViewAdapter.notifyItemChanged(position, ADAPTER_CHANGE_LIKE_ONLY);
+                }
             }
         }
         mFBCallbackManager.onActivityResult(requestCode, resultCode, data);
@@ -440,35 +434,8 @@ public class NewsWebViewActivity extends AppCompatActivity {
 
     private void setActionBar() {
         final ActionBar actionBar = getSupportActionBar();
-
         if(actionBar != null) {
-            actionBar.setElevation(0);
-            View view = LayoutInflater.from(actionBar.getThemedContext())
-                    .inflate(R.layout.main_action_bar, null);
-
-            SimpleDraweeView imageView = view.findViewById(R.id.action_bar_avatar);
-            if(imageView != null) {
-                imageView.setImageResource(R.drawable.ic_keyboard_backspace_white_24px);
-                imageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        onBackPressed();
-                    }
-                });
-            }
-
-            TextView textView = view.findViewById(R.id.action_bar_name);
-            if(textView != null) {
-                textView.setText(getResources().getText(R.string.activity_news_web_name));
-            }
-
-            actionBar.setDisplayShowHomeEnabled(false);
-            actionBar.setDisplayShowTitleEnabled(false);
-            actionBar.setCustomView(view,
-                    new ActionBar.LayoutParams(
-                            ActionBar.LayoutParams.MATCH_PARENT,
-                            ActionBar.LayoutParams.MATCH_PARENT));
-            actionBar.setDisplayShowCustomEnabled(true);
+            actionBar.hide();
         }
     }
 
@@ -496,6 +463,10 @@ public class NewsWebViewActivity extends AppCompatActivity {
             mImageMask.setVisibility(View.GONE);
             mNewsWebViewMiddleTitleTextView.setTextColor(getResources().getColor(R.color.text_black));
             mNewsWebViewMiddleDateTextView.setTextColor(getResources().getColor(R.color.text_black));
+            ConstraintLayout upperBlock = findViewById(R.id.marketsense_webview_upper_block);
+            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) upperBlock.getLayoutParams();
+            params.dimensionRatio = "1.55";
+            upperBlock.setLayoutParams(params);
         }
     }
 
@@ -571,10 +542,6 @@ public class NewsWebViewActivity extends AppCompatActivity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                mIsOriginalCompleted = true;
-                if(mLoadingProgressBarOriginal != null) {
-                    mLoadingProgressBarOriginal.setVisibility(View.GONE);
-                }
                 super.onPageFinished(view, url);
             }
         });
@@ -584,6 +551,11 @@ public class NewsWebViewActivity extends AppCompatActivity {
             public void onProgressChanged(WebView view, int newProgress) {
                 if(newProgress >= 80) {
                     mNewsWebViewOriginal.getSettings().setBlockNetworkImage(false);
+
+                    mIsOriginalCompleted = true;
+                    if(mLoadingProgressBarOriginal != null) {
+                        mLoadingProgressBarOriginal.setVisibility(View.GONE);
+                    }
                 }
                 super.onProgressChanged(view, newProgress);
             }
@@ -601,12 +573,12 @@ public class NewsWebViewActivity extends AppCompatActivity {
         return generateNewsWebViewActivityIntent(context, news.getId(),
                 news.getTitle(), news.getUrlImage(), news.getDate(),
                 news.getPageLink(), news.getOriginLink(),
-                news.getVoteRaiseNum(), news.getVoteFallNum());
+                news.getVoteRaiseNum(), news.getVoteFallNum(), news.getStockKeywords(), news.getLevel());
     }
 
     public static Intent generateNewsWebViewActivityIntent(
             Context context, String id, String title, String imageUrl, String sourceDate,
-            String middleUrl, String originalUrl, int voteRaiseNum, int voteFallNum) {
+            String middleUrl, String originalUrl, int voteRaiseNum, int voteFallNum, String[] stockKeywords, int level) {
         Intent intent = new Intent(context, NewsWebViewActivity.class);
         intent.putExtra(EXTRA_MIDDLE_ID, id);
         intent.putExtra(EXTRA_MIDDLE_TITLE, title);
@@ -616,6 +588,8 @@ public class NewsWebViewActivity extends AppCompatActivity {
         intent.putExtra(EXTRA_ORIGINAL_PAGE_URL, originalUrl);
         intent.putExtra(EXTRA_VOTE_RAISE_NUM, voteRaiseNum);
         intent.putExtra(EXTRA_VOTE_FALL_NUM, voteFallNum);
+        intent.putExtra(EXTRA_STOCK_KEYWORDS, stockKeywords);
+        intent.putExtra(EXTRA_NEWS_LEVEL, level);
         return intent;
     }
 
@@ -638,7 +612,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
             mCommentsRecyclerViewAdapter = null;
         }
         UserProfile userProfile = ClientData.getInstance(this).getUserProfile();
-        userProfile.deleteUserProfileChangeListener(mUserProfileChangeListener);
+        userProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
         super.onDestroy();
     }
 
@@ -677,21 +651,22 @@ public class NewsWebViewActivity extends AppCompatActivity {
                 PostEvent.sendRegister(NewsWebViewActivity.this, userId, userName, FACEBOOK_CONSTANTS,
                         UserProfile.generatePassword(userId, FACEBOOK_CONSTANTS), userEmail, avatarLink, new PostEvent.PostEventListener() {
                             @Override
-                            public void onResponse(boolean isSuccessful) {
+                            public void onResponse(boolean isSuccessful, Object data) {
                                 if(!isSuccessful) {
                                     Toast.makeText(NewsWebViewActivity.this, R.string.login_failed_description, Toast.LENGTH_SHORT).show();
                                     LoginManager.getInstance().logOut();
                                 } else {
                                     UserProfile userProfile = ClientData.getInstance(NewsWebViewActivity.this).getUserProfile();
-                                    userProfile.notifyUserProfile(NOTIFY_ID_NEWS_COMMENT_CLICK);
+                                    userProfile.globalBroadcast(NOTIFY_ID_NEWS_COMMENT_CLICK);
                                 }
                             }
                         });
             }
-        }, true);
+        });
     }
 
-    private void showLoginAlertDialog() {
+    private void showLoginAlertDialog(int lastClick) {
+        mLastClickAction = lastClick;
         if(mLoginAlertDialog != null) {
             mLoginAlertDialog.dismiss();
             mLoginAlertDialog = null;

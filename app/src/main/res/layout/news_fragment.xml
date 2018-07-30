@@ -53,6 +53,7 @@
             android:text="@string/ops_something_wrong"
             android:textColor="@color/marketsense_text_light_gray"
             android:gravity="center"
+            android:fontFamily="sans-serif"
             app:layout_constraintTop_toBottomOf="@id/no_news_iv"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent" />

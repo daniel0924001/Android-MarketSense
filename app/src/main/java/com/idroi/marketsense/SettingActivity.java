@@ -5,8 +5,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -22,10 +22,7 @@ import android.widget.Toast;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
@@ -38,9 +35,7 @@ import com.idroi.marketsense.common.MarketSenseRendererHelper;
 import com.idroi.marketsense.common.SharedPreferencesCompat;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
-
-import java.util.ArrayList;
-import java.util.Arrays;
+import com.idroi.marketsense.datasource.SettingSource;
 
 import org.json.JSONObject;
 
@@ -56,33 +51,34 @@ import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 
 public class SettingActivity extends AppCompatActivity {
 
-    private int[] mStringIds = {
-            R.string.preference_notification, // fake
-            R.string.preference_notification,
-            R.string.preference_share,
-            R.string.preference_feedback,
-            R.string.preference_star,
-            R.string.preference_privacy_statement,
-            R.string.preference_term_of_service,
-            R.string.preference_disclaimer
-    };
-
-    private Integer[] mDrawableIds = {
-            R.drawable.setting_notification, // fake
-            R.drawable.setting_notification,
-            R.drawable.setting_share,
-            R.drawable.setting_feedback,
-            R.drawable.setting_star,
-            R.drawable.setting_about,
-            R.drawable.setting_about,
-            R.drawable.setting_about,
-    };
+//    private int[] mStringIds = {
+//            R.string.preference_notification, // fake
+//            R.string.preference_notification,
+//            R.string.preference_share,
+//            R.string.preference_feedback,
+//            R.string.preference_star,
+//            R.string.preference_privacy_statement,
+//            R.string.preference_term_of_service,
+//            R.string.preference_disclaimer
+//    };
+//
+//    private Integer[] mDrawableIds = {
+//            R.drawable.setting_notification, // fake
+//            R.drawable.setting_notification,
+//            R.drawable.setting_share,
+//            R.drawable.setting_feedback,
+//            R.drawable.setting_star,
+//            R.drawable.setting_about,
+//            R.drawable.setting_about,
+//            R.drawable.setting_about,
+//    };
 
     private AlertDialog mLoginAlertDialog, mStarAlertDialog;
     private CallbackManager mFBCallbackManager;
     private LoginButton mFBLoginBtn;
     private ListView mListView;
     private SettingAdapter mSettingAdapter;
+    private SettingSource mSettingSource;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -155,7 +151,7 @@ public class SettingActivity extends AppCompatActivity {
                     PostEvent.sendRegister(SettingActivity.this, userId, userName, FACEBOOK_CONSTANTS,
                             UserProfile.generatePassword(userId, FACEBOOK_CONSTANTS), userEmail, avatarLink, new PostEvent.PostEventListener() {
                                 @Override
-                                public void onResponse(boolean isSuccessful) {
+                                public void onResponse(boolean isSuccessful, Object data) {
                                     if(!isSuccessful) {
                                         Toast.makeText(SettingActivity.this, R.string.login_failed_description, Toast.LENGTH_SHORT).show();
                                         LoginManager.getInstance().logOut();
@@ -168,7 +164,7 @@ public class SettingActivity extends AppCompatActivity {
                     refreshFBUi(userName, avatarLink);
                 }
             }
-        }, true);
+        });
     }
 
     private void refreshFBUi() {
@@ -227,16 +223,9 @@ public class SettingActivity extends AppCompatActivity {
 
     private void setListView() {
         mListView = (ListView) findViewById(R.id.setting_listview);
+        mSettingSource = new SettingSource(this);
 
-        final ArrayList<String> list = new ArrayList<>();
-        for (int stringId : mStringIds) {
-            list.add(getResources().getString(stringId));
-        }
-
-        final ArrayList<Integer> list2 = new ArrayList<>();
-        list2.addAll(Arrays.asList(mDrawableIds));
-
-        mSettingAdapter = new SettingAdapter(this, list, list2);
+        mSettingAdapter = new SettingAdapter(this, mSettingSource);
         mSettingAdapter.setSettingOnClickListener(new SettingAdapter.SettingOnClickListener() {
             @Override
             public void onLoginBtnClick() {
@@ -246,9 +235,9 @@ public class SettingActivity extends AppCompatActivity {
                     internalRefreshFBUi(null, null);
 
                     UserProfile userProfile = ClientData.getInstance(SettingActivity.this).getUserProfile();
-                    userProfile.clearFavoriteStock();
-                    userProfile.clearEvents();
-                    userProfile.notifyUserProfile(NOTIFY_ID_FAVORITE_LIST);
+                    userProfile.saveFavoriteStocksAndEvents(SettingActivity.this);
+                    userProfile.clearUserProfile();
+                    userProfile.globalBroadcast(NOTIFY_ID_FAVORITE_LIST);
                 } else {
                     MSLog.d("perform login");
                     showLoginAlertDialog();
@@ -269,7 +258,9 @@ public class SettingActivity extends AppCompatActivity {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                handleListClick(position);
+                if(mSettingSource.getItem(position).isClickable()) {
+                    handleListClick(position);
+                }
             }
         });
     }
@@ -313,6 +304,7 @@ public class SettingActivity extends AppCompatActivity {
                             MSLog.d("go to: " + Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName));
                             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
                         }
+                        mStarAlertDialog.dismiss();
                     }
                 })
                 .setNegativeButton(R.string.star_negative, new DialogInterface.OnClickListener() {
@@ -329,11 +321,29 @@ public class SettingActivity extends AppCompatActivity {
                 .show();
     }
 
+    private void sendEmail() {
+
+        String title = getResources().getString(R.string.preference_feedback);
+        String format = "MANUFACTURER: %s\nMODEL: %s\nPRODUCT: %s\nVERSION: %s\nSDK_VERSION: %s\n================\n意見回饋：";
+
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setType("message/rfc822");
+        intent.setData(Uri.parse("mailto:"));
+        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"bigbirdgeeks@gmail.com"});
+        intent.putExtra(Intent.EXTRA_SUBJECT, title);
+        intent.putExtra(Intent.EXTRA_TEXT, String.format(format, Build.MANUFACTURER, Build.MODEL, Build.PRODUCT, BuildConfig.VERSION_NAME, Build.VERSION.SDK_INT));
+        try {
+            startActivity(Intent.createChooser(intent, "寄信給開發者"));
+        } catch (android.content.ActivityNotFoundException ex) {
+            // pass
+        }
+    }
+
     private void handleListClick(int position) {
-        if(position <= 0 || position >= mStringIds.length) {
+        if(position <= 0 || position >= mSettingSource.getSize()) {
             return;
         }
-        int id = mStringIds[position];
+        int id = mSettingSource.getId(position);
         String title = getResources().getString(id);
         switch (id) {
             // https://play.google.com/store/apps/details?id=com.idroi.marketsense&referrer=utm_source%3Dandroid_app%26utm_medium%3Dinapp%26utm_campaign%3Dshare%26
@@ -362,6 +372,9 @@ public class SettingActivity extends AppCompatActivity {
             case R.string.preference_disclaimer:
                 startActivity(WebViewActivity.generateWebViewActivityIntent(
                         this, id, title, "http://www.infohubapp.com/marketsense/documents/disclaimer.html"));
+                break;
+            case R.string.preference_email:
+                sendEmail();
                 break;
             default:
                 Toast.makeText(this, R.string.preference_sorry, Toast.LENGTH_SHORT).show();
@@ -407,5 +420,11 @@ public class SettingActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         overridePendingTransition(R.anim.stop, R.anim.left_to_right_leave);
+    }
+
+    @Override
+    protected void onDestroy() {
+        mSettingSource.destroy();
+        super.onDestroy();
     }
 }

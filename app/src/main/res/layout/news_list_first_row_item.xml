@@ -41,7 +41,7 @@
         android:paddingTop="15dp"
         android:maxLines="2"
         android:ellipsize="end"
-        android:fontFamily="Roboto-Regular"
+        android:fontFamily="sans-serif"
         android:textColor="@color/marketsense_text_white"
         android:textSize="24sp"
         android:textStyle="bold"

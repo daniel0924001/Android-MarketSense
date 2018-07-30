@@ -3,6 +3,7 @@ package com.idroi.marketsense.adapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,9 +21,11 @@ import com.idroi.marketsense.data.News;
 public class NewsRenderer implements MarketSenseRenderer<News>{
 
     @NonNull private final WeakHashMap<View, NewsViewHolder> mViewHolderMap;
+    private boolean mIsShowRelatedStockNames;
 
-    NewsRenderer() {
+    NewsRenderer(boolean showRelatedStockNames) {
         mViewHolderMap = new WeakHashMap<View, NewsViewHolder>();
+        mIsShowRelatedStockNames = showRelatedStockNames;
     }
 
     @Override
@@ -49,11 +52,9 @@ public class NewsRenderer implements MarketSenseRenderer<News>{
 
         // fire text
         if(content.isOptimistic()) {
-            newsViewHolder.fireTextView.setText(R.string.title_news_good);
             newsViewHolder.fireTextView.setTextColor(context.getResources().getColor(R.color.colorTrendUp));
             newsViewHolder.fireTextView.setVisibility(View.VISIBLE);
         } else if(content.isPessimistic()) {
-            newsViewHolder.fireTextView.setText(R.string.title_news_bad);
             newsViewHolder.fireTextView.setTextColor(context.getResources().getColor(R.color.colorTrendDown));
             newsViewHolder.fireTextView.setVisibility(View.VISIBLE);
         } else {
@@ -64,26 +65,45 @@ public class NewsRenderer implements MarketSenseRenderer<News>{
         newsViewHolder.fireImageView.setVisibility(View.VISIBLE);
         switch (content.getLevel()) {
             case 3:
-                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_red3);
+                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_up3);
+                newsViewHolder.fireTextView.setText(R.string.title_news_good3);
                 break;
             case 2:
-                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_red2);
+                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_up2);
+                newsViewHolder.fireTextView.setText(R.string.title_news_good2);
                 break;
             case 1:
-                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_red1);
+                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_up1);
+                newsViewHolder.fireTextView.setText(R.string.title_news_good1);
                 break;
             case -1:
-                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_green1);
+                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_down1);
+                newsViewHolder.fireTextView.setText(R.string.title_news_bad1);
                 break;
             case -2:
-                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_green2);
+                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_down2);
+                newsViewHolder.fireTextView.setText(R.string.title_news_bad2);
                 break;
             case -3:
-                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_fire_green3);
+                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_down3);
+                newsViewHolder.fireTextView.setText(R.string.title_news_bad3);
                 break;
             default:
                 newsViewHolder.fireImageView.setVisibility(View.GONE);
         }
+
+        // related stock news
+        String[] relatedStockNames = content.getStockKeywords();
+        newsViewHolder.relatedStockNameAdapter.setRelatedStockNames(relatedStockNames);
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) newsViewHolder.dateView.getLayoutParams();
+        if(mIsShowRelatedStockNames && newsViewHolder.relatedStockNameAdapter.hasRelatedStock()) {
+            params.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+            newsViewHolder.relatedRecyclerView.setVisibility(View.VISIBLE);
+        } else {
+            params.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
+            newsViewHolder.relatedRecyclerView.setVisibility(View.GONE);
+        }
+        newsViewHolder.dateView.setLayoutParams(params);
     }
 
     private void setViewVisibility(final NewsViewHolder newsViewHolder, final int visibility) {

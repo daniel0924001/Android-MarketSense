@@ -11,9 +11,12 @@ import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.datasource.Networking;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +27,7 @@ import java.util.Map;
 public class PostEvent {
 
     public interface PostEventListener {
-        void onResponse(boolean isSuccessful);
+        void onResponse(boolean isSuccessful, Object data);
     }
 
     public enum PostEventType {
@@ -32,6 +35,8 @@ public class PostEvent {
         LOGIN("login", POST_TYPE_LOGIN),
         VOTING("voting", POST_TYPE_EVENT),
         COMMENT("comment", POST_TYPE_EVENT),
+        REPLY("reply", POST_TYPE_EVENT),
+        LIKE("like", POST_TYPE_EVENT),
         FAVORITE_STOCK_ADD("favorite_stock_add", POST_TYPE_ADD_FAVORITE),
         FAVORITE_STOCK_DELETE("favorite_stock_delete", POST_TYPE_DELETE_FAVORITE);
 
@@ -92,6 +97,7 @@ public class PostEvent {
 
     private static final String RESPONSE_STATUS = "status";
     private static final String RESPONSE_RESULT = "result";
+    private static final String RESPONSE_EVENT_ID = "event_id";
     private static final String RESPONSE_USER_TOKEN = "user_token";
     private static final String RESPONSE_DUPLICATE_REGISTER = "You have registered before!";
 
@@ -103,6 +109,8 @@ public class PostEvent {
 
     private static final String NEWS_CONST = "news";
     private static final String STOCK_CONST = "stock";
+    private static final String EVENT_CONST = "event";
+    private static final String THREAD_CONST = "thread";
 
     private int mPostType;
     private int mMethod;
@@ -113,7 +121,7 @@ public class PostEvent {
     private String mEventContent;
     private String mEventType;
     private Object mEventValue; // String or Integer
-    private String mEventDetail;
+    private JSONArray mEventDetail;
     private String mEventTarget;
 
     // POST_TYPE_REGISTER
@@ -165,7 +173,7 @@ public class PostEvent {
         return this;
     }
 
-    private PostEvent setEventDetail(String eventDetail) {
+    private PostEvent setEventDetail(JSONArray eventDetail) {
         mEventDetail = eventDetail;
         return this;
     }
@@ -235,7 +243,7 @@ public class PostEvent {
                     postJsonObject.put(POST_FIELD_USER_ID, mUserId);
                     postJsonObject.put(POST_FIELD_EVENT, mEvent);
                     postJsonObject.putOpt(POST_FIELD_EVENT_CONTENT, mEventContent);
-                    postJsonObject.putOpt(POST_FIELD_EVENT_DETAIL, mEventDetail);
+                    postJsonObject.put(POST_FIELD_EVENT_DETAIL, mEventDetail);
                     postJsonObject.putOpt(POST_FIELD_EVENT_TYPE, mEventType);
                     postJsonObject.putOpt(POST_FIELD_EVENT_VALUE, mEventValue);
                     postJsonObject.putOpt(POST_FIELD_EVENT_TARGET, mEventTarget);
@@ -285,6 +293,9 @@ public class PostEvent {
                                 case POST_TYPE_LOGIN:
                                     processLogin(response);
                                     break;
+                                case POST_TYPE_EVENT:
+                                    processEventResponse(response);
+                                    break;
                             }
                         }
                     },
@@ -299,9 +310,15 @@ public class PostEvent {
                             switch (mPostType) {
                                 case POST_TYPE_LOGIN:
                                     if(mListener != null) {
-                                        mListener.onResponse(false);
+                                        mListener.onResponse(false, null);
                                     }
                                     break;
+                                case POST_TYPE_EVENT:
+                                    if(mListener != null) {
+                                        mListener.onResponse(false, null);
+                                    }
+                                    break;
+
                             }
                         }
                     }){
@@ -348,7 +365,19 @@ public class PostEvent {
         }
 
         if(mListener != null) {
-            mListener.onResponse(isSuccessful);
+            mListener.onResponse(isSuccessful, null);
+        }
+    }
+
+    private void processEventResponse(JSONObject jsonObject) {
+        if(mListener != null) {
+            boolean isSuccessful = jsonObject.optBoolean(RESPONSE_STATUS, false);
+            JSONObject resultJsonObject = jsonObject.optJSONObject(RESPONSE_RESULT);
+            String id = null;
+            if(resultJsonObject != null) {
+                id = resultJsonObject.optString(RESPONSE_EVENT_ID);
+            }
+            mListener.onResponse(isSuccessful, id);
         }
     }
 
@@ -380,32 +409,90 @@ public class PostEvent {
         userProfile.addEvent(event);
     }
 
-    public static void sendStockComment(Context context, String code, String html) {
+    public static void sendStockComment(Context context, String code, String html, ArrayList<String> tags, PostEventListener listener) {
         ClientData clientData = ClientData.getInstance(context);
-        new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.COMMENT)
+        UserProfile userProfile = clientData.getUserProfile();
+        PostEvent postEvent = new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.COMMENT)
                 .setEventContent(code)
                 .setEventValueString(html)
                 .setEventType("normal")
                 .setEventTarget(STOCK_CONST)
+                .setEventDetail(new JSONArray(tags))
                 .setUserToken(clientData.getUserToken())
+                .setPostEventListener(listener)
                 .send(context);
+        Event event = postEvent.convertToEvent();
+        userProfile.addEvent(event);
     }
 
-    public static void sendNewsComment(Context context, String newsId, String html) {
+    public static void sendNewsComment(Context context, String newsId, String html, ArrayList<String> tags, PostEventListener listener) {
         ClientData clientData = ClientData.getInstance(context);
-        new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.COMMENT)
+        UserProfile userProfile = clientData.getUserProfile();
+        PostEvent postEvent = new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.COMMENT)
                 .setEventContent(newsId)
                 .setEventValueString(html)
                 .setEventType("normal")
                 .setEventTarget(NEWS_CONST)
+                .setEventDetail(new JSONArray(tags))
+                .setUserToken(clientData.getUserToken())
+                .setPostEventListener(listener)
+                .send(context);
+        Event event = postEvent.convertToEvent();
+        userProfile.addEvent(event);
+    }
+
+    public static void sendReplyComment(Context context, String eventId, String html, ArrayList<String> tags) {
+        ClientData clientData = ClientData.getInstance(context);
+        UserProfile userProfile = clientData.getUserProfile();
+        PostEvent postEvent = new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.REPLY)
+                .setEventContent(eventId)
+                .setEventValueString(html)
+                .setEventType("normal")
+                .setEventTarget(EVENT_CONST)
+                .setEventDetail(new JSONArray(tags))
                 .setUserToken(clientData.getUserToken())
                 .send(context);
+        Event event = postEvent.convertToEvent();
+        userProfile.addEvent(event);
+    }
+
+    public static void sendNoContentComment(Context context, String html, ArrayList<String> tags, PostEventListener listener) {
+        ClientData clientData = ClientData.getInstance(context);
+        UserProfile userProfile = clientData.getUserProfile();
+        PostEvent postEvent = new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.COMMENT)
+                .setEventValueString(html)
+                .setEventType("normal")
+                .setEventTarget(THREAD_CONST)
+                .setEventDetail(new JSONArray(tags))
+                .setUserToken(clientData.getUserToken())
+                .setPostEventListener(listener)
+                .send(context);
+        Event event = postEvent.convertToEvent();
+        userProfile.addEvent(event);
+    }
+
+    public static void sendLike(Context context, String eventId) {
+        ClientData clientData = ClientData.getInstance(context);
+        UserProfile userProfile = clientData.getUserProfile();
+        PostEvent postEvent = new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.LIKE)
+                .setEventContent(eventId)
+                .setEventValueInteger(1)
+                .setEventType("normal")
+                .setEventTarget(EVENT_CONST)
+                .setUserToken(clientData.getUserToken())
+                .send(context);
+        Event event = postEvent.convertToEvent();
+        userProfile.addEvent(event);
     }
 
     public static void sendRegister(Context context,
                                     String userId, String userName, String userType,
                                     String userPassword, String userEmail, String avatarLink,
                                     PostEventListener listener) {
+
+        UserProfile userProfile = ClientData.getInstance(context).getUserProfile();
+        userProfile.getFavoriteStocksAndEvents(context, userId);
+
         new PostEvent(userId, PostEventType.REGISTER)
                 .setUserName(userName)
                 .setUserType(userType)
@@ -427,9 +514,13 @@ public class PostEvent {
 
     public static void sendFavoriteStocksAdd(Context context, String code) {
         ClientData clientData = ClientData.getInstance(context);
-        new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.FAVORITE_STOCK_ADD)
-                .setStockCode(code)
-                .send(context);
+        if(!clientData.getUserProfile().isFavoriteStock(code)) {
+            new PostEvent(clientData.getUserProfile().getUserId(), PostEventType.FAVORITE_STOCK_ADD)
+                    .setStockCode(code)
+                    .send(context);
+        } else {
+            MSLog.w("already add favorite stock of this code in PostEvent: " + code);
+        }
     }
 
     public static void sendFavoriteStocksDelete(Context context, String code) {

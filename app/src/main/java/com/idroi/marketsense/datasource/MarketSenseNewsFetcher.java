@@ -1,12 +1,14 @@
 package com.idroi.marketsense.datasource;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.android.volley.Cache;
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
@@ -20,11 +22,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.common.MarketSenseNetworkError;
+import com.idroi.marketsense.common.SharedPreferencesCompat;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.request.NewsRequest;
 import com.idroi.marketsense.util.MarketSenseUtils;
 
+import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_REQUEST_NAME;
+import static com.idroi.marketsense.request.NewsRequest.PARAM_GTS;
 import static com.idroi.marketsense.request.NewsRequest.PARAM_KEYWORD_ARRAY;
+import static com.idroi.marketsense.request.NewsRequest.PARAM_LEVEL;
+import static com.idroi.marketsense.request.NewsRequest.PARAM_STATUS;
+import static com.idroi.marketsense.request.NewsRequest.PARAM_STATUS_FALLING;
+import static com.idroi.marketsense.request.NewsRequest.PARAM_STATUS_RISING;
 
 /**
  * Created by daniel.hsieh on 2018/4/18.
@@ -246,5 +255,88 @@ public class MarketSenseNewsFetcher {
                 mMarketSenseNewsNetworkListener.onNewsLoad(results, false);
             }
         }
+    }
+
+    public static void prefetchNewsFirstPage(final Context context) {
+        final Context applicationContext = context.getApplicationContext();
+        final ArrayList<String> networkUrls = new ArrayList<>();
+
+        final ArrayList<String> statusArrayList = new ArrayList<>();
+        final ArrayList<Integer> levelArrayList = new ArrayList<>();
+        statusArrayList.add(PARAM_STATUS_RISING);
+        statusArrayList.add(PARAM_STATUS_FALLING);
+        levelArrayList.add(3);
+        levelArrayList.add(-3);
+
+        long now = System.currentTimeMillis() / 1000;
+        final String gts = String.valueOf(now - 86400);
+
+        for(int i = 0; i < statusArrayList.size(); i++) {
+            String temp = NewsRequest.queryNewsUrl(
+                    applicationContext,
+                    statusArrayList.get(i),
+                    levelArrayList.get(i),
+                    true,
+                    gts);
+            networkUrls.add(temp);
+        }
+
+        final AtomicInteger networkCounter = new AtomicInteger(networkUrls.size());
+        final AtomicBoolean networkAnySuccesses = new AtomicBoolean(false);
+
+        Response.Listener<ArrayList<News>> responseListener = new Response.Listener<ArrayList<News>>() {
+            @Override
+            public void onResponse(ArrayList<News> response) {
+
+                final int count = networkCounter.decrementAndGet();
+                networkAnySuccesses.set(true);
+                MSLog.i("Prefetch News Request success and remain: " + count);
+
+                if(count == 0 && networkAnySuccesses.get()){
+                    MSLog.i("Prefetch News Request success");
+                    prefetchNewsFirstPageDone(applicationContext, statusArrayList, levelArrayList, networkUrls, gts);
+                }
+            }
+        };
+
+        Response.ErrorListener errorListener = new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                final int count = networkCounter.decrementAndGet();
+                MSLog.i("Prefetch News Request error and remain: " + count);
+                if(count == 0){
+                    if(!networkAnySuccesses.get()) {
+                        MSLog.e("Prefetch News Request error: " + error.getMessage(), error);
+                        if (error.networkResponse != null) {
+                            MSLog.e("Prefetch News Request error: " + new String(error.networkResponse.data), error);
+                        }
+                    } else {
+                        MSLog.i("Prefetch News Request success");
+                        prefetchNewsFirstPageDone(applicationContext, statusArrayList, levelArrayList, networkUrls, gts);
+                    }
+                }
+            }
+        };
+
+        RequestQueue requestQueue = Networking.getRequestQueue(applicationContext);
+        for(String networkUrl : networkUrls) {
+            NewsRequest newsRequest = new NewsRequest(Request.Method.GET, networkUrl, null, responseListener, errorListener);
+            requestQueue.add(newsRequest);
+        }
+    }
+
+    private static void prefetchNewsFirstPageDone(Context context,
+                                                  ArrayList<String> statusArrayList,
+                                                  ArrayList<Integer> levelArrayList,
+                                                  ArrayList<String> networkUrls,
+                                                  String gts) {
+        SharedPreferences.Editor editor =
+                context.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE).edit();
+        for(int i = 0; i < statusArrayList.size(); i++) {
+            String key = NewsRequest.queryNewsUrlPrefix(statusArrayList.get(i), levelArrayList.get(i), gts);
+            editor.putString(key, networkUrls.get(i));
+            MSLog.d("News network query success, so we save this network url to cache: " + key + ", " + networkUrls.get(i));
+        }
+        SharedPreferencesCompat.apply(editor);
     }
 }

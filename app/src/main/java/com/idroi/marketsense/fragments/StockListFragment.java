@@ -26,16 +26,10 @@ import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.StockRequest;
 
-import java.util.HashMap;
-
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
-import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_DIFF;
-import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_NAME;
-import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_NEWS;
-import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_PEOPLE;
-import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_PRICE;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_PRICE_CHANGED;
+import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_PREDICTION;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_DOWNWARD;
-import static com.idroi.marketsense.datasource.StockListPlacer.SORT_UPWARD;
 
 /**
  * Created by daniel.hsieh on 2018/4/23.
@@ -44,18 +38,12 @@ import static com.idroi.marketsense.datasource.StockListPlacer.SORT_UPWARD;
 public class StockListFragment extends Fragment {
 
     public final static String TASK_NAME = "TASK_NAME";
-    public final static int PREDICT_WIN_ID = 1;
-    public final static int PREDICT_LOSE_ID = 2;
-    public final static int ACTUAL_WIN_ID = 3;
-    public final static int ACTUAL_LOSE_ID = 4;
+    public final static int MAIN_ID = 1;
     public final static int SELF_CHOICES_ID = 5;
     public final static int WPCT_ID = 6;
 
     public enum TASK {
-        PREDICT_WIN(PREDICT_WIN_ID),
-        PREDICT_LOSE(PREDICT_LOSE_ID),
-        ACTUAL_WIN(ACTUAL_WIN_ID),
-        ACTUAL_LOSE(ACTUAL_LOSE_ID),
+        MAIN(MAIN_ID),
         SELF_CHOICES(SELF_CHOICES_ID),
         WPCT(WPCT_ID);
 
@@ -78,15 +66,17 @@ public class StockListFragment extends Fragment {
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private int mTaskId;
 
-    private TextView mSortedByName, mSortedByPrice, mSortedByDiff, mSortedByPeople, mSortedByNews;
-    private TextView[] mSortedViews;
-    private HashMap<View, String> mSortedTexts;
-    private View mLastSortedView;
-    private int mSortedDirection;
+//    private TextView mSortedByName, mSortedByPrice, mSortedByDiff, mSortedByPeople, mSortedByNews;
+//    private TextView[] mSortedViews;
+//    private HashMap<View, String> mSortedTexts;
+//    private View mLastSortedView;
+//    private int mSortedDirection;
 
-    private UserProfile.UserProfileChangeListener mUserProfileChangeListener;
+    private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
 
     private ConstraintLayout mNoDataRefreshLayout;
+
+    private boolean mIsRecyclerViewIdle;
 
     @Nullable
     @Override
@@ -96,7 +86,7 @@ public class StockListFragment extends Fragment {
         if(getArguments() != null) {
             mTaskId = getArguments().getInt(TASK_NAME);
         } else {
-            mTaskId = PREDICT_WIN_ID; // default
+            mTaskId = MAIN_ID; // default
         }
 
         final View view = inflater.inflate(R.layout.stock_list_fragment, container, false);
@@ -109,7 +99,7 @@ public class StockListFragment extends Fragment {
         }
         mNoDataTextView = view.findViewById(R.id.no_stock_tv);
 
-        mStockListRecyclerAdapter = new StockListRecyclerAdapter(getActivity(), mTaskId, SORT_BY_NEWS, SORT_DOWNWARD);
+        mStockListRecyclerAdapter = new StockListRecyclerAdapter(getActivity(), mRecyclerView, mTaskId, SORT_BY_PREDICTION, SORT_DOWNWARD);
         mRecyclerView.setAdapter(mStockListRecyclerAdapter);
 
         mLoadingProgressBar = view.findViewById(R.id.loading_progress_bar);
@@ -120,20 +110,31 @@ public class StockListFragment extends Fragment {
                 .show();
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mIsRecyclerViewIdle = true;
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                mIsRecyclerViewIdle = (newState == RecyclerView.SCROLL_STATE_IDLE);
+            }
 
-        if(mTaskId == SELF_CHOICES_ID) {
-            mUserProfileChangeListener = new UserProfile.UserProfileChangeListener() {
-                @Override
-                public void onUserProfileChange(int notifyId) {
-                    if(notifyId == NOTIFY_ID_FAVORITE_LIST) {
-                        MSLog.d("onUserProfileChange in StockListFragment: " + generateNetworkURL());
-                        mStockListRecyclerAdapter.loadStockList(generateNetworkURL(), generateCacheUrl());
-                    }
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+            }
+        });
+
+        mGlobalBroadcastListener = new UserProfile.GlobalBroadcastListener() {
+            @Override
+            public void onGlobalBroadcast(int notifyId, Object payload) {
+                if(notifyId == NOTIFY_ID_FAVORITE_LIST && mTaskId == SELF_CHOICES_ID) {
+                    loadStockList();
+                } else if(notifyId == NOTIFY_ID_PRICE_CHANGED && mIsRecyclerViewIdle) {
+                    mStockListRecyclerAdapter.updatePriceInVisibleItems();
                 }
-            };
-            ClientData.getInstance().getUserProfile()
-                    .addUserProfileChangeListener(mUserProfileChangeListener);
-        }
+            }
+        };
+        ClientData.getInstance().getUserProfile().addGlobalBroadcastListener(mGlobalBroadcastListener);
 
         view.setBackgroundColor(getResources().getColor(R.color.bottom_navigation_item_checked_false_bg));
         return view;
@@ -172,7 +173,7 @@ public class StockListFragment extends Fragment {
                 setVisibilityForEmptyData(true);
             }
         });
-        mStockListRecyclerAdapter.loadStockList(generateNetworkURL(), generateCacheUrl());
+        loadStockList();
 
         mStockListRecyclerAdapter.setOnItemClickListener(new StockListRecyclerAdapter.OnItemClickListener() {
             @Override
@@ -190,7 +191,7 @@ public class StockListFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mStockListRecyclerAdapter.loadStockList(generateNetworkURL(), generateCacheUrl());
+                loadStockList();
             }
         });
 
@@ -201,120 +202,35 @@ public class StockListFragment extends Fragment {
                     mSkeletonScreen.show();
                 }
                 setVisibilityForEmptyData(false);
-                mStockListRecyclerAdapter.loadStockList(generateNetworkURL(), generateCacheUrl());
+                loadStockList();
             }
         });
 
-        setSortBlock(view);
+//        setSortBlock(view);
     }
 
-    private void setSortBlock(View view) {
-        mSortedByName = view.findViewById(R.id.sorted_by_name);
-        mSortedByPrice = view.findViewById(R.id.sorted_by_price);
-        mSortedByDiff = view.findViewById(R.id.sorted_by_diff);
-        mSortedByPeople = view.findViewById(R.id.sorted_by_people);
-        mSortedByNews = view.findViewById(R.id.sorted_by_news);
-
-        mSortedViews = new TextView[] {
-                mSortedByName, mSortedByPrice, mSortedByDiff, mSortedByPeople, mSortedByNews};
-        mSortedTexts = new HashMap<>();
-        mSortedTexts.put(mSortedByName, getString(R.string.title_company_predict_name));
-        mSortedTexts.put(mSortedByPrice, getString(R.string.title_company_predict_price));
-        mSortedTexts.put(mSortedByDiff, getString(R.string.title_company_predict_fluctuation));
-        mSortedTexts.put(mSortedByPeople, getString(R.string.title_company_predict_people_title));
-        mSortedTexts.put(mSortedByNews, getString(R.string.title_company_predict_news_title));
-
-        mLastSortedView = null;
-        mSortedDirection = SORT_UPWARD;
-
-        mSortedByName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                changeSortedBlockLayout(SORT_BY_NAME, view);
-            }
-        });
-
-        mSortedByPrice.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                changeSortedBlockLayout(SORT_BY_PRICE, view);
-            }
-        });
-
-        mSortedByDiff.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                changeSortedBlockLayout(SORT_BY_DIFF, view);
-            }
-        });
-
-        mSortedByPeople.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                changeSortedBlockLayout(SORT_BY_PEOPLE, view);
-            }
-        });
-
-        mSortedByNews.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                changeSortedBlockLayout(SORT_BY_NEWS, view);
-            }
-        });
-        changeSortedBlockLayout(SORT_BY_NEWS, mSortedByNews);
-    }
-
-    private void changeSortedBlockLayout(int field, View view) {
-        if(view != mLastSortedView) {
-            mLastSortedView = view;
-            if(field != SORT_BY_NAME) {
-                mSortedDirection = SORT_DOWNWARD;
+    private void loadStockList() {
+        if(mStockListRecyclerAdapter != null) {
+            if(mTaskId == WPCT_ID) {
+                mStockListRecyclerAdapter.loadStockList(
+                        StockRequest.queryStockListWithMode(getContext(), true, StockRequest.MODE_WPCT),
+                        StockRequest.queryStockListWithMode(getContext(), false, StockRequest.MODE_WPCT),
+                        StockRequest.MODE_WPCT
+                );
             } else {
-                mSortedDirection = SORT_UPWARD;
+                mStockListRecyclerAdapter.loadStockList(
+                        StockRequest.queryStockList(getContext(), true),
+                        StockRequest.queryStockList(getContext(), false));
             }
-        } else {
-            mSortedDirection = (mSortedDirection == SORT_UPWARD ? SORT_DOWNWARD : SORT_UPWARD);
-        }
-        mStockListRecyclerAdapter.sortByTask(field, mSortedDirection);
-
-        for (TextView textView : mSortedViews) {
-            if (textView != view) {
-                // others
-                textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.mipmap.ic_sorting_off, 0);
-            } else {
-                // sorted one
-                if(mSortedDirection == SORT_UPWARD) {
-                    textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.mipmap.ic_sorting_on_up, 0);
-                } else {
-                    textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.mipmap.ic_sorting_on_down, 0);
-                }
-            }
-        }
-    }
-
-    public String generateNetworkURL() {
-        if(mTaskId == WPCT_ID) {
-            return StockRequest.queryStockListWithMode(getContext(), true, StockRequest.MODE_WPCT);
-        } else {
-            return StockRequest.queryStockList(getContext(), true);
-        }
-    }
-
-    public String generateCacheUrl() {
-        if(mTaskId == WPCT_ID) {
-            return StockRequest.queryStockListWithMode(getContext(), false, StockRequest.MODE_WPCT);
-        } else {
-            return StockRequest.queryStockList(getContext(), false);
         }
     }
 
     @Override
     public void onDestroyView() {
         mStockListRecyclerAdapter.destroy();
-        if(mTaskId == SELF_CHOICES_ID) {
-            ClientData.getInstance().getUserProfile()
-                    .deleteUserProfileChangeListener(mUserProfileChangeListener);
-        }
+        mRecyclerView.clearOnScrollListeners();
+        ClientData.getInstance().getUserProfile()
+                .deleteGlobalBroadcastListener(mGlobalBroadcastListener);
         super.onDestroyView();
     }
 
@@ -338,4 +254,88 @@ public class StockListFragment extends Fragment {
     private boolean isSelfNoneChoices() {
         return mTaskId == SELF_CHOICES_ID && ClientData.getInstance().getUserProfile().isEmptyFavoriteStock();
     }
+
+//    private void setSortBlock(View view) {
+//        mSortedByName = view.findViewById(R.id.sorted_by_name);
+//        mSortedByPrice = view.findViewById(R.id.sorted_by_price);
+//        mSortedByDiff = view.findViewById(R.id.sorted_by_diff);
+//        mSortedByPeople = view.findViewById(R.id.sorted_by_people);
+//        mSortedByNews = view.findViewById(R.id.sorted_by_news);
+//
+//        mSortedViews = new TextView[] {
+//                mSortedByName, mSortedByPrice, mSortedByDiff, mSortedByPeople, mSortedByNews};
+//        mSortedTexts = new HashMap<>();
+//        mSortedTexts.put(mSortedByName, getString(R.string.title_company_predict_name));
+//        mSortedTexts.put(mSortedByPrice, getString(R.string.title_company_predict_price));
+//        mSortedTexts.put(mSortedByDiff, getString(R.string.title_company_predict_fluctuation));
+//        mSortedTexts.put(mSortedByPeople, getString(R.string.title_company_predict_people_title));
+//        mSortedTexts.put(mSortedByNews, getString(R.string.title_company_predict_news_title));
+//
+//        mLastSortedView = null;
+//        mSortedDirection = SORT_UPWARD;
+//
+//        mSortedByName.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                changeSortedBlockLayout(SORT_BY_NAME, view);
+//            }
+//        });
+//
+//        mSortedByPrice.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                changeSortedBlockLayout(SORT_BY_PRICE, view);
+//            }
+//        });
+//
+//        mSortedByDiff.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                changeSortedBlockLayout(SORT_BY_DIFF, view);
+//            }
+//        });
+//
+//        mSortedByPeople.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                changeSortedBlockLayout(SORT_BY_PEOPLE, view);
+//            }
+//        });
+//
+//        mSortedByNews.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                changeSortedBlockLayout(SORT_BY_NEWS, view);
+//            }
+//        });
+//        changeSortedBlockLayout(SORT_BY_NEWS, mSortedByNews);
+//    }
+//
+//    private void changeSortedBlockLayout(int field, View view) {
+//        if(view != mLastSortedView) {
+//            mLastSortedView = view;
+//            if(field != SORT_BY_NAME) {
+//                mSortedDirection = SORT_DOWNWARD;
+//            } else {
+//                mSortedDirection = SORT_UPWARD;
+//            }
+//        } else {
+//            mSortedDirection = (mSortedDirection == SORT_UPWARD ? SORT_DOWNWARD : SORT_UPWARD);
+//        }
+//        mStockListRecyclerAdapter.sortByTask(field, mSortedDirection);
+//
+//        for (TextView textView : mSortedViews) {
+//            if (textView != view) {
+//                // others
+//                textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.mipmap.ic_sorting_off, 0);
+//            } else {
+//                // sorted one
+//                if(mSortedDirection == SORT_UPWARD) {
+//                    textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.mipmap.ic_sorting_on_up, 0);
+//                } else {
+//                    textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.mipmap.ic_sorting_on_down, 0);
+//                }
+//            }
+//        }
+//    }
 }

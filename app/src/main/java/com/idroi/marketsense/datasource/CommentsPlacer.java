@@ -1,14 +1,21 @@
 package com.idroi.marketsense.datasource;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 
+import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.MarketSenseError;
+import com.idroi.marketsense.common.SharedPreferencesCompat;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+
+import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_REQUEST_NAME;
+import static com.idroi.marketsense.request.CommentAndVoteRequest.COMMENT_CACHE_KEY_GENERAL;
 
 /**
  * Created by daniel.hsieh on 2018/5/8.
@@ -32,7 +39,7 @@ public class CommentsPlacer {
 
     private Activity mActivity;
     private MarketSenseCommentsFetcher mMarketSenseCommentsFetcher;
-    private String mUrl;
+    private String mUrl, mCacheKey;
 
     public CommentsPlacer(Activity activity) {
         mActivity = activity;
@@ -52,9 +59,9 @@ public class CommentsPlacer {
                 mRaiseNumber = commentAndVote.getRaiseNumber();
                 mFallNumber = commentAndVote.getFallNumber();
 
-                if(mCommentArrayList != null) {
-                    Collections.sort(mCommentArrayList, genComparator());
-                }
+//                if(mCommentArrayList != null) {
+//                    Collections.sort(mCommentArrayList, genComparator());
+//                }
 
                 if(mCommentsListener != null) {
                     mCommentsListener.onCommentsLoaded(commentAndVote);
@@ -70,8 +77,9 @@ public class CommentsPlacer {
 
                 increaseRetryTime();
                 if(isRetry()) {
-                    mMarketSenseCommentsFetcher.makeRequest(mUrl);
+                    mMarketSenseCommentsFetcher.makeRequest(mCacheKey, mUrl);
                 } else {
+                    resetRetryTime();
                     mCommentsListener.onCommentsFailed();
                 }
             }
@@ -106,15 +114,23 @@ public class CommentsPlacer {
         }
     }
 
-    public void loadComments(String url) {
+    public void setCommentArrayList(ArrayList<Comment> arrayList) {
+        if(arrayList != null) {
+            mCommentArrayList = new ArrayList<Comment>(arrayList);
+            Collections.sort(mCommentArrayList, genComparator());
+        }
+    }
+
+    public void loadComments(String cacheKey, String url) {
         mUrl = url;
+        mCacheKey = cacheKey;
         loadComments(new MarketSenseCommentsFetcher(mActivity, mMarketSenseCommentNetworkListener));
     }
 
     private void loadComments(MarketSenseCommentsFetcher commentsFetcher) {
         clear();
         mMarketSenseCommentsFetcher = commentsFetcher;
-        mMarketSenseCommentsFetcher.makeRequest(mUrl);
+        mMarketSenseCommentsFetcher.makeRequest(mCacheKey, mUrl);
     }
 
     public void clear() {
@@ -133,6 +149,16 @@ public class CommentsPlacer {
             return mCommentArrayList.size();
         } else {
             return 0;
+        }
+    }
+
+    public void updateCommentsLike() {
+        if(mCommentArrayList != null) {
+            MSLog.d("update comments' like information");
+            for (int i = 0; i < mCommentArrayList.size(); i++) {
+                Comment comment = mCommentArrayList.get(i);
+                comment.updateLikeUserProfile();
+            }
         }
     }
 

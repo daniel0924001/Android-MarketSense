@@ -16,6 +16,10 @@
         android:icon="@drawable/ic_public_black_24px"
         android:title="@string/title_news_tab" />
 
+    <item android:id="@+id/navigation_discussion"
+        android:icon="@drawable/ic_comment_theme_color_24px"
+        android:title="@string/title_discussion" />
+
     <item
         android:id="@+id/navigation_choices"
         android:icon="@drawable/ic_dashboard_black_24dp"

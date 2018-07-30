@@ -67,6 +67,7 @@ public class UserEventsAndCodesRequest extends Request<Void> {
                 jsonResponse.optJSONObject(PARAM_RESULT).optJSONArray(PARAM_STOCK_CODES) != null) {
 
             final UserProfile userProfile = ClientData.getInstance().getUserProfile();
+            userProfile.setIsInitFavoriteStocksAndEvents(true);
             userProfile.clearFavoriteStock();
             userProfile.clearEvents();
 
@@ -85,12 +86,13 @@ public class UserEventsAndCodesRequest extends Request<Void> {
             MarketSenseUtils.postOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    userProfile.notifyUserProfile(NOTIFY_ID_FAVORITE_LIST);
+                    userProfile.globalBroadcast(NOTIFY_ID_FAVORITE_LIST);
                 }
             });
 
             // event
             JSONArray eventsJsonArray = jsonResponse.optJSONObject(PARAM_RESULT).optJSONArray(PARAM_EVENTS);
+            userProfile.setUserAllEventsString(eventsJsonArray.toString());     // we want to save event array to string
             for(int i = 0; i < eventsJsonArray.length(); i++) {
                 if(eventsJsonArray.optJSONObject(i) != null) {
                     Event event = Event.JsonObjectToEvent(eventsJsonArray.optJSONObject(i));
@@ -102,7 +104,7 @@ public class UserEventsAndCodesRequest extends Request<Void> {
             MarketSenseUtils.postOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    userProfile.notifyUserProfile(NOTIFY_ID_EVENT_LIST);
+                    userProfile.globalBroadcast(NOTIFY_ID_EVENT_LIST);
                 }
             });
 
@@ -114,7 +116,7 @@ public class UserEventsAndCodesRequest extends Request<Void> {
     private static final String API_URL_SELF_CHOICES = "http://apiv2.infohubapp.com/v1/stock/user/";
 
     public static String querySelfStockList() {
-        String token = ClientData.getInstance().getUserToken();
-        return API_URL_SELF_CHOICES + token + "?timestamp=" + System.currentTimeMillis();
+        String id = ClientData.getInstance().getUserProfile().getUserId();
+        return API_URL_SELF_CHOICES + id + "?timestamp=" + System.currentTimeMillis();
     }
 }

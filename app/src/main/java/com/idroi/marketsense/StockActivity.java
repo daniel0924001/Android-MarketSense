@@ -4,11 +4,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.Guideline;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -26,8 +28,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ethanhua.skeleton.Skeleton;
-import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -36,9 +36,11 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.CandleStickChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter;
+import com.idroi.marketsense.adapter.CriticalStatisticsAdapter;
 import com.idroi.marketsense.adapter.NewsRecyclerAdapter;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
@@ -50,19 +52,33 @@ import com.idroi.marketsense.data.CommentAndVote;
 import com.idroi.marketsense.data.Event;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.PostEvent;
+import com.idroi.marketsense.data.Stock;
+import com.idroi.marketsense.data.StockTradeData;
 import com.idroi.marketsense.data.UserProfile;
+import com.idroi.marketsense.request.CriticalStatisticsRequest;
 import com.idroi.marketsense.request.NewsRequest;
-import com.idroi.marketsense.request.SingleNewsRequest;
+import com.idroi.marketsense.request.CommentAndVoteRequest;
+import com.idroi.marketsense.request.StockChartDataRequest;
 import com.idroi.marketsense.util.MarketSenseUtils;
 
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
+import static com.idroi.marketsense.CommentActivity.EXTRA_COMMENT;
+import static com.idroi.marketsense.CommentActivity.EXTRA_NEED_TO_CHANGE;
+import static com.idroi.marketsense.CommentActivity.EXTRA_POSITION;
+import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_EVENT_ID;
 import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_HTML;
+import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_ID;
+import static com.idroi.marketsense.RichEditorActivity.EXTRA_RES_TYPE;
 import static com.idroi.marketsense.RichEditorActivity.sEditorRequestCode;
+import static com.idroi.marketsense.RichEditorActivity.sReplyEditorRequestCode;
+import static com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter.ADAPTER_CHANGE_LIKE_ONLY;
 import static com.idroi.marketsense.adapter.NewsRecyclerAdapter.NEWS_SINGLE_LAYOUT;
 import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_EVENT_LIST;
@@ -87,22 +103,25 @@ public class StockActivity extends AppCompatActivity {
     public final static int CLICK_NOTHING_BEFORE_LOGIN = 0;
     public final static int CLICK_STAR_BEFORE_LOGIN = 1;
     public final static int CLICK_COMMENT_BEFORE_LOGIN = 2;
-    public final static int CLICK_VOTE_BEFORE_LOGIN = 3;
+    public final static int CLICK_LIKE_BEFORE_LOGIN = 4;
+    public final static int CLICK_VOTE_UP_BEFORE_LOGIN = 5;
+    public final static int CLICK_VOTE_DOWN_BEFORE_LOGIN = 6;
 
     private static final float CONST_ENABLE_ALPHA = 1.0f;
     private static final float CONST_DISABLE_ALPHA = 0.7f;
 
     private YahooStxChartCrawler mYahooStxChartCrawler;
-    private ViewSkeletonScreen mSkeletonScreen;
     private ProgressBar mLoadingProgressBar, mLoadingProgressBarMore;
     private boolean mIsMoreLoadFinished = false;
     private String mStockName;
     private String mCode;
     private String mPrice, mDiffNum, mDiffPercentage;
+    private ConstraintLayout mCommentBlock, mNewsBlock;
     private ConstraintLayout mVoteTopBlock, mBottomFixedBlock;
 
     private NewsWebView mStockAIWebView;
     private boolean mIsStockAIOpen = false;
+    private boolean mIsStockAILoading = false;
 
     private Button mButtonRaise, mButtonFall;
     private TextView mResultTextView;
@@ -111,6 +130,9 @@ public class StockActivity extends AppCompatActivity {
     private UserProfile mUserProfile;
     private boolean mIsFavorite;
 
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private TextView mSelectedChartTextView, mChartType1M;
+
     private RecyclerView mCommentRecyclerView;
     private CommentsRecyclerViewAdapter mCommentsRecyclerViewAdapter;
     private RecyclerView mNewsRecyclerView;
@@ -118,13 +140,19 @@ public class StockActivity extends AppCompatActivity {
 
     private int mVoteRaiseNum, mVoteFallNum;
 
-    private UserProfile.UserProfileChangeListener mUserProfileChangeListener;
+    private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
     private int mLastClickedButton;
-    private AlertDialog mLoginAlertDialog;
+    private AlertDialog mLoginAlertDialog, mStarAlertDialog;
     private LoginButton mFBLoginBtn;
     private ImageView mAddFavorite;
     private ConstraintLayout mSelectorComment, mSelectorNews;
     private NestedScrollView mNestedScrollView;
+
+    private RecyclerView mCriticalStatisticsRecyclerView;
+    private CriticalStatisticsAdapter mCriticalStatisticsAdapter;
+
+    private Comment mTempComment;
+    private int mTempPosition;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -137,6 +165,7 @@ public class StockActivity extends AppCompatActivity {
         initFBLogin();
         setInformation();
         setActionBar();
+        initCriticalStatistics();
         initStockChart();
         setSelector();
         initStockAIWebView();
@@ -154,7 +183,7 @@ public class StockActivity extends AppCompatActivity {
             mIsStockAIOpen = false;
         } else {
             super.onBackPressed();
-            mUserProfile.deleteUserProfileChangeListener(mUserProfileChangeListener);
+            mUserProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
             overridePendingTransition(R.anim.stop, R.anim.right_to_left);
         }
     }
@@ -162,8 +191,10 @@ public class StockActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         mNewsRecyclerAdapter.destroy();
-        mUserProfile.deleteUserProfileChangeListener(mUserProfileChangeListener);
+        mCommentsRecyclerViewAdapter.destroy();
+        mUserProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
         mStockAIWebView.destroy();
+        mYahooStxChartCrawler.destroy();
         super.onDestroy();
     }
 
@@ -174,6 +205,11 @@ public class StockActivity extends AppCompatActivity {
         if(mLoginAlertDialog != null) {
             mLoginAlertDialog.dismiss();
             mLoginAlertDialog = null;
+        }
+
+        if(mStarAlertDialog != null) {
+            mStarAlertDialog.dismiss();
+            mStarAlertDialog = null;
         }
     }
 
@@ -259,9 +295,6 @@ public class StockActivity extends AppCompatActivity {
                 super.onProgressChanged(view, newProgress);
             }
         });
-        String stockAIUrl = String.format(Locale.US, "https://stock-ai.com/tw-Dly-8-%s.php", mCode);
-        MSLog.d("load stock ai page: " + stockAIUrl);
-        mStockAIWebView.loadUrl(stockAIUrl);
     }
 
     private void initSocialButtons() {
@@ -287,7 +320,7 @@ public class StockActivity extends AppCompatActivity {
                 if(FBHelper.checkFBLogin()) {
                     doVoteAction(true);
                 } else {
-                    showLoginAlertDialog(CLICK_VOTE_BEFORE_LOGIN);
+                    showLoginAlertDialog(CLICK_VOTE_UP_BEFORE_LOGIN);
                 }
             }
         });
@@ -298,7 +331,7 @@ public class StockActivity extends AppCompatActivity {
                 if(FBHelper.checkFBLogin()) {
                     doVoteAction(false);
                 } else {
-                    showLoginAlertDialog(CLICK_VOTE_BEFORE_LOGIN);
+                    showLoginAlertDialog(CLICK_VOTE_DOWN_BEFORE_LOGIN);
                 }
             }
         });
@@ -335,9 +368,9 @@ public class StockActivity extends AppCompatActivity {
             }
         });
 
-        mUserProfileChangeListener = new UserProfile.UserProfileChangeListener() {
+        mGlobalBroadcastListener = new UserProfile.GlobalBroadcastListener() {
             @Override
-            public void onUserProfileChange(int notifyId) {
+            public void onGlobalBroadcast(int notifyId, Object payload) {
                 if(notifyId == NOTIFY_USER_HAS_LOGIN && FBHelper.checkFBLogin()) {
                     mVoteTopBlock.setVisibility(View.VISIBLE);
                     mButtonRaise.setClickable(false);
@@ -354,12 +387,31 @@ public class StockActivity extends AppCompatActivity {
                             return;
                         case CLICK_STAR_BEFORE_LOGIN:
                             changeFavorite(mAddFavorite);
+                            break;
+                        case CLICK_LIKE_BEFORE_LOGIN:
+                            mCommentsRecyclerViewAdapter.updateCommentsLike();
+                            MSLog.d("is like: " + mTempComment.isLiked());
+                            if(!mTempComment.isLiked()) {
+                                MSLog.d("say like at position: " + mTempPosition);
+                                mTempComment.increaseLike();
+                                mTempComment.setLike(true);
+                                PostEvent.sendLike(StockActivity.this, mTempComment.getCommentId());
+                                mCommentsRecyclerViewAdapter.notifyItemChanged(mTempPosition, ADAPTER_CHANGE_LIKE_ONLY);
+                            }
                     }
                 } else if(notifyId == NOTIFY_ID_EVENT_LIST) {
-                    if(mLastClickedButton == CLICK_VOTE_BEFORE_LOGIN && !mUserProfile.canVoteAgain(mCode)) {
-                        Toast.makeText(StockActivity.this, R.string.title_welcome_but_you_have_voted, Toast.LENGTH_SHORT).show();
+                    if(mLastClickedButton == CLICK_VOTE_UP_BEFORE_LOGIN || mLastClickedButton == CLICK_VOTE_DOWN_BEFORE_LOGIN) {
+                        if(!mUserProfile.canVoteAgain(mCode)) {
+                            Toast.makeText(StockActivity.this, R.string.title_welcome_but_you_have_voted, Toast.LENGTH_SHORT).show();
+                            setVoteButtons();
+                        } else if(mLastClickedButton == CLICK_VOTE_UP_BEFORE_LOGIN) {
+                            doVoteAction(true);
+                        } else if(mLastClickedButton == CLICK_VOTE_DOWN_BEFORE_LOGIN) {
+                            doVoteAction(false);
+                        }
+                    } else {
+                        setVoteButtons();
                     }
-                    setVoteButtons();
                 } else if(notifyId == NOTIFY_ID_FAVORITE_LIST) {
                     mIsFavorite = mUserProfile.isFavoriteStock(mCode);
                     if(mIsFavorite) {
@@ -370,7 +422,7 @@ public class StockActivity extends AppCompatActivity {
                 }
             }
         };
-        mUserProfile.addUserProfileChangeListener(mUserProfileChangeListener);
+        mUserProfile.addGlobalBroadcastListener(mGlobalBroadcastListener);
     }
 
     private void showLoginAlertDialog(int lastButton) {
@@ -403,85 +455,89 @@ public class StockActivity extends AppCompatActivity {
     }
 
     private void initSelector() {
-        final ConstraintLayout commentBlock = findViewById(R.id.marketsense_stock_comment);
-        final ConstraintLayout newsBlock = findViewById(R.id.marketsense_stock_news);
+        mCommentBlock = findViewById(R.id.marketsense_stock_comment);
+        mNewsBlock = findViewById(R.id.marketsense_stock_news);
         mSelectorComment = findViewById(R.id.selector_comment_block);
         mSelectorNews = findViewById(R.id.selector_news_block);
         mSelectorComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                chooseBottomBlock(0, commentBlock, newsBlock);
+                chooseBottomBlock(0);
             }
         });
         mSelectorNews.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                chooseBottomBlock(1, commentBlock, newsBlock);
+                chooseBottomBlock(1);
             }
         });
 
-        final DisplayMetrics metrics = getResources().getDisplayMetrics();
         mNestedScrollView = findViewById(R.id.body_scroll_view);
         final ConstraintLayout voteInformationBlock = findViewById(R.id.stock_people_vote_information);
         final ConstraintLayout newsInformationBlock = findViewById(R.id.stock_news_vote_information);
         voteInformationBlock.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                chooseBottomBlock(0, commentBlock, newsBlock);
-                mNestedScrollView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Point childOffset = new Point();
-                        MarketSenseUtils.getDeepChildOffset(mNestedScrollView, mSelectorComment.getParent(), mSelectorComment, childOffset);
-                        if(mUserProfile.canVoteAgain(mCode)) {
-                            childOffset.y = childOffset.y - (int)(56 * metrics.density);
-                        }
-                        mNestedScrollView.scrollTo(0, childOffset.y);
-                    }
-                });
+                chooseBottomBlock(0);
+                slideToView(mSelectorComment);
             }
         });
         newsInformationBlock.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                chooseBottomBlock(1, commentBlock, newsBlock);
-                mNestedScrollView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Point childOffset = new Point();
-                        MarketSenseUtils.getDeepChildOffset(mNestedScrollView, mSelectorNews.getParent(), mSelectorNews, childOffset);
-                        if(mUserProfile.canVoteAgain(mCode)) {
-                            childOffset.y = childOffset.y - (int)(56 * metrics.density);
-                        }
-                        mNestedScrollView.scrollTo(0, childOffset.y);
-                    }
-                });
+                chooseBottomBlock(1);
+                slideToView(mSelectorNews);
             }
         });
     }
 
-    private void chooseBottomBlock(int position, ConstraintLayout commentBlock, ConstraintLayout newsBlock) {
+    private void slideToView(final View child) {
+        mNestedScrollView.post(new Runnable() {
+            @Override
+            public void run() {
+                final DisplayMetrics metrics = getResources().getDisplayMetrics();
+                Point childOffset = new Point();
+                MarketSenseUtils.getDeepChildOffset(mNestedScrollView, child.getParent(), child, childOffset);
+                if(mUserProfile.canVoteAgain(mCode)) {
+                    childOffset.y = childOffset.y - (int)(56 * metrics.density);
+                }
+                mNestedScrollView.scrollTo(0, childOffset.y);
+            }
+        });
+    }
+
+    private void chooseBottomBlock(int position) {
         switch (position) {
             case 0:
-                commentBlock.setVisibility(View.VISIBLE);
-                newsBlock.setVisibility(View.GONE);
+                mCommentBlock.setVisibility(View.VISIBLE);
+                mNewsBlock.setVisibility(View.GONE);
                 mSelectorComment.setBackground(getDrawable(R.drawable.border_selector_selected));
                 mSelectorNews.setBackground(getDrawable(R.drawable.border_selector));
                 break;
             case 1:
-                commentBlock.setVisibility(View.GONE);
-                newsBlock.setVisibility(View.VISIBLE);
+                mCommentBlock.setVisibility(View.GONE);
+                mNewsBlock.setVisibility(View.VISIBLE);
                 mSelectorComment.setBackground(getDrawable(R.drawable.border_selector));
                 mSelectorNews.setBackground(getDrawable(R.drawable.border_selector_selected));
                 break;
         }
     }
 
+
+    private void initCriticalStatistics() {
+        mCriticalStatisticsRecyclerView = findViewById(R.id.critical_statistics_list_view);
+        mCriticalStatisticsAdapter = new CriticalStatisticsAdapter(this);
+        mCriticalStatisticsRecyclerView.setAdapter(mCriticalStatisticsAdapter);
+        mCriticalStatisticsRecyclerView.setNestedScrollingEnabled(false);
+        mCriticalStatisticsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mCriticalStatisticsAdapter.loadCriticalStatistics(CriticalStatisticsRequest.getUrlStockCriticalStatistics(mCode));
+    }
+
     private void initNews() {
         Bundle bundle = new Bundle();
         bundle.putString(KEYWORD_NAME, mStockName);
         mNewsRecyclerView = findViewById(R.id.news_recycler_view);
-        mNewsRecyclerAdapter = new NewsRecyclerAdapter(this, KEYWORD_TASK_ID, bundle);
+        mNewsRecyclerAdapter = new NewsRecyclerAdapter(this, KEYWORD_TASK_ID, bundle, false);
         mNewsRecyclerAdapter.setNewsLayoutType(NEWS_SINGLE_LAYOUT);
         mNewsRecyclerView.setAdapter(mNewsRecyclerAdapter);
         mNewsRecyclerView.setNestedScrollingEnabled(false);
@@ -536,7 +592,7 @@ public class StockActivity extends AppCompatActivity {
                         StockActivity.this, news.getId(), news.getTitle(),
                         news.getUrlImage(), news.getDate(),
                         news.getPageLink(), news.getOriginLink(),
-                        news.getVoteRaiseNum(), news.getVoteFallNum()));
+                        news.getVoteRaiseNum(), news.getVoteFallNum(), news.getStockKeywords(), news.getLevel()));
                 overridePendingTransition(R.anim.enter, R.anim.stop);
             }
         });
@@ -547,6 +603,7 @@ public class StockActivity extends AppCompatActivity {
         TextView newsJoin = findViewById(R.id.news_join);
         String format = getResources().getString(R.string.title_news_join);
         newsJoin.setText(String.format(format, mNewsRecyclerAdapter.getNewsTotalCount()));
+        newsJoin.setVisibility(View.VISIBLE);
 
         ImageView noDataImageView = findViewById(R.id.no_news_iv);
         TextView noDataTextView = findViewById(R.id.no_news_tv);
@@ -566,7 +623,30 @@ public class StockActivity extends AppCompatActivity {
     private void initComments() {
         mCommentRecyclerView = findViewById(R.id.marketsense_stock_comment_rv);
 
-        mCommentsRecyclerViewAdapter = new CommentsRecyclerViewAdapter(this);
+        mCommentsRecyclerViewAdapter = new CommentsRecyclerViewAdapter(this, new CommentsRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onSayLikeItemClick(Comment comment, int position) {
+                mTempComment = comment;
+                mTempPosition = position;
+                if(FBHelper.checkFBLogin()) {
+                    MSLog.d("say like at position: " + position);
+                    comment.increaseLike();
+                    comment.setLike(true);
+                    PostEvent.sendLike(StockActivity.this, comment.getCommentId());
+                    mCommentsRecyclerViewAdapter.notifyItemChanged(position, ADAPTER_CHANGE_LIKE_ONLY);
+                } else {
+                    showLoginAlertDialog(CLICK_LIKE_BEFORE_LOGIN);
+                }
+            }
+
+            @Override
+            public void onReplyItemClick(Comment comment, int position) {
+                MSLog.d("reply at position: " + position);
+                startActivityForResult(CommentActivity.generateCommentActivityIntent(
+                        StockActivity.this, comment, position), sReplyEditorRequestCode);
+                overridePendingTransition(R.anim.enter, R.anim.stop);
+            }
+        });
         mCommentRecyclerView.setAdapter(mCommentsRecyclerViewAdapter);
         mCommentRecyclerView.setNestedScrollingEnabled(false);
 
@@ -574,17 +654,19 @@ public class StockActivity extends AppCompatActivity {
         mCommentsRecyclerViewAdapter.setCommentsAvailableListener(new CommentsRecyclerViewAdapter.CommentsAvailableListener() {
             @Override
             public void onCommentsAvailable(CommentAndVote commentAndVote) {
-                if(commentAndVote.getCommentSize() > 0) {
-                    showCommentBlock();
+                if(commentAndVote != null) {
+                    if (commentAndVote.getCommentSize() > 0) {
+                        showCommentBlock();
+                    }
+                    mVoteRaiseNum = commentAndVote.getRaiseNumber();
+                    mVoteFallNum = commentAndVote.getFallNumber();
+                    MSLog.d("update stock raise vote number: " + commentAndVote.getRaiseNumber());
+                    MSLog.d("update stock fall vote number: " + commentAndVote.getFallNumber());
+                    setSocialInformation(commentAndVote);
                 }
-                mVoteRaiseNum = commentAndVote.getRaiseNumber();
-                mVoteFallNum = commentAndVote.getFallNumber();
-                MSLog.d("update stock raise vote number: " + commentAndVote.getRaiseNumber());
-                MSLog.d("update stock fall vote number: " + commentAndVote.getFallNumber());
-                setSocialInformation(commentAndVote);
             }
         });
-        mCommentsRecyclerViewAdapter.loadCommentsList(SingleNewsRequest.querySingleNewsUrl(mCode, SingleNewsRequest.TASK.STOCK_COMMENT));
+        mCommentsRecyclerViewAdapter.loadCommentsList(CommentAndVoteRequest.querySingleNewsUrl(mCode, CommentAndVoteRequest.TASK.STOCK_COMMENT));
     }
 
     private void showCommentBlock() {
@@ -598,6 +680,7 @@ public class StockActivity extends AppCompatActivity {
         TextView peopleJoin = findViewById(R.id.people_join);
         String format = getResources().getString(R.string.title_people_join);
         peopleJoin.setText(String.format(format, commentAndVote.getCommentSize()));
+        peopleJoin.setVisibility(View.VISIBLE);
 
         TextView peopleScore = findViewById(R.id.people_score);
         TextView peopleMaxScore = findViewById(R.id.people_score_max_const);
@@ -644,31 +727,52 @@ public class StockActivity extends AppCompatActivity {
         badPercentageTextView.setText(percentFormat.format(1 - goodPercentage));
     }
 
-    private void initStockChart() {
+    private void setPriceBlock(float price, float diffNum, float diffPercentage) {
+        String diffNumberString = null;
+        String diffPercentageString = null;
+        if(diffPercentage > 0) {
+            diffNumberString = String.format(Locale.US, "+%s", diffNum);
+            diffPercentageString = String.format(Locale.US, "+%.2f%%", diffPercentage);
+        } else {
+            diffNumberString = String.format(Locale.US, "%s", diffNum);
+            diffPercentageString = String.format(Locale.US, "%.2f%%", diffPercentage);
+        }
+        setPriceBlock(String.valueOf(price), diffNumberString, diffPercentageString);
+    }
 
-        mLoadingProgressBar = findViewById(R.id.loading_progress_bar_1);
-        mLoadingProgressBarMore = findViewById(R.id.loading_progress_bar_2);
-
+    private void setPriceBlock(String price, String diffNum, String diffPercentage) {
         TextView priceTextView = findViewById(R.id.stock_price_tv);
         TextView diffTextView = findViewById(R.id.stock_diff_tv);
         String format = getResources().getString(R.string.title_diff_format);
 
-        priceTextView.setText(mPrice);
-        diffTextView.setText(String.format(format, mDiffNum, mDiffPercentage));
+        priceTextView.setText(price);
+        diffTextView.setText(String.format(format, diffNum, diffPercentage));
 
         try {
-            float diffPercentage = Float.valueOf(mDiffNum);
-            if(diffPercentage > 0) {
+            float diffPercentageFloat = Float.valueOf(diffNum);
+            if(diffPercentageFloat > 0) {
+                priceTextView.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_red_s, 0, 0, 0);
                 diffTextView.setTextColor(getResources().getColor(R.color.colorTrendUp));
-            } else if(diffPercentage < 0) {
+            } else if(diffPercentageFloat < 0) {
+                priceTextView.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_green_s, 0, 0, 0);
                 diffTextView.setTextColor(getResources().getColor(R.color.colorTrendDown));
             } else {
+                priceTextView.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_none, 0, 0, 0);
                 diffTextView.setTextColor(getResources().getColor(R.color.colorTrendFlat));
             }
         } catch (NumberFormatException e) {
             diffTextView.setTextColor(getResources().getColor(R.color.colorTrendFlat));
             MSLog.e("NumberFormatException: " + mDiffNum);
         }
+    }
+
+    private void initStockChart() {
+
+        mLoadingProgressBar = findViewById(R.id.loading_progress_bar_1);
+        mLoadingProgressBarMore = findViewById(R.id.loading_progress_bar_2);
+        mSwipeRefreshLayout = findViewById(R.id.swipe_to_refresh);
+
+        setPriceBlock(mPrice, mDiffNum, mDiffPercentage);
 
         Button moreButton = findViewById(R.id.more_information_btn);
         moreButton.setOnClickListener(new View.OnClickListener() {
@@ -680,18 +784,40 @@ public class StockActivity extends AppCompatActivity {
                 if(mLoadingProgressBarMore != null && !mIsMoreLoadFinished) {
                     mLoadingProgressBarMore.setVisibility(View.VISIBLE);
                 }
+                if(!mIsStockAILoading) {
+                    String stockAIUrl = String.format(Locale.US, "https://stock-ai.com/tw-Dly-8-%s.php", mCode);
+                    MSLog.d("load stock ai page: " + stockAIUrl);
+                    mStockAIWebView.loadUrl(stockAIUrl);
+                }
             }
         });
 
         LineChart lineChart = findViewById(R.id.stock_chart_price);
         BarChart barChart = findViewById(R.id.stock_chart_volume);
+        CandleStickChart candleStickChart = findViewById(R.id.stock_candle_chart_price);
         mYahooStxChartCrawler =
-                new YahooStxChartCrawler(this, mStockName, mCode, lineChart, barChart);
+                new YahooStxChartCrawler(this, mStockName, mCode, lineChart, barChart, candleStickChart);
+
+        mYahooStxChartCrawler.setInformationTextView(
+                (TextView) findViewById(R.id.stock_price_tv),
+                (TextView) findViewById(R.id.stock_diff_tv),
+                (TextView) findViewById(R.id.stock_price_open),
+                (TextView) findViewById(R.id.stock_price_high),
+                (TextView) findViewById(R.id.stock_price_low),
+                (TextView) findViewById(R.id.stock_price_yesterday_close),
+                (TextView) findViewById(R.id.stock_date_tv),
+                (TextView) findViewById(R.id.stock_volume_tv));
         mYahooStxChartCrawler.setYahooStxChartListener(new YahooStxChartCrawler.YahooStxChartListener() {
             @Override
             public void onStxChartDataLoad() {
                 mYahooStxChartCrawler.renderStockChartData();
-                mSkeletonScreen.hide();
+                StockTradeData stockTradeData = mYahooStxChartCrawler.getStockTradeData();
+                if(stockTradeData != null) {
+                    setPriceBlock(stockTradeData.getRealPrice(),
+                            stockTradeData.getDiffPrice(),
+                            stockTradeData.getDiffPercentage());
+                }
+                mSwipeRefreshLayout.setRefreshing(false);
                 if(mLoadingProgressBar != null) {
                     mLoadingProgressBar.setVisibility(View.GONE);
                 }
@@ -700,31 +826,125 @@ public class StockActivity extends AppCompatActivity {
             @Override
             public void onStxChartDataFail(MarketSenseError marketSenseError) {
                 mYahooStxChartCrawler.renderStockChartData();
-                mSkeletonScreen.hide();
+                mSwipeRefreshLayout.setRefreshing(false);
                 if(mLoadingProgressBar != null) {
                     mLoadingProgressBar.setVisibility(View.GONE);
                 }
-                MSLog.e("onStxChartDataFail: " + marketSenseError.toString());
             }
         });
         mYahooStxChartCrawler.loadStockChartData();
-        mSkeletonScreen = Skeleton.bind(lineChart)
-                .shimmer(false)
-                .load(R.layout.skeleton_webview)
-                .show();
+
+        mChartType1M = findViewById(R.id.chart_type_1m);
+        final TextView chartTypeD = findViewById(R.id.chart_type_d);
+        final TextView chartTypeW = findViewById(R.id.chart_type_w);
+        final TextView chartTypeM = findViewById(R.id.chart_type_m);
+        mChartType1M.setTextColor(getResources().getColor(R.color.color_price_line));
+
+        mChartType1M.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeChartSelectorUI(mChartType1M, chartTypeD, chartTypeW, chartTypeM);
+                mYahooStxChartCrawler.loadStockChartData();
+            }
+        });
+
+        chartTypeD.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeChartSelectorUI(chartTypeD, mChartType1M, chartTypeW, chartTypeM);
+                mYahooStxChartCrawler.loadTaStockChartData(StockChartDataRequest.TA_TYPE_DAY);
+            }
+        });
+
+        chartTypeW.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeChartSelectorUI(chartTypeW, chartTypeD, mChartType1M, chartTypeM);
+                mYahooStxChartCrawler.loadTaStockChartData(StockChartDataRequest.TA_TYPE_WEEK);
+            }
+        });
+
+        chartTypeM.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeChartSelectorUI(chartTypeM, chartTypeD, chartTypeW, mChartType1M);
+                mYahooStxChartCrawler.loadTaStockChartData(StockChartDataRequest.TA_TYPE_MONTH);
+            }
+        });
+
+        final DisplayMetrics metrics = getResources().getDisplayMetrics();
+        int start = (int) (74 * metrics.density);
+        int end = (int) (94 * metrics.density);
+        mSelectedChartTextView = mChartType1M;
+        mSwipeRefreshLayout.setProgressViewOffset(false, start, end);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if(mSelectedChartTextView != null) {
+                    mSelectedChartTextView.performClick();
+                }
+            }
+        });
+    }
+
+    private void changeChartSelectorUI(TextView selected, TextView ... others) {
+        for (TextView other : others) {
+            other.setTextColor(getResources().getColor(R.color.text_gray));
+        }
+        selected.setTextColor(getResources().getColor(R.color.color_price_line));
+        mSelectedChartTextView = selected;
+        if(mSelectedChartTextView == mChartType1M) {
+            mSwipeRefreshLayout.setEnabled(true);
+        } else {
+            mSwipeRefreshLayout.setEnabled(false);
+        }
+        if(mLoadingProgressBar != null) {
+            mLoadingProgressBar.setVisibility(View.VISIBLE);
+        }
     }
 
     private void setInformation() {
-        mStockName = getIntent().getStringExtra(Intent.EXTRA_TITLE);
-        mCode = getIntent().getStringExtra(EXTRA_CODE);
-        mVoteRaiseNum = getIntent().getIntExtra(EXTRA_RAISE_NUM, 0);
-        mVoteFallNum = getIntent().getIntExtra(EXTRA_FALL_NUM, 0);
+        if(getIntent().getStringExtra(EXTRA_CODE) != null) {
+            MSLog.d("set information in normal stock list click");
+            mStockName = getIntent().getStringExtra(Intent.EXTRA_TITLE);
+            mCode = getIntent().getStringExtra(EXTRA_CODE);
+            mVoteRaiseNum = getIntent().getIntExtra(EXTRA_RAISE_NUM, 0);
+            mVoteFallNum = getIntent().getIntExtra(EXTRA_FALL_NUM, 0);
 
-        mIsFavorite = mUserProfile.isFavoriteStock(mCode);
+            mIsFavorite = mUserProfile.isFavoriteStock(mCode);
 
-        mPrice = getIntent().getStringExtra(EXTRA_PRICE);
-        mDiffNum = getIntent().getStringExtra(EXTRA_DIFF_NUM);
-        mDiffPercentage = getIntent().getStringExtra(EXTRA_DIFF_PERCENTAGE);
+            mPrice = getIntent().getStringExtra(EXTRA_PRICE);
+            mDiffNum = getIntent().getStringExtra(EXTRA_DIFF_NUM);
+            mDiffPercentage = getIntent().getStringExtra(EXTRA_DIFF_PERCENTAGE);
+        } else {
+            Intent intent = getIntent();
+            String action = intent.getAction();
+            Uri data = intent.getData();
+            Stock stock = null;
+            if(data != null) {
+                MSLog.d("set information in comment's deep link: " + action + ", uri: " + data);
+
+                List<String> pathSegments = data.getPathSegments();
+                int index = pathSegments.indexOf("code");
+                try {
+                    stock = ClientData.getInstance(this).getPriceFromCode(pathSegments.get(index + 1));
+                } catch (Exception e) {
+                    MSLog.e("deep link parse error: " + data);
+                    stock = ClientData.getInstance(this).getPriceFromCode("2330");
+                }
+
+                mStockName = stock.getName();
+                mCode = stock.getCode();
+                mVoteRaiseNum = stock.getRaiseNum();
+                mVoteFallNum = stock.getFallNum();
+
+                mIsFavorite = mUserProfile.isFavoriteStock(mCode);
+
+                mPrice = stock.getPrice();
+                mDiffNum = stock.getDiffNumber();
+                mDiffPercentage = stock.getDiffPercentage();
+            }
+        }
     }
 
     private void setActionBar() {
@@ -795,9 +1015,13 @@ public class StockActivity extends AppCompatActivity {
             String format = getResources().getString(R.string.title_add_complete);
             Toast.makeText(this, String.format(format, mStockName, mCode), Toast.LENGTH_SHORT).show();
             imageView.setImageResource(R.drawable.ic_star_yellow_24px);
+
+            if(mUserProfile.canShowStarDialog(this)) {
+                showStarAlertDialog();
+            }
         }
         mIsFavorite = mUserProfile.isFavoriteStock(mCode);
-        mUserProfile.notifyUserProfile(NOTIFY_ID_FAVORITE_LIST);
+        mUserProfile.globalBroadcast(NOTIFY_ID_FAVORITE_LIST);
     }
 
     public static Intent generateStockActivityIntent(Context context,
@@ -850,17 +1074,17 @@ public class StockActivity extends AppCompatActivity {
                 PostEvent.sendRegister(StockActivity.this, userId, userName, FACEBOOK_CONSTANTS,
                         UserProfile.generatePassword(userId, FACEBOOK_CONSTANTS), userEmail, avatarLink, new PostEvent.PostEventListener() {
                             @Override
-                            public void onResponse(boolean isSuccessful) {
+                            public void onResponse(boolean isSuccessful, Object data) {
                                 if(!isSuccessful) {
                                     Toast.makeText(StockActivity.this, R.string.login_failed_description, Toast.LENGTH_SHORT).show();
                                     LoginManager.getInstance().logOut();
                                 } else {
-                                    mUserProfile.notifyUserProfile(NOTIFY_USER_HAS_LOGIN);
+                                    mUserProfile.globalBroadcast(NOTIFY_USER_HAS_LOGIN);
                                 }
                             }
                         });
             }
-        }, true);
+        });
     }
 
     @Override
@@ -869,14 +1093,65 @@ public class StockActivity extends AppCompatActivity {
         if(requestCode == sEditorRequestCode) {
             if(resultCode == RESULT_OK) {
                 String html = data.getStringExtra(EXTRA_RES_HTML);
-                Comment comment = new Comment();
-                comment.setCommentHtml(html);
-                mCommentsRecyclerViewAdapter.addOneComment(comment);
+                String type = data.getStringExtra(EXTRA_RES_TYPE);
+                String id = data.getStringExtra(EXTRA_RES_ID);
+                String eventId = data.getStringExtra(EXTRA_RES_EVENT_ID);
+
+                Comment newComment = new Comment();
+                newComment.setCommentId(eventId);
+                newComment.setCommentHtml(html);
+                mCommentsRecyclerViewAdapter.addOneComment(newComment);
                 showCommentBlock();
-                MSLog.d("user send a comment on code: " + mCode);
-                MSLog.d("user send a comment of html: " + html);
+
+                chooseBottomBlock(0);
+                slideToView(mSelectorComment);
+
+                MSLog.d(String.format("user send a comment on (%s, %s, %s): %s", type, id, eventId, html));
+            }
+        } else if(requestCode == sReplyEditorRequestCode) {
+            if(resultCode == RESULT_OK && data.getBooleanExtra(EXTRA_NEED_TO_CHANGE, false)) {
+                Serializable serializable = data.getSerializableExtra(EXTRA_COMMENT);
+                int position = data.getIntExtra(EXTRA_POSITION, -1);
+                if (serializable != null && serializable instanceof Comment && position != -1) {
+                    MSLog.d("comment with position " + position + " is needed to change");
+                    Comment comment = (Comment) serializable;
+                    mCommentsRecyclerViewAdapter.cloneSocialContent(position, comment);
+                    mCommentsRecyclerViewAdapter.notifyItemChanged(position, ADAPTER_CHANGE_LIKE_ONLY);
+                }
             }
         }
         mFBCallbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void showStarAlertDialog() {
+        if(mStarAlertDialog != null) {
+            mStarAlertDialog.dismiss();
+            mStarAlertDialog = null;
+        }
+
+        mStarAlertDialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.star_title)
+                .setMessage(R.string.star_description_simple)
+                .setPositiveButton(R.string.star_positive, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+                        try {
+                            MSLog.d("go to: " + Uri.parse("market://details?id=" + appPackageName));
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                        } catch (android.content.ActivityNotFoundException e) {
+                            MSLog.d("go to: " + Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName));
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                        }
+                        mStarAlertDialog.dismiss();
+                    }
+                })
+                .setNegativeButton(R.string.star_negative_cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        mStarAlertDialog.dismiss();
+                    }
+                })
+                .show();
     }
 }

@@ -3,6 +3,7 @@ package com.idroi.marketsense.common;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Cache;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -13,11 +14,13 @@ import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.datasource.Networking;
 import com.idroi.marketsense.request.StocksListRequest;
 import com.idroi.marketsense.request.UserEventsAndCodesRequest;
+import com.idroi.marketsense.util.DateUtils;
 
 import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by daniel.hsieh on 2018/5/3.
@@ -39,6 +42,10 @@ public class ClientData {
     private static final int DEFAULT_RETRY_TIME = 3;
     private int mLoadPreferenceRetryCounter = DEFAULT_RETRY_TIME;
     private int mLoadAllStockListRetryCounter = DEFAULT_RETRY_TIME;
+
+    private boolean mIsWorkDayBeforeStockClosed;
+    private boolean mIsWorkDayAfterStockClosedBeforeAnswerDisclosure;
+    private boolean mDoesUseTodayPredictionValue;;
 
     /**
      * Returns the singleton ClientMetadata object, using the context to obtain data if necessary.
@@ -80,7 +87,14 @@ public class ClientData {
         mUserProfile = new UserProfile(context, true);
         mRealTimePricesHashMap = new HashMap<>();
 
+        updateClockInformation();
         loadAllStocksListTask(true);
+    }
+
+    public void updateClockInformation() {
+        mIsWorkDayBeforeStockClosed = DateUtils.isWorkDayBeforeStockClosed();
+        mIsWorkDayAfterStockClosedBeforeAnswerDisclosure = DateUtils.isWorkDayAfterStockClosedAndBeforeAnswerDisclosure();
+        mDoesUseTodayPredictionValue = DateUtils.doesUseTodayPredictionValue();
     }
 
     public void setScreenSizeInPixels(int widthPixels, int heightPixels) {
@@ -144,6 +158,16 @@ public class ClientData {
         }
     }
 
+    public Stock getPriceFromName(String name) {
+        if(mRealTimePricesHashMap != null) {
+            String code = getCodeFromName(name);
+            return mRealTimePricesHashMap.get(code);
+        } else {
+            MSLog.e("mRealTimePricesHashMap is null");
+            return null;
+        }
+    }
+
     public ArrayList<Stock> getAllStocksListInfo() {
         return mAllStocksListInfo;
     }
@@ -174,6 +198,18 @@ public class ClientData {
 
     public boolean isNameAndCodeAreValid(String name, String code) {
         return (name != null) && (code != null);
+    }
+
+    public boolean isWorkDayBeforeStockClosed() {
+        return mIsWorkDayBeforeStockClosed;
+    }
+
+    public boolean isWorkDayAfterStockClosedBeforeAnswerDisclosure() {
+        return mIsWorkDayAfterStockClosedBeforeAnswerDisclosure;
+    }
+
+    public boolean doesUseTodayPredictionValue() {
+        return mDoesUseTodayPredictionValue;
     }
 
     private void loadAllStocksListTask(boolean shouldReadCache) {
@@ -249,7 +285,18 @@ public class ClientData {
                             mLoadPreferenceRetryCounter = DEFAULT_RETRY_TIME;
                         }
                     }
-                });
+                }){
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        String token = ClientData.getInstance().getUserToken();
+                        HashMap<String, String> headers = new HashMap<String, String>();
+                        headers.put("Content-Type", "application/json");
+                        if(token != null && !token.isEmpty()) {
+                            headers.put("User-Token", token);
+                        }
+                        return headers;
+                    }
+            };
 
         userEventsAndCodesRequest.setShouldCache(false);
         Networking.getRequestQueue(mContext).add(userEventsAndCodesRequest);

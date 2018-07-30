@@ -1,19 +1,27 @@
 package com.idroi.marketsense.datasource;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Handler;
 
+import com.android.volley.Cache;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.common.MarketSenseNetworkError;
+import com.idroi.marketsense.common.SharedPreferencesCompat;
 import com.idroi.marketsense.data.CommentAndVote;
-import com.idroi.marketsense.request.SingleNewsRequest;
+import com.idroi.marketsense.request.CommentAndVoteRequest;
 import com.idroi.marketsense.util.MarketSenseUtils;
 
+import org.json.JSONException;
+
 import java.lang.ref.WeakReference;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_REQUEST_NAME;
 
 /**
  * Created by daniel.hsieh on 2018/5/8.
@@ -43,7 +51,7 @@ public class MarketSenseCommentsFetcher {
 
     private WeakReference<Context> mContext;
     private MarketSenseCommentsNetworkListener mMarketSenseCommentsNetworkListener;
-    private SingleNewsRequest mSingleNewsRequest;
+    private CommentAndVoteRequest mCommentAndVoteRequest;
 
     MarketSenseCommentsFetcher(Context context,
            MarketSenseCommentsNetworkListener marketSenseCommentsNetworkListener) {
@@ -53,16 +61,16 @@ public class MarketSenseCommentsFetcher {
         mTimeoutRunnable = new Runnable() {
             @Override
             public void run() {
-                if(mSingleNewsRequest != null) {
-                    mSingleNewsRequest.cancel();
-                    mSingleNewsRequest = null;
+                if(mCommentAndVoteRequest != null) {
+                    mCommentAndVoteRequest.cancel();
+                    mCommentAndVoteRequest = null;
                 }
                 mMarketSenseCommentsNetworkListener.onCommentsFail(MarketSenseError.NETWORK_CONNECTION_TIMEOUT);
             }
         };
     }
 
-    void makeRequest(String url) {
+    void makeRequest(String cacheKey, String url) {
         final Context context = getContextOrDestroy();
         if(context == null) {
             return;
@@ -73,18 +81,44 @@ public class MarketSenseCommentsFetcher {
             return;
         }
 
-        requestComments(url);
+        requestComments(cacheKey, url);
     }
 
-    private void requestComments(String url) {
+    private void requestComments(final String cacheKey, final String url) {
         final Context context = getContextOrDestroy();
         if(context == null) {
             return;
         }
 
+        final AtomicBoolean isCacheSuccessful = new AtomicBoolean(false);
         MSLog.i("Loading comments ...: " + url);
 
-        mSingleNewsRequest = new SingleNewsRequest(Request.Method.GET, url, new Response.Listener<CommentAndVote>() {
+        if(cacheKey != null) {
+            Cache cache = Networking.getRequestQueue(context).getCache();
+
+            SharedPreferences sharedPreferences =
+                    context.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE);
+            String cacheUrl = sharedPreferences.getString(cacheKey, null);
+
+            if(cacheUrl != null) {
+                Cache.Entry entry = cache.get(cacheUrl);
+                MSLog.i("Loading comments...(cache): " + cacheKey + ", " + cacheUrl);
+                if (entry != null) {
+                    try {
+                        CommentAndVote commentAndVote = CommentAndVoteRequest.commentsParseResponse(entry.data);
+                        MSLog.i("Loading comments...(cache hit): " + new String(entry.data));
+                        isCacheSuccessful.set(true);
+                        mMarketSenseCommentsNetworkListener.onCommentsLoad(commentAndVote);
+                    } catch (JSONException e) {
+                        MSLog.e("Loading comments...(cache failed JSONException)");
+                    }
+                } else {
+                    MSLog.i("Loading comments...(cache miss)");
+                }
+            }
+        }
+
+        mCommentAndVoteRequest = new CommentAndVoteRequest(Request.Method.GET, url, new Response.Listener<CommentAndVote>() {
             @Override
             public void onResponse(CommentAndVote response) {
                 final Context context = getContextOrDestroy();
@@ -93,6 +127,15 @@ public class MarketSenseCommentsFetcher {
                 }
 
                 mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
+
+                if(cacheKey != null) {
+                    writeToSharedPreference(cacheKey, url);
+                    if(isCacheSuccessful.get()) {
+                        MSLog.i("cache part is successful, so we do not return our network response");
+                        return;
+                    }
+                }
+
                 mMarketSenseCommentsNetworkListener.onCommentsLoad(response);
             }
         }, new Response.ErrorListener() {
@@ -117,17 +160,21 @@ public class MarketSenseCommentsFetcher {
             }
         });
 
-        mTimeoutHandler.postDelayed(mTimeoutRunnable, 3000);
-        mSingleNewsRequest.setShouldCache(false);
-        Networking.getRequestQueue(context).add(mSingleNewsRequest);
+        mTimeoutHandler.postDelayed(mTimeoutRunnable, 10000);
+        if(cacheKey != null) {
+            mCommentAndVoteRequest.setShouldCache(true);
+        } else {
+            mCommentAndVoteRequest.setShouldCache(false);
+        }
+        Networking.getRequestQueue(context).add(mCommentAndVoteRequest);
 
     }
 
     public void destroy() {
         mContext.clear();
-        if(mSingleNewsRequest != null) {
-            mSingleNewsRequest.cancel();
-            mSingleNewsRequest = null;
+        if(mCommentAndVoteRequest != null) {
+            mCommentAndVoteRequest.cancel();
+            mCommentAndVoteRequest = null;
         }
         mMarketSenseCommentsNetworkListener = EMPTY_NETWORK_LISTENER;
         if(mTimeoutHandler != null) {
@@ -144,5 +191,44 @@ public class MarketSenseCommentsFetcher {
                     "no more requests will be processed.");
         }
         return context;
+    }
+
+    private void writeToSharedPreference(String cacheKey, String url) {
+        Context context = getContextOrDestroy();
+        if(context == null) {
+            return;
+        }
+
+        SharedPreferences.Editor editor =
+                context.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE).edit();
+        editor.putString(cacheKey, url);
+        SharedPreferencesCompat.apply(editor);
+
+        MSLog.d("Comment network query success, so we save this network url to cache: " + cacheKey + ", " + url);
+    }
+
+    public static void prefetchGeneralComments(final Context context) {
+        final Context applicationContext = context.getApplicationContext();
+        final String url = CommentAndVoteRequest.queryCommentsEvent();
+        CommentAndVoteRequest commentAndVoteRequest = new CommentAndVoteRequest(Request.Method.GET, url, new Response.Listener<CommentAndVote>() {
+            @Override
+            public void onResponse(CommentAndVote response) {
+                if(applicationContext != null) {
+                    SharedPreferences.Editor editor =
+                            applicationContext.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE).edit();
+                    editor.putString(CommentAndVoteRequest.COMMENT_CACHE_KEY_GENERAL, url);
+                    SharedPreferencesCompat.apply(editor);
+                    MSLog.d("Prefetch comment network query success, so we save this network url to cache: " + CommentAndVoteRequest.COMMENT_CACHE_KEY_GENERAL + ", " + url);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                MSLog.e("Prefetch comment error: " + error.getMessage(), error);
+            }
+        });
+
+        commentAndVoteRequest.setShouldCache(true);
+        Networking.getRequestQueue(applicationContext).add(commentAndVoteRequest);
     }
 }

@@ -10,6 +10,7 @@ public class Constants {
 
     public static final String SHARED_PREFERENCE_REQUEST_NAME = "com.idroi.marketsense.request";
     public static final String SHARED_PREFERENCE_USER_SETTING = "com.idroi.marketsense.user_setting";
+    public static final String SHARED_PREFERENCE_LAST_STAR_TIMESTAMP = "com.idroi.marketsense.last_star_timestamp";
 
     public static final String USER_SETTING_NOTIFICATION_KEY = "com.idroi.marketsense.user_setting.notification";
 
@@ -24,4 +25,6 @@ public class Constants {
             new Stock("2330", "台積電"),
             new Stock("2317", "鴻海")
     };
+
+    public static final String STOCK_CODE_DEEP_LINK = "marketsense://open.marketsense.app/stock/code/%s";
 }

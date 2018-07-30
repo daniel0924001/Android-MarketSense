@@ -20,6 +20,7 @@ import static com.idroi.marketsense.fragments.StockFragment.STOCK_NAME;
  * Created by daniel.hsieh on 2018/4/24.
  */
 
+@Deprecated
 public class StockScreenSlidePagerAdapter extends BaseScreenSlidePagerAdapter {
 
     private String mStockName;

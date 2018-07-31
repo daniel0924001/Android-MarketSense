@@ -26,8 +26,11 @@ import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.StockRequest;
 
+import static com.idroi.marketsense.adapter.StockListRecyclerAdapter.ADAPTER_UPDATE_PRICE_ONLY;
+import static com.idroi.marketsense.adapter.StockListRecyclerAdapter.ADAPTER_UPDATE_RIGHT_BLOCK_ONLY;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_PRICE_CHANGED;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_RIGHT_PART_CHANGE;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_PREDICTION;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_DOWNWARD;
 
@@ -130,7 +133,9 @@ public class StockListFragment extends Fragment {
                 if(notifyId == NOTIFY_ID_FAVORITE_LIST && mTaskId == SELF_CHOICES_ID) {
                     loadStockList();
                 } else if(notifyId == NOTIFY_ID_PRICE_CHANGED && mIsRecyclerViewIdle) {
-                    mStockListRecyclerAdapter.updatePriceInVisibleItems();
+                    mStockListRecyclerAdapter.updatePriceInVisibleItems(ADAPTER_UPDATE_PRICE_ONLY);
+                } else if(notifyId == NOTIFY_ID_RIGHT_PART_CHANGE) {
+                    mStockListRecyclerAdapter.updatePriceInVisibleItems(ADAPTER_UPDATE_RIGHT_BLOCK_ONLY);
                 }
             }
         };

@@ -247,11 +247,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        ClientData clientData = ClientData.getInstance(this);
-        if(clientData != null) {
-            clientData.updateClockInformation();
-        }
-
         if(!mCanReturn) {
             setAvatarImage();
         }
@@ -276,7 +271,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         ClientData.getInstance(this).getUserProfile().deleteGlobalBroadcastListener(mGlobalBroadcastListener);
         MSLog.i("Exit MainActivity");
-        finish();
         super.onDestroy();
     }
 

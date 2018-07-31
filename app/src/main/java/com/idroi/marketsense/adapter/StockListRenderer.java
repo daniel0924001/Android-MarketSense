@@ -51,6 +51,20 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
         setViewVisibility(stockViewHolder, View.VISIBLE);
     }
 
+    public void updateRightPartOnly(final View view, final Stock stock) {
+        final StockViewHolder stockViewHolder = mViewHolderMap.get(view);
+        if(stockViewHolder == null) {
+            MSLog.e("stockViewHolder is null in updatePriceOnly");
+            return;
+        }
+
+        stock.setRightPredictionBlock(view.getContext(),
+                stockViewHolder.rightBlock,
+                stockViewHolder.rightTitle,
+                stockViewHolder.rightValue,
+                stockViewHolder.hitImageView);
+    }
+
     public void updatePriceOnly(final View view, final Stock stock) {
         final StockViewHolder stockViewHolder = mViewHolderMap.get(view);
         if(stockViewHolder == null) {

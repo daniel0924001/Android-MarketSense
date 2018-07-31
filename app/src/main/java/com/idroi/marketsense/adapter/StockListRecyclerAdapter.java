@@ -28,7 +28,8 @@ import static com.idroi.marketsense.fragments.StockListFragment.SELF_CHOICES_ID;
 
 public class StockListRecyclerAdapter extends RecyclerView.Adapter {
 
-    private static final int ADAPTER_UPDATE_PRICE_ONLY = 1;
+    public static final int ADAPTER_UPDATE_PRICE_ONLY = 1;
+    public static final int ADAPTER_UPDATE_RIGHT_BLOCK_ONLY = 2;
 
     public interface OnItemClickListener {
         void onItemClick(Stock stock);
@@ -78,12 +79,12 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
         });
     }
 
-    public void updatePriceInVisibleItems() {
+    public void updatePriceInVisibleItems(int payload) {
         LinearLayoutManager linearLayoutManager =
                 (LinearLayoutManager) mStockListRecyclerView.getLayoutManager();
         int start = linearLayoutManager.findFirstVisibleItemPosition();
         int end = linearLayoutManager.findLastVisibleItemPosition();
-        notifyItemRangeChanged(start, end + 1, ADAPTER_UPDATE_PRICE_ONLY);
+        notifyItemRangeChanged(start, end + 1, payload);
     }
 
     public void sortByTask(int field, int direction) {
@@ -118,12 +119,15 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
             onBindViewHolder(holder, position);
         } else {
             int type = (int) payloads.get(0);
-            switch (type) {
-                case ADAPTER_UPDATE_PRICE_ONLY:
-                    final Stock stock = mStockListPlacer.getStockData(position);
-                    if(stock != null) {
+            final Stock stock = mStockListPlacer.getStockData(position);
+            if(stock != null) {
+                switch (type) {
+                    case ADAPTER_UPDATE_PRICE_ONLY:
                         mStockListRenderer.updatePriceOnly(holder.itemView, stock);
-                    }
+                        break;
+                    case ADAPTER_UPDATE_RIGHT_BLOCK_ONLY:
+                        mStockListRenderer.updateRightPartOnly(holder.itemView, stock);
+                }
             }
         }
     }

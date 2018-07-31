@@ -23,6 +23,8 @@ import java.util.Locale;
 
 public class Stock {
 
+    private static boolean sPredictionStateIsToday;
+
     private static final String CODE = "code";
     private static final String NAME = "name";
     private static final String DIFF = "diff";
@@ -182,6 +184,7 @@ public class Stock {
         if(clientData != null && clientData.doesUseTodayPredictionValue()) {
             mPredictionDiffPercentage = mTodayPredictionDiffPercentage;
             mPredictionDiffDirection = mTodayPredictionDiffDirection;
+            sPredictionStateIsToday = true;
         }
     }
 
@@ -198,6 +201,7 @@ public class Stock {
         if(clientData != null &&!ClientData.getInstance().doesUseTodayPredictionValue()) {
             mPredictionDiffPercentage = mTomorrowPredictionDiffPercentage;
             mPredictionDiffDirection = mTomorrowPredictionDiffDirection;
+            sPredictionStateIsToday = false;
         }
     }
 
@@ -369,6 +373,10 @@ public class Stock {
                 || mTodayPredictionDiffDirection == mDiffDirection;
     }
 
+    public static void changeRightPartValue() {
+        sPredictionStateIsToday = !sPredictionStateIsToday;
+    }
+
     public double getEarnInPrediction(boolean simple) {
         if(mPredictionDiffDirection == TREND_FLAT) {
             return 0;
@@ -408,6 +416,11 @@ public class Stock {
         Resources resources = context.getResources();
         ClientData clientData = ClientData.getInstance(context);
         isHitImageView.setVisibility(View.GONE);
+        predictionBlock.setOnClickListener(null);
+
+        int direction = mPredictionDiffDirection;
+        double diffPercentage = mPredictionDiffPercentage;
+
         if(clientData.isWorkDayBeforeStockClosed()) {
             titleTextView.setText(resources.getString(R.string.title_predict_today));
         } else if(clientData.isWorkDayAfterStockClosedBeforeAnswerDisclosure()) {
@@ -416,32 +429,48 @@ public class Stock {
                 isHitImageView.setVisibility(View.VISIBLE);
             }
         } else {
-            titleTextView.setText(resources.getString(R.string.title_predict_tomorrow));
+            if(sPredictionStateIsToday) {
+                titleTextView.setText(resources.getString(R.string.title_predict_today_answer_disclosure));
+                direction = mTodayPredictionDiffDirection;
+                diffPercentage = mTodayPredictionDiffPercentage;
+            } else {
+                titleTextView.setText(resources.getString(R.string.title_predict_tomorrow));
+                direction = mTomorrowPredictionDiffDirection;
+                diffPercentage = mTomorrowPredictionDiffPercentage;
+            }
             if(isHitPredictionDirection(false)) {
                 isHitImageView.setVisibility(View.VISIBLE);
             }
+            predictionBlock.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Stock.changeRightPartValue();
+                    ClientData clientData = ClientData.getInstance();
+                    clientData.getUserProfile().globalBroadcast(UserProfile.NOTIFY_ID_RIGHT_PART_CHANGE);
+                }
+            });
         }
 
         valueTextView.setTextColor(resources.getColor(R.color.text_white));
         titleTextView.setTextColor(resources.getColor(R.color.text_white));
-        switch (mPredictionDiffDirection) {
+        switch (direction) {
             case TREND_UP:
                 predictionBlock.setBackground(resources.getDrawable(R.drawable.block_predict_up_background));
-                valueTextView.setText(String.format(Locale.US, "+%.2f%%", mPredictionDiffPercentage));
+                valueTextView.setText(String.format(Locale.US, "+%.2f%%", diffPercentage));
                 break;
             case TREND_FLAT:
                 predictionBlock.setBackgroundColor(resources.getColor(R.color.card_gray_background));
-                valueTextView.setText(String.format(Locale.US, "%.2f%%", mPredictionDiffPercentage));
+                valueTextView.setText(String.format(Locale.US, "%.2f%%", diffPercentage));
                 valueTextView.setTextColor(resources.getColor(R.color.text_dark_gray));
                 titleTextView.setTextColor(resources.getColor(R.color.text_dark_gray));
                 break;
             case TREND_DOWN:
                 predictionBlock.setBackground(resources.getDrawable(R.drawable.block_predict_down_background));
-                valueTextView.setText(String.format(Locale.US, "-%.2f%%", mPredictionDiffPercentage));
+                valueTextView.setText(String.format(Locale.US, "-%.2f%%", diffPercentage));
                 break;
             default:
                 predictionBlock.setBackgroundColor(resources.getColor(R.color.card_gray_background));
-                valueTextView.setText(String.format(Locale.US, "%.2f%%", mPredictionDiffPercentage));
+                valueTextView.setText(String.format(Locale.US, "%.2f%%", diffPercentage));
                 valueTextView.setTextColor(resources.getColor(R.color.text_dark_gray));
                 titleTextView.setTextColor(resources.getColor(R.color.text_dark_gray));
                 break;

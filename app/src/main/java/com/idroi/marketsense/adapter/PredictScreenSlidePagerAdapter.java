@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
 import com.idroi.marketsense.R;
+import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.fragments.StockListFragment;
 
 /**
@@ -19,6 +20,11 @@ public class PredictScreenSlidePagerAdapter extends BaseScreenSlidePagerAdapter 
                 context.getResources().getString(R.string.title_news_win_predict),
                 context.getResources().getString(R.string.title_choices_list),
         });
+
+        ClientData clientData = ClientData.getInstance(context);
+        if(clientData != null) {
+            clientData.updateClockInformation();
+        }
     }
 
     @Override

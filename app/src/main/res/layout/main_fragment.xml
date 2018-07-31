@@ -79,7 +79,7 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:paddingTop="25dp"
+                android:paddingTop="16dp"
                 android:paddingBottom="16dp"
                 android:maxLines="1"
                 android:textColor="#000000"
@@ -109,6 +109,7 @@
                 app:layout_constraintEnd_toEndOf="@id/guideline_1"/>
 
             <TextView
+                android:id="@+id/tv_tech_ranking_subtitle_price"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:paddingBottom="8dp"
@@ -123,6 +124,7 @@
                 app:layout_constraintEnd_toEndOf="@id/guideline_2"/>
 
             <TextView
+                android:id="@+id/tv_tech_ranking_subtitle_predict"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:paddingBottom="8dp"
@@ -160,7 +162,7 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:paddingTop="25dp"
+                android:paddingTop="16dp"
                 android:paddingBottom="16dp"
                 android:maxLines="1"
                 android:textColor="#000000"
@@ -191,6 +193,7 @@
                 app:layout_constraintEnd_toEndOf="@id/guideline_1"/>
 
             <TextView
+                android:id="@+id/tv_news_ranking_subtitle_price"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:paddingBottom="8dp"
@@ -205,6 +208,7 @@
                 app:layout_constraintEnd_toEndOf="@id/guideline_2"/>
 
             <TextView
+                android:id="@+id/tv_news_ranking_subtitle_predict"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:paddingBottom="8dp"

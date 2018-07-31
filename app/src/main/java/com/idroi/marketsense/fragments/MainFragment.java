@@ -111,37 +111,50 @@ public class MainFragment extends Fragment {
                 if(mLoadingProgressBarRankingPeople != null) {
                     mLoadingProgressBarRankingPeople.setVisibility(View.GONE);
                 }
-                TextView secondTitle = view.findViewById(R.id.tv_news_ranking);
-                ((ConstraintLayout.LayoutParams) secondTitle.getLayoutParams()).topToBottom = R.id.list_ranking_tech;
-                ((ConstraintLayout.LayoutParams) secondTitle.getLayoutParams()).topMargin = 0;
-                TextView thirdTitle = view.findViewById(R.id.tv_news);
-                ((ConstraintLayout.LayoutParams) thirdTitle.getLayoutParams()).topToBottom = R.id.list_ranking_news;
-                ((ConstraintLayout.LayoutParams) thirdTitle.getLayoutParams()).topMargin = 0;
+                if(mStockListPlacer.getStocks() != null) {
+                    TextView secondTitle = view.findViewById(R.id.tv_news_ranking);
+                    ((ConstraintLayout.LayoutParams) secondTitle.getLayoutParams()).topToBottom = R.id.list_ranking_tech;
+                    ((ConstraintLayout.LayoutParams) secondTitle.getLayoutParams()).topMargin = 0;
+                    TextView thirdTitle = view.findViewById(R.id.tv_news);
+                    ((ConstraintLayout.LayoutParams) thirdTitle.getLayoutParams()).topToBottom = R.id.list_ranking_news;
+                    ((ConstraintLayout.LayoutParams) thirdTitle.getLayoutParams()).topMargin = 0;
 
-                mTechRankingRecyclerAdapter = new StockRankingRecyclerAdapter(getActivity(),
-                        mStockListPlacer.getStocks(), StockRankingRenderer.RANKING_BY_TECH);
-                mNewsRankingRecyclerAdapter = new StockRankingRecyclerAdapter(getActivity(),
-                        mStockListPlacer.getStocks(), StockRankingRenderer.RANKING_BY_NEWS);
-                mTechRankingRecyclerView.setAdapter(mTechRankingRecyclerAdapter);
-                mNewsRankingRecyclerView.setAdapter(mNewsRankingRecyclerAdapter);
-                mTechRankingRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                mNewsRankingRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                mTechRankingRecyclerView.setNestedScrollingEnabled(false);
-                mNewsRankingRecyclerView.setNestedScrollingEnabled(false);
+                    mTechRankingRecyclerAdapter = new StockRankingRecyclerAdapter(getActivity(),
+                            mStockListPlacer.getStocks(), StockRankingRenderer.RANKING_BY_TECH);
+                    mNewsRankingRecyclerAdapter = new StockRankingRecyclerAdapter(getActivity(),
+                            mStockListPlacer.getStocks(), StockRankingRenderer.RANKING_BY_NEWS);
+                    mTechRankingRecyclerView.setAdapter(mTechRankingRecyclerAdapter);
+                    mNewsRankingRecyclerView.setAdapter(mNewsRankingRecyclerAdapter);
+                    mTechRankingRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                    mNewsRankingRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                    mTechRankingRecyclerView.setNestedScrollingEnabled(false);
+                    mNewsRankingRecyclerView.setNestedScrollingEnabled(false);
 
-                mTechRankingRecyclerAdapter.setOnItemClickListener(new StockRankingRecyclerAdapter.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(Stock stock) {
-                        openStockActivity(stock);
-                    }
-                });
+                    mTechRankingRecyclerAdapter.setOnItemClickListener(new StockRankingRecyclerAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(Stock stock) {
+                            openStockActivity(stock);
+                        }
+                    });
 
-                mNewsRankingRecyclerAdapter.setOnItemClickListener(new StockRankingRecyclerAdapter.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(Stock stock) {
-                        openStockActivity(stock);
-                    }
-                });
+                    mNewsRankingRecyclerAdapter.setOnItemClickListener(new StockRankingRecyclerAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(Stock stock) {
+                            openStockActivity(stock);
+                        }
+                    });
+                } else {
+                    mTechRankingRecyclerView.setVisibility(View.GONE);
+                    mNewsRankingRecyclerView.setVisibility(View.GONE);
+                    view.findViewById(R.id.tv_news_ranking).setVisibility(View.GONE);
+                    view.findViewById(R.id.tv_news_ranking_subtitle).setVisibility(View.GONE);
+                    view.findViewById(R.id.tv_news_ranking_subtitle_price).setVisibility(View.GONE);
+                    view.findViewById(R.id.tv_news_ranking_subtitle_predict).setVisibility(View.GONE);
+                    view.findViewById(R.id.tv_tech_ranking).setVisibility(View.GONE);
+                    view.findViewById(R.id.tv_tech_ranking_subtitle).setVisibility(View.GONE);
+                    view.findViewById(R.id.tv_tech_ranking_subtitle_price).setVisibility(View.GONE);
+                    view.findViewById(R.id.tv_tech_ranking_subtitle_predict).setVisibility(View.GONE);
+                }
             }
         });
 

@@ -392,7 +392,11 @@ public class Stock {
                 clientData.isWorkDayAfterStockClosedBeforeAnswerDisclosure()) {
             return mPredictionError;
         } else {
-            return mPredictionDiffDirection * mPredictionDiffPercentage;
+            if(isHitPredictionDirection(false)) {
+                return 10 + mPredictionDiffDirection * mPredictionDiffPercentage;
+            } else {
+                return mPredictionDiffDirection * mPredictionDiffPercentage;
+            }
         }
     }
 

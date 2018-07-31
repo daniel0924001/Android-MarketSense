@@ -154,10 +154,12 @@ public class CommentActivity extends AppCompatActivity {
     private void setNewsBlock(final News news) {
         ConstraintLayout newsBlock = findViewById(R.id.comment_news_block);
         TextView newsTitleView = findViewById(R.id.comment_news_title_tv);
+        TextView dateTitleView = findViewById(R.id.comment_news_date_tv);
         TextView fireTextView = findViewById(R.id.comment_news_fire_tv);
         ImageView fireImageView = findViewById(R.id.comment_news_fire_iv);
 
         MarketSenseRendererHelper.addTextView(newsTitleView, news.getTitle());
+        MarketSenseRendererHelper.addTextView(dateTitleView, news.getDate());
 
         // fire text
         if(fireTextView != null) {

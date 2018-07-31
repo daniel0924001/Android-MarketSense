@@ -56,6 +56,7 @@ public class UserProfile implements Serializable {
     public static final int NOTIFY_ID_FUNCTION_INSERT_COMMENT = 10;
 
     public static final int NOTIFY_ID_PRICE_CHANGED = 11;
+    public static final int NOTIFY_ID_NEED_TO_APK_UPDATED = 12;
 
     public interface GlobalBroadcastListener {
         void onGlobalBroadcast(int notifyId, Object payload);

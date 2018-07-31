@@ -222,6 +222,11 @@
     <string name="star_negative">意見回饋</string>
     <string name="star_negative_cancel">已經評過了</string>
 
+    <string name="need_to_update_title">體驗新功能</string>
+    <string name="need_to_update_description">我們有新版本了，趕緊更新市覺來體驗新功能。</string>
+    <string name="need_to_update_positive">馬上更新</string>
+    <string name="need_to_update_negative">等一下</string>
+
     <string name="hello">Hello, 市覺使用者</string>
     <string name="login">登入</string>
     <string name="login_failed">登入失敗</string>

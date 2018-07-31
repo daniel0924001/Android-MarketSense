@@ -69,6 +69,7 @@ import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FUNCTION_INSERT_COMMENT;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FUNCTION_SEARCH_COMMENT;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_MAIN_ACTIVITY_FUNCTION_CLICK;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_NEED_TO_APK_UPDATED;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_USER_HAS_LOGIN;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_USER_LOGIN_FAILED;
 import static com.idroi.marketsense.notification.NotificationHelper.NEWS_GENERAL_ALL;
@@ -216,11 +217,17 @@ public class MainActivity extends AppCompatActivity {
                             break;
                     }
                     mLastClick = LAST_CLICK_IS_NONE;
+                } else if(notifyId == NOTIFY_ID_NEED_TO_APK_UPDATED) {
+                    showStarAlertDialog(R.string.need_to_update_title,
+                            R.string.need_to_update_description,
+                            R.string.need_to_update_positive,
+                            R.string.need_to_update_negative);
                 }
             }
         };
 
         clientData.getUserProfile().addGlobalBroadcastListener(mGlobalBroadcastListener);
+        MarketSenseUtils.isNeedToUpdated(this);
 
         FrescoHelper.initialize(getApplicationContext());
         setContentView(R.layout.activity_main);
@@ -691,7 +698,10 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, String.format(format, name, code), Toast.LENGTH_SHORT).show();
 
             if(userProfile.canShowStarDialog(this)) {
-                showStarAlertDialog();
+                showStarAlertDialog(R.string.star_title,
+                        R.string.star_description_simple,
+                        R.string.star_positive,
+                        R.string.star_negative);
             }
         } else {
             String format = getResources().getString(R.string.title_add_duplicated);
@@ -774,16 +784,16 @@ public class MainActivity extends AppCompatActivity {
     }
     // end of fb login
 
-    private void showStarAlertDialog() {
+    private void showStarAlertDialog(int titleId, int descriptionId, int positiveStringId, int negativeStringId) {
         if(mStarAlertDialog != null) {
             mStarAlertDialog.dismiss();
             mStarAlertDialog = null;
         }
 
         mStarAlertDialog = new AlertDialog.Builder(this)
-                .setTitle(R.string.star_title)
-                .setMessage(R.string.star_description_simple)
-                .setPositiveButton(R.string.star_positive, new DialogInterface.OnClickListener() {
+                .setTitle(titleId)
+                .setMessage(descriptionId)
+                .setPositiveButton(positiveStringId, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
@@ -797,7 +807,7 @@ public class MainActivity extends AppCompatActivity {
                         mStarAlertDialog.dismiss();
                     }
                 })
-                .setNegativeButton(R.string.star_negative_cancel, new DialogInterface.OnClickListener() {
+                .setNegativeButton(negativeStringId, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         mStarAlertDialog.dismiss();

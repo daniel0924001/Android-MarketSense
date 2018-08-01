@@ -67,7 +67,7 @@ public class StockNotification extends BaseNotificationHandler {
     protected String getChannelId(Context context) {
         if(getImportanceScore() >= NotificationManager.IMPORTANCE_DEFAULT ||
                 getPriority() >= NotificationCompat.PRIORITY_DEFAULT) {
-            return context.getString(R.string.notification_channel_stock_price_id);
+            return context.getString(R.string.notification_channel_stock_price_priority_default_id);
         } else {
             return context.getString(R.string.notification_channel_stock_price_priority_low_id);
         }
@@ -77,7 +77,7 @@ public class StockNotification extends BaseNotificationHandler {
     protected String getChannelTitle(Context context) {
         if(getImportanceScore() >= NotificationManager.IMPORTANCE_DEFAULT ||
                 getPriority() >= NotificationCompat.PRIORITY_DEFAULT) {
-            return context.getString(R.string.notification_channel_stock_price_title);
+            return context.getString(R.string.notification_channel_stock_price_priority_default_title);
         } else {
             return context.getString(R.string.notification_channel_stock_price_priority_low_title);
         }

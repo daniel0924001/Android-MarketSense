@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#3C4858</color>
+    <color name="colorPrimaryLight">#55667c</color>
     <color name="colorPrimaryDark">#222C3A</color>
     <color name="colorAccent">#F20060</color>
 
@@ -51,4 +52,6 @@
     <color name="background_predict_up_bottom">#ff4248</color>
     <color name="background_predict_down_top">#21d7c2</color>
     <color name="background_predict_down_bottom">#03cab3</color>
+
+    <color name="foreground_shadow">#b3ffffff</color>
 </resources>

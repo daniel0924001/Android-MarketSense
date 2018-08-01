@@ -6,6 +6,9 @@
     android:id="@+id/marketsense_stock_item_id"
     android:layout_width="match_parent"
     android:layout_height="60dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="@drawable/item_foreground_with_clicked_shadow"
     android:background="@drawable/news_layout_border">
 
     <TextView

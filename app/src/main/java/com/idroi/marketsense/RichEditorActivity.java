@@ -134,7 +134,6 @@ public class RichEditorActivity extends AppCompatActivity {
     }
 
     private void leaveRichEditorActivity(boolean isSuccessful, String html, String eventId) {
-        mCompletedTextView.setClickable(true);
         if(isSuccessful) {
             Intent intent = new Intent();
             intent.putExtra(EXTRA_RES_HTML, html);
@@ -147,6 +146,7 @@ public class RichEditorActivity extends AppCompatActivity {
             finish();
             overridePendingTransition(R.anim.stop, R.anim.right_to_left);
         } else {
+            mCompletedTextView.setClickable(true);
             Toast.makeText(this, R.string.send_comment_fail, Toast.LENGTH_SHORT).show();
         }
     }

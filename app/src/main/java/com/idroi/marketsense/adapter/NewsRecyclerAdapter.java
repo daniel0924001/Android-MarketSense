@@ -263,7 +263,7 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
                             }
                         }
                     }
-                    return true;
+                    return false;
                 }
             });
         }

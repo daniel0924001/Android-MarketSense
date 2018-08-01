@@ -5,6 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="142dp"
     android:layout_marginBottom="1dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="@drawable/item_foreground_with_clicked_shadow"
     android:background="@drawable/news_layout_border">
 
     <TextView

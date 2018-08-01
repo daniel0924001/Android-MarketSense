@@ -251,6 +251,7 @@
                 android:id="@+id/social_say_like"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
+                android:foreground="@drawable/item_foreground_with_clicked_shadow"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/comment_guide_line"

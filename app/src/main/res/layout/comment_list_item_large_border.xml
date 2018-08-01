@@ -89,6 +89,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        android:foreground="@drawable/item_foreground_with_clicked_shadow"
         android:background="@color/card_gray_background"
         android:visibility="visible"
         app:layout_constraintStart_toStartOf="parent"
@@ -168,7 +169,8 @@
         android:layout_height="43dp"
         app:layout_constraintTop_toBottomOf="@id/social_horizontal_line"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/social_reply_block">
+        app:layout_constraintEnd_toStartOf="@id/social_reply_block"
+        android:foreground="@drawable/item_foreground_with_clicked_shadow">
 
         <ImageView
             android:id="@+id/iv_like"
@@ -205,7 +207,8 @@
         android:layout_height="43dp"
         app:layout_constraintTop_toBottomOf="@id/social_horizontal_line"
         app:layout_constraintStart_toEndOf="@id/social_like_block"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:foreground="@drawable/item_foreground_with_clicked_shadow">
 
         <ImageView
             android:id="@+id/iv_comment"

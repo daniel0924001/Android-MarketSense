@@ -271,8 +271,11 @@
     <string name="notification_channel_news_id" translatable="false">fcm_news_channel</string>
     <string name="notification_channel_news_title">市覺焦點新聞通知</string>
 
-    <string name="notification_channel_stock_price_id" translatable="false">fcm_stock_price_channel</string>
-    <string name="notification_channel_stock_price_title">市覺股價通知</string>
+    <string name="notification_channel_stock_price_priority_default_id" translatable="false">fcm_stock_price_channel_priority_default</string>
+    <string name="notification_channel_stock_price_priority_default_title">市覺股價通知</string>
+
+    <string name="notification_channel_stock_price_priority_low_id" translatable="false">fcm_stock_price_channel_priority_low</string>
+    <string name="notification_channel_stock_price_priority_low_title">市覺股價通知(低重要性)</string>
 
     <string name="notification_channel_voting_result_id" translatable="false">fcm_voting_result_channel</string>
     <string name="notification_channel_voting_result_title">市覺投票通知</string>

@@ -4,7 +4,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
+import android.support.v4.app.NotificationCompat;
 
 import com.idroi.marketsense.MainActivity;
 import com.idroi.marketsense.R;
@@ -65,12 +65,22 @@ public class StockNotification extends BaseNotificationHandler {
 
     @Override
     protected String getChannelId(Context context) {
-        return context.getString(R.string.notification_channel_stock_price_id);
+        if(getImportanceScore() >= NotificationManager.IMPORTANCE_DEFAULT ||
+                getPriority() >= NotificationCompat.PRIORITY_DEFAULT) {
+            return context.getString(R.string.notification_channel_stock_price_id);
+        } else {
+            return context.getString(R.string.notification_channel_stock_price_priority_low_id);
+        }
     }
 
     @Override
     protected String getChannelTitle(Context context) {
-        return context.getString(R.string.notification_channel_stock_price_title);
+        if(getImportanceScore() >= NotificationManager.IMPORTANCE_DEFAULT ||
+                getPriority() >= NotificationCompat.PRIORITY_DEFAULT) {
+            return context.getString(R.string.notification_channel_stock_price_title);
+        } else {
+            return context.getString(R.string.notification_channel_stock_price_priority_low_title);
+        }
     }
 
     @Override

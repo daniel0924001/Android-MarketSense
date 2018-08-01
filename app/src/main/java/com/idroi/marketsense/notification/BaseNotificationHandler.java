@@ -53,12 +53,20 @@ public abstract class BaseNotificationHandler {
         sendNotification(context, pendingIntent, getTitle(), getText());
     }
 
+    // Remember you can only update channel's id and name, nothing else.
+    // The importance will be ignored, because the user
+    // might have already changed the importance of the channel manually.
     protected int getImportanceScore() {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             return Math.min(mImportance, NotificationManager.IMPORTANCE_DEFAULT);
         } else {
             return Math.min(mImportance, 3);
         }
+    }
+
+    protected int getPriority() {
+        int priority = mImportance - 3;
+        return Math.min(priority, NotificationCompat.PRIORITY_DEFAULT);
     }
 
     abstract protected String getTitle();
@@ -86,6 +94,7 @@ public abstract class BaseNotificationHandler {
                         .setColor(context.getResources().getColor(R.color.text_pink))
                         .setContentIntent(pendingIntent)
                         .setVibrate(new long[] {0})
+                        .setPriority(getPriority())
                         .setOnlyAlertOnce(true);
 
         NotificationManager notificationManager =

@@ -51,28 +51,6 @@ import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 
 public class SettingActivity extends AppCompatActivity {
 
-//    private int[] mStringIds = {
-//            R.string.preference_notification, // fake
-//            R.string.preference_notification,
-//            R.string.preference_share,
-//            R.string.preference_feedback,
-//            R.string.preference_star,
-//            R.string.preference_privacy_statement,
-//            R.string.preference_term_of_service,
-//            R.string.preference_disclaimer
-//    };
-//
-//    private Integer[] mDrawableIds = {
-//            R.drawable.setting_notification, // fake
-//            R.drawable.setting_notification,
-//            R.drawable.setting_share,
-//            R.drawable.setting_feedback,
-//            R.drawable.setting_star,
-//            R.drawable.setting_about,
-//            R.drawable.setting_about,
-//            R.drawable.setting_about,
-//    };
-
     private AlertDialog mLoginAlertDialog, mStarAlertDialog;
     private CallbackManager mFBCallbackManager;
     private LoginButton mFBLoginBtn;
@@ -222,7 +200,7 @@ public class SettingActivity extends AppCompatActivity {
     }
 
     private void setListView() {
-        mListView = (ListView) findViewById(R.id.setting_listview);
+        mListView = findViewById(R.id.setting_listview);
         mSettingSource = new SettingSource(this);
 
         mSettingAdapter = new SettingAdapter(this, mSettingSource);

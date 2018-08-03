@@ -695,7 +695,7 @@ public class MainActivity extends AppCompatActivity {
                 showStarAlertDialog(R.string.star_title,
                         R.string.star_description_simple,
                         R.string.star_positive,
-                        R.string.star_negative);
+                        R.string.star_negative_cancel);
             }
         } else {
             String format = getResources().getString(R.string.title_add_duplicated);

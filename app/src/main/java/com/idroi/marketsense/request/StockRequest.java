@@ -109,7 +109,7 @@ public class StockRequest extends Request<ArrayList<Stock>> {
         } else {
             SharedPreferences sharedPreferences =
                     context.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE);
-            return sharedPreferences.getString(url, url + "?timestamp=" + System.currentTimeMillis() / (30 * 1000));
+            return sharedPreferences.getString(url, null);
         }
     }
 

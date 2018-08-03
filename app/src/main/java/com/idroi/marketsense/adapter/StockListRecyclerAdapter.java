@@ -50,15 +50,12 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
     private int mTaskId;
     private AlertDialog mDeleteCodeAlertDialog;
 
-    private RecyclerView mStockListRecyclerView;
-
-    public StockListRecyclerAdapter(final Activity activity, RecyclerView recyclerView, int taskId, int field, int direction) {
+    public StockListRecyclerAdapter(final Activity activity, int taskId, int field, int direction) {
         mActivity = activity;
         mStockListPlacer = new StockListPlacer(activity, taskId, field, direction);
         mStockListRenderer = new StockListRenderer();
         mTaskId = taskId;
         mHandler = new Handler();
-        mStockListRecyclerView = recyclerView;
         mStockListPlacer.setStockListListener(new StockListPlacer.StockListListener() {
             @Override
             public void onStockListLoaded() {
@@ -77,14 +74,11 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
                 });
             }
         });
+        Stock.initializeRightPartValue();
     }
 
     public void updatePriceInVisibleItems(int payload) {
-        LinearLayoutManager linearLayoutManager =
-                (LinearLayoutManager) mStockListRecyclerView.getLayoutManager();
-        int start = linearLayoutManager.findFirstVisibleItemPosition();
-        int end = linearLayoutManager.findLastVisibleItemPosition();
-        notifyItemRangeChanged(start, end + 1, payload);
+        notifyItemRangeChanged(0, getItemCount(), payload);
     }
 
     public void sortByTask(int field, int direction) {

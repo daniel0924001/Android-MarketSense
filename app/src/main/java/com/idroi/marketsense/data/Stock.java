@@ -186,7 +186,6 @@ public class Stock {
         if(clientData != null && clientData.doesUseTodayPredictionValue()) {
             mPredictionDiffPercentage = mTodayPredictionDiffPercentage;
             mPredictionDiffDirection = mTodayPredictionDiffDirection;
-            sPredictionStateIsToday = true;
         }
     }
 
@@ -203,7 +202,6 @@ public class Stock {
         if(clientData != null &&!ClientData.getInstance().doesUseTodayPredictionValue()) {
             mPredictionDiffPercentage = mTomorrowPredictionDiffPercentage;
             mPredictionDiffDirection = mTomorrowPredictionDiffDirection;
-            sPredictionStateIsToday = false;
         }
     }
 
@@ -381,6 +379,10 @@ public class Stock {
     public boolean isHitPredictionDirection(boolean isCountZero) {
         return (isCountZero && mDiffDirection == TREND_FLAT)
                 || mTodayPredictionDiffDirection == mDiffDirection;
+    }
+
+    public static void initializeRightPartValue() {
+        sPredictionStateIsToday = false;
     }
 
     public static void changeRightPartValue() {

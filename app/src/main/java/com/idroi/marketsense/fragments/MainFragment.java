@@ -29,6 +29,7 @@ import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.datasource.StockListPlacer;
 import com.idroi.marketsense.request.NewsRequest;
 import com.idroi.marketsense.request.StockRequest;
+import com.idroi.marketsense.viewholders.RankingListViewHolder;
 
 import java.util.ArrayList;
 
@@ -55,9 +56,8 @@ public class MainFragment extends Fragment {
     private ConstraintLayout mNoDataRefreshLayout;
     private ImageView mNoDataImageView;
     private TextView mNoDataTextView;
-    private ProgressBar mLoadingProgressBar, mLoadingProgressBarRankingPeople, mLoadingProgressBarRankingNews;
+    private ProgressBar mLoadingProgressBar;
 
-    private RecyclerView mTechRankingRecyclerView, mNewsRankingRecyclerView;
     private StockRankingRecyclerAdapter mTechRankingRecyclerAdapter, mNewsRankingRecyclerAdapter;
 
     private StockListPlacer mStockListPlacer;
@@ -65,6 +65,8 @@ public class MainFragment extends Fragment {
     private NestedScrollView mNestedScrollView;
     private Fragment mStockListFragment;
     private OnActionBarChangeListener mOnActionBarChangeListener;
+
+    private RankingListViewHolder mTechBlockViewHolder, mNewsBlockViewHolder;
 
     @Nullable
     @Override
@@ -83,14 +85,18 @@ public class MainFragment extends Fragment {
         mNewsRecyclerView.setAdapter(mNewsRecyclerAdapter);
         mNewsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        mLoadingProgressBar = view.findViewById(R.id.loading_progress_bar);
-        mLoadingProgressBarRankingNews = view.findViewById(R.id.loading_progress_bar_rank_news);
-        mLoadingProgressBarRankingPeople = view.findViewById(R.id.loading_progress_bar_rank_people);
-
-        mTechRankingRecyclerView = view.findViewById(R.id.list_ranking_tech);
-        mNewsRankingRecyclerView = view.findViewById(R.id.list_ranking_news);
+        mLoadingProgressBar = view.findViewById(R.id.news_list_progress_bar);
 
         mNestedScrollView = view.findViewById(R.id.body_scroll_view);
+
+        mTechBlockViewHolder =
+                RankingListViewHolder.convertToViewHolder(
+                        view.findViewById(R.id.tech_block),
+                        R.string.main_page_tech_ranking);
+        mNewsBlockViewHolder =
+                RankingListViewHolder.convertToViewHolder(
+                        view.findViewById(R.id.news_block),
+                        R.string.main_page_news_ranking);
 
         initTopBanner(view);
 
@@ -105,30 +111,28 @@ public class MainFragment extends Fragment {
         mStockListPlacer.setStockListListener(new StockListPlacer.StockListListener() {
             @Override
             public void onStockListLoaded() {
-                if(mLoadingProgressBarRankingNews != null) {
-                    mLoadingProgressBarRankingNews.setVisibility(View.GONE);
+                if(mTechBlockViewHolder != null) {
+                    mTechBlockViewHolder.progressBar.setVisibility(View.GONE);
                 }
-                if(mLoadingProgressBarRankingPeople != null) {
-                    mLoadingProgressBarRankingPeople.setVisibility(View.GONE);
+                if(mNewsBlockViewHolder != null) {
+                    mNewsBlockViewHolder.progressBar.setVisibility(View.GONE);
                 }
                 if(mStockListPlacer.getStocks() != null) {
-                    TextView secondTitle = view.findViewById(R.id.tv_news_ranking);
-                    ((ConstraintLayout.LayoutParams) secondTitle.getLayoutParams()).topToBottom = R.id.list_ranking_tech;
-                    ((ConstraintLayout.LayoutParams) secondTitle.getLayoutParams()).topMargin = 0;
-                    TextView thirdTitle = view.findViewById(R.id.tv_news);
-                    ((ConstraintLayout.LayoutParams) thirdTitle.getLayoutParams()).topToBottom = R.id.list_ranking_news;
-                    ((ConstraintLayout.LayoutParams) thirdTitle.getLayoutParams()).topMargin = 0;
+                    View secondView = mNewsBlockViewHolder.mainView;
+                    ((ConstraintLayout.LayoutParams) secondView.getLayoutParams()).topToBottom
+                            = mTechBlockViewHolder.mainView.getId();
+                    ((ConstraintLayout.LayoutParams) secondView.getLayoutParams()).topMargin = 0;
 
                     mTechRankingRecyclerAdapter = new StockRankingRecyclerAdapter(getActivity(),
                             mStockListPlacer.getStocks(), StockRankingRenderer.RANKING_BY_TECH);
                     mNewsRankingRecyclerAdapter = new StockRankingRecyclerAdapter(getActivity(),
                             mStockListPlacer.getStocks(), StockRankingRenderer.RANKING_BY_NEWS);
-                    mTechRankingRecyclerView.setAdapter(mTechRankingRecyclerAdapter);
-                    mNewsRankingRecyclerView.setAdapter(mNewsRankingRecyclerAdapter);
-                    mTechRankingRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                    mNewsRankingRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                    mTechRankingRecyclerView.setNestedScrollingEnabled(false);
-                    mNewsRankingRecyclerView.setNestedScrollingEnabled(false);
+                    mTechBlockViewHolder.recyclerView.setAdapter(mTechRankingRecyclerAdapter);
+                    mNewsBlockViewHolder.recyclerView.setAdapter(mNewsRankingRecyclerAdapter);
+                    mTechBlockViewHolder.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                    mNewsBlockViewHolder.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                    mTechBlockViewHolder.recyclerView.setNestedScrollingEnabled(false);
+                    mNewsBlockViewHolder.recyclerView.setNestedScrollingEnabled(false);
 
                     mTechRankingRecyclerAdapter.setOnItemClickListener(new StockRankingRecyclerAdapter.OnItemClickListener() {
                         @Override
@@ -144,16 +148,10 @@ public class MainFragment extends Fragment {
                         }
                     });
                 } else {
-                    mTechRankingRecyclerView.setVisibility(View.GONE);
-                    mNewsRankingRecyclerView.setVisibility(View.GONE);
-                    view.findViewById(R.id.tv_news_ranking).setVisibility(View.GONE);
-                    view.findViewById(R.id.tv_news_ranking_subtitle).setVisibility(View.GONE);
-                    view.findViewById(R.id.tv_news_ranking_subtitle_price).setVisibility(View.GONE);
-                    view.findViewById(R.id.tv_news_ranking_subtitle_predict).setVisibility(View.GONE);
-                    view.findViewById(R.id.tv_tech_ranking).setVisibility(View.GONE);
-                    view.findViewById(R.id.tv_tech_ranking_subtitle).setVisibility(View.GONE);
-                    view.findViewById(R.id.tv_tech_ranking_subtitle_price).setVisibility(View.GONE);
-                    view.findViewById(R.id.tv_tech_ranking_subtitle_predict).setVisibility(View.GONE);
+                    mTechBlockViewHolder.recyclerView.setVisibility(View.GONE);
+                    mNewsBlockViewHolder.recyclerView.setVisibility(View.GONE);
+                    mTechBlockViewHolder.mainView.setVisibility(View.GONE);
+                    mNewsBlockViewHolder.mainView.setVisibility(View.GONE);
                 }
             }
         });
@@ -297,8 +295,6 @@ public class MainFragment extends Fragment {
         }
         return results;
     }
-
-
 
     @Override
     public void onDestroyView() {

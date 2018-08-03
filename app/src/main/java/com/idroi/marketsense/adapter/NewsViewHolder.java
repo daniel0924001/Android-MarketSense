@@ -21,8 +21,7 @@ public class NewsViewHolder{
     View mainView;
     TextView titleView;
     TextView dateView;
-    TextView fireTextView;
-    ImageView fireImageView;
+    TextView predictionView;
 
     RecyclerView relatedRecyclerView;
     RelatedStockNameAdapter relatedStockNameAdapter;
@@ -37,8 +36,7 @@ public class NewsViewHolder{
         try {
             newsViewHolder.titleView = view.findViewById(R.id.marketsense_news_title_tv);
             newsViewHolder.dateView = view.findViewById(R.id.marketsense_news_date_tv);
-            newsViewHolder.fireTextView = view.findViewById(R.id.marketsense_news_fire_tv);
-            newsViewHolder.fireImageView = view.findViewById(R.id.marketsense_news_fire_iv);
+            newsViewHolder.predictionView = view.findViewById(R.id.marketsense_news_prediction);
             newsViewHolder.relatedRecyclerView = view.findViewById(R.id.related_stock_name);
             newsViewHolder.relatedRecyclerView.setNestedScrollingEnabled(false);
             newsViewHolder.relatedRecyclerView.setLayoutManager(

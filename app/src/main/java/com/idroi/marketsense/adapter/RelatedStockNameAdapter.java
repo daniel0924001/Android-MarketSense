@@ -24,10 +24,12 @@ public class RelatedStockNameAdapter extends RecyclerView.Adapter {
     private RelatedStockNameRenderer mRelatedStockNameRenderer;
     private OnItemClickListener mOnItemClickListener;
     private ArrayList<Stock> mRelatedStocks;
+    private int mMaxItemCount;
 
     public RelatedStockNameAdapter(final Context context) {
         mContext = context;
         mRelatedStockNameRenderer = new RelatedStockNameRenderer();
+        mMaxItemCount = 3;
     }
 
     public void setRelatedStockNames(String[] relatedStockNames) {
@@ -49,6 +51,10 @@ public class RelatedStockNameAdapter extends RecyclerView.Adapter {
 
     public boolean hasRelatedStock() {
         return mRelatedStocks != null && mRelatedStocks.size() > 0;
+    }
+
+    public void setMaxItemCount(int maxItemCount) {
+        mMaxItemCount = maxItemCount;
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -81,7 +87,7 @@ public class RelatedStockNameAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemCount() {
         if(mRelatedStocks != null) {
-            return Math.min(3, mRelatedStocks.size());
+            return Math.min(mMaxItemCount, mRelatedStocks.size());
         } else {
             return 0;
         }

@@ -37,6 +37,7 @@ public class Stock {
     private static final String FALL = "fall";
     private static final String TODAY_DIFF_PRED = "today_diff_predict";
     private static final String NEXT_DIFF_PRED = "next_diff_predict";
+    private static final String YESTERDAY_VOLUME = "y_vol";
 
     public static final int LEVEL_HIGHEST = 2;
     public static final int LEVEL_HIGH = 1;
@@ -54,6 +55,7 @@ public class Stock {
 
     private int mDiffDirection = 3;
     private double mPrice, mDiffNumber, mDiffPercentage;
+    private int mYesterdayVolume;
 
     private double mConfidence = 75;
     private int mConfidenceDirection;
@@ -203,6 +205,14 @@ public class Stock {
             mPredictionDiffDirection = mTomorrowPredictionDiffDirection;
             sPredictionStateIsToday = false;
         }
+    }
+
+    public void setYesterdayVolume(int yesterdayVolume) {
+        mYesterdayVolume = yesterdayVolume;
+    }
+
+    public int getYesterdayVolume() {
+        return mYesterdayVolume;
     }
 
     public String getName() {
@@ -535,6 +545,9 @@ public class Stock {
                         break;
                     case NEXT_DIFF_PRED:
                         stock.setTomorrowPrediction(jsonObject.optDouble(NEXT_DIFF_PRED));
+                        break;
+                    case YESTERDAY_VOLUME:
+                        stock.setYesterdayVolume(jsonObject.optInt(YESTERDAY_VOLUME));
                         break;
                     default:
                         break;

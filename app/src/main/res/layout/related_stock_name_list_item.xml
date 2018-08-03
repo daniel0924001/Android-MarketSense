@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginEnd="10dp"
+    android:layout_height="28dp"
+    android:layout_marginEnd="8dp"
     android:clickable="true"
     android:focusable="true"
     android:foreground="@drawable/item_foreground_with_clicked_shadow"
-    android:background="@color/text_light_gray">
+    android:background="@drawable/btn_oval_small_corner_gray">
 
     <TextView
         android:id="@+id/related_stock_name"
@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:textSize="12sp"
         android:fontFamily="sans-serif"
-        android:textColor="@color/text_dark_gray"
+        android:textColor="@color/warm_grey_two"
         android:text="@string/title_company_name"
         android:layout_marginTop="3dp"
         android:layout_marginBottom="3dp"
@@ -31,7 +31,7 @@
         android:layout_height="wrap_content"
         android:textSize="12sp"
         android:fontFamily="sans-serif"
-        android:textColor="@color/text_gray"
+        android:textColor="@color/warm_grey_two"
         android:text="@string/title_company_price"
         android:layout_marginTop="3dp"
         android:layout_marginBottom="3dp"

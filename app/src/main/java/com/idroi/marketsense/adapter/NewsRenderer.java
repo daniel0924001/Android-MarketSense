@@ -50,60 +50,53 @@ public class NewsRenderer implements MarketSenseRenderer<News>{
         MarketSenseRendererHelper.addTextView(newsViewHolder.titleView, content.getTitle());
         MarketSenseRendererHelper.addTextView(newsViewHolder.dateView, content.getDate());
 
-        // fire text
-        if(content.isOptimistic()) {
-            newsViewHolder.fireTextView.setTextColor(context.getResources().getColor(R.color.colorTrendUp));
-            newsViewHolder.fireTextView.setVisibility(View.VISIBLE);
-        } else if(content.isPessimistic()) {
-            newsViewHolder.fireTextView.setTextColor(context.getResources().getColor(R.color.colorTrendDown));
-            newsViewHolder.fireTextView.setVisibility(View.VISIBLE);
-        } else {
-            newsViewHolder.fireTextView.setVisibility(View.GONE);
-        }
-
-        // fire image
-        newsViewHolder.fireImageView.setVisibility(View.VISIBLE);
-        switch (content.getLevel()) {
-            case 3:
-                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_up3);
-                newsViewHolder.fireTextView.setText(R.string.title_news_good3);
-                break;
-            case 2:
-                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_up2);
-                newsViewHolder.fireTextView.setText(R.string.title_news_good2);
-                break;
-            case 1:
-                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_up1);
-                newsViewHolder.fireTextView.setText(R.string.title_news_good1);
-                break;
-            case -1:
-                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_down1);
-                newsViewHolder.fireTextView.setText(R.string.title_news_bad1);
-                break;
-            case -2:
-                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_down2);
-                newsViewHolder.fireTextView.setText(R.string.title_news_bad2);
-                break;
-            case -3:
-                newsViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_down3);
-                newsViewHolder.fireTextView.setText(R.string.title_news_bad3);
-                break;
-            default:
-                newsViewHolder.fireImageView.setVisibility(View.GONE);
-        }
-
         // related stock news
         String[] relatedStockNames = content.getStockKeywords();
         newsViewHolder.relatedStockNameAdapter.setRelatedStockNames(relatedStockNames);
-        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) newsViewHolder.dateView.getLayoutParams();
         if(mIsShowRelatedStockNames && newsViewHolder.relatedStockNameAdapter.hasRelatedStock()) {
-            params.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
             newsViewHolder.relatedRecyclerView.setVisibility(View.VISIBLE);
         } else {
-            params.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
             newsViewHolder.relatedRecyclerView.setVisibility(View.GONE);
         }
-        newsViewHolder.dateView.setLayoutParams(params);
+
+        // fire text
+        if(content.isOptimistic()) {
+            newsViewHolder.predictionView.setBackground(context.getResources().getDrawable(R.drawable.btn_oval_small_corner_red));
+            newsViewHolder.predictionView.setVisibility(View.VISIBLE);
+            newsViewHolder.relatedStockNameAdapter.setMaxItemCount(2);
+        } else if(content.isPessimistic()) {
+            newsViewHolder.predictionView.setBackground(context.getResources().getDrawable(R.drawable.btn_oval_small_corner_green));
+            newsViewHolder.predictionView.setVisibility(View.VISIBLE);
+            newsViewHolder.relatedStockNameAdapter.setMaxItemCount(2);
+        } else {
+            newsViewHolder.predictionView.setVisibility(View.GONE);
+            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) newsViewHolder.relatedRecyclerView.getLayoutParams();
+            params.goneStartMargin = 0;
+            newsViewHolder.relatedRecyclerView.setLayoutParams(params);
+            newsViewHolder.relatedStockNameAdapter.setMaxItemCount(3);
+        }
+
+        // fire image
+        switch (content.getLevel()) {
+            case 3:
+                newsViewHolder.predictionView.setText(R.string.title_news_good3);
+                break;
+            case 2:
+                newsViewHolder.predictionView.setText(R.string.title_news_good2);
+                break;
+            case 1:
+                newsViewHolder.predictionView.setText(R.string.title_news_good1);
+                break;
+            case -1:
+                newsViewHolder.predictionView.setText(R.string.title_news_bad1);
+                break;
+            case -2:
+                newsViewHolder.predictionView.setText(R.string.title_news_bad2);
+                break;
+            case -3:
+                newsViewHolder.predictionView.setText(R.string.title_news_bad3);
+                break;
+        }
     }
 
     private void setViewVisibility(final NewsViewHolder newsViewHolder, final int visibility) {

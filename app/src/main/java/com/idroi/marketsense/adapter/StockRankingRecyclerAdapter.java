@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.data.Stock;
 
 import java.util.ArrayList;
@@ -109,15 +110,20 @@ public class StockRankingRecyclerAdapter extends RecyclerView.Adapter {
 
     private int compareValue(Stock stock1, Stock stock2, int type) {
         float value1 = 0, value2 = 0;
+
+        // we want to find hot stock
+        value1 = (stock1.getYesterdayVolume() > 1500) ? 10 : -10;
+        value2 = (stock2.getYesterdayVolume() > 1500) ? 10 : -10;
+
         if(type == RANKING_BY_TECH) {
-            value1 = (stock1.getDiffDirection() == stock1.getPredictTechDirection()) ? 10 : -10;
-            value2 = (stock2.getDiffDirection() == stock2.getPredictTechDirection()) ? 10 : -10;
+            value1 += (stock1.getDiffDirection() == stock1.getPredictTechDirection()) ? 20 : -20;
+            value2 += (stock2.getDiffDirection() == stock2.getPredictTechDirection()) ? 20 : -20;
 
             value1 += Math.abs(stock1.getPredictionTechScore());
             value2 += Math.abs(stock2.getPredictionTechScore());
         } else if(type == RANKING_BY_NEWS) {
-            value1 = (stock1.getDiffDirection() == stock1.getConfidenceDirection()) ? 10 : -10;
-            value2 = (stock2.getDiffDirection() == stock2.getConfidenceDirection()) ? 10 : -10;
+            value1 += (stock1.getDiffDirection() == stock1.getConfidenceDirection()) ? 20 : -20;
+            value2 += (stock2.getDiffDirection() == stock2.getConfidenceDirection()) ? 20 : -20;
 
             value1 += Math.abs(stock1.getPredictNewsScore());
             value2 += Math.abs(stock2.getPredictNewsScore());

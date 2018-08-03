@@ -140,12 +140,16 @@ public class StatisticDataItem {
     public void changeColor(Context context, TextView valueTextView, String value) {
         if(mColorful && value != null) {
             value = value.replace("%", "");
-            float valueFloat = Float.valueOf(value);
-            if(valueFloat > 0) {
-                valueTextView.setTextColor(context.getResources().getColor(R.color.colorTrendUp));
-            } else if(valueFloat < 0) {
-                valueTextView.setTextColor(context.getResources().getColor(R.color.colorTrendDown));
-            } else {
+            try {
+                float valueFloat = Float.valueOf(value);
+                if (valueFloat > 0) {
+                    valueTextView.setTextColor(context.getResources().getColor(R.color.colorTrendUp));
+                } else if (valueFloat < 0) {
+                    valueTextView.setTextColor(context.getResources().getColor(R.color.colorTrendDown));
+                } else {
+                    valueTextView.setTextColor(context.getResources().getColor(R.color.colorTrendFlat));
+                }
+            } catch (Exception exception) {
                 valueTextView.setTextColor(context.getResources().getColor(R.color.colorTrendFlat));
             }
         }

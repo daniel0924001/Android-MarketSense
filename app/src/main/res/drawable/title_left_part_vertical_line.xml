@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <gradient android:startColor="@color/card_top_color"
-        android:endColor="@color/card_bottom_color"
+    <corners android:radius="2dp" />
+    <gradient android:startColor="@color/salmon"
+        android:endColor="@color/light_red"
         android:angle="-90" />
 </shape>

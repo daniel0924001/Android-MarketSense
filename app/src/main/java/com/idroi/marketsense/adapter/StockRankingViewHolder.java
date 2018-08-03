@@ -16,6 +16,7 @@ public class StockRankingViewHolder {
     TextView nameView;
     TextView priceView;
 
+    ImageView priceImageView;
     ImageView predictionImageView;
 
     static final StockRankingViewHolder EMPTY_VIEW_HOLDER = new StockRankingViewHolder();
@@ -27,6 +28,7 @@ public class StockRankingViewHolder {
         try {
             stockRankingViewHolder.nameView = view.findViewById(R.id.ranking_stock_title);
             stockRankingViewHolder.priceView = view.findViewById(R.id.ranking_stock_price);
+            stockRankingViewHolder.priceImageView = view.findViewById(R.id.ranking_stock_price_iv);
             stockRankingViewHolder.predictionImageView = view.findViewById(R.id.ranking_stock_iv);
             return stockRankingViewHolder;
         } catch (ClassCastException exception) {

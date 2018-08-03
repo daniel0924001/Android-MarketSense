@@ -54,4 +54,17 @@
     <color name="background_predict_down_bottom">#03cab3</color>
 
     <color name="foreground_shadow">#b3ffffff</color>
+
+    <!-- new version -->
+    <color name="black">#2b2b2b</color>
+    <color name="white">#ffffff</color>
+    <color name="salmon">#ff6762</color>
+    <color name="light_red">#ff4248</color>
+    <color name="pinkish_grey">#bdbdbd</color>
+    <color name="white_two">#eeeeee</color>
+    <color name="white_three">#f6f6f6</color>
+    <color name="warm_grey">#959595</color>
+    <color name="warm_grey_two">#7d7d7d</color>
+    <color name="aquamarine">#01d5bc</color>
+    <color name="alight_red_two">#ff444a</color>
 </resources>

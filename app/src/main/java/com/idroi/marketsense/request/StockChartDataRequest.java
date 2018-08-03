@@ -17,7 +17,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Created by daniel.hsieh on 2018/5/21.
@@ -149,6 +152,23 @@ public class StockChartDataRequest extends Request<StockTradeData> {
                     MSLog.e("Exception in setTickData: " + e);
                 }
             }
+
+            // append no transaction data
+            try {
+                Calendar now = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei"));
+                int hour = now.get(Calendar.HOUR_OF_DAY);
+                int minute = now.get(Calendar.MINUTE);
+                int appendNumber = (hour - 9) * 60 + minute;
+                JSONObject lastTick = tickArray.getJSONObject(tickArray.length() - 1);
+                for (int i = tickArray.length(); i < Math.min(appendNumber, 270); i++) {
+                    StockTickData stockTickData
+                            = new StockTickData((long)0, lastTick.getDouble(PARAM_P), 0, i);
+                    stockTickDataArrayList.add(stockTickData);
+                }
+            } catch (Exception exception) {
+                MSLog.e("Exception in append no transaction data: " + exception);
+            }
+
             stockTradeData.setStockTransactionData(stockTickDataArrayList);
         }
     }

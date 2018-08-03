@@ -19,6 +19,7 @@ import java.util.Locale;
 
 import static com.idroi.marketsense.fragments.StockListFragment.MAIN_ID;
 import static com.idroi.marketsense.fragments.StockListFragment.SELF_CHOICES_ID;
+import static com.idroi.marketsense.fragments.StockListFragment.WPCT_ID;
 
 /**
  * Created by daniel.hsieh on 2018/4/23.
@@ -144,7 +145,11 @@ public class StockListPlacer {
                         return;
                     }
 
-                    mNetworkUrl = StockRequest.queryStockList(activity, true);
+                    if(mTask == WPCT_ID) {
+                        mNetworkUrl = StockRequest.queryStockListWithMode(activity, true, StockRequest.MODE_WPCT);
+                    } else {
+                        mNetworkUrl = StockRequest.queryStockList(activity, true);
+                    }
                     mMarketSenseStockFetcher.makeRequest(mNetworkUrl, null, true);
 
                     MSLog.d("schedule refresh stock price in " + REFRESH_TIME + " millisecond.");

@@ -201,7 +201,9 @@ public class MainActivity extends AppCompatActivity {
                     MSLog.i("[user login]: notify user login success");
                     internalSetAvatarImage(true);
                 } else if(notifyId == NOTIFY_USER_LOGIN_FAILED) {
-                    // empty
+                    Toast.makeText(MainActivity.this, R.string.login_failed_description, Toast.LENGTH_SHORT).show();
+                    LoginManager.getInstance().logOut();
+                    internalSetAvatarImage(false);
                 } else if(notifyId == NOTIFY_ID_MAIN_ACTIVITY_FUNCTION_CLICK) {
                     switch (mLastClick) {
                         case LAST_CLICK_IS_WRITE_COMMENT:

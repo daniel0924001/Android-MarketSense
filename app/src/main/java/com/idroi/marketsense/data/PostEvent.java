@@ -361,6 +361,8 @@ public class PostEvent {
                 ClientData clientData = ClientData.getInstance();
                 clientData.setUserToken(token);
                 clientData.loadPreference();
+            } else {
+                isSuccessful = false;
             }
         }
 

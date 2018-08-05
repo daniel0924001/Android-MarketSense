@@ -408,8 +408,7 @@ public class Stock {
 
     public double getPredictionSortScore() {
         ClientData clientData = ClientData.getInstance();
-        if(clientData.isWorkDayBeforeStockClosed() ||
-                clientData.isWorkDayAfterStockClosedBeforeAnswerDisclosure()) {
+        if(clientData.isWorkDayAndStockMarketIsOpen()) {
             return mPredictionError;
         } else {
             if(isHitPredictionDirection(false)) {

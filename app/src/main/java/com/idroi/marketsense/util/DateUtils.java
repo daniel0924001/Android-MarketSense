@@ -283,11 +283,25 @@ public class DateUtils {
         return c.getTime();
     }
 
+    private static Date getTodayStockOpenTime(Date now) {
+        if(now == null) {
+            return null;
+        }
+        return getTodaySpecificTime(now, 9, 0);
+    }
+
     private static Date getTodayStockClosedTime(Date now) {
         if(now == null) {
             return null;
         }
         return getTodaySpecificTime(now, 13, 30);
+    }
+
+    public static boolean isWorkDayAndStockMarketOpen() {
+        Date now = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei")).getTime();
+        Date open = getTodayStockOpenTime(now);
+        Date close = getTodayStockClosedTime(now);
+        return isWorkDay(now) && now.after(open) && now.before(close);
     }
 
     public static boolean isWorkDayBeforeStockClosed() {

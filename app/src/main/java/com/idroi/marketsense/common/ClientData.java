@@ -43,6 +43,7 @@ public class ClientData {
     private int mLoadPreferenceRetryCounter = DEFAULT_RETRY_TIME;
     private int mLoadAllStockListRetryCounter = DEFAULT_RETRY_TIME;
 
+    private boolean mIsWorkDayAndStockMarketIsOpen;
     private boolean mIsWorkDayBeforeStockClosed;
     private boolean mIsWorkDayAfterStockClosedBeforeAnswerDisclosure;
     private boolean mIsWorkDayAfterAnswerDisclosure;
@@ -93,6 +94,7 @@ public class ClientData {
     }
 
     public void updateClockInformation() {
+        mIsWorkDayAndStockMarketIsOpen = DateUtils.isWorkDayAndStockMarketOpen();
         mIsWorkDayBeforeStockClosed = DateUtils.isWorkDayBeforeStockClosed();
         mIsWorkDayAfterStockClosedBeforeAnswerDisclosure = DateUtils.isWorkDayAfterStockClosedAndBeforeAnswerDisclosure();
         mIsWorkDayAfterAnswerDisclosure = DateUtils.isWorkDayAfterAnswerDisclosure();
@@ -200,6 +202,10 @@ public class ClientData {
 
     public boolean isNameAndCodeAreValid(String name, String code) {
         return (name != null) && (code != null);
+    }
+
+    public boolean isWorkDayAndStockMarketIsOpen() {
+        return mIsWorkDayAndStockMarketIsOpen;
     }
 
     public boolean isWorkDayBeforeStockClosed() {

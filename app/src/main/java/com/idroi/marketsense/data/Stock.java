@@ -23,7 +23,7 @@ import java.util.Locale;
 
 public class Stock {
 
-    private static boolean sPredictionStateIsToday;
+    private static boolean sDisclosureState;
 
     private static final String CODE = "code";
     private static final String NAME = "name";
@@ -382,11 +382,11 @@ public class Stock {
     }
 
     public static void initializeRightPartValue() {
-        sPredictionStateIsToday = false;
+        sDisclosureState = false;
     }
 
     public static void changeRightPartValue() {
-        sPredictionStateIsToday = !sPredictionStateIsToday;
+        sDisclosureState = !sDisclosureState;
     }
 
     public double getEarnInPrediction(boolean simple) {
@@ -420,73 +420,163 @@ public class Stock {
         }
     }
 
-    public void setRightPredictionBlock(Context context,
-                                        ConstraintLayout predictionBlock,
-                                        TextView titleTextView,
-                                        TextView valueTextView,
-                                        ImageView isHitImageView) {
-        Resources resources = context.getResources();
-        ClientData clientData = ClientData.getInstance(context);
-        isHitImageView.setVisibility(View.GONE);
-        predictionBlock.setOnClickListener(null);
-
-        int direction = mPredictionDiffDirection;
-        double diffPercentage = mPredictionDiffPercentage;
-
-        if(clientData.isWorkDayBeforeStockClosed()) {
-            titleTextView.setText(resources.getString(R.string.title_predict_today));
-        } else if(clientData.isWorkDayAfterStockClosedBeforeAnswerDisclosure()) {
-            titleTextView.setText(resources.getString(R.string.title_predict_today_answer_disclosure));
-            if(isHitPredictionDirection(false)) {
-                isHitImageView.setVisibility(View.VISIBLE);
-            }
-        } else {
-            if(sPredictionStateIsToday) {
-                titleTextView.setText(resources.getString(R.string.title_predict_today_answer_disclosure));
-                direction = mTodayPredictionDiffDirection;
-                diffPercentage = mTodayPredictionDiffPercentage;
-            } else {
-                titleTextView.setText(resources.getString(R.string.title_predict_tomorrow));
-                direction = mTomorrowPredictionDiffDirection;
-                diffPercentage = mTomorrowPredictionDiffPercentage;
-            }
-            if(isHitPredictionDirection(false)) {
-                isHitImageView.setVisibility(View.VISIBLE);
-            }
-            predictionBlock.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Stock.changeRightPartValue();
-                    ClientData clientData = ClientData.getInstance();
-                    clientData.getUserProfile().globalBroadcast(UserProfile.NOTIFY_ID_RIGHT_PART_CHANGE);
-                }
-            });
-        }
-
-        valueTextView.setTextColor(resources.getColor(R.color.text_white));
-        titleTextView.setTextColor(resources.getColor(R.color.text_white));
-        switch (direction) {
+    public void renderDiffColor(Context context, TextView textView) {
+        switch (mDiffDirection) {
             case TREND_UP:
-                predictionBlock.setBackground(resources.getDrawable(R.drawable.block_predict_up_background));
-                valueTextView.setText(String.format(Locale.US, "+%.2f%%", diffPercentage));
+                textView.setTextColor(context.getResources().getColor(R.color.colorTrendUp));
                 break;
             case TREND_FLAT:
-                predictionBlock.setBackgroundColor(resources.getColor(R.color.card_gray_background));
-                valueTextView.setText(String.format(Locale.US, "%.2f%%", diffPercentage));
-                valueTextView.setTextColor(resources.getColor(R.color.text_dark_gray));
-                titleTextView.setTextColor(resources.getColor(R.color.text_dark_gray));
+                textView.setTextColor(context.getResources().getColor(R.color.colorTrendFlat));
                 break;
             case TREND_DOWN:
-                predictionBlock.setBackground(resources.getDrawable(R.drawable.block_predict_down_background));
-                valueTextView.setText(String.format(Locale.US, "-%.2f%%", diffPercentage));
+                textView.setTextColor(context.getResources().getColor(R.color.colorTrendDown));
                 break;
             default:
-                predictionBlock.setBackgroundColor(resources.getColor(R.color.card_gray_background));
-                valueTextView.setText(String.format(Locale.US, "%.2f%%", diffPercentage));
-                valueTextView.setTextColor(resources.getColor(R.color.text_dark_gray));
-                titleTextView.setTextColor(resources.getColor(R.color.text_dark_gray));
+                textView.setTextColor(context.getResources().getColor(R.color.colorTrendFlat));
                 break;
         }
+    }
+
+    public void renderDiffIcon(ImageView imageView) {
+        switch (mDiffDirection) {
+            case TREND_UP:
+                imageView.setVisibility(View.VISIBLE);
+                imageView.setImageResource(R.mipmap.ic_trend_arrow_up);
+                break;
+            case TREND_FLAT:
+                imageView.setVisibility(View.INVISIBLE);
+                break;
+            case TREND_DOWN:
+                imageView.setVisibility(View.VISIBLE);
+                imageView.setImageResource(R.mipmap.ic_trend_arrow_down);
+                break;
+            default:
+                imageView.setVisibility(View.INVISIBLE);
+                break;
+        }
+    }
+
+    public static void renderTitleAndStars(Context context, int direction, int level,
+                                           ConstraintLayout blockView,
+                                           TextView titleTextView,
+                                           TextView unavailableTextView,
+                                           ImageView[] imageViews) {
+        Resources resources = context.getResources();
+        if(direction == TREND_FLAT) {
+            blockView.setBackground(resources.getDrawable(R.drawable.block_gray_border_with_radius_corner));
+            titleTextView.setVisibility(View.GONE);
+            unavailableTextView.setVisibility(View.VISIBLE);
+            for(ImageView imageView : imageViews) {
+                imageView.setVisibility(View.INVISIBLE);
+            }
+        } else {
+            blockView.setBackground(resources.getDrawable(R.drawable.block_black_border_with_radius_corner));
+            titleTextView.setVisibility(View.VISIBLE);
+            unavailableTextView.setVisibility(View.GONE);
+            int iconResourceId;
+            if(direction == TREND_UP) {
+                iconResourceId = R.mipmap.ic_trend_arrow_up;
+            } else {
+                iconResourceId = R.mipmap.ic_trend_arrow_down;
+            }
+            for(int i = 0; i <= level; i++) {
+                imageViews[i].setVisibility(View.VISIBLE);
+                imageViews[i].setImageResource(iconResourceId);
+            }
+            for(int i = level + 1; i < 3; i++) {
+                imageViews[i].setVisibility(View.INVISIBLE);
+            }
+        }
+    }
+
+    public void renderTodayBlock(Context context,
+                                 ConstraintLayout blockView,
+                                 TextView titleTextView,
+                                 TextView statusTextView) {
+        Resources resources = context.getResources();
+        ClientData clientData = ClientData.getInstance();
+        if(clientData.isWorkDayAfterAnswerDisclosure()) {
+            titleTextView.setText(R.string.title_predict_today);
+        } else {
+            titleTextView.setText(R.string.title_predict_yesterday);
+        }
+
+        if(isHitPredictionDirection(false)) {
+            blockView.setBackground(resources.getDrawable(R.drawable.block_black_border_with_radius_corner));
+            titleTextView.setTextColor(resources.getColor(R.color.black));
+            statusTextView.setTextColor(resources.getColor(R.color.black));
+            statusTextView.setText(R.string.title_hit);
+        } else {
+            blockView.setBackground(resources.getDrawable(R.drawable.block_gray_border_with_radius_corner));
+            titleTextView.setTextColor(resources.getColor(R.color.pinkish_grey_two));
+            statusTextView.setTextColor(resources.getColor(R.color.pinkish_grey_two));
+            statusTextView.setText(R.string.title_miss);
+        }
+    }
+
+    public void renderTomorrowBlock(Context context,
+                                    ConstraintLayout blockView,
+                                    TextView titleTextView,
+                                    TextView statusTextView) {
+
+        Resources resources = context.getResources();
+        ClientData clientData = ClientData.getInstance();
+        blockView.setOnClickListener(null);
+
+        if(sDisclosureState) {
+            titleTextView.setTextColor(resources.getColor(R.color.white));
+            statusTextView.setTextColor(resources.getColor(R.color.white));
+            if (mTodayPredictionDiffDirection == TREND_UP) {
+                blockView.setBackground(resources.getDrawable(R.drawable.block_predict_up_background));
+                statusTextView.setText(String.format(Locale.US, "+%.2f%%", mTodayPredictionDiffPercentage));
+            } else if (mTodayPredictionDiffDirection == TREND_DOWN) {
+                blockView.setBackground(resources.getDrawable(R.drawable.block_predict_down_background));
+                statusTextView.setText(String.format(Locale.US, "-%.2f%%", mTodayPredictionDiffPercentage));
+            } else {
+                blockView.setBackground(resources.getDrawable(R.drawable.block_predict_unavailable));
+                statusTextView.setText(String.format(Locale.US, "%.2f%%", mTodayPredictionDiffPercentage));
+            }
+            if(clientData.isWorkDayAfterAnswerDisclosure()) {
+                titleTextView.setText(R.string.title_predict_today);
+            } else {
+                titleTextView.setText(R.string.title_predict_yesterday);
+            }
+        } else {
+            if (clientData.isWorkDayAfterStockClosedBeforeAnswerDisclosure()) {
+                blockView.setBackground(resources.getDrawable(R.drawable.block_predict_unavailable));
+                titleTextView.setText(resources.getString(R.string.title_predict_tomorrow));
+                titleTextView.setTextColor(resources.getColor(R.color.pinkish_grey_three));
+                statusTextView.setText(R.string.title_disclosure_at_1500);
+                statusTextView.setTextColor(resources.getColor(R.color.warm_grey_three));
+            } else {
+                titleTextView.setTextColor(resources.getColor(R.color.white));
+                statusTextView.setTextColor(resources.getColor(R.color.white));
+                if (mPredictionDiffDirection == TREND_UP) {
+                    blockView.setBackground(resources.getDrawable(R.drawable.block_predict_up_background));
+                    statusTextView.setText(String.format(Locale.US, "+%.2f%%", mPredictionDiffPercentage));
+                } else if (mPredictionDiffDirection == TREND_DOWN) {
+                    blockView.setBackground(resources.getDrawable(R.drawable.block_predict_down_background));
+                    statusTextView.setText(String.format(Locale.US, "-%.2f%%", mPredictionDiffPercentage));
+                } else {
+                    blockView.setBackground(resources.getDrawable(R.drawable.block_predict_unavailable));
+                    statusTextView.setText(String.format(Locale.US, "%.2f%%", mPredictionDiffPercentage));
+                }
+                if (clientData.isWorkDayBeforeStockClosed()) {
+                    titleTextView.setText(R.string.title_predict_today);
+                } else {
+                    titleTextView.setText(R.string.title_predict_tomorrow);
+                }
+            }
+        }
+
+        blockView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Stock.changeRightPartValue();
+                ClientData clientData = ClientData.getInstance();
+                clientData.getUserProfile().globalBroadcast(UserProfile.NOTIFY_ID_RIGHT_PART_CHANGE);
+            }
+        });
     }
 
     @Nullable

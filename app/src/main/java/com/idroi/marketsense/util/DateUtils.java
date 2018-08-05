@@ -303,6 +303,12 @@ public class DateUtils {
         return isWorkDay(now) && now.after(close) && now.before(disclosureEnd);
     }
 
+    public static boolean isWorkDayAfterAnswerDisclosure() {
+        Date now = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei")).getTime();
+        Date disclosureEnd = getTodaySpecificTime(now, 15, 0);
+        return isWorkDay(now) && now.after(disclosureEnd);
+    }
+
     public static boolean doesUseTodayPredictionValue() {
         Date now = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei")).getTime();
         Date start = getTodaySpecificTime(now, 8, 10);

@@ -19,22 +19,27 @@ public class StockViewHolder {
     TextView nameView;
     TextView codeView;
 
+    ImageView priceImageView;
     TextView priceView;
     TextView diffView;
 
-    ImageView predictNewsImageView;
-    ImageView predictTechImageView;
-    ImageView predictFundamentalImageView;
+    ConstraintLayout techBlockView;
+    TextView techTitleTextView;
+    TextView techUnavailableTextView;
+    ImageView[] techImageViews;
 
-    TextView predictNewsAttitude;
-    TextView predictTechAttitude;
-    TextView predictFundamentalAttitude;
+    ConstraintLayout newsBlockView;
+    TextView newsTitleTextView;
+    TextView newsUnavailableTextView;
+    ImageView[] newsImageViews;
 
-    ConstraintLayout rightBlock;
-    TextView rightTitle;
-    TextView rightValue;
+    ConstraintLayout todayBlock;
+    TextView todayTitleTextView;
+    TextView todayStatusTextView;
 
-    ImageView hitImageView;
+    ConstraintLayout tomorrowBlock;
+    TextView tomorrowTitleTextView;
+    TextView tomorrowStatusTextView;
 
     static final StockViewHolder EMPTY_VIEW_HOLDER = new StockViewHolder();
 
@@ -44,24 +49,40 @@ public class StockViewHolder {
         final StockViewHolder stockViewHolder = new StockViewHolder();
         stockViewHolder.mainView = view;
         try {
+
+            // upper block
             stockViewHolder.nameView = view.findViewById(R.id.marketsense_stock_name_tv);
             stockViewHolder.codeView = view.findViewById(R.id.marketsense_stock_code_tv);
+            stockViewHolder.priceImageView = view.findViewById(R.id.marketsense_stock_price_iv);
             stockViewHolder.priceView = view.findViewById(R.id.marketsense_stock_price_tv);
             stockViewHolder.diffView = view.findViewById(R.id.marketsense_stock_diff_tv);
 
-            stockViewHolder.predictNewsImageView = view.findViewById(R.id.marketsense_stock_news_iv);
-            stockViewHolder.predictTechImageView = view.findViewById(R.id.marketsense_stock_tech_iv);
-            stockViewHolder.predictFundamentalImageView = view.findViewById(R.id.marketsense_stock_fundamental_iv);
+            // two bottom right blocks
+            stockViewHolder.techBlockView = view.findViewById(R.id.tech_block);
+            stockViewHolder.techTitleTextView = view.findViewById(R.id.tech_block_title);
+            stockViewHolder.techUnavailableTextView = view.findViewById(R.id.tech_block_unavailable);
+            stockViewHolder.techImageViews = new ImageView[]{
+                    view.findViewById(R.id.tech_block_icon1),
+                    view.findViewById(R.id.tech_block_icon2),
+                    view.findViewById(R.id.tech_block_icon3)};
 
-            stockViewHolder.predictNewsAttitude = view.findViewById(R.id.marketsense_stock_news_attitude_tv);
-            stockViewHolder.predictTechAttitude = view.findViewById(R.id.marketsense_stock_people_attitude_tv);
-            stockViewHolder.predictFundamentalAttitude = view.findViewById(R.id.marketsense_stock_fundamental_attitude_tv);
+            stockViewHolder.newsBlockView = view.findViewById(R.id.news_block);
+            stockViewHolder.newsTitleTextView = view.findViewById(R.id.news_block_title);
+            stockViewHolder.newsUnavailableTextView = view.findViewById(R.id.news_block_unavailable);
+            stockViewHolder.newsImageViews = new ImageView[]{
+                    view.findViewById(R.id.news_block_icon1),
+                    view.findViewById(R.id.news_block_icon2),
+                    view.findViewById(R.id.news_block_icon3)};
 
-            stockViewHolder.rightBlock = view.findViewById(R.id.predict_block);
-            stockViewHolder.rightTitle = view.findViewById(R.id.predict_title);
-            stockViewHolder.rightValue = view.findViewById(R.id.predict_value);
+            // today part
+            stockViewHolder.todayBlock = view.findViewById(R.id.today_block);
+            stockViewHolder.todayTitleTextView = view.findViewById(R.id.today_block_predict_title);
+            stockViewHolder.todayStatusTextView = view.findViewById(R.id.today_block_predict_status);
 
-            stockViewHolder.hitImageView = view.findViewById(R.id.ic_hit);
+            // tomorrow part
+            stockViewHolder.tomorrowBlock = view.findViewById(R.id.tomorrow_block);
+            stockViewHolder.tomorrowTitleTextView = view.findViewById(R.id.tomorrow_block_predict_title);
+            stockViewHolder.tomorrowStatusTextView = view.findViewById(R.id.tomorrow_block_predict_status);
 
             return stockViewHolder;
         } catch (ClassCastException exception) {

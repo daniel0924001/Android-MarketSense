@@ -45,6 +45,7 @@ public class ClientData {
 
     private boolean mIsWorkDayBeforeStockClosed;
     private boolean mIsWorkDayAfterStockClosedBeforeAnswerDisclosure;
+    private boolean mIsWorkDayAfterAnswerDisclosure;
     private boolean mDoesUseTodayPredictionValue;;
 
     /**
@@ -94,6 +95,7 @@ public class ClientData {
     public void updateClockInformation() {
         mIsWorkDayBeforeStockClosed = DateUtils.isWorkDayBeforeStockClosed();
         mIsWorkDayAfterStockClosedBeforeAnswerDisclosure = DateUtils.isWorkDayAfterStockClosedAndBeforeAnswerDisclosure();
+        mIsWorkDayAfterAnswerDisclosure = DateUtils.isWorkDayAfterAnswerDisclosure();
         mDoesUseTodayPredictionValue = DateUtils.doesUseTodayPredictionValue();
     }
 
@@ -206,6 +208,10 @@ public class ClientData {
 
     public boolean isWorkDayAfterStockClosedBeforeAnswerDisclosure() {
         return mIsWorkDayAfterStockClosedBeforeAnswerDisclosure;
+    }
+
+    public boolean isWorkDayAfterAnswerDisclosure() {
+        return mIsWorkDayAfterAnswerDisclosure;
     }
 
     public boolean doesUseTodayPredictionValue() {

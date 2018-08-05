@@ -101,16 +101,21 @@
     <string name="title_company_predict_people_title">鄉民</string>
     <string name="title_company_predict_tech_title">技術</string>
 
+    <string name="title_predict_yesterday">前日預測</string>
     <string name="title_predict_today">今日預測</string>
     <string name="title_predict_today_answer_disclosure">今日收盤預測</string>
-    <string name="title_predict_tomorrow">次交易日預測</string>
+    <string name="title_predict_tomorrow">明日預測</string>
     <string name="title_predict_none">無法預測</string>
     <string name="title_hit">命中</string>
+    <string name="title_miss">未命中</string>
+    <string name="title_disclosure_at_1500">15:00公開</string>
 
     <string name="title_fundamental">基本面</string>
     <string name="title_people">鄉民面</string>
     <string name="title_news">新聞面</string>
     <string name="title_tech">技術面</string>
+    <string name="title_news_unavailable">近期無新聞</string>
+    <string name="title_tech_unavailable">冷門股</string>
 
     <string name="title_level_flat">？？？</string>
     <string name="title_level_up_highest">超看漲</string>

@@ -37,7 +37,7 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
     public View createView(@NonNull Context context, @Nullable ViewGroup parent) {
         return LayoutInflater
                 .from(context)
-                .inflate(R.layout.stock_list_item, parent, false);
+                .inflate(R.layout.stock_list_item_v2, parent, false);
     }
 
     @Override
@@ -58,11 +58,8 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
             return;
         }
 
-        stock.setRightPredictionBlock(view.getContext(),
-                stockViewHolder.rightBlock,
-                stockViewHolder.rightTitle,
-                stockViewHolder.rightValue,
-                stockViewHolder.hitImageView);
+        stock.renderTomorrowBlock(view.getContext(), stockViewHolder.tomorrowBlock,
+                stockViewHolder.tomorrowTitleTextView, stockViewHolder.tomorrowStatusTextView);
     }
 
     public void updatePriceOnly(final View view, final Stock stock) {
@@ -117,55 +114,28 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
         MarketSenseRendererHelper.addTextView(stockViewHolder.priceView, content.getPrice());
         MarketSenseRendererHelper.addTextView(stockViewHolder.diffView, content.getDiffPercentage());
 
-        int techLevel = content.getPredictTechLevel();
-        int newsLevel = content.getPredictNewsLevel();
-        int foundationLevel = content.getPredictFoundationLevel();
+        content.renderDiffColor(context, stockViewHolder.diffView);
+        content.renderDiffIcon(stockViewHolder.priceImageView);
 
-        if(content.getPredictFoundationDirection() == Stock.TREND_UP) {
-            stockViewHolder.predictFundamentalImageView.setImageResource(mBarRedResourceId[foundationLevel]);
-            stockViewHolder.predictFundamentalAttitude.setText(mAttitudeRedResourceId[foundationLevel]);
-        } else if(content.getPredictFoundationDirection() == Stock.TREND_DOWN) {
-            stockViewHolder.predictFundamentalImageView.setImageResource(mBarGreenResourceId[foundationLevel]);
-            stockViewHolder.predictFundamentalAttitude.setText(mAttitudeGreenResourceId[foundationLevel]);
-        } else {
-            stockViewHolder.predictFundamentalImageView.setImageResource(R.mipmap.ic_bar0_overview_none);
-            stockViewHolder.predictFundamentalAttitude.setText(R.string.title_level_flat);
-        }
+        Stock.renderTitleAndStars(context, content.getPredictTechDirection(),
+                content.getPredictTechLevel(),
+                stockViewHolder.techBlockView,
+                stockViewHolder.techTitleTextView,
+                stockViewHolder.techUnavailableTextView,
+                stockViewHolder.techImageViews);
 
-        if(content.getPredictTechDirection() == Stock.TREND_UP) {
-            stockViewHolder.predictTechImageView.setImageResource(mBarRedResourceId[techLevel]);
-            stockViewHolder.predictTechAttitude.setText(mAttitudeRedResourceId[techLevel]);
-        } else if(content.getPredictTechDirection() == Stock.TREND_DOWN) {
-            stockViewHolder.predictTechImageView.setImageResource(mBarGreenResourceId[techLevel]);
-            stockViewHolder.predictTechAttitude.setText(mAttitudeGreenResourceId[techLevel]);
-        } else {
-            stockViewHolder.predictTechImageView.setImageResource(R.mipmap.ic_bar0_overview_none);
-            stockViewHolder.predictTechAttitude.setText(R.string.title_level_flat);
-        }
+        Stock.renderTitleAndStars(context, content.getConfidenceDirection(),
+                content.getPredictNewsLevel(),
+                stockViewHolder.newsBlockView,
+                stockViewHolder.newsTitleTextView,
+                stockViewHolder.newsUnavailableTextView,
+                stockViewHolder.newsImageViews);
 
-        if(content.getConfidenceDirection() == Stock.TREND_UP) {
-            stockViewHolder.predictNewsImageView.setImageResource(mBarRedResourceId[newsLevel]);
-            stockViewHolder.predictNewsAttitude.setText(mAttitudeRedResourceId[newsLevel]);
-        } else if(content.getConfidenceDirection() == Stock.TREND_DOWN) {
-            stockViewHolder.predictNewsImageView.setImageResource(mBarGreenResourceId[newsLevel]);
-            stockViewHolder.predictNewsAttitude.setText(mAttitudeGreenResourceId[newsLevel]);
-        } else {
-            stockViewHolder.predictNewsImageView.setImageResource(R.mipmap.ic_bar0_overview_none);
-            stockViewHolder.predictNewsAttitude.setText(R.string.title_level_flat);
-        }
+        content.renderTodayBlock(context, stockViewHolder.todayBlock,
+                stockViewHolder.todayTitleTextView, stockViewHolder.todayStatusTextView);
 
-        setColor(context, stockViewHolder, content);
-
-        content.setRightPredictionBlock(context,
-                stockViewHolder.rightBlock,
-                stockViewHolder.rightTitle,
-                stockViewHolder.rightValue,
-                stockViewHolder.hitImageView);
-    }
-
-    private void setColor(Context context, StockViewHolder stockViewHolder, Stock content) {
-        int colorResourceId = context.getResources().getColor(content.getDiffColorResourceId());
-        stockViewHolder.diffView.setTextColor(colorResourceId);
+        content.renderTomorrowBlock(context, stockViewHolder.tomorrowBlock,
+                stockViewHolder.tomorrowTitleTextView, stockViewHolder.tomorrowStatusTextView);
     }
 
     private void setViewVisibility(final StockViewHolder stockViewHolder, final int visibility) {

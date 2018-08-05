@@ -4,5 +4,5 @@
     <corners android:radius="4dip" />
     <gradient android:startColor="@color/background_predict_up_top"
         android:endColor="@color/background_predict_up_bottom"
-        android:angle="90" />
+        android:angle="-90" />
 </shape>

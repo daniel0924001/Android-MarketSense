@@ -307,6 +307,6 @@ public class DateUtils {
         Date now = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei")).getTime();
         Date start = getTodaySpecificTime(now, 8, 10);
         Date end = getTodaySpecificTime(now, 15, 0);
-        return now.after(start) && now.before(end);
+        return isWorkDay(now) & now.after(start) && now.before(end);
     }
 }

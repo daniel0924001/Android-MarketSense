@@ -137,10 +137,15 @@ public class YahooStxChartCrawler {
                 tickRenderer.render(context, mStockTradeData);
                 MarketSenseRendererHelper.addTextView(mDateTextView, mStockTradeData.getTickTradeDay());
                 MarketSenseRendererHelper.addTextView(mVolumeTextView, mStockTradeData.getTickTotalVolume());
-                MarketSenseRendererHelper.addTextView(mOpenTextView, String.valueOf(mStockTradeData.getOpenPrice()));
-                MarketSenseRendererHelper.addTextView(mHighTextView, String.valueOf(mStockTradeData.getHighPrice()));
-                MarketSenseRendererHelper.addTextView(mLowTextView, String.valueOf(mStockTradeData.getLowPrice()));
-                MarketSenseRendererHelper.addTextView(mYesterdayCloseTextView, String.valueOf(mStockTradeData.getYesterdayPrice()));
+                MSLog.e(mStockTradeData.getOpenPrice() + ": " + String.valueOf(mStockTradeData.getOpenPrice()));
+                MarketSenseRendererHelper.addNumberStringToTextView(mOpenTextView,
+                        String.valueOf(mStockTradeData.getOpenPrice()), "--");
+                MarketSenseRendererHelper.addNumberStringToTextView(mHighTextView,
+                        String.valueOf(mStockTradeData.getHighPrice()), "--");
+                MarketSenseRendererHelper.addNumberStringToTextView(mLowTextView,
+                        String.valueOf(mStockTradeData.getLowPrice()), "--");
+                MarketSenseRendererHelper.addNumberStringToTextView(mYesterdayCloseTextView,
+                        String.valueOf(mStockTradeData.getYesterdayPrice()), "--");
             } else if (mStockTradeData.getType().equals(StockTradeData.STOCK_TRADE_DATA_TYPE_TA)) {
                 mPriceLineChart.setVisibility(View.INVISIBLE);
                 mCandleStickChart.setVisibility(View.VISIBLE);

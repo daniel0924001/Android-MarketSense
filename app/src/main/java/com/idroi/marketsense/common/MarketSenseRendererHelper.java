@@ -30,4 +30,28 @@ public class MarketSenseRendererHelper {
             textView.setText(contents);
         }
     }
+
+    public static void addNumberStringToTextView(@Nullable final TextView textView,
+                                                 @Nullable final String contents,
+                                                 final String defaultContents) {
+        if (textView == null) {
+            MSLog.v("Attempted to add text (" + contents + ") to null TextView.");
+            return;
+        }
+
+        // Clear previous value
+        textView.setText(null);
+
+        if (contents == null) {
+            textView.setVisibility(View.INVISIBLE); // 20161203 Ansel: to hide CTA button and text view without content
+            MSLog.v("Attempted to set TextView contents to null.");
+        } else {
+            textView.setVisibility(View.VISIBLE); // 20161203 Ansel: to display CTA button and text view with content
+            if(contents.equals("NaN")) {
+                textView.setText(defaultContents);
+            } else {
+                textView.setText(contents);
+            }
+        }
+    }
 }

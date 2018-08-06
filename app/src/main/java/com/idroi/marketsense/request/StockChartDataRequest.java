@@ -177,16 +177,16 @@ public class StockChartDataRequest extends Request<StockTradeData> {
         JSONObject data = jsonResponse.optJSONObject(PARAM_MEM);
         if(data != null) {
             try {
-                float yesterdayPrice = (float) data.getDouble(PARAM_YESTERDAY);
-                float openPrice = (float) data.getDouble(PARAM_OPEN);
-                float highPrice = (float) data.getDouble(PARAM_HIGH);
-                float lowPrice = (float) data.getDouble(PARAM_LOW);
-                float minPrice = (float) data.getDouble(PARAM_MIN_PRICE);
-                float maxPrice = (float) data.getDouble(PARAM_MAX_PRICE);
+                float yesterdayPrice = (float) data.optDouble(PARAM_YESTERDAY);
+                float openPrice = (float) data.optDouble(PARAM_OPEN);
+                float highPrice = (float) data.optDouble(PARAM_HIGH);
+                float lowPrice = (float) data.optDouble(PARAM_LOW);
+                float minPrice = (float) data.optDouble(PARAM_MIN_PRICE);
+                float maxPrice = (float) data.optDouble(PARAM_MAX_PRICE);
                 float todayTotalVolume = (float) data.optDouble(PARAM_TODAY_TOTAL_VOLUME);
-                float realPrice = (float) data.getDouble(PARAM_REAL_PRICE);
-                float diffPrice = (float) data.getDouble(PARAM_DIFF_PRICE);
-                float diffPercentage = (float) data.getDouble(PARAM_DIFF_PERCENTAGE);
+                float realPrice = (float) data.optDouble(PARAM_REAL_PRICE);
+                float diffPrice = (float) data.optDouble(PARAM_DIFF_PRICE);
+                float diffPercentage = (float) data.optDouble(PARAM_DIFF_PERCENTAGE);
                 stockTradeData.setOpenPrice(openPrice);
                 stockTradeData.setHighPrice(highPrice);
                 stockTradeData.setLowPrice(lowPrice);

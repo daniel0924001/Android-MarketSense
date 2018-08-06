@@ -42,11 +42,13 @@ public class StockListFragment extends Fragment {
 
     public final static String TASK_NAME = "TASK_NAME";
     public final static int MAIN_ID = 1;
+    public final static int NORMAL_ID = 2;
     public final static int SELF_CHOICES_ID = 5;
     public final static int WPCT_ID = 6;
 
     public enum TASK {
         MAIN(MAIN_ID),
+        NORMAL(NORMAL_ID),
         SELF_CHOICES(SELF_CHOICES_ID),
         WPCT(WPCT_ID);
 

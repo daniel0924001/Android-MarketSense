@@ -137,7 +137,6 @@ public class YahooStxChartCrawler {
                 tickRenderer.render(context, mStockTradeData);
                 MarketSenseRendererHelper.addTextView(mDateTextView, mStockTradeData.getTickTradeDay());
                 MarketSenseRendererHelper.addTextView(mVolumeTextView, mStockTradeData.getTickTotalVolume());
-                MSLog.e(mStockTradeData.getOpenPrice() + ": " + String.valueOf(mStockTradeData.getOpenPrice()));
                 MarketSenseRendererHelper.addNumberStringToTextView(mOpenTextView,
                         String.valueOf(mStockTradeData.getOpenPrice()), "--");
                 MarketSenseRendererHelper.addNumberStringToTextView(mHighTextView,

@@ -35,7 +35,7 @@ import java.util.ArrayList;
 
 import static com.idroi.marketsense.adapter.NewsRecyclerAdapter.NEWS_SINGLE_LAYOUT;
 import static com.idroi.marketsense.fragments.NewsFragment.GENERAL_TASK_ID;
-import static com.idroi.marketsense.fragments.StockListFragment.WPCT_ID;
+import static com.idroi.marketsense.fragments.StockListFragment.NORMAL_ID;
 import static com.idroi.marketsense.request.NewsRequest.PARAM_GTS;
 import static com.idroi.marketsense.request.NewsRequest.PARAM_LEVEL;
 import static com.idroi.marketsense.request.NewsRequest.PARAM_STATUS;
@@ -107,7 +107,7 @@ public class MainFragment extends Fragment {
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mStockListPlacer = new StockListPlacer(getActivity(), WPCT_ID);
+        mStockListPlacer = new StockListPlacer(getActivity(), NORMAL_ID);
         mStockListPlacer.setStockListListener(new StockListPlacer.StockListListener() {
             @Override
             public void onStockListLoaded() {

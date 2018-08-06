@@ -279,7 +279,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if(!mCanReturn) {
+        if(mCanReturn) {
+            mCanReturn = false;
             setActionBar();
             setActionBarTwoButton(mClickable, mSwitchable, mIsDiscussion);
         }
@@ -515,7 +516,6 @@ public class MainActivity extends AppCompatActivity {
                                         mAvatarImageView.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View view) {
-                                                mCanReturn = false;
                                                 onBackPressed();
                                             }
                                         });

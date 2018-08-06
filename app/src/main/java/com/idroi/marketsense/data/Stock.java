@@ -70,6 +70,8 @@ public class Stock {
     private double mTodayPredictionDiffPercentage, mTomorrowPredictionDiffPercentage, mPredictionDiffPercentage;
     private double mPredictionError;
 
+    private boolean mIsUpOrDownStop;
+
     public Stock() {
 
     }
@@ -106,6 +108,31 @@ public class Stock {
             mDiffDirection = Stock.TREND_FLAT;
         } else {
             mDiffDirection = Stock.TREND_DOWN;
+        }
+    }
+
+    public void checkIsStop(double yesterdayPrice, double price) {
+        double maxThreshold = yesterdayPrice * 1.1;
+        double minThreshold = yesterdayPrice * 0.9;
+        double step = 0;
+        if(yesterdayPrice < 10) {
+            step = 0.01;
+        } else if(yesterdayPrice < 50) {
+            step = 0.05;
+        } else if(yesterdayPrice < 100) {
+            step = 0.1;
+        } else if(yesterdayPrice < 500) {
+            step = 0.5;
+        } else if(yesterdayPrice < 1000) {
+            step = 1;
+        } else {
+            step = 5;
+        }
+
+        if(price + step >= maxThreshold || price - step <= minThreshold) {
+            mIsUpOrDownStop = true;
+        } else {
+            mIsUpOrDownStop = false;
         }
     }
 
@@ -420,19 +447,32 @@ public class Stock {
     }
 
     public void renderDiffColor(Context context, TextView textView) {
-        switch (mDiffDirection) {
-            case TREND_UP:
-                textView.setTextColor(context.getResources().getColor(R.color.colorTrendUp));
-                break;
-            case TREND_FLAT:
-                textView.setTextColor(context.getResources().getColor(R.color.colorTrendFlat));
-                break;
-            case TREND_DOWN:
-                textView.setTextColor(context.getResources().getColor(R.color.colorTrendDown));
-                break;
-            default:
-                textView.setTextColor(context.getResources().getColor(R.color.colorTrendFlat));
-                break;
+        if(mIsUpOrDownStop) {
+            textView.setTextColor(context.getResources().getColor(R.color.white));
+            switch (mDiffDirection) {
+                case TREND_UP:
+                    textView.setBackgroundColor(context.getResources().getColor(R.color.colorTrendUp));
+                    break;
+                case TREND_DOWN:
+                    textView.setBackgroundColor(context.getResources().getColor(R.color.colorTrendDown));
+                    break;
+            }
+        } else {
+            textView.setBackgroundColor(context.getResources().getColor(R.color.white));
+            switch (mDiffDirection) {
+                case TREND_UP:
+                    textView.setTextColor(context.getResources().getColor(R.color.colorTrendUp));
+                    break;
+                case TREND_FLAT:
+                    textView.setTextColor(context.getResources().getColor(R.color.colorTrendFlat));
+                    break;
+                case TREND_DOWN:
+                    textView.setTextColor(context.getResources().getColor(R.color.colorTrendDown));
+                    break;
+                default:
+                    textView.setTextColor(context.getResources().getColor(R.color.colorTrendFlat));
+                    break;
+            }
         }
     }
 
@@ -624,6 +664,7 @@ public class Stock {
                         stock.setDiffNumber(diff);
                         stock.setDiffPercentage(diffPercentage);
                         stock.setDiffDirection(diff);
+                        stock.checkIsStop(yesterdayPrice, price);
                         break;
                     case RAISE:
                         stock.setRaiseNum(jsonObject.optInt(RAISE));

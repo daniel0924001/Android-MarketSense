@@ -12,7 +12,6 @@ import com.idroi.marketsense.common.SharedPreferencesCompat;
 import com.idroi.marketsense.notification.NotificationHelper;
 import com.idroi.marketsense.util.DateUtils;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,12 +22,10 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.TimeZone;
 
 import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_LAST_STAR_TIMESTAMP;
 import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_USER_SETTING;
@@ -182,10 +179,6 @@ public class UserProfile implements Serializable {
     public String getUserName() {
         return mUserName;
     }
-
-//    public String getUserToken() {
-//        return mUserToken;
-//    }
 
     public String getUserAvatarLink() {
         return mUserAvatarLink;

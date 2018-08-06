@@ -130,52 +130,37 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
         MarketSenseRendererHelper.addTextView(commentViewHolder.newsTitleView, news.getTitle());
         MarketSenseRendererHelper.addTextView(commentViewHolder.newsDateView, news.getDate());
 
-        // fire text
-        if(commentViewHolder.fireTextView != null) {
+        if(commentViewHolder.newsPredictionTextView != null) {
             if (news.isOptimistic()) {
-                commentViewHolder.fireTextView.setTextColor(
-                        commentViewHolder.fireTextView.getContext().getResources().getColor(R.color.colorTrendUp));
-                commentViewHolder.fireTextView.setVisibility(View.VISIBLE);
+                commentViewHolder.newsPredictionTextView.setBackground(commentViewHolder.newsPredictionTextView.getContext().getResources().getDrawable(R.drawable.btn_oval_small_corner_red));
+                commentViewHolder.newsPredictionTextView.setVisibility(View.VISIBLE);
             } else if (news.isPessimistic()) {
-                commentViewHolder.fireTextView.setTextColor(
-                        commentViewHolder.fireTextView.getContext().getResources().getColor(R.color.colorTrendDown));
-                commentViewHolder.fireTextView.setVisibility(View.VISIBLE);
+                commentViewHolder.newsPredictionTextView.setBackground(commentViewHolder.newsPredictionTextView.getContext().getResources().getDrawable(R.drawable.btn_oval_small_corner_green));
+                commentViewHolder.newsPredictionTextView.setVisibility(View.VISIBLE);
             } else {
-                commentViewHolder.fireTextView.setVisibility(View.GONE);
+                commentViewHolder.newsPredictionTextView.setVisibility(View.GONE);
             }
         }
 
-        // fire image
-        if(commentViewHolder.fireImageView != null) {
-            commentViewHolder.fireImageView.setVisibility(View.VISIBLE);
-            switch (news.getLevel()) {
-                case 3:
-                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_up3);
-                    commentViewHolder.fireTextView.setText(R.string.title_news_good3);
-                    break;
-                case 2:
-                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_up2);
-                    commentViewHolder.fireTextView.setText(R.string.title_news_good2);
-                    break;
-                case 1:
-                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_up1);
-                    commentViewHolder.fireTextView.setText(R.string.title_news_good1);
-                    break;
-                case -1:
-                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_down1);
-                    commentViewHolder.fireTextView.setText(R.string.title_news_bad1);
-                    break;
-                case -2:
-                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_down2);
-                    commentViewHolder.fireTextView.setText(R.string.title_news_bad2);
-                    break;
-                case -3:
-                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_down3);
-                    commentViewHolder.fireTextView.setText(R.string.title_news_bad3);
-                    break;
-                default:
-                    commentViewHolder.fireImageView.setVisibility(View.GONE);
-            }
+        switch (news.getLevel()) {
+            case 3:
+                commentViewHolder.newsPredictionTextView.setText(R.string.title_news_good3);
+                break;
+            case 2:
+                commentViewHolder.newsPredictionTextView.setText(R.string.title_news_good2);
+                break;
+            case 1:
+                commentViewHolder.newsPredictionTextView.setText(R.string.title_news_good1);
+                break;
+            case -1:
+                commentViewHolder.newsPredictionTextView.setText(R.string.title_news_bad1);
+                break;
+            case -2:
+                commentViewHolder.newsPredictionTextView.setText(R.string.title_news_bad2);
+                break;
+            case -3:
+                commentViewHolder.newsPredictionTextView.setText(R.string.title_news_bad3);
+                break;
         }
 
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) commentViewHolder.horizontalLineView.getLayoutParams();

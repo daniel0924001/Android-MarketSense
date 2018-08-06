@@ -155,57 +155,42 @@ public class CommentActivity extends AppCompatActivity {
         ConstraintLayout newsBlock = findViewById(R.id.comment_news_block);
         TextView newsTitleView = findViewById(R.id.comment_news_title_tv);
         TextView dateTitleView = findViewById(R.id.comment_news_date_tv);
-        TextView fireTextView = findViewById(R.id.comment_news_fire_tv);
-        ImageView fireImageView = findViewById(R.id.comment_news_fire_iv);
+        TextView predictionTextView = findViewById(R.id.comment_news_prediction);
 
         MarketSenseRendererHelper.addTextView(newsTitleView, news.getTitle());
         MarketSenseRendererHelper.addTextView(dateTitleView, news.getDate());
 
         // fire text
-        if(fireTextView != null) {
+        if(predictionTextView != null) {
             if (news.isOptimistic()) {
-                fireTextView.setTextColor(
-                        fireTextView.getContext().getResources().getColor(R.color.colorTrendUp));
-                fireTextView.setVisibility(View.VISIBLE);
+                predictionTextView.setBackground(this.getResources().getDrawable(R.drawable.btn_oval_small_corner_red));
+                predictionTextView.setVisibility(View.VISIBLE);
             } else if (news.isPessimistic()) {
-                fireTextView.setTextColor(
-                        fireTextView.getContext().getResources().getColor(R.color.colorTrendDown));
-                fireTextView.setVisibility(View.VISIBLE);
+                predictionTextView.setBackground(this.getResources().getDrawable(R.drawable.btn_oval_small_corner_green));
+                predictionTextView.setVisibility(View.VISIBLE);
             } else {
-                fireTextView.setVisibility(View.GONE);
+                predictionTextView.setVisibility(View.GONE);
             }
-        }
 
-        // fire image
-        if(fireImageView != null && fireTextView != null) {
-            fireImageView.setVisibility(View.VISIBLE);
             switch (news.getLevel()) {
                 case 3:
-                    fireImageView.setImageResource(R.mipmap.ic_news_up3);
-                    fireTextView.setText(R.string.title_news_good3);
+                    predictionTextView.setText(R.string.title_news_good3);
                     break;
                 case 2:
-                    fireImageView.setImageResource(R.mipmap.ic_news_up2);
-                    fireTextView.setText(R.string.title_news_good2);
+                    predictionTextView.setText(R.string.title_news_good2);
                     break;
                 case 1:
-                    fireImageView.setImageResource(R.mipmap.ic_news_up1);
-                    fireTextView.setText(R.string.title_news_good1);
+                    predictionTextView.setText(R.string.title_news_good1);
                     break;
                 case -1:
-                    fireImageView.setImageResource(R.mipmap.ic_news_down1);
-                    fireTextView.setText(R.string.title_news_bad1);
+                    predictionTextView.setText(R.string.title_news_bad1);
                     break;
                 case -2:
-                    fireImageView.setImageResource(R.mipmap.ic_news_down2);
-                    fireTextView.setText(R.string.title_news_bad2);
+                    predictionTextView.setText(R.string.title_news_bad2);
                     break;
                 case -3:
-                    fireImageView.setImageResource(R.mipmap.ic_news_down3);
-                    fireTextView.setText(R.string.title_news_bad3);
+                    predictionTextView.setText(R.string.title_news_bad3);
                     break;
-                default:
-                    fireImageView.setVisibility(View.GONE);
             }
         }
 

@@ -12,7 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,9 +51,8 @@ public class RichEditorActivity extends AppCompatActivity {
     public static final String EXTRA_REQ_STOCK_KEYWORDS = "extra_stock_keywords";
     public static final String EXTRA_REQ_NEWS_TITLE = "extra_news_title";
     public static final String EXTRA_REQ_NEWS_DATE = "extra_news_date";
-    public static final String EXTRA_REQ_NEWS_FIRE_IMAGE_ID = "extra_news_fire_image_id";
-    public static final String EXTRA_REQ_NEWS_FIRE_TEXT_ID = "extra_news_fire_text";
-    public static final String EXTRA_REQ_NEWS_FIRE_TEXT_COLOR_ID = "extra_news_fire_text_color";
+    public static final String EXTRA_REQ_NEWS_PREDICTION_IMAGE_ID = "extra_news_prediction_image_id";
+    public static final String EXTRA_REQ_NEWS_PREDICTION_TEXT_ID = "extra_news_prediction_text";
     public static final String EXTRA_RES_HTML = "extra_response_html";
     public static final String EXTRA_RES_TYPE = EXTRA_REQ_TYPE;
     public static final String EXTRA_RES_ID = EXTRA_REQ_ID;
@@ -73,9 +71,8 @@ public class RichEditorActivity extends AppCompatActivity {
 
     private String mNewsTitle;
     private String mNewsSourceDate;
-    private int mNewsFireStringResourceId;
-    private int mNewsFireImageResourceId;
-    private int mNewsFireColorStringResourceId;
+    private int mNewsPredictionStringResourceId;
+    private int mNewsPredictionBackgroundDrawableResourceId;
 
     public enum TYPE {
         NEWS("news"),
@@ -128,9 +125,8 @@ public class RichEditorActivity extends AppCompatActivity {
 
         mNewsTitle = intent.getStringExtra(EXTRA_REQ_NEWS_TITLE);
         mNewsSourceDate = intent.getStringExtra(EXTRA_REQ_NEWS_DATE);
-        mNewsFireStringResourceId = intent.getIntExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, 0);
-        mNewsFireImageResourceId = intent.getIntExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, 0);
-        mNewsFireColorStringResourceId = intent.getIntExtra(EXTRA_REQ_NEWS_FIRE_TEXT_COLOR_ID, 0);
+        mNewsPredictionStringResourceId = intent.getIntExtra(EXTRA_REQ_NEWS_PREDICTION_TEXT_ID, 0);
+        mNewsPredictionBackgroundDrawableResourceId = intent.getIntExtra(EXTRA_REQ_NEWS_PREDICTION_IMAGE_ID, 0);
     }
 
     private void leaveRichEditorActivity(boolean isSuccessful, String html, String eventId) {
@@ -194,15 +190,13 @@ public class RichEditorActivity extends AppCompatActivity {
             titleTextView.setText(mNewsTitle);
             TextView dateTextView = findViewById(R.id.comment_news_date_tv);
             dateTextView.setText(mNewsSourceDate);
-            TextView fireTextView = findViewById(R.id.comment_news_fire_tv);
-            ImageView fireImageView = findViewById(R.id.comment_news_fire_iv);
+            TextView predictionTextView = findViewById(R.id.comment_news_prediction);
             try {
-                fireTextView.setText(mNewsFireStringResourceId);
-                fireTextView.setTextColor(getResources().getColor(mNewsFireColorStringResourceId));
-                fireImageView.setImageResource(mNewsFireImageResourceId);
+                predictionTextView.setText(mNewsPredictionStringResourceId);
+                predictionTextView.setBackground(getResources().getDrawable(mNewsPredictionBackgroundDrawableResourceId));
             } catch (Exception e) {
-                fireTextView.setVisibility(View.GONE);
-                fireImageView.setVisibility(View.GONE);
+                predictionTextView.setVisibility(View.GONE);
+                predictionTextView.setVisibility(View.GONE);
             }
 
             ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) mEditor.getLayoutParams();
@@ -386,39 +380,32 @@ public class RichEditorActivity extends AppCompatActivity {
 
         switch (level) {
             case 3:
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_news_up3);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_good3);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_COLOR_ID, R.color.colorTrendUp);
+                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_IMAGE_ID, R.drawable.btn_oval_small_corner_red);
+                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_TEXT_ID, R.string.title_news_good3);
                 break;
             case 2:
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_news_up2);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_good2);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_COLOR_ID, R.color.colorTrendUp);
+                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_IMAGE_ID, R.drawable.btn_oval_small_corner_red);
+                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_TEXT_ID, R.string.title_news_good2);
                 break;
             case 1:
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_news_up1);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_good1);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_COLOR_ID, R.color.colorTrendUp);
+                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_IMAGE_ID, R.drawable.btn_oval_small_corner_red);
+                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_TEXT_ID, R.string.title_news_good1);
                 break;
             case -1:
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_news_down1);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_bad1);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_COLOR_ID, R.color.colorTrendDown);
+                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_IMAGE_ID, R.drawable.btn_oval_small_corner_green);
+                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_TEXT_ID, R.string.title_news_bad1);
                 break;
             case -2:
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_news_down2);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_bad2);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_COLOR_ID, R.color.colorTrendDown);
+                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_IMAGE_ID, R.drawable.btn_oval_small_corner_green);
+                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_TEXT_ID, R.string.title_news_bad2);
                 break;
             case -3:
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_news_down3);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_bad3);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_COLOR_ID, R.color.colorTrendDown);
+                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_IMAGE_ID, R.drawable.btn_oval_small_corner_green);
+                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_TEXT_ID, R.string.title_news_bad3);
                 break;
             default:
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, 0);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, 0);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_COLOR_ID, 0);
+                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_IMAGE_ID, 0);
+                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_TEXT_ID, 0);
         }
 
         return intent;

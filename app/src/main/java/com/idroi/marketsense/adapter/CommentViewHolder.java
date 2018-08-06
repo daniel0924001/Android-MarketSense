@@ -38,8 +38,7 @@ public class CommentViewHolder {
     @Nullable ConstraintLayout newsBlock;
     @Nullable TextView newsTitleView;
     @Nullable TextView newsDateView;
-    @Nullable TextView fireTextView;
-    @Nullable ImageView fireImageView;
+    @Nullable TextView newsPredictionTextView;
 
     static final CommentViewHolder EMPTY_VIEW_HOLDER = new CommentViewHolder();
 
@@ -78,8 +77,7 @@ public class CommentViewHolder {
             commentViewHolder.newsBlock = view.findViewById(R.id.comment_news_block);
             commentViewHolder.newsTitleView = view.findViewById(R.id.comment_news_title_tv);
             commentViewHolder.newsDateView = view.findViewById(R.id.comment_news_date_tv);
-            commentViewHolder.fireTextView = view.findViewById(R.id.comment_news_fire_tv);
-            commentViewHolder.fireImageView = view.findViewById(R.id.comment_news_fire_iv);
+            commentViewHolder.newsPredictionTextView = view.findViewById(R.id.comment_news_prediction);
 
             return commentViewHolder;
         } catch (ClassCastException exception) {

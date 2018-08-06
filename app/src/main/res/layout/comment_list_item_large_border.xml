@@ -6,7 +6,7 @@
     android:layout_marginBottom="24dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/news_layout_border">
+    android:background="@drawable/border_on_top_and_bottom_layout">
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/comment_avatar_image_iv"

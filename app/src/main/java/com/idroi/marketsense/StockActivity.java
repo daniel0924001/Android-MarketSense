@@ -83,6 +83,7 @@ import static com.idroi.marketsense.adapter.NewsRecyclerAdapter.NEWS_SINGLE_LAYO
 import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_EVENT_LIST;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_NEWS_READ_RECORD_LIST;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_USER_HAS_LOGIN;
 import static com.idroi.marketsense.fragments.NewsFragment.KEYWORD_NAME;
 import static com.idroi.marketsense.fragments.NewsFragment.KEYWORD_TASK_ID;
@@ -419,6 +420,9 @@ public class StockActivity extends AppCompatActivity {
                     } else {
                         mAddFavorite.setImageResource(R.drawable.ic_star_border_white_24px);
                     }
+                } else if(notifyId == NOTIFY_ID_NEWS_READ_RECORD_LIST) {
+                    MSLog.d("update user's read news records");
+                    mNewsRecyclerAdapter.notifyItemRangeChanged(0, mNewsRecyclerAdapter.getItemCount());
                 }
             }
         };
@@ -588,6 +592,7 @@ public class StockActivity extends AppCompatActivity {
         mNewsRecyclerAdapter.setOnItemClickListener(new NewsRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(News news) {
+                mNewsRecyclerAdapter.notifyNewsIsClicked(news);
                 startActivity(NewsWebViewActivity.generateNewsWebViewActivityIntent(
                         StockActivity.this, news.getId(), news.getTitle(),
                         news.getUrlImage(), news.getDate(),

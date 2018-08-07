@@ -365,6 +365,9 @@ public class PostEvent {
         }
 
         if(mListener != null) {
+            if(!isSuccessful) {
+                ClientData.getInstance().getUserProfile().clearUserProfile();
+            }
             mListener.onResponse(isSuccessful, null);
         }
     }

@@ -11,6 +11,7 @@ import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.common.SharedPreferencesCompat;
 import com.idroi.marketsense.notification.NotificationHelper;
 import com.idroi.marketsense.util.DateUtils;
+import com.idroi.marketsense.util.NewsReadRecordHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,6 +48,7 @@ public class UserProfile implements Serializable {
     public static final int NOTIFY_ID_MAIN_ACTIVITY_FUNCTION_CLICK = 9;
     public static final int NOTIFY_USER_HAS_LOGIN = 4;
     public static final int NOTIFY_ID_EVENT_LIST = 5;
+    public static final int NOTIFY_ID_NEWS_READ_RECORD_LIST = 14;
     public static final int NOTIFY_USER_LOGIN_FAILED = 6;
 
     public static final int NOTIFY_ID_FUNCTION_SEARCH_COMMENT = 9;
@@ -97,6 +99,7 @@ public class UserProfile implements Serializable {
 
     @Nullable private ArrayList<String> mFavoriteStocks;
     @Nullable private transient ArrayList<Event> mEventsArrayList;
+    private ArrayList<NewsReadRecord> mNewsReadRecords;
 
     private UserProfile() {
         this(null, false);
@@ -182,6 +185,10 @@ public class UserProfile implements Serializable {
 
     public String getUserAvatarLink() {
         return mUserAvatarLink;
+    }
+
+    public ArrayList<NewsReadRecord> getNewsReadRecords() {
+        return mNewsReadRecords;
     }
 
     /* favorite stock list */
@@ -377,6 +384,12 @@ public class UserProfile implements Serializable {
         clearEvents();
         MSLog.d("clear favorite stocks...");
         clearFavoriteStock();
+        clearNewsReadRecords();
+    }
+
+    public void clearNewsReadRecords() {
+        mNewsReadRecords.clear();
+        globalBroadcast(NOTIFY_ID_NEWS_READ_RECORD_LIST);
     }
 
     public void saveFavoriteStocksAndEvents(Context context) {
@@ -396,6 +409,15 @@ public class UserProfile implements Serializable {
 
     public void setIsInitFavoriteStocksAndEvents(boolean isInit) {
         mIsInitFavoriteStocksAndEvents = isInit;
+    }
+
+    public void addNewsReadRecord(String newsId) {
+        MSLog.d("addNewsReadRecord newsId: " + newsId);
+        mNewsReadRecords.add(new NewsReadRecord(newsId));
+    }
+
+    public boolean hasReadThisNews(String newsId) {
+        return mNewsReadRecords != null && mNewsReadRecords.contains(new NewsReadRecord(newsId));
     }
 
     public void getFavoriteStocksAndEvents(Context context, String userId) {
@@ -431,6 +453,10 @@ public class UserProfile implements Serializable {
                     MSLog.e("JSONException in getFavoriteStocksAndEvents: " + e.toString());
                 }
             }
+
+            // news read records
+            mNewsReadRecords = NewsReadRecordHelper.readFromInternalStorage(context, userId);
+            globalBroadcast(NOTIFY_ID_NEWS_READ_RECORD_LIST);
         }
     }
 

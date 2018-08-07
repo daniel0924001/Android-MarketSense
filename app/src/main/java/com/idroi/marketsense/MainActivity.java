@@ -271,7 +271,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        ClientData.getInstance(this).getUserProfile().deleteGlobalBroadcastListener(mGlobalBroadcastListener);
+        UserProfile userProfile = ClientData.getInstance(this).getUserProfile();
+        userProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
         MSLog.i("Exit MainActivity");
         super.onDestroy();
     }

@@ -11,8 +11,10 @@ import android.view.ViewGroup;
 import java.util.WeakHashMap;
 
 import com.idroi.marketsense.R;
+import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.MarketSenseRendererHelper;
 import com.idroi.marketsense.data.News;
+import com.idroi.marketsense.data.UserProfile;
 
 /**
  * Created by daniel.hsieh on 2018/4/19.
@@ -49,6 +51,11 @@ public class NewsRenderer implements MarketSenseRenderer<News>{
     private void update(final Context context, final NewsViewHolder newsViewHolder, News content) {
         MarketSenseRendererHelper.addTextView(newsViewHolder.titleView, content.getTitle());
         MarketSenseRendererHelper.addTextView(newsViewHolder.dateView, content.getDate());
+
+        UserProfile userProfile = ClientData.getInstance().getUserProfile();
+        if(userProfile.hasReadThisNews(content.getId())) {
+            newsViewHolder.titleView.setTextColor(context.getResources().getColor(R.color.warm_grey));
+        }
 
         // related stock news
         String[] relatedStockNames = content.getStockKeywords();

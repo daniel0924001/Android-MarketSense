@@ -50,6 +50,7 @@ import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.CommentAndVoteRequest;
+import com.idroi.marketsense.util.NewsReadRecordHelper;
 
 import org.json.JSONObject;
 
@@ -613,6 +614,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
         }
         UserProfile userProfile = ClientData.getInstance(this).getUserProfile();
         userProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
+        NewsReadRecordHelper.saveToInternalStorage(this, userProfile.getUserId(), userProfile.getNewsReadRecords());
         super.onDestroy();
     }
 

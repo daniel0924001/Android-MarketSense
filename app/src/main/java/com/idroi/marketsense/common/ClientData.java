@@ -47,7 +47,7 @@ public class ClientData {
     private boolean mIsWorkDayBeforeStockClosed;
     private boolean mIsWorkDayAfterStockClosedBeforeAnswerDisclosure;
     private boolean mIsWorkDayAfterAnswerDisclosure;
-    private boolean mDoesUseTodayPredictionValue;;
+    private boolean mDoesUseTodayPredictionValue;
 
     /**
      * Returns the singleton ClientMetadata object, using the context to obtain data if necessary.

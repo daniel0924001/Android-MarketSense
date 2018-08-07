@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.data.News;
+import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.datasource.NewsSource;
 import com.idroi.marketsense.datasource.NewsStreamPlacer;
 
@@ -304,6 +305,17 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
 
     public int getNewsTotalCount() {
         return mNewsStreamPlacer.getNewsTotalCount();
+    }
+
+    public void notifyNewsIsClicked(News news) {
+        int position = mNewsStreamPlacer.getNewsPosition(news);
+        if(position != -1) {
+            UserProfile userProfile = ClientData.getInstance().getUserProfile();
+            if(userProfile != null) {
+                userProfile.addNewsReadRecord(news.getId());
+            }
+            notifyItemChanged(position);
+        }
     }
 
     public void clearNews() {

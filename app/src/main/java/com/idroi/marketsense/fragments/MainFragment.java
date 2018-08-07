@@ -23,9 +23,11 @@ import com.idroi.marketsense.StockActivity;
 import com.idroi.marketsense.adapter.NewsRecyclerAdapter;
 import com.idroi.marketsense.adapter.StockRankingRecyclerAdapter;
 import com.idroi.marketsense.adapter.StockRankingRenderer;
+import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.data.Stock;
+import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.datasource.StockListPlacer;
 import com.idroi.marketsense.request.NewsRequest;
 import com.idroi.marketsense.request.StockRequest;
@@ -34,6 +36,7 @@ import com.idroi.marketsense.viewholders.RankingListViewHolder;
 import java.util.ArrayList;
 
 import static com.idroi.marketsense.adapter.NewsRecyclerAdapter.NEWS_SINGLE_LAYOUT;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_NEWS_READ_RECORD_LIST;
 import static com.idroi.marketsense.fragments.NewsFragment.GENERAL_TASK_ID;
 import static com.idroi.marketsense.fragments.StockListFragment.NORMAL_ID;
 import static com.idroi.marketsense.request.NewsRequest.PARAM_GTS;
@@ -67,6 +70,8 @@ public class MainFragment extends Fragment {
     private OnActionBarChangeListener mOnActionBarChangeListener;
 
     private RankingListViewHolder mTechBlockViewHolder, mNewsBlockViewHolder;
+
+    private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
 
     @Nullable
     @Override
@@ -106,6 +111,21 @@ public class MainFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        mGlobalBroadcastListener = new UserProfile.GlobalBroadcastListener() {
+            @Override
+            public void onGlobalBroadcast(int notifyId, Object payload) {
+                if(notifyId == NOTIFY_ID_NEWS_READ_RECORD_LIST) {
+                    MSLog.d("update user's read news records");
+                    mNewsRecyclerAdapter.notifyItemRangeChanged(0, mNewsRecyclerAdapter.getItemCount());
+                }
+            }
+        };
+
+        UserProfile userProfile = ClientData.getInstance(getContext()).getUserProfile();
+        if(userProfile != null) {
+            userProfile.addGlobalBroadcastListener(mGlobalBroadcastListener);
+        }
 
         mStockListPlacer = new StockListPlacer(getActivity(), NORMAL_ID);
         mStockListPlacer.setStockListListener(new StockListPlacer.StockListListener() {
@@ -193,6 +213,7 @@ public class MainFragment extends Fragment {
         mNewsRecyclerAdapter.setOnItemClickListener(new NewsRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(News news) {
+                mNewsRecyclerAdapter.notifyNewsIsClicked(news);
                 startActivity(NewsWebViewActivity.generateNewsWebViewActivityIntent(
                         getContext(), news.getId(), news.getTitle(),
                         news.getUrlImage(), news.getDate(),
@@ -315,6 +336,11 @@ public class MainFragment extends Fragment {
 
         if(mOnActionBarChangeListener != null) {
             mOnActionBarChangeListener.onActionBarChange(getResources().getString(R.string.app_name), false);
+        }
+
+        UserProfile userProfile = ClientData.getInstance(getContext()).getUserProfile();
+        if(userProfile != null) {
+            userProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
         }
 
         super.onDestroyView();

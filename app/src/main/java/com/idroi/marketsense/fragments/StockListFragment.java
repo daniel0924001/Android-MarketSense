@@ -84,6 +84,11 @@ public class StockListFragment extends Fragment {
             mTaskId = MAIN_ID; // default
         }
 
+        ClientData clientData = ClientData.getInstance();
+        if(clientData != null) {
+            clientData.updateClockInformation();
+        }
+
         final View view = inflater.inflate(R.layout.stock_list_fragment, container, false);
         mSwipeRefreshLayout = view.findViewById(R.id.swipe_to_refresh);
         mRecyclerView = view.findViewById(R.id.stock_recycler_view);

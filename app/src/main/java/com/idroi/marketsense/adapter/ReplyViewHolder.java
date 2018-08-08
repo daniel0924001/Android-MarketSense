@@ -4,8 +4,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.idroi.marketsense.CommentTextView;
 import com.idroi.marketsense.Logging.MSLog;
-import com.idroi.marketsense.NewsWebView;
 import com.idroi.marketsense.R;
 
 /**
@@ -18,7 +18,7 @@ public class ReplyViewHolder {
     SimpleDraweeView avatarView;
     TextView userNameView;
     TextView createTimeView;
-    NewsWebView commentBodyView;
+    CommentTextView commentBodyTextView;
 
     static final ReplyViewHolder EMPTY_VIEW_HOLDER = new ReplyViewHolder();
 
@@ -37,10 +37,7 @@ public class ReplyViewHolder {
             // maybe we should use this javascript to adjust the height of webview
             // https://stackoverflow.com/questions/1973565/how-to-resize-a-android-webview-after-adding-data-in-it
             // https://capdroid.wordpress.com/2014/08/07/resizing-webview-to-match-the-content-size/
-            replyViewHolder.commentBodyView = view.findViewById(R.id.comment_body);
-            replyViewHolder.commentBodyView.getSettings().setLoadWithOverviewMode(false);
-            replyViewHolder.commentBodyView.getSettings().setUseWideViewPort(false);
-            replyViewHolder.commentBodyView.getSettings().setJavaScriptEnabled(false);
+            replyViewHolder.commentBodyTextView = view.findViewById(R.id.comment_body);
             return replyViewHolder;
         } catch (ClassCastException exception) {
             MSLog.e(exception.toString());

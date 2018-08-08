@@ -9,15 +9,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.idroi.marketsense.CommentTextView;
 import com.idroi.marketsense.Logging.MSLog;
-import com.idroi.marketsense.NewsWebView;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.common.FrescoImageHelper;
 import com.idroi.marketsense.common.MarketSenseRendererHelper;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.News;
 
-import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
@@ -72,12 +71,7 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
                     commentViewHolder.avatarView, FrescoImageHelper.ICON_IMAGE_RATIO);
         }
 
-        // chinese characters can not be decoded.
-        // https://blog.csdn.net/top_code/article/details/9163597
-        // we have a /assets/img.css file.
-        String htmlData = "<link rel=\"stylesheet\" type=\"text/css\" href=\"img.css\" />" + content.getCommentHtml();
-        commentViewHolder.commentBodyView.
-                loadDataWithBaseURL("file:///android_asset/", htmlData, "text/html", "UTF-8", null);
+        MarketSenseRendererHelper.addHtmlToTextView(commentViewHolder.commentBodyView, content.getCommentHtml());
 
         setLikeAndReplyBlock(commentViewHolder, content);
 
@@ -191,7 +185,7 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
                 });
             }
 
-            commentViewHolder.commentBodyView.setOnReachMaxHeightListener(new NewsWebView.OnReachMaxHeightListener() {
+            commentViewHolder.commentBodyView.setOnReachMaxHeightListener(new CommentTextView.OnReachMaxHeightListener() {
                 @Override
                 public void onReachMaxHeight() {
                     setReadMoreTextView(commentViewHolder, true, comment, position);
@@ -245,10 +239,6 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
 
     @Override
     public void clear() {
-        for(Map.Entry<View, CommentViewHolder> entry : mViewHolderMap.entrySet()) {
-            CommentViewHolder commentViewHolder = entry.getValue();
-            commentViewHolder.commentBodyView.destroy();
-        }
         mViewHolderMap.clear();
     }
 }

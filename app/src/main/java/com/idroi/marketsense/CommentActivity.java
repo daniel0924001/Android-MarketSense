@@ -138,12 +138,8 @@ public class CommentActivity extends AppCompatActivity {
             FrescoImageHelper.loadImageView("http://monster.infohubapp.com/monsters/ic_mon_01_y.png",
                     (SimpleDraweeView) findViewById(R.id.comment_avatar_image_iv), FrescoImageHelper.ICON_IMAGE_RATIO);
         }
-        NewsWebView commentBody = findViewById(R.id.comment_body);
-        commentBody.getSettings().setLoadWithOverviewMode(false);
-        commentBody.getSettings().setUseWideViewPort(false);
-        commentBody.getSettings().setJavaScriptEnabled(false);
-        String htmlData = "<link rel=\"stylesheet\" type=\"text/css\" href=\"img.css\" />" + mComment.getCommentHtml();
-        commentBody.loadDataWithBaseURL("file:///android_asset/", htmlData, "text/html", "UTF-8", null);
+        CommentTextView commentBody = findViewById(R.id.comment_body);
+        MarketSenseRendererHelper.addHtmlToTextView(commentBody, mComment.getCommentHtml());
 
         News news = mComment.getNews();
         if(news != null) {

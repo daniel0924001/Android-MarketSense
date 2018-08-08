@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.idroi.marketsense.NewsWebView;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.common.FrescoImageHelper;
 import com.idroi.marketsense.common.MarketSenseRendererHelper;
@@ -56,9 +55,10 @@ public class ReplyRenderer implements MarketSenseRenderer<Comment> {
         // chinese characters can not be decoded.
         // https://blog.csdn.net/top_code/article/details/9163597
         // we have a /assets/img.css file.
-        String htmlData = "<link rel=\"stylesheet\" type=\"text/css\" href=\"img.css\" />" + content.getCommentHtml();
-        replyViewHolder.commentBodyView.
-                loadDataWithBaseURL("file:///android_asset/", htmlData, "text/html", "UTF-8", null);
+//        String htmlData = "<link rel=\"stylesheet\" type=\"text/css\" href=\"img.css\" />" + content.getCommentHtml();
+//        replyViewHolder.commentBodyTextView.
+//                loadDataWithBaseURL("file:///android_asset/", htmlData, "text/html", "UTF-8", null);
+        MarketSenseRendererHelper.addHtmlToTextView(replyViewHolder.commentBodyTextView, content.getCommentHtml());
 
         setViewVisibility(replyViewHolder, View.VISIBLE);
     }
@@ -71,10 +71,6 @@ public class ReplyRenderer implements MarketSenseRenderer<Comment> {
 
     @Override
     public void clear() {
-        for(Map.Entry<View, ReplyViewHolder> entry : mViewHolderMap.entrySet()) {
-            ReplyViewHolder replyViewHolder = entry.getValue();
-            replyViewHolder.commentBodyView.destroy();
-        }
         mViewHolderMap.clear();
     }
 }

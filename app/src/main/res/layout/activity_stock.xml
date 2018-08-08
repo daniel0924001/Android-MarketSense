@@ -1037,7 +1037,7 @@
 
     </android.support.constraint.ConstraintLayout>
 
-    <com.idroi.marketsense.NewsWebView xmlns:android="http://schemas.android.com/apk/res/android"
+    <com.idroi.marketsense.NewsWebView
         android:id="@+id/more_webview"
         android:layout_width="0dp"
         android:layout_height="0dp"

@@ -7,8 +7,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.idroi.marketsense.CommentTextView;
 import com.idroi.marketsense.Logging.MSLog;
-import com.idroi.marketsense.NewsWebView;
 import com.idroi.marketsense.R;
 
 /**
@@ -23,7 +23,7 @@ public class CommentViewHolder {
     SimpleDraweeView avatarView;
     TextView userNameView;
     TextView createTimeView;
-    NewsWebView commentBodyView;
+    CommentTextView commentBodyView;
 
     ConstraintLayout replyBlock;
     ConstraintLayout likeBlock;
@@ -58,11 +58,7 @@ public class CommentViewHolder {
             // https://stackoverflow.com/questions/1973565/how-to-resize-a-android-webview-after-adding-data-in-it
             // https://capdroid.wordpress.com/2014/08/07/resizing-webview-to-match-the-content-size/
             commentViewHolder.commentBodyView = view.findViewById(R.id.comment_body);
-            commentViewHolder.commentBodyView.getSettings().setLoadWithOverviewMode(false);
-            commentViewHolder.commentBodyView.getSettings().setUseWideViewPort(false);
-            commentViewHolder.commentBodyView.getSettings().setJavaScriptEnabled(false);
-            float density = view.getContext().getResources().getDisplayMetrics().density;
-            commentViewHolder.commentBodyView.setMaxHeight((int)(MAX_COMMENT_HEIGHT * density));
+            commentViewHolder.commentBodyView.setMaxLineCount(5);
 
             commentViewHolder.replyBlock = view.findViewById(R.id.social_reply_block);
             commentViewHolder.likeBlock = view.findViewById(R.id.social_like_block);

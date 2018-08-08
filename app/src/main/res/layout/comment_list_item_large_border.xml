@@ -47,14 +47,19 @@
         app:layout_constraintTop_toBottomOf="@id/comment_user_name"
         app:layout_constraintStart_toStartOf="@id/comment_user_name" />
 
-    <com.idroi.marketsense.NewsWebView
+    <com.idroi.marketsense.CommentTextView
         android:id="@+id/comment_body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/comment_avatar_image_iv"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp" />
+        android:layout_marginEnd="16dp"
+        android:textColor="@color/marketsense_text_black"
+        android:textColorLink="@color/hyperlink_color"
+        android:textColorHighlight="@color/hyperlink_color"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif"
+        app:layout_constraintTop_toBottomOf="@id/comment_avatar_image_iv" />
 
     <View
         android:id="@+id/social_horizontal_line"

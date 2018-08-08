@@ -203,7 +203,7 @@
         </android.support.constraint.ConstraintLayout>
     </ScrollView>
 
-    <com.idroi.marketsense.NewsWebView  xmlns:android="http://schemas.android.com/apk/res/android"
+    <com.idroi.marketsense.NewsWebView
         android:id="@+id/news_webview_original"
         android:layout_width="0dp"
         android:layout_height="0dp"

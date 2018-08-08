@@ -131,8 +131,10 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
                 stockViewHolder.newsUnavailableTextView,
                 stockViewHolder.newsImageViews);
 
+        content.renderIsHit(context, stockViewHolder.hitView);
+
         content.renderTodayBlock(context, stockViewHolder.todayBlock,
-                stockViewHolder.todayTitleTextView, stockViewHolder.todayStatusTextView, stockViewHolder.hitView);
+                stockViewHolder.todayTitleTextView, stockViewHolder.todayStatusTextView);
 
         content.renderTomorrowBlock(context, stockViewHolder.tomorrowBlock,
                 stockViewHolder.tomorrowTitleTextView, stockViewHolder.tomorrowStatusTextView);

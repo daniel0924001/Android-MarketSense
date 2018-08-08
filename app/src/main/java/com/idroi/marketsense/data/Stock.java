@@ -529,11 +529,31 @@ public class Stock {
         }
     }
 
+    public void renderIsHit(Context context, TextView hitTextView) {
+        Resources resources = context.getResources();
+        ClientData clientData = ClientData.getInstance();
+
+        if(isHitPredictionDirection(false) && !clientData.isWorkDayAndStockMarketIsOpen()) {
+            hitTextView.setVisibility(View.VISIBLE);
+            if (mTodayPredictionDiffDirection == TREND_UP) {
+                hitTextView.setBackground(resources.getDrawable(R.drawable.block_red_border_with_radius_corner));
+                hitTextView.setTextColor(resources.getColor(R.color.grapefruit));
+            } else if (mTodayPredictionDiffDirection == TREND_DOWN) {
+                hitTextView.setBackground(resources.getDrawable(R.drawable.block_green_border_with_radius_corner));
+                hitTextView.setTextColor(resources.getColor(R.color.aquamarine));
+            } else {
+                hitTextView.setBackground(resources.getDrawable(R.drawable.block_flat_border_with_radius_corner));
+                hitTextView.setTextColor(resources.getColor(R.color.colorTrendFlat));
+            }
+        } else {
+            hitTextView.setVisibility(View.GONE);
+        }
+    }
+
     public void renderTodayBlock(Context context,
                                  ConstraintLayout blockView,
                                  TextView titleTextView,
-                                 TextView statusTextView,
-                                 TextView hitTextView) {
+                                 TextView statusTextView) {
         Resources resources = context.getResources();
         ClientData clientData = ClientData.getInstance();
 
@@ -558,27 +578,19 @@ public class Stock {
         }
 
         if(isHitPredictionDirection(false)) {
-            hitTextView.setVisibility(View.VISIBLE);
             titleTextView.setTextColor(resources.getColor(R.color.white));
             statusTextView.setTextColor(resources.getColor(R.color.white));
             if (mTodayPredictionDiffDirection == TREND_UP) {
                 blockView.setBackground(resources.getDrawable(R.drawable.block_predict_up_background));
                 statusTextView.setText(String.format(Locale.US, "+%.2f%%", mTodayPredictionDiffPercentage));
-                hitTextView.setBackground(resources.getDrawable(R.drawable.block_red_border_with_radius_corner));
-                hitTextView.setTextColor(resources.getColor(R.color.grapefruit));
             } else if (mTodayPredictionDiffDirection == TREND_DOWN) {
                 blockView.setBackground(resources.getDrawable(R.drawable.block_predict_down_background));
                 statusTextView.setText(String.format(Locale.US, "-%.2f%%", mTodayPredictionDiffPercentage));
-                hitTextView.setBackground(resources.getDrawable(R.drawable.block_green_border_with_radius_corner));
-                hitTextView.setTextColor(resources.getColor(R.color.aquamarine));
             } else {
                 blockView.setBackground(resources.getDrawable(R.drawable.block_predict_flat_background));
                 statusTextView.setText(String.format(Locale.US, "%.2f%%", mTodayPredictionDiffPercentage));
-                hitTextView.setBackground(resources.getDrawable(R.drawable.block_flat_border_with_radius_corner));
-                hitTextView.setTextColor(resources.getColor(R.color.colorTrendFlat));
             }
         } else {
-            hitTextView.setVisibility(View.GONE);
             blockView.setBackground(resources.getDrawable(R.drawable.block_predict_unavailable));
             titleTextView.setTextColor(resources.getColor(R.color.pinkish_grey_four));
             statusTextView.setTextColor(resources.getColor(R.color.warm_grey_four));

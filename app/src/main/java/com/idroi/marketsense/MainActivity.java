@@ -487,6 +487,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setViewPager() {
+        mViewPager = findViewById(R.id.pager);
+        if(mViewPager != null) {
+            mViewPager.setCurrentItem(0, false);
+        }
+
         setViewPager(R.id.navigation_main_page);
     }
 

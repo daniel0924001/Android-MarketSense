@@ -24,6 +24,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -99,7 +100,9 @@ public class UserProfile implements Serializable {
 
     @Nullable private ArrayList<String> mFavoriteStocks;
     @Nullable private transient ArrayList<Event> mEventsArrayList;
-    private ArrayList<NewsReadRecord> mNewsReadRecords;
+
+    private ArrayList<NewsReadRecord> mNewsReadRecordsArrayList;
+    private HashMap<String, NewsReadRecord> mNewsReadRecordsMap;
 
     private UserProfile() {
         this(null, false);
@@ -188,7 +191,7 @@ public class UserProfile implements Serializable {
     }
 
     public ArrayList<NewsReadRecord> getNewsReadRecords() {
-        return mNewsReadRecords;
+        return mNewsReadRecordsArrayList;
     }
 
     /* favorite stock list */
@@ -388,7 +391,8 @@ public class UserProfile implements Serializable {
     }
 
     public void clearNewsReadRecords() {
-        mNewsReadRecords.clear();
+        mNewsReadRecordsMap.clear();
+        mNewsReadRecordsArrayList.clear();
         globalBroadcast(NOTIFY_ID_NEWS_READ_RECORD_LIST);
     }
 
@@ -413,11 +417,13 @@ public class UserProfile implements Serializable {
 
     public void addNewsReadRecord(String newsId) {
         MSLog.d("addNewsReadRecord newsId: " + newsId);
-        mNewsReadRecords.add(new NewsReadRecord(newsId));
+        NewsReadRecord newsReadRecord = new NewsReadRecord(newsId);
+        mNewsReadRecordsMap.put(newsId, newsReadRecord);
+        mNewsReadRecordsArrayList.add(newsReadRecord);
     }
 
     public boolean hasReadThisNews(String newsId) {
-        return mNewsReadRecords != null && mNewsReadRecords.contains(new NewsReadRecord(newsId));
+        return mNewsReadRecordsMap != null && mNewsReadRecordsMap.containsKey(newsId);
     }
 
     public void getFavoriteStocksAndEvents(Context context, String userId) {
@@ -455,7 +461,8 @@ public class UserProfile implements Serializable {
             }
 
             // news read records
-            mNewsReadRecords = NewsReadRecordHelper.readFromInternalStorage(context, userId);
+            mNewsReadRecordsMap = NewsReadRecordHelper.readFromInternalStorage(context, userId);
+            mNewsReadRecordsArrayList = new ArrayList<>(mNewsReadRecordsMap.values());
             globalBroadcast(NOTIFY_ID_NEWS_READ_RECORD_LIST);
         }
     }

@@ -9,6 +9,8 @@ import com.idroi.marketsense.data.NewsReadRecord;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_NEWS_BROWSE_HISTORY;
 
@@ -38,8 +40,8 @@ public class NewsReadRecordHelper {
         }
     }
 
-    public static ArrayList<NewsReadRecord> readFromInternalStorage(Context context, String userId) {
-        ArrayList<NewsReadRecord> readRecords = new ArrayList<>();
+    public static HashMap<String, NewsReadRecord> readFromInternalStorage(Context context, String userId) {
+        HashMap<String, NewsReadRecord> readRecords = new HashMap<>();
 
         if(userId == null) {
             MSLog.e("userId is null in readFromInternalStorage");
@@ -55,7 +57,7 @@ public class NewsReadRecordHelper {
                     if(o instanceof NewsReadRecord) {
                         NewsReadRecord newsReadRecord = (NewsReadRecord) o;
                         if(!newsReadRecord.isExpired()) {
-                            readRecords.add(newsReadRecord);
+                            readRecords.put(newsReadRecord.getNewsId(), newsReadRecord);
                         }
                     }
                 }

@@ -23,6 +23,8 @@ public class StockViewHolder {
     TextView priceView;
     TextView diffView;
 
+    TextView hitView;
+
     ConstraintLayout techBlockView;
     TextView techTitleTextView;
     TextView techUnavailableTextView;
@@ -56,6 +58,7 @@ public class StockViewHolder {
             stockViewHolder.priceImageView = view.findViewById(R.id.marketsense_stock_price_iv);
             stockViewHolder.priceView = view.findViewById(R.id.marketsense_stock_price_tv);
             stockViewHolder.diffView = view.findViewById(R.id.marketsense_stock_diff_tv);
+            stockViewHolder.hitView = view.findViewById(R.id.is_hit_tv);
 
             // two bottom right blocks
             stockViewHolder.techBlockView = view.findViewById(R.id.tech_block);

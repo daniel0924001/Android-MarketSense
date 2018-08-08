@@ -260,6 +260,10 @@ public class DateUtils {
     public static Date MAX_DATE = new Date(Long.MAX_VALUE);
 
     /* stock transaction related methods part */
+    public static boolean isWorkDay() {
+        return isWorkDay(Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei")).getTime());
+    }
+
     private static boolean isWorkDay(Date now) {
         if(now == null) {
             throw new IllegalArgumentException("The dates must not be null");
@@ -297,6 +301,12 @@ public class DateUtils {
         return getTodaySpecificTime(now, 13, 30);
     }
 
+    public static boolean isWorkDayBeforeStockMarketOpen() {
+        Date now = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei")).getTime();
+        Date open = getTodayStockOpenTime(now);
+        return isWorkDay(now) && now.before(open);
+    }
+
     public static boolean isWorkDayAndStockMarketOpen() {
         Date now = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei")).getTime();
         Date open = getTodayStockOpenTime(now);
@@ -328,5 +338,23 @@ public class DateUtils {
         Date start = getTodaySpecificTime(now, 8, 10);
         Date end = getTodaySpecificTime(now, 15, 0);
         return isWorkDay(now) & now.after(start) && now.before(end);
+    }
+
+    public static Calendar getTheWorkDayLessButClosestToToday(int offset) {
+        Calendar result = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei"));
+        result.add(Calendar.DAY_OF_YEAR, offset);
+        while(!isWorkDay(result.getTime())) {
+            result.add(Calendar.DAY_OF_YEAR, -1);
+        }
+        return result;
+    }
+
+    public static Calendar getTheWorkDayLaterButClosestToTomorrow() {
+        Calendar result = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei"));
+        result.add(Calendar.DAY_OF_YEAR, 1);
+        while(!isWorkDay(result.getTime())) {
+            result.add(Calendar.DAY_OF_YEAR, 1);
+        }
+        return result;
     }
 }

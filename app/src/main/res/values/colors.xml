@@ -74,4 +74,7 @@
     <color name="pinkish_grey_two">#c1c1c1</color>
     <color name="pinkish_grey_three">#cacaca</color>
     <color name="warm_grey_three">#777777</color>
+    <color name="pinkish_grey_four">#c3c3c3</color>
+    <color name="warm_grey_four">#6f6f6f</color>
+    <color name="grapefruit">#ff5a5a</color>
 </resources>

@@ -19,6 +19,7 @@ import com.idroi.marketsense.util.DateUtils;
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,11 +44,14 @@ public class ClientData {
     private int mLoadPreferenceRetryCounter = DEFAULT_RETRY_TIME;
     private int mLoadAllStockListRetryCounter = DEFAULT_RETRY_TIME;
 
+    private boolean mIsWorkDayBeforeStockOpen;
     private boolean mIsWorkDayAndStockMarketIsOpen;
     private boolean mIsWorkDayBeforeStockClosed;
     private boolean mIsWorkDayAfterStockClosedBeforeAnswerDisclosure;
     private boolean mIsWorkDayAfterAnswerDisclosure;
     private boolean mDoesUseTodayPredictionValue;
+    private boolean mIsWorkDay;
+    private Calendar mWorkDay, mWorkDayMinusOne, mWorkDayPlusOne;
 
     /**
      * Returns the singleton ClientMetadata object, using the context to obtain data if necessary.
@@ -94,11 +98,28 @@ public class ClientData {
     }
 
     public void updateClockInformation() {
+        mIsWorkDayBeforeStockOpen = DateUtils.isWorkDayBeforeStockMarketOpen();
         mIsWorkDayAndStockMarketIsOpen = DateUtils.isWorkDayAndStockMarketOpen();
         mIsWorkDayBeforeStockClosed = DateUtils.isWorkDayBeforeStockClosed();
         mIsWorkDayAfterStockClosedBeforeAnswerDisclosure = DateUtils.isWorkDayAfterStockClosedAndBeforeAnswerDisclosure();
         mIsWorkDayAfterAnswerDisclosure = DateUtils.isWorkDayAfterAnswerDisclosure();
         mDoesUseTodayPredictionValue = DateUtils.doesUseTodayPredictionValue();
+        mIsWorkDay = DateUtils.isWorkDay();
+        mWorkDay = DateUtils.getTheWorkDayLessButClosestToToday(0);
+        mWorkDayMinusOne = DateUtils.getTheWorkDayLessButClosestToToday(-1);
+        mWorkDayPlusOne = DateUtils.getTheWorkDayLaterButClosestToTomorrow();
+    }
+
+    public Calendar getWorkDay() {
+        return mWorkDay;
+    }
+
+    public Calendar getWorkDayMinusOne() {
+        return mWorkDayMinusOne;
+    }
+
+    public Calendar getWorkDayPlusOne() {
+        return mWorkDayPlusOne;
     }
 
     public void setScreenSizeInPixels(int widthPixels, int heightPixels) {
@@ -202,6 +223,14 @@ public class ClientData {
 
     public boolean isNameAndCodeAreValid(String name, String code) {
         return (name != null) && (code != null);
+    }
+
+    public boolean isWorkDay() {
+        return mIsWorkDay;
+    }
+
+    public boolean isWorkDayBeforeStockOpen() {
+        return mIsWorkDayBeforeStockOpen;
     }
 
     public boolean isWorkDayAndStockMarketIsOpen() {

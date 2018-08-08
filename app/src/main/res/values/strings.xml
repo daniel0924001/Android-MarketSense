@@ -108,7 +108,8 @@
     <string name="title_predict_none">無法預測</string>
     <string name="title_hit">命中</string>
     <string name="title_miss">未命中</string>
-    <string name="title_disclosure_at_1500">15:00公開</string>
+    <string name="title_disclosure_at_1500">15:00 公布</string>
+    <string name="title_month_day_close_predict">%d/%d 收盤預測</string>
 
     <string name="title_fundamental">基本面</string>
     <string name="title_people">鄉民面</string>

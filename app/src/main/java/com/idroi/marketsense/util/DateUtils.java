@@ -271,7 +271,18 @@ public class DateUtils {
         Calendar c = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei"));
         c.setTime(now);
         int day = c.get(Calendar.DAY_OF_WEEK);
-        return !(day == Calendar.SUNDAY || day == Calendar.SATURDAY);
+        return !(day == Calendar.SUNDAY || day == Calendar.SATURDAY || isHoliday(now));
+    }
+
+    private static boolean isHoliday(Date now) {
+        Calendar c = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei"));
+        c.setTime(now);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        if (month == Calendar.SEPTEMBER && day == 24) return true;
+        if (month == Calendar.OCTOBER && day == 10) return true;
+        if (month == Calendar.DECEMBER && day == 31) return true;
+        return false;
     }
 
     private static Date getTodaySpecificTime(Date now, int hour, int minute) {

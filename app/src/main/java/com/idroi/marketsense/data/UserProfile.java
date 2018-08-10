@@ -104,8 +104,8 @@ public class UserProfile implements Serializable {
     @Nullable private ArrayList<String> mFavoriteStocks;
     @Nullable private transient ArrayList<Event> mEventsArrayList;
 
-    private ArrayList<NewsReadRecord> mNewsReadRecordsArrayList;
-    private HashMap<String, NewsReadRecord> mNewsReadRecordsMap;
+    @Nullable private ArrayList<NewsReadRecord> mNewsReadRecordsArrayList;
+    @Nullable private HashMap<String, NewsReadRecord> mNewsReadRecordsMap;
 
     private UserProfile() {
         this(null, false);
@@ -408,8 +408,12 @@ public class UserProfile implements Serializable {
     }
 
     public void clearNewsReadRecords() {
-        mNewsReadRecordsMap.clear();
-        mNewsReadRecordsArrayList.clear();
+        if(mNewsReadRecordsMap != null) {
+            mNewsReadRecordsMap.clear();
+        }
+        if(mNewsReadRecordsArrayList != null) {
+            mNewsReadRecordsArrayList.clear();
+        }
         globalBroadcast(NOTIFY_ID_NEWS_READ_RECORD_LIST);
     }
 
@@ -435,8 +439,12 @@ public class UserProfile implements Serializable {
     public void addNewsReadRecord(String newsId) {
         MSLog.d("addNewsReadRecord newsId: " + newsId);
         NewsReadRecord newsReadRecord = new NewsReadRecord(newsId);
-        mNewsReadRecordsMap.put(newsId, newsReadRecord);
-        mNewsReadRecordsArrayList.add(newsReadRecord);
+        if(mNewsReadRecordsMap != null) {
+            mNewsReadRecordsMap.put(newsId, newsReadRecord);
+        }
+        if(mNewsReadRecordsArrayList != null) {
+            mNewsReadRecordsArrayList.add(newsReadRecord);
+        }
     }
 
     public boolean hasReadThisNews(String newsId) {

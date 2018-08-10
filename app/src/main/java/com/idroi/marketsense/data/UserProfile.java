@@ -98,6 +98,9 @@ public class UserProfile implements Serializable {
 
     private ArrayList<GlobalBroadcastListener> mGlobalBroadcastListeners;
 
+    private static final int RETRY_TIME_CONST = 2;
+    private int mCurrentRetries = 0;
+
     @Nullable private ArrayList<String> mFavoriteStocks;
     @Nullable private transient ArrayList<Event> mEventsArrayList;
 
@@ -192,6 +195,20 @@ public class UserProfile implements Serializable {
 
     public ArrayList<NewsReadRecord> getNewsReadRecords() {
         return mNewsReadRecordsArrayList;
+    }
+
+    private boolean isRetry() {
+        return mCurrentRetries <= RETRY_TIME_CONST;
+    }
+
+    private void increaseRetryTime() {
+        if(mCurrentRetries <= RETRY_TIME_CONST) {
+            mCurrentRetries++;
+        }
+    }
+
+    private void resetRetryTime() {
+        mCurrentRetries = 0;
     }
 
     /* favorite stock list */
@@ -505,6 +522,7 @@ public class UserProfile implements Serializable {
                     mHasLogin = isSuccessful;
 
                     if (mHasLogin) {
+                        resetRetryTime();
                         mUserName = sharedPreferences.getString(SHARE_PREF_NAME_KEY,
                                 context.getResources().getString(R.string.default_user_name));
                         mUserEmail = sharedPreferences.getString(SHARE_PREF_EMAIL_KEY, null);
@@ -514,7 +532,12 @@ public class UserProfile implements Serializable {
                                 mUserId, mUserName, mUserEmail, mUserAvatarLink));
                         globalBroadcast(NOTIFY_USER_HAS_LOGIN);
                     } else {
-                        globalBroadcast(NOTIFY_USER_LOGIN_FAILED);
+                        increaseRetryTime();
+                        if(isRetry()) {
+                            tryToLoginAndInitUserData(context);
+                        } else {
+                            globalBroadcast(NOTIFY_USER_LOGIN_FAILED);
+                        }
                     }
                 }
             });

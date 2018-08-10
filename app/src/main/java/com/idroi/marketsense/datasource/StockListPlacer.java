@@ -60,6 +60,8 @@ public class StockListPlacer {
     private Runnable mRefreshRunnable;
     private static final int REFRESH_TIME = 30 * 1000;
 
+    private ClientData mClientData;
+
     public StockListPlacer(Activity activity, int taskId) {
         this(activity, taskId, SORT_BY_NEWS, SORT_DOWNWARD);
     }
@@ -69,6 +71,7 @@ public class StockListPlacer {
         mSortedField = field;
         mSortedDirection = direction;
         mRefreshHandler = new Handler();
+        mClientData = ClientData.getInstance(activity);
 
         mMarketSenseStockNetworkListener = new MarketSenseStockFetcher.MarketSenseStockNetworkListener() {
             @Override
@@ -82,7 +85,10 @@ public class StockListPlacer {
 
                 if(!isAutoRefresh && mStockArrayList == null) {
                     // first time
-                    mRefreshHandler.postDelayed(mRefreshRunnable, REFRESH_TIME);
+
+                    if(mClientData.isWorkDayAndStockMarketIsOpen()) {
+                        mRefreshHandler.postDelayed(mRefreshRunnable, REFRESH_TIME);
+                    }
 
                     if (mTask == SELF_CHOICES_ID) {
 

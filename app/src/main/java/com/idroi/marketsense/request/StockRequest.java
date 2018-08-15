@@ -9,6 +9,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.common.MarketSenseNetworkError;
 import com.idroi.marketsense.data.Stock;
@@ -55,6 +56,12 @@ public class StockRequest extends Request<ArrayList<Stock>> {
             ArrayList<Stock> stockArrayList = stockParseResponse(response.data);
             if(stockArrayList != null && stockArrayList.size() != 0) {
                 MSLog.i("Stock Request success: " + new String(response.data));
+
+                ClientData clientData = ClientData.getInstance();
+                if(clientData != null) {
+                    clientData.updateClockInformation();
+                }
+
                 return Response.success(stockArrayList, HttpHeaderParser.parseCacheHeaders(response));
             } else {
                 return Response.error(new MarketSenseNetworkError(MarketSenseError.JSON_PARSED_NO_DATA));

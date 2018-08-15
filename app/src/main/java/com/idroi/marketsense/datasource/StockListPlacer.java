@@ -115,8 +115,6 @@ public class StockListPlacer {
                     if (mStockListListener != null) {
                         mStockListListener.onStockListLoaded();
                     }
-
-//                    showPredictionAccuracy();
                 }
             }
 
@@ -318,43 +316,6 @@ public class StockListPlacer {
             return 0;
         } else {
             return -1;
-        }
-    }
-
-    private void showPredictionAccuracy() {
-        if(mStockArrayList != null) {
-            int count_with_zero = 0;
-            int count = 0;
-            int count_without_zero = 0;
-            int total_without_zero = 0;
-            double earn_simple = 0;
-            double earn_weighted = 0;
-            for (Stock stock : mStockArrayList) {
-                if (stock.isHitPredictionDirection(true)) {
-                    count_with_zero++;
-                }
-                if (stock.isHitPredictionDirection(false)) {
-                    count++;
-                }
-                if (!(stock.getDiffDirection() == Stock.TREND_FLAT)) {
-                    total_without_zero++;
-                    if(stock.isHitPredictionDirection(false)) {
-                        count_without_zero++;
-                    }
-                    earn_simple += stock.getEarnInPrediction(true);
-                    earn_weighted += stock.getEarnInPrediction(false);
-                }
-            }
-            String format = "hit %d in total %d, accuracy: %.2f";
-            String format2 = "invest money on prediction list %d -> %.2f";
-            // real diff equaling to zero is always true
-            MSLog.e(String.format(Locale.US, format, count_with_zero, mStockArrayList.size(), (float) count_with_zero / mStockArrayList.size() * 100));
-            // you have to prediction 0 when the real diff is 0
-            MSLog.e(String.format(Locale.US, format, count, mStockArrayList.size(), (float) count / mStockArrayList.size() * 100));
-            // we exclude the real diff equaling to 0 situation
-            MSLog.e(String.format(Locale.US, format, count_without_zero, total_without_zero, (float) count_without_zero / total_without_zero * 100));
-            MSLog.e(String.format(Locale.US, format2, total_without_zero, earn_simple));
-            MSLog.e(String.format(Locale.US, format2, total_without_zero, earn_weighted));
         }
     }
 }

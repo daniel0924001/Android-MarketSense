@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.R;
+import com.idroi.marketsense.viewholders.StockPredictionBlockViewHolder;
 
 /**
  * Created by daniel.hsieh on 2018/4/23.
@@ -25,23 +26,7 @@ public class StockViewHolder {
 
     TextView hitView;
 
-    ConstraintLayout techBlockView;
-    TextView techTitleTextView;
-    TextView techUnavailableTextView;
-    ImageView[] techImageViews;
-
-    ConstraintLayout newsBlockView;
-    TextView newsTitleTextView;
-    TextView newsUnavailableTextView;
-    ImageView[] newsImageViews;
-
-    ConstraintLayout todayBlock;
-    TextView todayTitleTextView;
-    TextView todayStatusTextView;
-
-    ConstraintLayout tomorrowBlock;
-    TextView tomorrowTitleTextView;
-    TextView tomorrowStatusTextView;
+    StockPredictionBlockViewHolder stockPredictionBlockViewHolder;
 
     static final StockViewHolder EMPTY_VIEW_HOLDER = new StockViewHolder();
 
@@ -60,32 +45,8 @@ public class StockViewHolder {
             stockViewHolder.diffView = view.findViewById(R.id.marketsense_stock_diff_tv);
             stockViewHolder.hitView = view.findViewById(R.id.is_hit_tv);
 
-            // two bottom right blocks
-            stockViewHolder.techBlockView = view.findViewById(R.id.tech_block);
-            stockViewHolder.techTitleTextView = view.findViewById(R.id.tech_block_title);
-            stockViewHolder.techUnavailableTextView = view.findViewById(R.id.tech_block_unavailable);
-            stockViewHolder.techImageViews = new ImageView[]{
-                    view.findViewById(R.id.tech_block_icon1),
-                    view.findViewById(R.id.tech_block_icon2),
-                    view.findViewById(R.id.tech_block_icon3)};
-
-            stockViewHolder.newsBlockView = view.findViewById(R.id.news_block);
-            stockViewHolder.newsTitleTextView = view.findViewById(R.id.news_block_title);
-            stockViewHolder.newsUnavailableTextView = view.findViewById(R.id.news_block_unavailable);
-            stockViewHolder.newsImageViews = new ImageView[]{
-                    view.findViewById(R.id.news_block_icon1),
-                    view.findViewById(R.id.news_block_icon2),
-                    view.findViewById(R.id.news_block_icon3)};
-
-            // today part
-            stockViewHolder.todayBlock = view.findViewById(R.id.today_block);
-            stockViewHolder.todayTitleTextView = view.findViewById(R.id.today_block_predict_title);
-            stockViewHolder.todayStatusTextView = view.findViewById(R.id.today_block_predict_status);
-
-            // tomorrow part
-            stockViewHolder.tomorrowBlock = view.findViewById(R.id.tomorrow_block);
-            stockViewHolder.tomorrowTitleTextView = view.findViewById(R.id.tomorrow_block_predict_title);
-            stockViewHolder.tomorrowStatusTextView = view.findViewById(R.id.tomorrow_block_predict_status);
+            stockViewHolder.stockPredictionBlockViewHolder =
+                    StockPredictionBlockViewHolder.convertToViewHolder(view);
 
             return stockViewHolder;
         } catch (ClassCastException exception) {

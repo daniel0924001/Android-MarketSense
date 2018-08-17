@@ -2,6 +2,7 @@ package com.idroi.marketsense.common;
 
 import android.content.Context;
 import android.os.Handler;
+import android.support.constraint.ConstraintLayout;
 import android.view.View;
 import android.widget.TextView;
 
@@ -15,8 +16,12 @@ import com.idroi.marketsense.data.StockTaData;
 import com.idroi.marketsense.data.StockTradeData;
 import com.idroi.marketsense.datasource.Networking;
 import com.idroi.marketsense.request.StockChartDataRequest;
+import com.idroi.marketsense.viewholders.ChartTaTopItemsViewHolder;
+import com.idroi.marketsense.viewholders.ChartTickBottomItemsViewHolder;
+import com.idroi.marketsense.viewholders.StockActivityRealPriceBlockViewHolder;
 
 import java.lang.ref.WeakReference;
+import java.util.Locale;
 
 
 /**
@@ -59,9 +64,12 @@ public class YahooStxChartCrawler {
     private Handler mHandler;
     private Runnable mRetryRunnable, mTimeoutRunnable;
 
-    private TextView mPriceTextView, mDiffTextView;
-    private TextView mOpenTextView, mHighTextView, mLowTextView, mYesterdayCloseTextView;
-    private TextView mDateTextView, mVolumeTextView;
+//    private TextView mPriceTextView, mDiffTextView;
+//    private TextView mOpenTextView, mHighTextView, mLowTextView, mYesterdayCloseTextView;
+//    private TextView mDateTextView, mVolumeTextView;
+
+    private ChartTaTopItemsViewHolder mChartTaTopItemsViewHolder;
+    private ChartTickBottomItemsViewHolder mChartTickBottomItemsViewHolder;
 
     public YahooStxChartCrawler(Context context, String name, String code,
                                 LineChart lineChart,
@@ -97,15 +105,10 @@ public class YahooStxChartCrawler {
         };
     }
 
-    public void setInformationTextView(TextView price, TextView diff, TextView open, TextView high, TextView low, TextView yesterdayClose, TextView date, TextView volume) {
-        mPriceTextView = price;
-        mDiffTextView = diff;
-        mOpenTextView = open;
-        mHighTextView = high;
-        mLowTextView = low;
-        mYesterdayCloseTextView = yesterdayClose;
-        mDateTextView = date;
-        mVolumeTextView = volume;
+    public void setInformationTextView(ChartTaTopItemsViewHolder chartTaTopItemsViewHolder,
+                                       ChartTickBottomItemsViewHolder chartTickBottomItemsViewHolder) {
+        mChartTaTopItemsViewHolder = chartTaTopItemsViewHolder;
+        mChartTickBottomItemsViewHolder = chartTickBottomItemsViewHolder;
     }
 
     public void setYahooStxChartListener(YahooStxChartListener listener) {
@@ -130,36 +133,58 @@ public class YahooStxChartCrawler {
 
         if(mStockTradeData != null) {
             if (mStockTradeData.getType().equals(StockTradeData.STOCK_TRADE_DATA_TYPE_TICK)) {
+
                 mPriceLineChart.setVisibility(View.VISIBLE);
-                mCandleStickChart.setVisibility(View.INVISIBLE);
+                mCandleStickChart.setVisibility(View.GONE);
+
                 YahooStxChartTickRenderer tickRenderer =
                         new YahooStxChartTickRenderer(mName, mCode, mPriceLineChart, mVolumeBarChart);
                 tickRenderer.render(context, mStockTradeData);
-                MarketSenseRendererHelper.addTextView(mDateTextView, mStockTradeData.getTickTradeDay());
-                MarketSenseRendererHelper.addTextView(mVolumeTextView, mStockTradeData.getTickTotalVolume());
-                MarketSenseRendererHelper.addNumberStringToTextView(mOpenTextView,
-                        String.valueOf(mStockTradeData.getOpenPrice()), "--");
-                MarketSenseRendererHelper.addNumberStringToTextView(mHighTextView,
-                        String.valueOf(mStockTradeData.getHighPrice()), "--");
-                MarketSenseRendererHelper.addNumberStringToTextView(mLowTextView,
-                        String.valueOf(mStockTradeData.getLowPrice()), "--");
-                MarketSenseRendererHelper.addNumberStringToTextView(mYesterdayCloseTextView,
-                        String.valueOf(mStockTradeData.getYesterdayPrice()), "--");
+                MarketSenseRendererHelper.addTextView(mChartTaTopItemsViewHolder.tradeDateTextView, mStockTradeData.getTickTradeDay());
+                MarketSenseRendererHelper.addTextView(mChartTaTopItemsViewHolder.tradeVolumeTextView, mStockTradeData.getTickTotalVolume());
+                MarketSenseRendererHelper.addNumberStringToTextView(mChartTickBottomItemsViewHolder.openTextView,
+                        String.valueOf(mStockTradeData.getOpenPrice()), "--", mStockTradeData.getOpenPrice(), mStockTradeData.getYesterdayPrice());
+                MarketSenseRendererHelper.addNumberStringToTextView(mChartTickBottomItemsViewHolder.highTextView,
+                        String.valueOf(mStockTradeData.getHighPrice()), "--", mStockTradeData.getHighPrice(), mStockTradeData.getYesterdayPrice());
+                MarketSenseRendererHelper.addNumberStringToTextView(mChartTickBottomItemsViewHolder.lowTextView,
+                        String.valueOf(mStockTradeData.getLowPrice()), "--", mStockTradeData.getLowPrice(), mStockTradeData.getYesterdayPrice());
+                MarketSenseRendererHelper.addNumberStringToTextView(mChartTickBottomItemsViewHolder.yesterdayCloseTextView,
+                        String.valueOf(mStockTradeData.getYesterdayPrice()), "--", mStockTradeData.getYesterdayPrice(), mStockTradeData.getYesterdayPrice());
+
+                MarketSenseRendererHelper.addNumberStringToTextView(mChartTickBottomItemsViewHolder.buyTextView,
+                        String.valueOf(mStockTradeData.getTickBuyPrice()), "--", mStockTradeData.getTickBuyPrice(), mStockTradeData.getYesterdayPrice());
+                MarketSenseRendererHelper.addNumberStringToTextView(mChartTickBottomItemsViewHolder.sellTextView,
+                        String.valueOf(mStockTradeData.getTickSellPrice()), "--", mStockTradeData.getTickSellPrice(), mStockTradeData.getYesterdayPrice());
+                MarketSenseRendererHelper.addNumberStringToTextView(mChartTickBottomItemsViewHolder.moneyTextView,
+                        String.format(Locale.US, "%.2f", mStockTradeData.getTradeMoney()), "--");
+                MarketSenseRendererHelper.addNumberStringToTextView(mChartTickBottomItemsViewHolder.yesterdayVolumeTextView,
+                        String.valueOf(mStockTradeData.getYesterdayVolume()), "--");
+
+                ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) mVolumeBarChart.getLayoutParams();
+                params.topToBottom = mPriceLineChart.getId();
+                mVolumeBarChart.setLayoutParams(params);
+
             } else if (mStockTradeData.getType().equals(StockTradeData.STOCK_TRADE_DATA_TYPE_TA)) {
-                mPriceLineChart.setVisibility(View.INVISIBLE);
+
+                mPriceLineChart.setVisibility(View.GONE);
                 mCandleStickChart.setVisibility(View.VISIBLE);
+
                 YahooStxChartTaRenderer taRenderer =
                         new YahooStxChartTaRenderer(mName, mCode, mCandleStickChart, mVolumeBarChart);
-                taRenderer.setInformationTextView(mPriceTextView, mDiffTextView, mOpenTextView, mHighTextView, mLowTextView, mYesterdayCloseTextView, mDateTextView, mVolumeTextView);
-                StockTaData stockTaData = mStockTradeData.getLastStockTaData(0);
-                StockTaData stockTaDataYesterday = mStockTradeData.getLastStockTaData(1);
-                MarketSenseRendererHelper.addTextView(mDateTextView, StockTradeData.getTaTradeDate(stockTaData.getTime().toString()));
-                MarketSenseRendererHelper.addTextView(mVolumeTextView, StockVolumeFormatter.getFormattedValue(stockTaData.getVolume()));
-                MarketSenseRendererHelper.addTextView(mOpenTextView, String.valueOf(stockTaData.getOpen()));
-                MarketSenseRendererHelper.addTextView(mHighTextView, String.valueOf(stockTaData.getShadowHigh()));
-                MarketSenseRendererHelper.addTextView(mLowTextView, String.valueOf(stockTaData.getShadowLow()));
-                MarketSenseRendererHelper.addTextView(mYesterdayCloseTextView, String.valueOf(stockTaDataYesterday.getClose()));
+                taRenderer.setInformationTextView(mChartTaTopItemsViewHolder.closePriceTextView,
+                        mChartTaTopItemsViewHolder.diffTextView,
+                        mChartTickBottomItemsViewHolder.openTextView,
+                        mChartTickBottomItemsViewHolder.highTextView,
+                        mChartTickBottomItemsViewHolder.lowTextView,
+                        mChartTickBottomItemsViewHolder.yesterdayCloseTextView,
+                        mChartTaTopItemsViewHolder.tradeDateTextView,
+                        mChartTaTopItemsViewHolder.tradeVolumeTextView);
                 taRenderer.render(context, mStockTradeData);
+
+                ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) mVolumeBarChart.getLayoutParams();
+                params.topToBottom = mCandleStickChart.getId();
+                mVolumeBarChart.setLayoutParams(params);
+
             }
         }
     }

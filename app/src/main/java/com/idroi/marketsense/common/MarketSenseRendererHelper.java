@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.R;
 import com.idroi.marketsense.util.URLSpanNoUnderline;
 
 /**
@@ -18,10 +19,69 @@ import com.idroi.marketsense.util.URLSpanNoUnderline;
 
 public class MarketSenseRendererHelper {
 
+    public static void setBackgroundColor(@Nullable final View view,
+                                          final int backgroundColor) {
+        if (view == null) {
+            MSLog.w("Attempted to add color to null view.");
+            return;
+        }
+
+        view.setBackgroundColor(view.getContext().getResources().getColor(backgroundColor));
+    }
+
+    public static void addTextViewWithColorAndIcon(@Nullable final TextView textView,
+                                                   @Nullable final String contents,
+                                                   final int textColor,
+                                                   final int iconId) {
+        if (textView == null) {
+            MSLog.w("Attempted to add text (" + contents + ") to null TextView.");
+            return;
+        }
+
+        textView.setCompoundDrawablesWithIntrinsicBounds(iconId, 0, 0, 0);
+        addTextViewWithColor(textView, contents, textColor);
+    }
+
+    public static void addTextViewWithIcon(@Nullable final TextView textView,
+                                                   @Nullable final String contents,
+                                                   final int iconId) {
+        if (textView == null) {
+            MSLog.w("Attempted to add text (" + contents + ") to null TextView.");
+            return;
+        }
+
+        textView.setCompoundDrawablesWithIntrinsicBounds(iconId, 0, 0, 0);
+        addTextView(textView, contents);
+    }
+
+    public static void addTextViewWithColor(@Nullable final TextView textView,
+                                            @Nullable final String contents,
+                                            final int textColor) {
+        if (textView == null) {
+            MSLog.w("Attempted to add text (" + contents + ") to null TextView.");
+            return;
+        }
+
+        textView.setTextColor(textView.getContext().getResources().getColor(textColor));
+        addTextView(textView, contents);
+    }
+
+    public static void addTextViewWithAutoColor(@Nullable final TextView textView,
+                                                @Nullable final String contents,
+                                                float value, float baseline) {
+        if(value > baseline) {
+            addTextViewWithColor(textView, contents, R.color.faded_orange);
+        } else if(value < baseline) {
+            addTextViewWithColor(textView, contents, R.color.aqua_marine);
+        } else {
+            addTextViewWithColor(textView, contents, R.color.text_black);
+        }
+    }
+
     public static void addTextView(@Nullable final TextView textView,
                                    @Nullable final String contents) {
         if (textView == null) {
-            MSLog.v("Attempted to add text (" + contents + ") to null TextView.");
+            MSLog.w("Attempted to add text (" + contents + ") to null TextView.");
             return;
         }
 
@@ -30,7 +90,7 @@ public class MarketSenseRendererHelper {
 
         if (contents == null) {
             textView.setVisibility(View.INVISIBLE); // 20161203 Ansel: to hide CTA button and text view without content
-            MSLog.v("Attempted to set TextView contents to null.");
+            MSLog.w("Attempted to set TextView contents to null.");
         } else {
             textView.setVisibility(View.VISIBLE); // 20161203 Ansel: to display CTA button and text view with content
             textView.setText(contents);
@@ -40,7 +100,7 @@ public class MarketSenseRendererHelper {
     public static void addHtmlToTextView(@Nullable final TextView textView,
                                          @Nullable final String html) {
         if (textView == null) {
-            MSLog.v("Attempted to add text (" + html + ") to null TextView.");
+            MSLog.w("Attempted to add text (" + html + ") to null TextView.");
             return;
         }
 
@@ -48,7 +108,7 @@ public class MarketSenseRendererHelper {
 
         if (html == null) {
             textView.setVisibility(View.INVISIBLE);
-            MSLog.v("Attempted to set TextView contents to null.");
+            MSLog.w("Attempted to set TextView contents to null.");
         } else {
             textView.setVisibility(View.VISIBLE);
             // https://stackoverflow.com/questions/37899856/html-fromhtml-is-deprecated-what-is-the-alternative
@@ -83,8 +143,15 @@ public class MarketSenseRendererHelper {
     public static void addNumberStringToTextView(@Nullable final TextView textView,
                                                  @Nullable final String contents,
                                                  final String defaultContents) {
+        addNumberStringToTextView(textView, contents, defaultContents, 0, 0);
+    }
+
+    public static void addNumberStringToTextView(@Nullable final TextView textView,
+                                                 @Nullable final String contents,
+                                                 final String defaultContents,
+                                                 float value, float baseline) {
         if (textView == null) {
-            MSLog.v("Attempted to add text (" + contents + ") to null TextView.");
+            MSLog.w("Attempted to add text (" + contents + ") to null TextView.");
             return;
         }
 
@@ -93,13 +160,19 @@ public class MarketSenseRendererHelper {
 
         if (contents == null) {
             textView.setVisibility(View.INVISIBLE); // 20161203 Ansel: to hide CTA button and text view without content
-            MSLog.v("Attempted to set TextView contents to null.");
+            MSLog.w("Attempted to set TextView contents to null.");
         } else {
             textView.setVisibility(View.VISIBLE); // 20161203 Ansel: to display CTA button and text view with content
             if(contents.equals("NaN")) {
-                textView.setText(defaultContents);
+                addTextViewWithColor(textView, defaultContents, R.color.text_black);
             } else {
-                textView.setText(contents);
+                if(value > baseline) {
+                    addTextViewWithColor(textView, contents, R.color.faded_orange);
+                } else if(value < baseline) {
+                    addTextViewWithColor(textView, contents, R.color.aqua_marine);
+                } else {
+                    addTextViewWithColor(textView, contents, R.color.text_black);
+                }
             }
         }
     }

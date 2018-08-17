@@ -19,6 +19,7 @@
     <string name="title_discussion">討論</string>
     <string name="title_no_comment">目前暫無評論</string>
     <string name="title_send_first">立馬搶頭香</string>
+    <string name="title_more">更多</string>
 
     <string name="main_page_tech_ranking">技術面預測排行</string>
     <string name="main_page_news_ranking">新聞面排行</string>
@@ -87,6 +88,7 @@
     <string name="title_company_name">公司名稱</string>
     <string name="title_company_code">公司代號</string>
     <string name="title_company_name_code_format">%s (%s)</string>
+    <string name="title_company_name_code_format_no_decoration">%s %s</string>
     <string name="title_company_name_and_code">公司名稱/代號</string>
     <string name="title_company_price">1467.32</string>
     <string name="title_company_price_diff_num">股價漲跌數字</string>
@@ -124,6 +126,13 @@
     <string name="title_level_down_highest">超看跌</string>
     <string name="title_level_down_high">看跌</string>
 
+    <string name="title_last_refresh_time">上次刷新 %02d:%02d</string>
+    <string name="title_chart_ta_trade_date">%4d/%2d/%2d</string>
+    <string name="title_close_priced">收盤價</string>
+    <string name="title_diff">漲跌幅</string>
+    <string name="title_trade_volume">成交量</string>
+
+    <string name="title_trade_now">交易中</string>
     <string name="title_news_look_good">新聞看漲</string>
     <string name="title_news_look_flat">近期無重大新聞</string>
     <string name="title_news_look_bad">新聞看跌</string>
@@ -136,12 +145,14 @@
     <string name="title_vote_to_see">查看投票結果，請先進行投票</string>
     <string name="title_diff_format">%s (%s)</string>
     <string name="title_volume_format">%s量(張)</string>
+    <string name="title_date_time_format">%02d/%02d %02d:%02d</string>
     <string name="title_unavailable_even_percentage">50%</string>
     <string name="title_unavailable_score">0.0</string>
     <string name="title_unavailable_score_int">0</string>
-    <string name="title_unavailable_score_double">+0.0 (+0.0)</string>
-    <string name="title_unavailable_time">09/24</string>
-    <string name="title_unavailable_volume">28,707量(張)</string>
+    <string name="title_unavailable_score_double">0.33 (0.23%)</string>
+    <string name="title_unavailable_time">09/24 14:21</string>
+    <string name="title_unavailable_volume">28,707</string>
+    <string name="title_unavailable_price">5,600</string>
     <string name="title_unavailable_number">283</string>
     <string name="title_max_score"> / 5.0</string>
     <string name="title_you_look_good">你 <![CDATA[<font color="#EF476F">看漲</font>]]> 這支股票</string>
@@ -156,6 +167,10 @@
     <string name="title_stock_price_high">最高</string>
     <string name="title_stock_price_low">最低</string>
     <string name="title_stock_price_yesterday_close">昨收</string>
+    <string name="title_stock_price_buy">買價</string>
+    <string name="title_stock_price_sell">賣價</string>
+    <string name="title_stock_volume_yesterday">昨量</string>
+    <string name="title_stock_money">金額(億)</string>
     <string name="title_chart_type_1m">即時</string>
     <string name="title_chart_type_d">日K</string>
     <string name="title_chart_type_w">週K</string>

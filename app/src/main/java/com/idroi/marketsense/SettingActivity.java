@@ -370,7 +370,7 @@ public class SettingActivity extends AppCompatActivity {
 
             SimpleDraweeView imageView = view.findViewById(R.id.action_bar_avatar);
             if(imageView != null) {
-                imageView.setImageResource(R.drawable.ic_keyboard_backspace_white_24px);
+                imageView.setImageResource(R.mipmap.ic_arrow_left);
                 imageView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

@@ -518,7 +518,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                                 if(mAvatarImageView != null) {
                                     if (mCanReturn) {
-                                        mAvatarImageView.setImageResource(R.drawable.ic_keyboard_backspace_white_24px);
+                                        mAvatarImageView.setImageResource(R.mipmap.ic_arrow_left);
                                         mAvatarImageView.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View view) {

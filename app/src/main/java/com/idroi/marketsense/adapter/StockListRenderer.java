@@ -58,8 +58,10 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
             return;
         }
 
-        stock.renderTomorrowBlock(view.getContext(), stockViewHolder.tomorrowBlock,
-                stockViewHolder.tomorrowTitleTextView, stockViewHolder.tomorrowStatusTextView);
+        stock.renderTomorrowBlock(view.getContext(),
+                stockViewHolder.stockPredictionBlockViewHolder.tomorrowBlock,
+                stockViewHolder.stockPredictionBlockViewHolder.tomorrowTitleTextView,
+                stockViewHolder.stockPredictionBlockViewHolder.tomorrowStatusTextView);
     }
 
     public void updatePriceOnly(final View view, final Stock stock) {
@@ -119,25 +121,29 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
 
         Stock.renderTitleAndStars(context, content.getPredictTechDirection(),
                 content.getPredictTechLevel(),
-                stockViewHolder.techBlockView,
-                stockViewHolder.techTitleTextView,
-                stockViewHolder.techUnavailableTextView,
-                stockViewHolder.techImageViews);
+                stockViewHolder.stockPredictionBlockViewHolder.techBlockView,
+                stockViewHolder.stockPredictionBlockViewHolder.techTitleTextView,
+                stockViewHolder.stockPredictionBlockViewHolder.techUnavailableTextView,
+                stockViewHolder.stockPredictionBlockViewHolder.techImageViews);
 
         Stock.renderTitleAndStars(context, content.getConfidenceDirection(),
                 content.getPredictNewsLevel(),
-                stockViewHolder.newsBlockView,
-                stockViewHolder.newsTitleTextView,
-                stockViewHolder.newsUnavailableTextView,
-                stockViewHolder.newsImageViews);
+                stockViewHolder.stockPredictionBlockViewHolder.newsBlockView,
+                stockViewHolder.stockPredictionBlockViewHolder.newsTitleTextView,
+                stockViewHolder.stockPredictionBlockViewHolder.newsUnavailableTextView,
+                stockViewHolder.stockPredictionBlockViewHolder.newsImageViews);
 
         content.renderIsHit(context, stockViewHolder.hitView);
 
-        content.renderTodayBlock(context, stockViewHolder.todayBlock,
-                stockViewHolder.todayTitleTextView, stockViewHolder.todayStatusTextView);
+        content.renderTodayBlock(context,
+                stockViewHolder.stockPredictionBlockViewHolder.todayBlock,
+                stockViewHolder.stockPredictionBlockViewHolder.todayTitleTextView,
+                stockViewHolder.stockPredictionBlockViewHolder.todayStatusTextView);
 
-        content.renderTomorrowBlock(context, stockViewHolder.tomorrowBlock,
-                stockViewHolder.tomorrowTitleTextView, stockViewHolder.tomorrowStatusTextView);
+        content.renderTomorrowBlock(context,
+                stockViewHolder.stockPredictionBlockViewHolder.tomorrowBlock,
+                stockViewHolder.stockPredictionBlockViewHolder.tomorrowTitleTextView,
+                stockViewHolder.stockPredictionBlockViewHolder.tomorrowStatusTextView);
     }
 
     private void setViewVisibility(final StockViewHolder stockViewHolder, final int visibility) {

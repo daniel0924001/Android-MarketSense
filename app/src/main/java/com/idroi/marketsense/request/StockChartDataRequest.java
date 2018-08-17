@@ -41,6 +41,10 @@ public class StockChartDataRequest extends Request<StockTradeData> {
     private static final String PARAM_REAL_PRICE = "125";
     private static final String PARAM_DIFF_PRICE = "184";
     private static final String PARAM_DIFF_PERCENTAGE = "185";
+    private static final String PARAM_YESTERDAY_VOLUME = "128";
+    private static final String PARAM_AVERAGE_PRICE = "471";
+    private static final String PARAM_BUY_PRICE = "101";
+    private static final String PARAM_SELL_PRICE = "102";
     private static final String PARAM_TRADE_DAY = "TradeDay";
     private static final String PARAM_T = "t";
     private static final String PARAM_P = "p";
@@ -187,6 +191,10 @@ public class StockChartDataRequest extends Request<StockTradeData> {
                 float realPrice = (float) data.optDouble(PARAM_REAL_PRICE);
                 float diffPrice = (float) data.optDouble(PARAM_DIFF_PRICE);
                 float diffPercentage = (float) data.optDouble(PARAM_DIFF_PERCENTAGE);
+                float buyPrice = (float) data.optDouble(PARAM_BUY_PRICE);
+                float sellPrice = (float) data.optDouble(PARAM_SELL_PRICE);
+                float yesterdayVolume = (float) data.optDouble(PARAM_YESTERDAY_VOLUME);
+                float money = (float) data.optDouble(PARAM_AVERAGE_PRICE) * todayTotalVolume;
                 stockTradeData.setOpenPrice(openPrice);
                 stockTradeData.setHighPrice(highPrice);
                 stockTradeData.setLowPrice(lowPrice);
@@ -197,6 +205,10 @@ public class StockChartDataRequest extends Request<StockTradeData> {
                 stockTradeData.setDiffPrice(diffPrice);
                 stockTradeData.setDiffPercentage(diffPercentage);
                 stockTradeData.setTickTotalVolume(todayTotalVolume);
+                stockTradeData.setTickBuyPrice(buyPrice);
+                stockTradeData.setTickSellPrice(sellPrice);
+                stockTradeData.setTradeMoney(money);
+                stockTradeData.setYesterdayVolume(yesterdayVolume);
 
                 if(data.has(PARAM_TRADE_DAY)) {
                     stockTradeData.setTickTradeDate(data.optString(PARAM_TRADE_DAY));

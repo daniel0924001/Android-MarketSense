@@ -77,6 +77,7 @@ public class YahooStxChartTaRenderer {
             setXAxis(context);
             setYAxis(context);
             setTouchMarker(context);
+            refreshTextView(context, stockTradeData.getLastStockTaData(0));
 
             mCandleStickChart.invalidate();
             mVolumeBarChart.invalidate();
@@ -274,38 +275,39 @@ public class YahooStxChartTaRenderer {
         MarketSenseRendererHelper.addTextView(mPriceTextView, String.valueOf(todayClose));
         MarketSenseRendererHelper.addTextView(mDateTextView, StockTradeData.getTaTradeDate(stockTaData.getTime().toString()));
         MarketSenseRendererHelper.addTextView(mVolumeTextView, StockVolumeFormatter.getFormattedValue(stockTaData.getVolume()));
-        MarketSenseRendererHelper.addTextView(mOpenTextView, String.valueOf(stockTaData.getOpen()));
-        MarketSenseRendererHelper.addTextView(mHighTextView, String.valueOf(stockTaData.getShadowHigh()));
-        MarketSenseRendererHelper.addTextView(mLowTextView, String.valueOf(stockTaData.getShadowLow()));
+        MarketSenseRendererHelper.addTextViewWithColor(mOpenTextView, String.valueOf(stockTaData.getOpen()), R.color.text_black);
+        MarketSenseRendererHelper.addTextViewWithColor(mHighTextView, String.valueOf(stockTaData.getShadowHigh()), R.color.text_black);
+        MarketSenseRendererHelper.addTextViewWithColor(mLowTextView, String.valueOf(stockTaData.getShadowLow()), R.color.text_black);
 
         try {
             int index = ta.indexOf(stockTaData);
             StockTaData stockTaDataYesterday = (StockTaData) ta.get(index - 1);
             float yesterdayClose = stockTaDataYesterday.getClose();
-            MarketSenseRendererHelper.addTextView(mYesterdayCloseTextView, String.valueOf(yesterdayClose));
+            MarketSenseRendererHelper.addTextViewWithColor(mYesterdayCloseTextView, String.valueOf(yesterdayClose), R.color.text_black);
 
             float diffNumber = todayClose - yesterdayClose;
             float diffPercentage = (diffNumber / yesterdayClose) * 100;
             String format = context.getResources().getString(R.string.title_diff_format);
             if(diffNumber > 0) {
-                mPriceTextView.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_red_s, 0, 0, 0);
-                mDiffTextView.setTextColor(context.getResources().getColor(R.color.colorTrendUp));
-                mDiffTextView.setText(String.format(format, String.format(Locale.US,"+%.2f", diffNumber), String.format(Locale.US, "+%.2f%%", diffPercentage)));
+                MarketSenseRendererHelper.addTextViewWithIcon(
+                        mDiffTextView,
+                        String.format(format, String.format(Locale.US,"+%.2f", diffNumber), String.format(Locale.US, "+%.2f%%", diffPercentage)),
+                        R.mipmap.ic_trend_arrow_up);
             } else if(diffNumber < 0) {
-                mPriceTextView.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_green_s, 0, 0, 0);
-                mDiffTextView.setTextColor(context.getResources().getColor(R.color.colorTrendDown));
-                mDiffTextView.setText(String.format(format, String.format(Locale.US,"%.2f", diffNumber), String.format(Locale.US, "%.2f%%", diffPercentage)));
+                MarketSenseRendererHelper.addTextViewWithIcon(
+                        mDiffTextView,
+                        String.format(format, String.format(Locale.US,"%.2f", diffNumber), String.format(Locale.US, "%.2f%%", diffPercentage)),
+                        R.mipmap.ic_trend_arrow_down);
             } else {
-                mPriceTextView.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_none, 0, 0, 0);
-                mDiffTextView.setTextColor(context.getResources().getColor(R.color.colorTrendFlat));
-                mDiffTextView.setText(String.format(format, String.format(Locale.US,"%.2f", diffNumber), String.format(Locale.US, "%.2f%%", diffPercentage)));
+                MarketSenseRendererHelper.addTextViewWithIcon(
+                        mDiffTextView,
+                        String.format(format, String.format(Locale.US,"%.2f", diffNumber), String.format(Locale.US, "%.2f%%", diffPercentage)),
+                        R.mipmap.ic_trend_arrow_draw_white);
             }
 
             mDiffTextView.setVisibility(View.VISIBLE);
         } catch (Exception e) {
             MarketSenseRendererHelper.addTextView(mYesterdayCloseTextView, String.valueOf("--"));
-
-            mPriceTextView.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_none, 0, 0, 0);
             mDiffTextView.setVisibility(View.INVISIBLE);
         }
     }

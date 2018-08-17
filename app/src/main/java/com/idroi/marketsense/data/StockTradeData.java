@@ -22,6 +22,9 @@ public class StockTradeData {
     private float mRealPrice, mDiffPrice, mDiffPercentage;
 
     private float mTaHighPrice, mTaLowPrice;
+    private float mBuyPrice, mSellPrice;
+    private int mYesterdayVolume;
+    private float mTradeMoney;
 
     private String mTradeDay;
     private int mTotalVolume;
@@ -196,5 +199,37 @@ public class StockTradeData {
 
     public String getTickTotalVolume() {
         return StockVolumeFormatter.getFormattedValue(mTotalVolume);
+    }
+
+    public void setTickBuyPrice(float buyPrice) {
+        mBuyPrice = buyPrice;
+    }
+
+    public float getTickBuyPrice() {
+        return mBuyPrice;
+    }
+
+    public void setTickSellPrice(float sellPrice) {
+        mSellPrice = sellPrice;
+    }
+
+    public float getTickSellPrice() {
+        return mSellPrice;
+    }
+
+    public void setYesterdayVolume(float yesterdayVolume) {
+        mYesterdayVolume = (int) yesterdayVolume;
+    }
+
+    public int getYesterdayVolume() {
+        return mYesterdayVolume;
+    }
+
+    public void setTradeMoney(float tradeMoney) {
+        mTradeMoney = tradeMoney / 100000;
+    }
+
+    public float getTradeMoney() {
+        return mTradeMoney;
     }
 }

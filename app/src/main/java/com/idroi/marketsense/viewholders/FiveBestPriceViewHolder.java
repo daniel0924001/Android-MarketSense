@@ -69,11 +69,11 @@ public class FiveBestPriceViewHolder {
 
                 MarketSenseRendererHelper.addTextViewWithColor(
                         viewHolder.bestPrices[i].buyVolume,
-                        String.valueOf(buyVolume),
+                        String.valueOf((int) buyVolume),
                         R.color.white);
                 MarketSenseRendererHelper.addTextViewWithColor(
                         viewHolder.bestPrices[i].sellVolume,
-                        String.valueOf(sellVolume),
+                        String.valueOf((int) sellVolume),
                         R.color.white);
 
                 if(buyVolume > tempMaxVolume) {

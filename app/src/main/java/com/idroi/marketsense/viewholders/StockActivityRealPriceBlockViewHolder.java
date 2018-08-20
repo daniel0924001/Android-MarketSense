@@ -77,7 +77,7 @@ public class StockActivityRealPriceBlockViewHolder {
         try {
             float diffPercentageFloat = Float.valueOf(diffNum);
             if(diffPercentageFloat > 0) {
-                MarketSenseRendererHelper.setBackgroundColor(viewHolder.mainView, R.color.grapefruit_two);
+                MarketSenseRendererHelper.setBackgroundColor(viewHolder.mainView, R.color.grapefruit_four);
                 MarketSenseRendererHelper.addTextViewWithIcon(
                         viewHolder.diffTextView,
                         String.format(format, diffNum, diffPercentage),

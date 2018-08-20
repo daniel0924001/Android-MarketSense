@@ -143,6 +143,16 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/end_of_chart" />
 
+                <include
+                    android:id="@+id/predict_for_different_period"
+                    layout="@layout/layout_predict_for_different_period"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="40dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/five_best_price" />
+
                 <android.support.constraint.ConstraintLayout
                     android:id="@+id/selector_comment_block"
                     android:layout_width="0dp"
@@ -152,7 +162,7 @@
                     android:layout_marginTop="40dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/selector_news_block"
-                    app:layout_constraintTop_toBottomOf="@id/five_best_price">
+                    app:layout_constraintTop_toBottomOf="@id/predict_for_different_period">
 
                     <TextView
                         android:id="@+id/selector_comment_tv"
@@ -179,7 +189,7 @@
                     android:layout_marginTop="40dp"
                     app:layout_constraintStart_toEndOf="@id/selector_comment_block"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/five_best_price">
+                    app:layout_constraintTop_toBottomOf="@id/predict_for_different_period">
 
                     <TextView
                         android:id="@+id/selector_news_tv"
@@ -334,12 +344,12 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:background="@drawable/btn_rectangle_white"
-            android:paddingStart="87dp"
-            android:paddingEnd="87dp"
+            android:paddingStart="100dp"
+            android:paddingEnd="100dp"
             android:text="@string/title_publish_comment"
             android:textColor="@color/colorPrimary"
             android:textSize="16sp"
-            android:drawableStart="@drawable/ic_comment_theme_color_24px"
+            android:drawableStart="@mipmap/ic_activity_comment"
             android:drawablePadding="4dp"
             android:stateListAnimator="@null"
             android:foreground="@drawable/item_foreground_with_clicked_shadow"
@@ -358,7 +368,7 @@
             android:id="@+id/btn_go_up"
             android:layout_width="0dp"
             android:layout_height="48dp"
-            android:background="@drawable/btn_rectangle_theme_color"
+            android:background="@color/grapefruit_four"
             android:text="@string/title_go_top"
             android:textColor="@color/text_white"
             android:textSize="12sp"

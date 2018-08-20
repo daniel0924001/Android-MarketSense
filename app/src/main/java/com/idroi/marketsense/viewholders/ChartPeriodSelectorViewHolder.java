@@ -52,7 +52,7 @@ public class ChartPeriodSelectorViewHolder {
             other.setTextColor(context.getResources().getColor(R.color.text_black));
             other.setBackground(context.getDrawable(R.drawable.border_selector));
         }
-        selectedTextView.setTextColor(context.getResources().getColor(R.color.grapefruit));
+        selectedTextView.setTextColor(context.getResources().getColor(R.color.grapefruit_four));
         selectedTextView.setBackground(context.getDrawable(R.drawable.border_selector_selected));
     }
 }

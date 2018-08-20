@@ -4,8 +4,8 @@
         <shape
             android:shape="rectangle">
             <!-- Set the border color of your layout here -->
-            <stroke android:width="0dp" android:color="@color/grapefruit_three" />
-            <solid android:color="@color/grapefruit_three" />
+            <stroke android:width="0dp" android:color="@color/grapefruit_four" />
+            <solid android:color="@color/grapefruit_four" />
 
         </shape>
     </item>

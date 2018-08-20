@@ -36,24 +36,10 @@
         android:layout_height="wrap_content"
         app:srcCompat="@mipmap/ic_fav_off"
         android:contentDescription="@string/title_choices_tab"
-        android:layout_marginEnd="30dp"
+        android:layout_marginEnd="18dp"
         app:layout_constraintEnd_toStartOf="@id/action_bar_more"
-        app:layout_constraintTop_toTopOf="@id/action_bar_title"
-        app:layout_constraintBottom_toTopOf="@id/action_bar_favorite_tv" />
-
-    <TextView
-        android:id="@+id/action_bar_favorite_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/white"
-        android:textSize="12sp"
-        android:fontFamily="sans-serif"
-        android:textStyle="normal"
-        android:text="@string/title_choices_tab"
-        app:layout_constraintStart_toStartOf="@id/action_bar_favorite"
-        app:layout_constraintEnd_toEndOf="@id/action_bar_favorite"
-        app:layout_constraintTop_toBottomOf="@id/action_bar_favorite"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <ImageView
         android:id="@+id/action_bar_more"
@@ -61,24 +47,8 @@
         android:layout_height="wrap_content"
         app:srcCompat="@mipmap/ic_more"
         android:contentDescription="@string/title_more"
-        android:layout_marginEnd="10dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/action_bar_title"
-        app:layout_constraintBottom_toTopOf="@id/action_bar_more_tv" />
-
-    <TextView
-        android:id="@+id/action_bar_more_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/white"
-        android:textSize="12sp"
-        android:fontFamily="sans-serif"
-        android:textStyle="normal"
-        android:text="@string/title_more"
-        app:layout_constraintStart_toStartOf="@id/action_bar_more"
-        app:layout_constraintEnd_toEndOf="@id/action_bar_more"
-        app:layout_constraintTop_toBottomOf="@id/action_bar_more"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

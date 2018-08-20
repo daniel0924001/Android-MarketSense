@@ -24,10 +24,8 @@ public class StockActivityActionBarViewHolder {
     public TextView titleTextView;
 
     public ImageView favoriteImageView;
-    public TextView favoriteTextView;
 
     public ImageView moreImageView;
-    public TextView moreTextView;
 
     static final StockActivityActionBarViewHolder EMPTY_VIEW_HOLDER = new StockActivityActionBarViewHolder();
 
@@ -42,9 +40,7 @@ public class StockActivityActionBarViewHolder {
             stockActivityActionBarViewHolder.backImageView = view.findViewById(R.id.action_bar_back);
             stockActivityActionBarViewHolder.titleTextView = view.findViewById(R.id.action_bar_title);
             stockActivityActionBarViewHolder.favoriteImageView = view.findViewById(R.id.action_bar_favorite);
-            stockActivityActionBarViewHolder.favoriteTextView = view.findViewById(R.id.action_bar_favorite_tv);
             stockActivityActionBarViewHolder.moreImageView = view.findViewById(R.id.action_bar_more);
-            stockActivityActionBarViewHolder.moreTextView = view.findViewById(R.id.action_bar_more_tv);
             return stockActivityActionBarViewHolder;
         } catch (ClassCastException exception) {
             MSLog.e(exception.toString());
@@ -61,7 +57,7 @@ public class StockActivityActionBarViewHolder {
         try {
             float diffPercentageFloat = Float.valueOf(diffNum);
             if(diffPercentageFloat > 0) {
-                viewHolder.actionBar.setBackgroundDrawable(new ColorDrawable(resources.getColor(R.color.grapefruit_two)));
+                viewHolder.actionBar.setBackgroundDrawable(new ColorDrawable(resources.getColor(R.color.grapefruit_four)));
             } else if(diffPercentageFloat < 0) {
                 viewHolder.actionBar.setBackgroundDrawable(new ColorDrawable(resources.getColor(R.color.green_blue)));
             } else {

@@ -316,6 +316,10 @@ public class Stock {
         return mFallNum;
     }
 
+    public int getTomorrowPredictionDiffDirection() {
+        return mTomorrowPredictionDiffDirection;
+    }
+
     public int getPredictNewsLevel() {
         if(mConfidence >= 0 && mConfidence <= 1) {
             return LEVEL_LOW;
@@ -537,7 +541,7 @@ public class Stock {
             hitTextView.setVisibility(View.VISIBLE);
             if (mTodayPredictionDiffDirection == TREND_UP) {
                 hitTextView.setBackground(resources.getDrawable(R.drawable.block_red_border_with_radius_corner));
-                hitTextView.setTextColor(resources.getColor(R.color.grapefruit));
+                hitTextView.setTextColor(resources.getColor(R.color.grapefruit_four));
             } else if (mTodayPredictionDiffDirection == TREND_DOWN) {
                 hitTextView.setBackground(resources.getDrawable(R.drawable.block_green_border_with_radius_corner));
                 hitTextView.setTextColor(resources.getColor(R.color.green_blue));
@@ -611,7 +615,6 @@ public class Stock {
 
         Resources resources = context.getResources();
         ClientData clientData = ClientData.getInstance();
-        blockView.setOnClickListener(null);
 
         String todayFormat = resources.getString(R.string.title_month_day_close_predict);
         if(clientData.isWorkDay()) {

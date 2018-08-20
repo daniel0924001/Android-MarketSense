@@ -64,7 +64,6 @@
         android:layout_width="0dp"
         android:layout_height="64dp"
         android:layout_marginStart="8dp"
-        android:foreground="@drawable/item_foreground_with_clicked_shadow"
         android:background="@drawable/block_predict_unavailable"
         app:layout_constraintTop_toTopOf="@id/guideline_bottom_part"
         app:layout_constraintStart_toEndOf="@id/guideline_left_part"

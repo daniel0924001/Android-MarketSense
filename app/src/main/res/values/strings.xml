@@ -182,6 +182,10 @@
     <string name="title_sell_volume">委賣量</string>
     <string name="title_buy_price">買價</string>
     <string name="title_sell_price">賣價</string>
+    <string name="title_predict_up_or_down">預測漲跌</string>
+    <string name="title_predict_1d">1日預測</string>
+    <string name="title_predict_5d">5日預測</string>
+    <string name="title_predict_20d">20日預測</string>
 
     <string name="title_up">漲</string>
     <string name="title_down">跌</string>

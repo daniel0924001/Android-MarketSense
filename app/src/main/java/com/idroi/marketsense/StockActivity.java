@@ -65,6 +65,7 @@ import com.idroi.marketsense.viewholders.ChartTaTopItemsViewHolder;
 import com.idroi.marketsense.viewholders.ChartTickBottomItemsViewHolder;
 import com.idroi.marketsense.viewholders.ChartTickTopItemsViewHolder;
 import com.idroi.marketsense.viewholders.FiveBestPriceViewHolder;
+import com.idroi.marketsense.viewholders.PredictForDifferentPeriodViewHolder;
 import com.idroi.marketsense.viewholders.StockActivityActionBarViewHolder;
 import com.idroi.marketsense.viewholders.StockActivityRealPriceBlockViewHolder;
 import com.idroi.marketsense.viewholders.StockPredictionBlockViewHolder;
@@ -170,6 +171,7 @@ public class StockActivity extends AppCompatActivity {
     private ChartTaTopItemsViewHolder mChartTaTopItemsViewHolder;
     private ChartTickBottomItemsViewHolder mChartTickBottomItemsViewHolder;
     private FiveBestPriceViewHolder mBestPriceRowViewHolder;
+    private PredictForDifferentPeriodViewHolder mPredictForDifferentPeriodViewHolder;
 
     private AlertDialog mMoreAlertDialog;
 
@@ -214,6 +216,9 @@ public class StockActivity extends AppCompatActivity {
         mBestPriceRowViewHolder =
                 FiveBestPriceViewHolder
                         .convertToViewHolder(findViewById(R.id.five_best_price));
+        mPredictForDifferentPeriodViewHolder =
+                PredictForDifferentPeriodViewHolder
+                        .convertToViewHolder(findViewById(R.id.predict_for_different_period));
     }
 
     @Override
@@ -639,6 +644,11 @@ public class StockActivity extends AppCompatActivity {
                 mStockPredictionBlockViewHolder.tomorrowBlock,
                 mStockPredictionBlockViewHolder.tomorrowTitleTextView,
                 mStockPredictionBlockViewHolder.tomorrowStatusTextView);
+
+        PredictForDifferentPeriodViewHolder.update(mPredictForDifferentPeriodViewHolder,
+                stock.getTomorrowPredictionDiffDirection(),
+                stock.getTomorrowPredictionDiffDirection(),
+                stock.getTomorrowPredictionDiffDirection());
     }
 
     private void initStockChart() {
@@ -863,23 +873,7 @@ public class StockActivity extends AppCompatActivity {
                     }
                 }
             });
-            mStockActivityActionBarViewHolder.favoriteTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(FBHelper.checkFBLogin()) {
-                        changeFavorite(mStockActivityActionBarViewHolder.favoriteImageView);
-                    } else {
-                        showLoginAlertDialog(CLICK_STAR_BEFORE_LOGIN);
-                    }
-                }
-            });
             mStockActivityActionBarViewHolder.moreImageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    showMoreAlertDialog();
-                }
-            });
-            mStockActivityActionBarViewHolder.moreTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     showMoreAlertDialog();

@@ -16,6 +16,11 @@ public class BestPriceRowViewHolder {
     TextView sellPrice;
     TextView sellVolume;
 
+    View burBar;
+
+    View buyColorBar;
+    View sellColorBar;
+
     static final BestPriceRowViewHolder EMPTY_VIEW_HOLDER = new BestPriceRowViewHolder();
 
     private BestPriceRowViewHolder() {}
@@ -27,6 +32,9 @@ public class BestPriceRowViewHolder {
             viewHolder.buyVolume = view.findViewById(R.id.buy_volume);
             viewHolder.sellPrice = view.findViewById(R.id.sell_price);
             viewHolder.sellVolume = view.findViewById(R.id.sell_volume);
+            viewHolder.burBar = view.findViewById(R.id.buy_bar);
+            viewHolder.buyColorBar = view.findViewById(R.id.buy_bar_color);
+            viewHolder.sellColorBar = view.findViewById(R.id.sell_bar_color);
 
             return viewHolder;
         } catch (ClassCastException exception) {

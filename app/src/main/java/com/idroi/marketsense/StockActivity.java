@@ -756,7 +756,7 @@ public class StockActivity extends AppCompatActivity {
     }
 
     private void updateFiveBestPrice(StockTradeData.BestPriceRow[] bestPriceRows, float yesterdayPrice) {
-        FiveBestPriceViewHolder.update(this, mBestPriceRowViewHolder, bestPriceRows, yesterdayPrice);
+        FiveBestPriceViewHolder.update(mBestPriceRowViewHolder, bestPriceRows, yesterdayPrice);
     }
 
     private void changeChartSelectorUI(TextView selected) {

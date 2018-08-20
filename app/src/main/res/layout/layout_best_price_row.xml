@@ -37,6 +37,15 @@
         app:layout_constraintStart_toStartOf="@id/buy_volume" />
 
     <View
+        android:id="@+id/buy_bar_color"
+        android:layout_width="50dp"
+        android:layout_height="0dp"
+        android:background="@color/blue_purple"
+        app:layout_constraintEnd_toStartOf="@id/left_guideline"
+        app:layout_constraintTop_toTopOf="@id/buy_volume"
+        app:layout_constraintBottom_toBottomOf="@id/buy_volume" />
+
+    <View
         android:id="@+id/sell_bar"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -45,6 +54,15 @@
         app:layout_constraintTop_toTopOf="@id/sell_volume"
         app:layout_constraintBottom_toBottomOf="@id/sell_volume"
         app:layout_constraintEnd_toEndOf="@id/sell_volume"/>
+
+    <View
+        android:id="@+id/sell_bar_color"
+        android:layout_width="50dp"
+        android:layout_height="0dp"
+        android:background="@color/blue_purple"
+        app:layout_constraintStart_toStartOf="@id/right_guideline"
+        app:layout_constraintTop_toTopOf="@id/sell_volume"
+        app:layout_constraintBottom_toBottomOf="@id/sell_volume" />
 
     <TextView
         android:id="@+id/buy_volume"

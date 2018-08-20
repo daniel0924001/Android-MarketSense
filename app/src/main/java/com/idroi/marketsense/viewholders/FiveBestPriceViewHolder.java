@@ -1,6 +1,7 @@
 package com.idroi.marketsense.viewholders;
 
 import android.content.Context;
+import android.support.constraint.ConstraintLayout;
 import android.view.View;
 
 import com.idroi.marketsense.Logging.MSLog;
@@ -45,10 +46,10 @@ public class FiveBestPriceViewHolder {
         }
     }
 
-    public static void update(Context context,
-                              FiveBestPriceViewHolder viewHolder,
-                              StockTradeData.BestPriceRow[] bestPriceRows,
-                              float yesterdayPrice) {
+    public static void update(final FiveBestPriceViewHolder viewHolder,
+                              final StockTradeData.BestPriceRow[] bestPriceRows,
+                              final float yesterdayPrice) {
+        float tempMaxVolume = 0;
         try {
             for (int i = 0; i < 5; i++) {
                 StockTradeData.BestPriceRow bestPriceRow = bestPriceRows[i];
@@ -62,16 +63,49 @@ public class FiveBestPriceViewHolder {
                         String.valueOf(bestPriceRow.getSellPrice()),
                         bestPriceRow.getSellPrice(),
                         yesterdayPrice);
+
+                float buyVolume = bestPriceRow.getBuyVolume();
+                float sellVolume = bestPriceRow.getSellVolume();
+
                 MarketSenseRendererHelper.addTextViewWithColor(
                         viewHolder.bestPrices[i].buyVolume,
-                        String.valueOf(bestPriceRow.getBuyVolume()),
+                        String.valueOf(buyVolume),
                         R.color.white);
                 MarketSenseRendererHelper.addTextViewWithColor(
                         viewHolder.bestPrices[i].sellVolume,
-                        String.valueOf(bestPriceRow.getSellVolume()),
+                        String.valueOf(sellVolume),
                         R.color.white);
+
+                if(buyVolume > tempMaxVolume) {
+                    tempMaxVolume = buyVolume;
+                }
+                if(sellVolume > tempMaxVolume) {
+                    tempMaxVolume = sellVolume;
+                }
             }
+            final float maxVolume = tempMaxVolume;
             viewHolder.mainView.setVisibility(View.VISIBLE);
+
+            viewHolder.bestPrices[0].burBar.post(new Runnable() {
+                @Override
+                public void run() {
+                    int width = viewHolder.bestPrices[0].burBar.getWidth();
+                    for(int i = 0; i < 5; i++) {
+                        StockTradeData.BestPriceRow bestPriceRow = bestPriceRows[i];
+
+                        float buyRatio = bestPriceRow.getBuyVolume() / maxVolume;
+                        float sellRatio = bestPriceRow.getSellVolume() / maxVolume;
+
+                        ConstraintLayout.LayoutParams burParams = (ConstraintLayout.LayoutParams) viewHolder.bestPrices[i].buyColorBar.getLayoutParams();
+                        burParams.width = (int) (width * buyRatio);
+                        viewHolder.bestPrices[i].buyColorBar.setLayoutParams(burParams);
+                        ConstraintLayout.LayoutParams sellParams = (ConstraintLayout.LayoutParams) viewHolder.bestPrices[i].sellColorBar.getLayoutParams();
+                        sellParams.width = (int) (width * sellRatio);
+                        viewHolder.bestPrices[i].sellColorBar.setLayoutParams(sellParams);
+                    }
+                }
+            });
+
         } catch (Exception exception) {
             MSLog.e("update exception in FiveBestPriceViewHolder: " + exception.toString());
             viewHolder.mainView.setVisibility(View.GONE);

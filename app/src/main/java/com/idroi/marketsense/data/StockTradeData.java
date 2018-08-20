@@ -28,6 +28,37 @@ public class StockTradeData {
 
     private String mTradeDay;
     private int mTotalVolume;
+    private BestPriceRow[] mBestPriceRow;
+
+    public static class BestPriceRow {
+        private float mBuyPrice;
+        private float mSellPrice;
+        private int mBuyVolume;
+        private int mSellVolume;
+
+        public BestPriceRow(float buyPrice, int buyVolume, float sellPrice, int sellVolume) {
+            mBuyPrice = buyPrice;
+            mBuyVolume = buyVolume;
+            mSellPrice = sellPrice;
+            mSellVolume = sellVolume;
+        }
+
+        public float getBuyPrice() {
+            return mBuyPrice;
+        }
+
+        public float getSellPrice() {
+            return mSellPrice;
+        }
+
+        public int getBuyVolume() {
+            return mBuyVolume;
+        }
+
+        public int getSellVolume() {
+            return mSellVolume;
+        }
+    }
 
     public StockTradeData(String type) {
         mType = type;
@@ -231,5 +262,21 @@ public class StockTradeData {
 
     public float getTradeMoney() {
         return mTradeMoney;
+    }
+
+    public void setFiveBestPrice(int index, float buyPrice, float sellPrice, int buyVolume, int sellVolume) {
+        if(mBestPriceRow == null) {
+            mBestPriceRow = new BestPriceRow[5];
+        }
+
+        if(index < 0 || index >= 5) {
+            return;
+        }
+
+        mBestPriceRow[index] = new BestPriceRow(buyPrice, buyVolume, sellPrice, sellVolume);
+    }
+
+    public BestPriceRow[] getFiveBestPrice() {
+        return mBestPriceRow;
     }
 }

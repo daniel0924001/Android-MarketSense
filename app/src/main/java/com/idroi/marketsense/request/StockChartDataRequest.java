@@ -54,6 +54,30 @@ public class StockChartDataRequest extends Request<StockTradeData> {
     private static final String PARAM_O = "o";
     private static final String PARAM_C = "c";
 
+    private static final String BEST_PRICE_1_BUY_PRICE = "101";
+    private static final String BEST_PRICE_2_BUY_PRICE = "103";
+    private static final String BEST_PRICE_3_BUY_PRICE = "105";
+    private static final String BEST_PRICE_4_BUY_PRICE = "107";
+    private static final String BEST_PRICE_5_BUY_PRICE = "109";
+
+    private static final String BEST_PRICE_1_SELL_PRICE = "102";
+    private static final String BEST_PRICE_2_SELL_PRICE = "104";
+    private static final String BEST_PRICE_3_SELL_PRICE = "106";
+    private static final String BEST_PRICE_4_SELL_PRICE = "108";
+    private static final String BEST_PRICE_5_SELL_PRICE = "110";
+
+    private static final String BEST_PRICE_1_BUY_VOLUME = "113";
+    private static final String BEST_PRICE_2_BUY_VOLUME = "115";
+    private static final String BEST_PRICE_3_BUY_VOLUME = "117";
+    private static final String BEST_PRICE_4_BUY_VOLUME = "119";
+    private static final String BEST_PRICE_5_BUY_VOLUME = "121";
+
+    private static final String BEST_PRICE_1_SELL_VOLUME = "114";
+    private static final String BEST_PRICE_2_SELL_VOLUME = "116";
+    private static final String BEST_PRICE_3_SELL_VOLUME = "118";
+    private static final String BEST_PRICE_4_SELL_VOLUME = "120";
+    private static final String BEST_PRICE_5_SELL_VOLUME = "122";
+
     private final Response.Listener<StockTradeData> mListener;
 
     public StockChartDataRequest(String url, Response.Listener<StockTradeData> listener, Response.ErrorListener errorListener) {
@@ -209,6 +233,33 @@ public class StockChartDataRequest extends Request<StockTradeData> {
                 stockTradeData.setTickSellPrice(sellPrice);
                 stockTradeData.setTradeMoney(money);
                 stockTradeData.setYesterdayVolume(yesterdayVolume);
+
+                // five prices
+                stockTradeData.setFiveBestPrice(0,
+                        (float) data.optDouble(BEST_PRICE_1_BUY_PRICE),
+                        (float) data.optDouble(BEST_PRICE_1_SELL_PRICE),
+                        (int) data.optDouble(BEST_PRICE_1_BUY_VOLUME),
+                        (int) data.optDouble(BEST_PRICE_1_SELL_VOLUME));
+                stockTradeData.setFiveBestPrice(1,
+                        (float) data.optDouble(BEST_PRICE_2_BUY_PRICE),
+                        (float) data.optDouble(BEST_PRICE_2_SELL_PRICE),
+                        (int) data.optDouble(BEST_PRICE_2_BUY_VOLUME),
+                        (int) data.optDouble(BEST_PRICE_2_SELL_VOLUME));
+                stockTradeData.setFiveBestPrice(2,
+                        (float) data.optDouble(BEST_PRICE_3_BUY_PRICE),
+                        (float) data.optDouble(BEST_PRICE_3_SELL_PRICE),
+                        (int) data.optDouble(BEST_PRICE_3_BUY_VOLUME),
+                        (int) data.optDouble(BEST_PRICE_3_SELL_VOLUME));
+                stockTradeData.setFiveBestPrice(3,
+                        (float) data.optDouble(BEST_PRICE_4_BUY_PRICE),
+                        (float) data.optDouble(BEST_PRICE_4_SELL_PRICE),
+                        (int) data.optDouble(BEST_PRICE_4_BUY_VOLUME),
+                        (int) data.optDouble(BEST_PRICE_4_SELL_VOLUME));
+                stockTradeData.setFiveBestPrice(4,
+                        (float) data.optDouble(BEST_PRICE_5_BUY_PRICE),
+                        (float) data.optDouble(BEST_PRICE_5_SELL_PRICE),
+                        (int) data.optDouble(BEST_PRICE_5_BUY_VOLUME),
+                        (int) data.optDouble(BEST_PRICE_5_SELL_VOLUME));
 
                 if(data.has(PARAM_TRADE_DAY)) {
                     stockTradeData.setTickTradeDate(data.optString(PARAM_TRADE_DAY));

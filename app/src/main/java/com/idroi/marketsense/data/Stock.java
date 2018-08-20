@@ -540,7 +540,7 @@ public class Stock {
                 hitTextView.setTextColor(resources.getColor(R.color.grapefruit));
             } else if (mTodayPredictionDiffDirection == TREND_DOWN) {
                 hitTextView.setBackground(resources.getDrawable(R.drawable.block_green_border_with_radius_corner));
-                hitTextView.setTextColor(resources.getColor(R.color.aquamarine));
+                hitTextView.setTextColor(resources.getColor(R.color.green_blue));
             } else {
                 hitTextView.setBackground(resources.getDrawable(R.drawable.block_flat_border_with_radius_corner));
                 hitTextView.setTextColor(resources.getColor(R.color.colorTrendFlat));

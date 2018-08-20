@@ -72,7 +72,7 @@ public class MarketSenseRendererHelper {
         if(value > baseline) {
             addTextViewWithColor(textView, contents, R.color.faded_orange);
         } else if(value < baseline) {
-            addTextViewWithColor(textView, contents, R.color.aqua_marine);
+            addTextViewWithColor(textView, contents, R.color.green_blue);
         } else {
             addTextViewWithColor(textView, contents, R.color.text_black);
         }
@@ -169,7 +169,7 @@ public class MarketSenseRendererHelper {
                 if(value > baseline) {
                     addTextViewWithColor(textView, contents, R.color.faded_orange);
                 } else if(value < baseline) {
-                    addTextViewWithColor(textView, contents, R.color.aqua_marine);
+                    addTextViewWithColor(textView, contents, R.color.green_blue);
                 } else {
                     addTextViewWithColor(textView, contents, R.color.text_black);
                 }

@@ -69,7 +69,6 @@
     <color name="white_four">#f3f3f3</color>
     <color name="warm_grey">#959595</color>
     <color name="warm_grey_two">#7d7d7d</color>
-    <color name="aquamarine">#01d5bc</color>
     <color name="alight_red_two">#ff444a</color>
     <color name="pinkish_grey_two">#c1c1c1</color>
     <color name="pinkish_grey_three">#cacaca</color>
@@ -80,11 +79,14 @@
     <color name="grapefruit_two">#f36f6c</color>
     <color name="grapefruit_three">#ff5e5c</color>
     <color name="yellow_orange">#ffbb00</color>
-    <color name="aqua_marine">#4CE0B3</color>
     <color name="cool_grey">#abb1bc</color>
     <color name="pale_grey">#f8fafc</color>
     <color name="gunmetal">#454d5e</color>
     <color name="ice_blue">#f6faff</color>
     <color name="cool_grey_two">#8a909c</color>
     <color name="faded_orange">#ee6663</color>
+    <color name="pale_grey_two">#f6f7fb</color>
+    <color name="bluey_grey">#8797b2</color>
+    <color name="green_blue">#00d07c</color>
+    <color name="cloudy_blue">#bfcad7</color>
 </resources>

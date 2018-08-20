@@ -133,6 +133,7 @@
     <string name="title_trade_volume">成交量</string>
 
     <string name="title_trade_now">交易中</string>
+    <string name="title_not_trade_now">已收盤</string>
     <string name="title_news_look_good">新聞看漲</string>
     <string name="title_news_look_flat">近期無重大新聞</string>
     <string name="title_news_look_bad">新聞看跌</string>
@@ -175,6 +176,12 @@
     <string name="title_chart_type_d">日K</string>
     <string name="title_chart_type_w">週K</string>
     <string name="title_chart_type_m">月K</string>
+
+    <string name="title_five_best_price">五檔</string>
+    <string name="title_buy_volume">委買量</string>
+    <string name="title_sell_volume">委賣量</string>
+    <string name="title_buy_price">買價</string>
+    <string name="title_sell_price">賣價</string>
 
     <string name="title_up">漲</string>
     <string name="title_down">跌</string>

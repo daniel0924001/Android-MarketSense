@@ -59,10 +59,12 @@ import com.idroi.marketsense.request.NewsRequest;
 import com.idroi.marketsense.request.CommentAndVoteRequest;
 import com.idroi.marketsense.request.StockChartDataRequest;
 import com.idroi.marketsense.util.MarketSenseUtils;
+import com.idroi.marketsense.viewholders.BestPriceRowViewHolder;
 import com.idroi.marketsense.viewholders.ChartPeriodSelectorViewHolder;
 import com.idroi.marketsense.viewholders.ChartTaTopItemsViewHolder;
 import com.idroi.marketsense.viewholders.ChartTickBottomItemsViewHolder;
 import com.idroi.marketsense.viewholders.ChartTickTopItemsViewHolder;
+import com.idroi.marketsense.viewholders.FiveBestPriceViewHolder;
 import com.idroi.marketsense.viewholders.StockActivityActionBarViewHolder;
 import com.idroi.marketsense.viewholders.StockActivityRealPriceBlockViewHolder;
 import com.idroi.marketsense.viewholders.StockPredictionBlockViewHolder;
@@ -125,12 +127,8 @@ public class StockActivity extends AppCompatActivity {
     private ConstraintLayout mCommentBlock, mNewsBlock;
     private ConstraintLayout mBottomFixedBlock;
 
-//    private NewsWebView mStockAIWebView;
     private boolean mIsStockAIOpen = false;
     private boolean mIsStockAILoading = false;
-
-//    private Button mButtonRaise, mButtonFall;
-//    private TextView mResultTextView;
 
     private CallbackManager mFBCallbackManager;
     private UserProfile mUserProfile;
@@ -171,6 +169,7 @@ public class StockActivity extends AppCompatActivity {
     private ChartTickTopItemsViewHolder mChartTickTopItemsViewHolder;
     private ChartTaTopItemsViewHolder mChartTaTopItemsViewHolder;
     private ChartTickBottomItemsViewHolder mChartTickBottomItemsViewHolder;
+    private FiveBestPriceViewHolder mBestPriceRowViewHolder;
 
     private AlertDialog mMoreAlertDialog;
 
@@ -212,6 +211,9 @@ public class StockActivity extends AppCompatActivity {
         mChartTickBottomItemsViewHolder =
                 ChartTickBottomItemsViewHolder
                         .convertToViewHolder(findViewById(R.id.stock_chart_tick_bottom_block));
+        mBestPriceRowViewHolder =
+                FiveBestPriceViewHolder
+                        .convertToViewHolder(findViewById(R.id.five_best_price));
     }
 
     @Override
@@ -390,22 +392,6 @@ public class StockActivity extends AppCompatActivity {
         });
 
         mNestedScrollView = findViewById(R.id.body_scroll_view);
-        final ConstraintLayout voteInformationBlock = findViewById(R.id.stock_people_vote_information);
-        final ConstraintLayout newsInformationBlock = findViewById(R.id.stock_news_vote_information);
-        voteInformationBlock.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                chooseBottomBlock(0);
-                slideToView(mSelectorComment);
-            }
-        });
-        newsInformationBlock.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                chooseBottomBlock(1);
-                slideToView(mSelectorNews);
-            }
-        });
     }
 
     private void slideToView(final View child) {
@@ -555,12 +541,6 @@ public class StockActivity extends AppCompatActivity {
     }
 
     private void setNewsForEmptyData(boolean isEmpty) {
-
-        TextView newsJoin = findViewById(R.id.news_join);
-        String format = getResources().getString(R.string.title_news_join);
-        newsJoin.setText(String.format(format, mNewsRecyclerAdapter.getNewsTotalCount()));
-        newsJoin.setVisibility(View.VISIBLE);
-
         ImageView noDataImageView = findViewById(R.id.no_news_iv);
         TextView noDataTextView = findViewById(R.id.no_news_tv);
         if(isEmpty) {
@@ -618,7 +598,6 @@ public class StockActivity extends AppCompatActivity {
                     mVoteFallNum = commentAndVote.getFallNumber();
                     MSLog.d("update stock raise vote number: " + commentAndVote.getRaiseNumber());
                     MSLog.d("update stock fall vote number: " + commentAndVote.getFallNumber());
-                    setSocialInformation(commentAndVote);
                 }
             }
         });
@@ -630,57 +609,6 @@ public class StockActivity extends AppCompatActivity {
         findViewById(R.id.marketsense_stock_no_comment_tv).setVisibility(View.GONE);
         findViewById(R.id.btn_send_first).setVisibility(View.GONE);
         mCommentRecyclerView.setVisibility(View.VISIBLE);
-    }
-
-    private void setSocialInformation(CommentAndVote commentAndVote) {
-        TextView peopleJoin = findViewById(R.id.people_join);
-        String format = getResources().getString(R.string.title_people_join);
-        peopleJoin.setText(String.format(format, commentAndVote.getCommentSize()));
-        peopleJoin.setVisibility(View.VISIBLE);
-
-        TextView peopleScore = findViewById(R.id.people_score);
-        TextView peopleMaxScore = findViewById(R.id.people_score_max_const);
-        TextView newsScore = findViewById(R.id.news_score);
-        TextView newsMaxScore = findViewById(R.id.news_score_max_const);
-        TextView peopleAttitude = findViewById(R.id.people_attitude);
-        TextView newsAttitude = findViewById(R.id.news_attitude);
-
-        commentAndVote.setVotingText(peopleScore, peopleMaxScore);
-        commentAndVote.setPredictionText(newsScore, newsMaxScore);
-        peopleAttitude.setText(commentAndVote.getVotingAttitude(this));
-        newsAttitude.setText(commentAndVote.getPredictionAttitude(this));
-
-        ImageView peopleImageView = findViewById(R.id.people_score_iv);
-        ImageView newsImageView = findViewById(R.id.news_score_iv);
-        commentAndVote.setVotingIcon(this, peopleImageView);
-        commentAndVote.setPredictionIcon(this, newsImageView);
-        setVoteResult();
-    }
-
-    private void setVoteResult() {
-        DecimalFormat decimalFormat = new DecimalFormat("#,###,###");
-
-        TextView totalPeopleTextView = findViewById(R.id.vote_result_people_number);
-        String totalNumberString =
-                decimalFormat.format(mVoteRaiseNum + mVoteFallNum) +
-                        getResources().getString(R.string.title_vote_people_number);
-        totalPeopleTextView.setText(totalNumberString);
-        TextView goodPeopleTextView = findViewById(R.id.vote_result_vote_good_number);
-        TextView badPeopleTextView = findViewById(R.id.vote_result_vote_bad_number);
-        goodPeopleTextView.setText(decimalFormat.format(mVoteRaiseNum));
-        badPeopleTextView.setText(decimalFormat.format(mVoteFallNum));
-
-        Guideline guideLine = findViewById(R.id.vote_percentage_guideline);
-        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) guideLine.getLayoutParams();
-        float goodPercentage = (float) mVoteRaiseNum / (mVoteRaiseNum + mVoteFallNum);
-        params.guidePercent = goodPercentage;
-        guideLine.setLayoutParams(params);
-
-        DecimalFormat percentFormat = new DecimalFormat("#%");
-        TextView goodPercentageTextView = findViewById(R.id.vote_look_good_percentage);
-        TextView badPercentageTextView = findViewById(R.id.vote_look_bad_percentage);
-        goodPercentageTextView.setText(percentFormat.format(goodPercentage));
-        badPercentageTextView.setText(percentFormat.format(1 - goodPercentage));
     }
 
     private void initStockPredictionBlock() {
@@ -740,6 +668,9 @@ public class StockActivity extends AppCompatActivity {
                             stockTradeData.getDiffPrice(),
                             stockTradeData.getDiffPercentage(),
                             stockTradeData.getTickTotalVolume());
+                    if(stockTradeData.getFiveBestPrice() != null) {
+                        updateFiveBestPrice(stockTradeData.getFiveBestPrice(), stockTradeData.getYesterdayPrice());
+                    }
                 }
 
                 if(mSelectedChartTextView == mChartPeriodSelectorViewHolder.chartType1M) {
@@ -822,6 +753,10 @@ public class StockActivity extends AppCompatActivity {
         StockActivityRealPriceBlockViewHolder.update(this, mStockActivityRealPriceBlockViewHolder, price, diffNum, diffPercentage);
         StockActivityActionBarViewHolder.update(this, mStockActivityActionBarViewHolder, diffNum);
         ChartTickTopItemsViewHolder.update(this, mChartTickTopItemsViewHolder, volume);
+    }
+
+    private void updateFiveBestPrice(StockTradeData.BestPriceRow[] bestPriceRows, float yesterdayPrice) {
+        FiveBestPriceViewHolder.update(this, mBestPriceRowViewHolder, bestPriceRows, yesterdayPrice);
     }
 
     private void changeChartSelectorUI(TextView selected) {

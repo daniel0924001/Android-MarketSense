@@ -83,31 +83,33 @@ public class StockActivityRealPriceBlockViewHolder {
                         String.format(format, diffNum, diffPercentage),
                         R.mipmap.ic_trend_arrow_up_white);
             } else if(diffPercentageFloat < 0) {
-                MarketSenseRendererHelper.setBackgroundColor(viewHolder.mainView, R.color.aqua_marine);
+                MarketSenseRendererHelper.setBackgroundColor(viewHolder.mainView, R.color.green_blue);
                 MarketSenseRendererHelper.addTextViewWithIcon(
                         viewHolder.diffTextView,
                         String.format(format, diffNum, diffPercentage),
                         R.mipmap.ic_trend_arrow_down_white);
             } else {
-                MarketSenseRendererHelper.setBackgroundColor(viewHolder.mainView, R.color.grapefruit_two);
+                MarketSenseRendererHelper.setBackgroundColor(viewHolder.mainView, R.color.cloudy_blue);
                 MarketSenseRendererHelper.addTextViewWithIcon(
                         viewHolder.diffTextView,
                         String.format(format, diffNum, diffPercentage),
-                        R.mipmap.ic_trend_arrow_draw_white);
+                        0);
             }
         } catch (NumberFormatException e) {
-            MarketSenseRendererHelper.setBackgroundColor(viewHolder.mainView, R.color.grapefruit_two);
+            MarketSenseRendererHelper.setBackgroundColor(viewHolder.mainView, R.color.cloudy_blue);
             MarketSenseRendererHelper.addTextViewWithIcon(
                     viewHolder.diffTextView,
                     String.format(format, diffNum, diffPercentage),
-                    R.mipmap.ic_arrow_none);
+                    0);
             MSLog.e("NumberFormatException: " + diffNum);
         }
 
         if(ClientData.getInstance().isWorkDayAndStockMarketIsOpen()) {
-            viewHolder.tradingTextView.setVisibility(View.VISIBLE);
+            MarketSenseRendererHelper.addTextView(viewHolder.tradingTextView, context.getString(R.string.title_trade_now));
+            viewHolder.tradingTextView.setBackground(context.getDrawable(R.drawable.btn_oval_small_corner_yellow));
         } else {
-            viewHolder.tradingTextView.setVisibility(View.GONE);
+            MarketSenseRendererHelper.addTextView(viewHolder.tradingTextView, context.getString(R.string.title_not_trade_now));
+            viewHolder.tradingTextView.setBackgroundResource(android.R.color.transparent);
         }
 
         Calendar c = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei"));

@@ -539,14 +539,12 @@ public class Stock {
                                            ImageView[] imageViews) {
         Resources resources = context.getResources();
         if(direction == TREND_FLAT) {
-            blockView.setBackground(resources.getDrawable(R.drawable.block_gray_border_with_radius_corner));
             titleTextView.setVisibility(View.GONE);
             unavailableTextView.setVisibility(View.VISIBLE);
             for(ImageView imageView : imageViews) {
                 imageView.setVisibility(View.INVISIBLE);
             }
         } else {
-            blockView.setBackground(resources.getDrawable(R.drawable.block_black_border_with_radius_corner));
             titleTextView.setVisibility(View.VISIBLE);
             unavailableTextView.setVisibility(View.GONE);
             int iconResourceId;

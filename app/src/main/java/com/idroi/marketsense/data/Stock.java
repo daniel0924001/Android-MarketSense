@@ -38,6 +38,8 @@ public class Stock {
     private static final String FALL = "fall";
     private static final String TODAY_DIFF_PRED = "today_diff_predict";
     private static final String NEXT_DIFF_PRED = "next_diff_predict";
+    private static final String NEXT_5D_DIFF_PRED = "next_5d_diff_predict";
+    private static final String NEXT_20D_DIFF_PRED = "next_20d_diff_predict";
     private static final String YESTERDAY_VOLUME = "y_vol";
 
     public static final int LEVEL_HIGHEST = 2;
@@ -70,6 +72,8 @@ public class Stock {
     private int mTodayPredictionDiffDirection, mTomorrowPredictionDiffDirection, mPredictionDiffDirection;
     private double mTodayPredictionDiffPercentage, mTomorrowPredictionDiffPercentage, mPredictionDiffPercentage;
     private double mPredictionError;
+
+    private int m5DPredictionDirection, m20DPredictionDirection;
 
     private boolean mIsUpOrDownStop;
 
@@ -233,6 +237,26 @@ public class Stock {
         }
     }
 
+    public void set5DPrediction(double prediction) {
+        if(prediction > 0) {
+            m5DPredictionDirection = TREND_UP;
+        } else if(prediction == 0) {
+            m5DPredictionDirection = TREND_FLAT;
+        } else {
+            m5DPredictionDirection = TREND_DOWN;
+        }
+    }
+
+    public void set20DPrediction(double prediction) {
+        if(prediction > 0) {
+            m20DPredictionDirection = TREND_UP;
+        } else if(prediction == 0) {
+            m20DPredictionDirection = TREND_FLAT;
+        } else {
+            m20DPredictionDirection = TREND_DOWN;
+        }
+    }
+
     public void setYesterdayVolume(int yesterdayVolume) {
         mYesterdayVolume = yesterdayVolume;
     }
@@ -318,6 +342,14 @@ public class Stock {
 
     public int getTomorrowPredictionDiffDirection() {
         return mTomorrowPredictionDiffDirection;
+    }
+
+    public int get5DPredictionDirection() {
+        return m5DPredictionDirection;
+    }
+
+    public int get20DPredictionDirection() {
+        return m20DPredictionDirection;
     }
 
     public int getPredictNewsLevel() {
@@ -741,6 +773,12 @@ public class Stock {
                         break;
                     case YESTERDAY_VOLUME:
                         stock.setYesterdayVolume(jsonObject.optInt(YESTERDAY_VOLUME));
+                        break;
+                    case NEXT_5D_DIFF_PRED:
+                        stock.set5DPrediction(jsonObject.optDouble(NEXT_5D_DIFF_PRED));
+                        break;
+                    case NEXT_20D_DIFF_PRED:
+                        stock.set20DPrediction(jsonObject.optDouble(NEXT_20D_DIFF_PRED));
                         break;
                     default:
                         break;

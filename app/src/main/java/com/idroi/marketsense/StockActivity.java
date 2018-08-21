@@ -638,8 +638,8 @@ public class StockActivity extends AppCompatActivity {
 
         PredictForDifferentPeriodViewHolder.update(mPredictForDifferentPeriodViewHolder,
                 stock.getTomorrowPredictionDiffDirection(),
-                stock.getTomorrowPredictionDiffDirection(),
-                stock.getTomorrowPredictionDiffDirection());
+                stock.get5DPredictionDirection(),
+                stock.get20DPredictionDirection());
     }
 
     private void initStockChart() {

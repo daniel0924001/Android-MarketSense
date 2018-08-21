@@ -5,9 +5,9 @@
     android:layout_height="wrap_content" >
 
     <ImageView
-        android:layout_width="10dp"
-        android:layout_height="10dp"
-        app:srcCompat="@drawable/ic_access_time_24px"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@mipmap/ic_time_12x12"
         android:contentDescription="@string/title_last_refresh_time"
         android:layout_marginEnd="6dp"
         app:layout_constraintTop_toTopOf="@id/last_refresh_time"

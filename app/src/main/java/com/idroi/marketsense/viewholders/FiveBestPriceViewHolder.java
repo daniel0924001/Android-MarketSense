@@ -53,28 +53,44 @@ public class FiveBestPriceViewHolder {
         try {
             for (int i = 0; i < 5; i++) {
                 StockTradeData.BestPriceRow bestPriceRow = bestPriceRows[i];
-                MarketSenseRendererHelper.addTextViewWithAutoColor(
+                MarketSenseRendererHelper.addNumberStringToTextView(
                         viewHolder.bestPrices[i].buyPrice,
                         String.valueOf(bestPriceRow.getBuyPrice()),
+                        "--",
                         bestPriceRow.getBuyPrice(),
                         yesterdayPrice);
-                MarketSenseRendererHelper.addTextViewWithAutoColor(
+                MarketSenseRendererHelper.addNumberStringToTextView(
                         viewHolder.bestPrices[i].sellPrice,
                         String.valueOf(bestPriceRow.getSellPrice()),
+                        "--",
                         bestPriceRow.getSellPrice(),
                         yesterdayPrice);
 
                 float buyVolume = bestPriceRow.getBuyVolume();
                 float sellVolume = bestPriceRow.getSellVolume();
 
-                MarketSenseRendererHelper.addTextViewWithColor(
-                        viewHolder.bestPrices[i].buyVolume,
-                        String.valueOf((int) buyVolume),
-                        R.color.white);
-                MarketSenseRendererHelper.addTextViewWithColor(
-                        viewHolder.bestPrices[i].sellVolume,
-                        String.valueOf((int) sellVolume),
-                        R.color.white);
+                if(buyVolume != 0) {
+                    MarketSenseRendererHelper.addTextViewWithColor(
+                            viewHolder.bestPrices[i].buyVolume,
+                            String.valueOf((int) buyVolume),
+                            R.color.white);
+                } else {
+                    MarketSenseRendererHelper.addTextViewWithColor(
+                            viewHolder.bestPrices[i].buyVolume,
+                            "--",
+                            R.color.white);
+                }
+                if(sellVolume != 0) {
+                    MarketSenseRendererHelper.addTextViewWithColor(
+                            viewHolder.bestPrices[i].sellVolume,
+                            String.valueOf((int) sellVolume),
+                            R.color.white);
+                } else {
+                    MarketSenseRendererHelper.addTextViewWithColor(
+                            viewHolder.bestPrices[i].sellVolume,
+                            "--",
+                            R.color.white);
+                }
 
                 if(buyVolume > tempMaxVolume) {
                     tempMaxVolume = buyVolume;
@@ -93,15 +109,23 @@ public class FiveBestPriceViewHolder {
                     for(int i = 0; i < 5; i++) {
                         StockTradeData.BestPriceRow bestPriceRow = bestPriceRows[i];
 
-                        float buyRatio = bestPriceRow.getBuyVolume() / maxVolume;
-                        float sellRatio = bestPriceRow.getSellVolume() / maxVolume;
+                        if(bestPriceRow.getBuyVolume() != 0) {
+                            ConstraintLayout.LayoutParams buyParams = (ConstraintLayout.LayoutParams) viewHolder.bestPrices[i].buyColorBar.getLayoutParams();
+                            float buyRatio = bestPriceRow.getBuyVolume() / maxVolume;
+                            buyParams.width = (int) (width * buyRatio);
+                            viewHolder.bestPrices[i].buyColorBar.setLayoutParams(buyParams);
+                        } else {
+                            viewHolder.bestPrices[i].buyColorBar.setVisibility(View.GONE);
+                        }
 
-                        ConstraintLayout.LayoutParams burParams = (ConstraintLayout.LayoutParams) viewHolder.bestPrices[i].buyColorBar.getLayoutParams();
-                        burParams.width = (int) (width * buyRatio);
-                        viewHolder.bestPrices[i].buyColorBar.setLayoutParams(burParams);
-                        ConstraintLayout.LayoutParams sellParams = (ConstraintLayout.LayoutParams) viewHolder.bestPrices[i].sellColorBar.getLayoutParams();
-                        sellParams.width = (int) (width * sellRatio);
-                        viewHolder.bestPrices[i].sellColorBar.setLayoutParams(sellParams);
+                        if(bestPriceRow.getSellVolume() != 0) {
+                            ConstraintLayout.LayoutParams sellParams = (ConstraintLayout.LayoutParams) viewHolder.bestPrices[i].sellColorBar.getLayoutParams();
+                            float sellRatio = bestPriceRow.getSellVolume() / maxVolume;
+                            sellParams.width = (int) (width * sellRatio);
+                            viewHolder.bestPrices[i].sellColorBar.setLayoutParams(sellParams);
+                        } else {
+                            viewHolder.bestPrices[i].sellColorBar.setVisibility(View.GONE);
+                        }
                     }
                 }
             });

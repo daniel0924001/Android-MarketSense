@@ -67,6 +67,7 @@ import com.idroi.marketsense.viewholders.ChartTickTopItemsViewHolder;
 import com.idroi.marketsense.viewholders.FiveBestPriceViewHolder;
 import com.idroi.marketsense.viewholders.PredictForDifferentPeriodViewHolder;
 import com.idroi.marketsense.viewholders.StockActivityActionBarViewHolder;
+import com.idroi.marketsense.viewholders.StockActivityBottomSelector;
 import com.idroi.marketsense.viewholders.StockActivityRealPriceBlockViewHolder;
 import com.idroi.marketsense.viewholders.StockPredictionBlockViewHolder;
 
@@ -116,19 +117,11 @@ public class StockActivity extends AppCompatActivity {
     public final static int CLICK_VOTE_UP_BEFORE_LOGIN = 5;
     public final static int CLICK_VOTE_DOWN_BEFORE_LOGIN = 6;
 
-    private static final float CONST_ENABLE_ALPHA = 1.0f;
-    private static final float CONST_DISABLE_ALPHA = 0.7f;
-
     private YahooStxChartCrawler mYahooStxChartCrawler;
     private ProgressBar mLoadingProgressBar;
-    private boolean mIsMoreLoadFinished = false;
     private String mStockName;
     private String mCode;
     private String mPrice, mDiffNum, mDiffPercentage;
-    private ConstraintLayout mCommentBlock, mNewsBlock;
-    private ConstraintLayout mBottomFixedBlock;
-
-    private boolean mIsStockAIOpen = false;
 
     private CallbackManager mFBCallbackManager;
     private UserProfile mUserProfile;
@@ -142,13 +135,10 @@ public class StockActivity extends AppCompatActivity {
     private RecyclerView mNewsRecyclerView;
     private NewsRecyclerAdapter mNewsRecyclerAdapter;
 
-    private int mVoteRaiseNum, mVoteFallNum;
-
     private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
     private int mLastClickedButton;
     private AlertDialog mLoginAlertDialog, mStarAlertDialog;
     private LoginButton mFBLoginBtn;
-    private ConstraintLayout mSelectorComment, mSelectorNews;
     private NestedScrollView mNestedScrollView;
 
     private View mMoreAlertView;
@@ -171,6 +161,7 @@ public class StockActivity extends AppCompatActivity {
     private ChartTickBottomItemsViewHolder mChartTickBottomItemsViewHolder;
     private FiveBestPriceViewHolder mBestPriceRowViewHolder;
     private PredictForDifferentPeriodViewHolder mPredictForDifferentPeriodViewHolder;
+    private StockActivityBottomSelector mStockActivityBottomSelector;
 
     private AlertDialog mMoreAlertDialog;
 
@@ -218,6 +209,9 @@ public class StockActivity extends AppCompatActivity {
         mPredictForDifferentPeriodViewHolder =
                 PredictForDifferentPeriodViewHolder
                         .convertToViewHolder(findViewById(R.id.predict_for_different_period));
+        mStockActivityBottomSelector =
+                StockActivityBottomSelector
+                        .convertToViewHolder(findViewById(R.id.stock_activity_bottom_selector));
     }
 
     @Override
@@ -257,7 +251,6 @@ public class StockActivity extends AppCompatActivity {
     }
 
     private void initSocialButtons() {
-        mBottomFixedBlock = findViewById(R.id.the_most_bottom_block);
 
         Button buttonGoUp = findViewById(R.id.btn_go_up);
         buttonGoUp.setOnClickListener(new View.OnClickListener() {
@@ -370,17 +363,13 @@ public class StockActivity extends AppCompatActivity {
     }
 
     private void initSelector() {
-        mCommentBlock = findViewById(R.id.marketsense_stock_comment);
-        mNewsBlock = findViewById(R.id.marketsense_stock_news);
-        mSelectorComment = findViewById(R.id.selector_comment_block);
-        mSelectorNews = findViewById(R.id.selector_news_block);
-        mSelectorComment.setOnClickListener(new View.OnClickListener() {
+        mStockActivityBottomSelector.commentSelector.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 chooseBottomBlock(0);
             }
         });
-        mSelectorNews.setOnClickListener(new View.OnClickListener() {
+        mStockActivityBottomSelector.newsSelector.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 chooseBottomBlock(1);
@@ -408,16 +397,14 @@ public class StockActivity extends AppCompatActivity {
     private void chooseBottomBlock(int position) {
         switch (position) {
             case 0:
-                mCommentBlock.setVisibility(View.VISIBLE);
-                mNewsBlock.setVisibility(View.GONE);
-                mSelectorComment.setBackground(getDrawable(R.drawable.border_selector_selected));
-                mSelectorNews.setBackground(getDrawable(R.drawable.border_selector));
+                mStockActivityBottomSelector.setSelected(this,
+                        mStockActivityBottomSelector.commentSelector,
+                        mStockActivityBottomSelector.commentBlock);
                 break;
             case 1:
-                mCommentBlock.setVisibility(View.GONE);
-                mNewsBlock.setVisibility(View.VISIBLE);
-                mSelectorComment.setBackground(getDrawable(R.drawable.border_selector));
-                mSelectorNews.setBackground(getDrawable(R.drawable.border_selector_selected));
+                mStockActivityBottomSelector.setSelected(this,
+                        mStockActivityBottomSelector.newsSelector,
+                        mStockActivityBottomSelector.newsBlock);
                 break;
         }
     }
@@ -590,8 +577,6 @@ public class StockActivity extends AppCompatActivity {
                     if (commentAndVote.getCommentSize() > 0) {
                         showCommentBlock();
                     }
-                    mVoteRaiseNum = commentAndVote.getRaiseNumber();
-                    mVoteFallNum = commentAndVote.getFallNumber();
                     MSLog.d("update stock raise vote number: " + commentAndVote.getRaiseNumber());
                     MSLog.d("update stock fall vote number: " + commentAndVote.getFallNumber());
                 }
@@ -788,8 +773,6 @@ public class StockActivity extends AppCompatActivity {
             MSLog.d("set information in normal stock list click");
             mStockName = getIntent().getStringExtra(Intent.EXTRA_TITLE);
             mCode = getIntent().getStringExtra(EXTRA_CODE);
-            mVoteRaiseNum = getIntent().getIntExtra(EXTRA_RAISE_NUM, 0);
-            mVoteFallNum = getIntent().getIntExtra(EXTRA_FALL_NUM, 0);
 
             mIsFavorite = mUserProfile.isFavoriteStock(mCode);
 
@@ -815,8 +798,6 @@ public class StockActivity extends AppCompatActivity {
 
                 mStockName = stock.getName();
                 mCode = stock.getCode();
-                mVoteRaiseNum = stock.getRaiseNum();
-                mVoteFallNum = stock.getFallNum();
 
                 mIsFavorite = mUserProfile.isFavoriteStock(mCode);
 
@@ -982,7 +963,7 @@ public class StockActivity extends AppCompatActivity {
                 showCommentBlock();
 
                 chooseBottomBlock(0);
-                slideToView(mSelectorComment);
+                slideToView(mStockActivityBottomSelector.commentSelector);
 
                 MSLog.d(String.format("user send a comment on (%s, %s, %s): %s", type, id, eventId, html));
             }

@@ -120,7 +120,7 @@ public class StockActivity extends AppCompatActivity {
     private static final float CONST_DISABLE_ALPHA = 0.7f;
 
     private YahooStxChartCrawler mYahooStxChartCrawler;
-    private ProgressBar mLoadingProgressBar, mLoadingProgressBarMore;
+    private ProgressBar mLoadingProgressBar;
     private boolean mIsMoreLoadFinished = false;
     private String mStockName;
     private String mCode;
@@ -129,7 +129,6 @@ public class StockActivity extends AppCompatActivity {
     private ConstraintLayout mBottomFixedBlock;
 
     private boolean mIsStockAIOpen = false;
-    private boolean mIsStockAILoading = false;
 
     private CallbackManager mFBCallbackManager;
     private UserProfile mUserProfile;
@@ -223,17 +222,9 @@ public class StockActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(mIsStockAIOpen) {
-            mBottomFixedBlock.setVisibility(View.VISIBLE);
-            if(mLoadingProgressBarMore != null) {
-                mLoadingProgressBarMore.setVisibility(View.GONE);
-            }
-            mIsStockAIOpen = false;
-        } else {
-            super.onBackPressed();
-            mUserProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
-            overridePendingTransition(R.anim.stop, R.anim.right_to_left);
-        }
+        super.onBackPressed();
+        mUserProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
+        overridePendingTransition(R.anim.stop, R.anim.right_to_left);
     }
 
     @Override
@@ -654,7 +645,6 @@ public class StockActivity extends AppCompatActivity {
     private void initStockChart() {
 
         mLoadingProgressBar = findViewById(R.id.loading_progress_bar_1);
-        mLoadingProgressBarMore = findViewById(R.id.loading_progress_bar_2);
         mSwipeRefreshLayout = findViewById(R.id.swipe_to_refresh);
 
         updatePrice(mPrice, mDiffNum, mDiffPercentage, null);

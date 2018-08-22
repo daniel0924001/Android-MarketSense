@@ -280,13 +280,13 @@ public class Stock {
     public int getDiffColorResourceId() {
         switch (mDiffDirection) {
             case TREND_UP:
-                return R.color.colorTrendUp;
+                return R.color.trend_red;
             case TREND_FLAT:
-                return R.color.colorTrendFlat;
+                return R.color.draw_grey;
             case TREND_DOWN:
-                return R.color.colorTrendDown;
+                return R.color.trend_green;
             default:
-                return R.color.colorTrendFlat;
+                return R.color.draw_grey;
         }
     }
 
@@ -488,26 +488,26 @@ public class Stock {
             textView.setTextColor(context.getResources().getColor(R.color.white));
             switch (mDiffDirection) {
                 case TREND_UP:
-                    textView.setBackgroundColor(context.getResources().getColor(R.color.colorTrendUp));
+                    textView.setBackgroundColor(context.getResources().getColor(R.color.trend_red));
                     break;
                 case TREND_DOWN:
-                    textView.setBackgroundColor(context.getResources().getColor(R.color.colorTrendDown));
+                    textView.setBackgroundColor(context.getResources().getColor(R.color.trend_green));
                     break;
             }
         } else {
             textView.setBackgroundColor(context.getResources().getColor(R.color.white));
             switch (mDiffDirection) {
                 case TREND_UP:
-                    textView.setTextColor(context.getResources().getColor(R.color.colorTrendUp));
+                    textView.setTextColor(context.getResources().getColor(R.color.trend_red));
                     break;
                 case TREND_FLAT:
-                    textView.setTextColor(context.getResources().getColor(R.color.colorTrendFlat));
+                    textView.setTextColor(context.getResources().getColor(R.color.draw_grey));
                     break;
                 case TREND_DOWN:
-                    textView.setTextColor(context.getResources().getColor(R.color.colorTrendDown));
+                    textView.setTextColor(context.getResources().getColor(R.color.trend_green));
                     break;
                 default:
-                    textView.setTextColor(context.getResources().getColor(R.color.colorTrendFlat));
+                    textView.setTextColor(context.getResources().getColor(R.color.draw_grey));
                     break;
             }
         }
@@ -571,13 +571,13 @@ public class Stock {
             hitTextView.setVisibility(View.VISIBLE);
             if (mTodayPredictionDiffDirection == TREND_UP) {
                 hitTextView.setBackground(resources.getDrawable(R.drawable.block_red_border_with_radius_corner));
-                hitTextView.setTextColor(resources.getColor(R.color.grapefruit_four));
+                hitTextView.setTextColor(resources.getColor(R.color.trend_red));
             } else if (mTodayPredictionDiffDirection == TREND_DOWN) {
                 hitTextView.setBackground(resources.getDrawable(R.drawable.block_green_border_with_radius_corner));
-                hitTextView.setTextColor(resources.getColor(R.color.green_blue));
+                hitTextView.setTextColor(resources.getColor(R.color.trend_green));
             } else {
                 hitTextView.setBackground(resources.getDrawable(R.drawable.block_flat_border_with_radius_corner));
-                hitTextView.setTextColor(resources.getColor(R.color.colorTrendFlat));
+                hitTextView.setTextColor(resources.getColor(R.color.draw_grey));
             }
         } else {
             hitTextView.setVisibility(View.GONE);

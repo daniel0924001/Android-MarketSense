@@ -181,7 +181,7 @@ public class YahooStxChartTickRenderer {
         yRightAxis.setDrawLimitLinesBehindData(true);
 
         YAxis yRightAxisVolume = mVolumeBarChart.getAxisRight();
-        yRightAxisVolume.setTextColor(context.getResources().getColor(R.color.colorTrendUp));
+        yRightAxisVolume.setTextColor(context.getResources().getColor(R.color.trend_red));
         yRightAxisVolume.setTextSize(10f);
         yRightAxisVolume.setDrawAxisLine(false);
         yRightAxisVolume.setDrawGridLines(true);

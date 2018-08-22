@@ -419,7 +419,7 @@ public class RichEditorActivity extends AppCompatActivity {
                         getResources().getColor(R.color.marketsense_rich_edit_black_background));
             }
             view.setBackgroundColor(
-                    getResources().getColor(R.color.colorTrendUp));
+                    getResources().getColor(R.color.trend_red));
             mLastPressView = view;
         } else {
             view.setBackgroundColor(
@@ -436,7 +436,7 @@ public class RichEditorActivity extends AppCompatActivity {
                         getResources().getColor(R.color.marketsense_rich_edit_black_background));
             }
             view.setBackgroundColor(
-                    getResources().getColor(R.color.colorTrendUp));
+                    getResources().getColor(R.color.trend_red));
             mLastPressView = view;
             view.performClick();
         } else if (motionEvent.getAction() == MotionEvent.ACTION_UP ||
@@ -570,7 +570,7 @@ public class RichEditorActivity extends AppCompatActivity {
 //                        getResources().getColor(R.color.marketsense_text_red));
 //                view.setBackgroundColor(isChanged ?
 //                        getResources().getColor(R.color.marketsense_rich_edit_black_background) :
-//                        getResources().getColor(R.color.colorTrendUp));
+//                        getResources().getColor(R.color.trend_red));
 //                isChanged = !isChanged;
 //            }
 //        });
@@ -584,7 +584,7 @@ public class RichEditorActivity extends AppCompatActivity {
 //                        Color.YELLOW);
 //                view.setBackgroundColor(isChanged ?
 //                        getResources().getColor(R.color.marketsense_rich_edit_black_background) :
-//                        getResources().getColor(R.color.colorTrendUp));
+//                        getResources().getColor(R.color.trend_red));
 //                isChanged = !isChanged;
 //            }
 //        });

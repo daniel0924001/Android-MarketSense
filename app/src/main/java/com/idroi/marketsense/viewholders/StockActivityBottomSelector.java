@@ -60,7 +60,7 @@ public class StockActivityBottomSelector {
                 other.setTextColor(context.getResources().getColor(R.color.text_black));
             } else {
                 other.setBackground(context.getDrawable(R.drawable.border_selector_selected));
-                other.setTextColor(context.getResources().getColor(R.color.grapefruit_four));
+                other.setTextColor(context.getResources().getColor(R.color.trend_red));
             }
         }
 

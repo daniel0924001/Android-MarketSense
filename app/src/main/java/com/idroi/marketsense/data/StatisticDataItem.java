@@ -143,14 +143,14 @@ public class StatisticDataItem {
             try {
                 float valueFloat = Float.valueOf(value);
                 if (valueFloat > 0) {
-                    valueTextView.setTextColor(context.getResources().getColor(R.color.colorTrendUp));
+                    valueTextView.setTextColor(context.getResources().getColor(R.color.trend_red));
                 } else if (valueFloat < 0) {
-                    valueTextView.setTextColor(context.getResources().getColor(R.color.colorTrendDown));
+                    valueTextView.setTextColor(context.getResources().getColor(R.color.trend_green));
                 } else {
-                    valueTextView.setTextColor(context.getResources().getColor(R.color.colorTrendFlat));
+                    valueTextView.setTextColor(context.getResources().getColor(R.color.draw_grey));
                 }
             } catch (Exception exception) {
-                valueTextView.setTextColor(context.getResources().getColor(R.color.colorTrendFlat));
+                valueTextView.setTextColor(context.getResources().getColor(R.color.draw_grey));
             }
         }
     }

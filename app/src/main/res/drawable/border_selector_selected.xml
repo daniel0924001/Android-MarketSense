@@ -4,8 +4,8 @@
         <shape
             android:shape="rectangle">
             <!-- Set the border color of your layout here -->
-            <stroke android:width="0dp" android:color="@color/grapefruit_four" />
-            <solid android:color="@color/grapefruit_four" />
+            <stroke android:width="0dp" android:color="@color/trend_red" />
+            <solid android:color="@color/trend_red" />
 
         </shape>
     </item>
@@ -16,8 +16,8 @@
         <shape
             android:shape="rectangle">
             <!-- Set the background color of your layout here -->
-            <stroke android:width="0dp" android:color="#FFFFFF" />
-            <solid android:color="#FFFFFF" />
+            <stroke android:width="0dp" android:color="@color/white" />
+            <solid android:color="@color/white" />
         </shape>
     </item>
 

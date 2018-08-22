@@ -57,14 +57,14 @@ public class StockActivityActionBarViewHolder {
         try {
             float diffPercentageFloat = Float.valueOf(diffNum);
             if(diffPercentageFloat > 0) {
-                viewHolder.actionBar.setBackgroundDrawable(new ColorDrawable(resources.getColor(R.color.grapefruit_four)));
+                viewHolder.actionBar.setBackgroundDrawable(new ColorDrawable(resources.getColor(R.color.trend_red)));
             } else if(diffPercentageFloat < 0) {
-                viewHolder.actionBar.setBackgroundDrawable(new ColorDrawable(resources.getColor(R.color.green_blue)));
+                viewHolder.actionBar.setBackgroundDrawable(new ColorDrawable(resources.getColor(R.color.trend_green)));
             } else {
-                viewHolder.actionBar.setBackgroundDrawable(new ColorDrawable(resources.getColor(R.color.cloudy_blue)));
+                viewHolder.actionBar.setBackgroundDrawable(new ColorDrawable(resources.getColor(R.color.draw_grey)));
             }
         } catch (NumberFormatException e) {
-            viewHolder.actionBar.setBackgroundDrawable(new ColorDrawable(resources.getColor(R.color.cloudy_blue)));
+            viewHolder.actionBar.setBackgroundDrawable(new ColorDrawable(resources.getColor(R.color.draw_grey)));
             MSLog.e("NumberFormatException: " + diffNum);
         }
     }

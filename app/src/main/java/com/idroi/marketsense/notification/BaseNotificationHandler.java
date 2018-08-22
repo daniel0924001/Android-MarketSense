@@ -91,7 +91,7 @@ public abstract class BaseNotificationHandler {
                         .setContentTitle(title)
                         .setContentText(text)
                         .setAutoCancel(true)
-                        .setColor(context.getResources().getColor(R.color.text_pink))
+                        .setColor(context.getResources().getColor(R.color.trend_red))
                         .setContentIntent(pendingIntent)
                         .setVibrate(new long[] {0})
                         .setPriority(getPriority())

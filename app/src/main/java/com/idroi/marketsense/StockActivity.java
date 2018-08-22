@@ -252,7 +252,7 @@ public class StockActivity extends AppCompatActivity {
 
     private void initSocialButtons() {
 
-        Button buttonGoUp = findViewById(R.id.btn_go_up);
+        ImageView buttonGoUp = findViewById(R.id.btn_go_up);
         buttonGoUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

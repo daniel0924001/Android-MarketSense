@@ -70,11 +70,11 @@ public class MarketSenseRendererHelper {
                                                 @Nullable final String contents,
                                                 float value, float baseline) {
         if(value > baseline) {
-            addTextViewWithColor(textView, contents, R.color.faded_orange);
+            addTextViewWithColor(textView, contents, R.color.trend_red);
         } else if(value < baseline) {
-            addTextViewWithColor(textView, contents, R.color.green_blue);
+            addTextViewWithColor(textView, contents, R.color.trend_green);
         } else {
-            addTextViewWithColor(textView, contents, R.color.text_black);
+            addTextViewWithColor(textView, contents, R.color.draw_grey);
         }
     }
 
@@ -167,11 +167,11 @@ public class MarketSenseRendererHelper {
                 addTextViewWithColor(textView, defaultContents, R.color.text_black);
             } else {
                 if(value > baseline) {
-                    addTextViewWithColor(textView, contents, R.color.faded_orange);
+                    addTextViewWithColor(textView, contents, R.color.trend_red);
                 } else if(value < baseline) {
-                    addTextViewWithColor(textView, contents, R.color.green_blue);
+                    addTextViewWithColor(textView, contents, R.color.trend_green);
                 } else {
-                    addTextViewWithColor(textView, contents, R.color.text_black);
+                    addTextViewWithColor(textView, contents, R.color.draw_grey);
                 }
             }
         }

@@ -12,7 +12,7 @@
         android:textSize="14sp"
         android:fontFamily="sans-serif"
         android:textStyle="normal"
-        android:textColor="@color/grapefruit_four"
+        android:textColor="@color/trend_red"
         android:text="@string/title_chart_type_1m"
         android:gravity="center"
         android:background="@drawable/border_selector_selected"

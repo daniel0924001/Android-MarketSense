@@ -5,7 +5,6 @@
     <color name="colorPrimaryDark">#222C3A</color>
     <color name="colorAccent">#F20060</color>
 
-    <color name="text_black">#4a4a4a</color>
     <color name="text_white">#ffffff</color>
     <color name="text_red">#F20060</color>
     <color name="text_green">#00BE9F</color>
@@ -29,67 +28,52 @@
     <color name="marketsense_text_gray">#a5a5a5</color>
     <color name="marketsense_text_light_gray">#dfdfdf</color>
     <color name="marketsense_text_white">#fff</color>
-    <color name="marketsense_text_red">#F20060</color>
     <color name="marketsense_trans_black">#4c000000</color>
     <color name="marketsense_trans_light_black">#28000000</color>
     <color name="marketsense_trans">#00ffffff</color>
 
     <color name="marketsense_rich_edit_black_background">#4a4a4a</color>
 
-    <color name="colorTrendUp">#ff6358</color>
-    <color name="colorTrendDown">#00cf7a</color>
-    <color name="colorTrendFlat">#bfcad7</color>
-
     <color name="color_volume_line">#e64a19</color>
     <color name="color_price_line">#e73b76ec</color>
-    <color name="color_yellow">#E9C46A</color>
 
     <color name="card_top_color">#ff6a00</color>
     <color name="card_bottom_color">#ee0979</color>
 
-    <color name="background_predict_up_top">#ff8862</color>
-    <color name="background_predict_up_bottom">#ff4248</color>
-    <color name="background_predict_down_top">#21d7c2</color>
-    <color name="background_predict_down_bottom">#03cab3</color>
-
     <color name="foreground_shadow">#b3ffffff</color>
 
     <!-- new version -->
-    <color name="hyperlink_color">#4a90e2</color>
-
-    <color name="black">#2b2b2b</color>
     <color name="white">#ffffff</color>
     <color name="silver">#c8c7cc</color>
-    <color name="salmon">#ff6762</color>
-    <color name="light_red">#ff4248</color>
     <color name="pinkish_grey">#bdbdbd</color>
     <color name="white_two">#eeeeee</color>
     <color name="white_seven">#e4e4e4</color>
     <color name="white_eight">#fbfbfb</color>
-    <color name="white_three">#f6f6f6</color>
     <color name="white_four">#f3f3f3</color>
     <color name="warm_grey">#959595</color>
     <color name="warm_grey_two">#7d7d7d</color>
-    <color name="alight_red_two">#ff444a</color>
     <color name="pinkish_grey_two">#c1c1c1</color>
-    <color name="pinkish_grey_three">#cacaca</color>
     <color name="warm_grey_three">#777777</color>
     <color name="pinkish_grey_four">#c3c3c3</color>
     <color name="warm_grey_four">#6f6f6f</color>
-    <color name="grapefruit_four">#ff6358</color>
-    <color name="yellow_orange">#ffbb00</color>
     <color name="cool_grey">#abb1bc</color>
     <color name="pale_grey">#f8fafc</color>
     <color name="gunmetal">#454d5e</color>
     <color name="ice_blue">#f6faff</color>
     <color name="cool_grey_two">#8a909c</color>
-    <color name="faded_orange">#ee6663</color>
     <color name="pale_grey_two">#f6f7fb</color>
-    <color name="bluey_grey">#8797b2</color>
-    <color name="green_blue">#00d07c</color>
-    <color name="cloudy_blue">#bfcad7</color>
-    <color name="cornflower">#5680f7</color>
+    <color name="bluey_grey">#B48797B2</color>
     <color name="white_six">#ebebeb</color>
     <color name="battleship_grey">#717886</color>
     <color name="warm_grey_87">#de727272</color>
+
+    <!-- color guideline -->
+    <color name="trend_red">#ff6358</color>
+    <color name="trend_green">#00cf7a</color>
+    <color name="tag_yellow">#ffbb00</color>
+    <color name="stock_blue">#5680f7</color>
+    <color name="text_black">#2b2b2b</color>
+    <color name="draw_grey">#bfcad7</color>
+    <color name="background">#ebedf0</color>
+    <color name="grid_grey">#f6f7fb</color>
 </resources>

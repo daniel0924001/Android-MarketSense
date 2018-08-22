@@ -60,7 +60,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif"
         android:text="@string/title_company_price_diff_percentage"
-        android:textColor="@color/colorTrendUp"
+        android:textColor="@color/trend_red"
         android:textSize="14sp"
         android:textStyle="normal"
         android:padding="5dp"

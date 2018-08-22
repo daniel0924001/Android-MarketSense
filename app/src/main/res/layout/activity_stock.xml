@@ -207,17 +207,14 @@
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.85"/>
 
-        <Button
+        <ImageView
             android:id="@+id/btn_go_up"
             android:layout_width="0dp"
             android:layout_height="48dp"
-            android:background="@color/grapefruit_four"
-            android:text="@string/title_go_top"
-            android:textColor="@color/text_white"
-            android:textSize="12sp"
-            android:gravity="center_horizontal|top"
-            android:paddingTop="5dp"
-            android:drawableTop="@drawable/ic_arrow_upward_white_24px"
+            android:padding="12dp"
+            android:background="@color/trend_red"
+            android:contentDescription="@string/title_go_back"
+            android:src="@mipmap/ic_arrow_backtotop"
             android:stateListAnimator="@null"
             android:foreground="@drawable/item_foreground_with_clicked_shadow"
             app:layout_constraintBottom_toBottomOf="parent"

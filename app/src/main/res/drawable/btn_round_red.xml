@@ -3,7 +3,7 @@
     <item>
         <shape android:shape="oval">
             <!--<stroke android:color="#1E90FF" android:width="5dp" />-->
-            <solid android:color="@color/colorTrendUp"/>
+            <solid android:color="@color/trend_red"/>
             <size android:width="30dp" android:height="30dp"/>
         </shape>
     </item>

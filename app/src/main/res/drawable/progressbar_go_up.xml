@@ -32,8 +32,8 @@
                 <corners
                     android:radius="5dip" />
                 <gradient
-                    android:startColor="@color/colorTrendUp"
-                    android:endColor="@color/colorTrendUp"
+                    android:startColor="@color/trend_red"
+                    android:endColor="@color/trend_red"
                     android:angle="270"
                     />
             </shape>

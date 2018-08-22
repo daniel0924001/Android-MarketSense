@@ -77,26 +77,26 @@ public class StockActivityRealPriceBlockViewHolder {
         try {
             float diffPercentageFloat = Float.valueOf(diffNum);
             if(diffPercentageFloat > 0) {
-                MarketSenseRendererHelper.setBackgroundColor(viewHolder.mainView, R.color.grapefruit_four);
+                MarketSenseRendererHelper.setBackgroundColor(viewHolder.mainView, R.color.trend_red);
                 MarketSenseRendererHelper.addTextViewWithIcon(
                         viewHolder.diffTextView,
                         String.format(format, diffNum, diffPercentage),
                         R.mipmap.ic_trend_arrow_up_white);
             } else if(diffPercentageFloat < 0) {
-                MarketSenseRendererHelper.setBackgroundColor(viewHolder.mainView, R.color.green_blue);
+                MarketSenseRendererHelper.setBackgroundColor(viewHolder.mainView, R.color.trend_green);
                 MarketSenseRendererHelper.addTextViewWithIcon(
                         viewHolder.diffTextView,
                         String.format(format, diffNum, diffPercentage),
                         R.mipmap.ic_trend_arrow_down_white);
             } else {
-                MarketSenseRendererHelper.setBackgroundColor(viewHolder.mainView, R.color.cloudy_blue);
+                MarketSenseRendererHelper.setBackgroundColor(viewHolder.mainView, R.color.draw_grey);
                 MarketSenseRendererHelper.addTextViewWithIcon(
                         viewHolder.diffTextView,
                         String.format(format, diffNum, diffPercentage),
                         0);
             }
         } catch (NumberFormatException e) {
-            MarketSenseRendererHelper.setBackgroundColor(viewHolder.mainView, R.color.cloudy_blue);
+            MarketSenseRendererHelper.setBackgroundColor(viewHolder.mainView, R.color.draw_grey);
             MarketSenseRendererHelper.addTextViewWithIcon(
                     viewHolder.diffTextView,
                     String.format(format, diffNum, diffPercentage),

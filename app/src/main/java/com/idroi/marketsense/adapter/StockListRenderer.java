@@ -93,10 +93,10 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
 
     private void animationForPriceChange(final TextView textView, final Stock stock, boolean goUp) {
         if(goUp) {
-            textView.setBackgroundColor(textView.getContext().getResources().getColor(R.color.colorTrendUp));
+            textView.setBackgroundColor(textView.getContext().getResources().getColor(R.color.trend_red));
             textView.setTextColor(textView.getContext().getResources().getColor(R.color.text_white));
         } else {
-            textView.setBackgroundColor(textView.getResources().getColor(R.color.colorTrendDown));
+            textView.setBackgroundColor(textView.getResources().getColor(R.color.trend_green));
             textView.setTextColor(textView.getResources().getColor(R.color.text_white));
         }
         new Handler().postDelayed(new Runnable() {

@@ -112,11 +112,11 @@ public class YahooStxChartTaRenderer {
             volume.setData(stockTaData);
 
             if(closePrice > openPrice) {
-                colorsArray.add(resources.getColor(R.color.colorTrendUp));
+                colorsArray.add(resources.getColor(R.color.trend_red));
             } else if(closePrice < openPrice) {
-                colorsArray.add(resources.getColor(R.color.colorTrendDown));
+                colorsArray.add(resources.getColor(R.color.trend_green));
             } else {
-                colorsArray.add(resources.getColor(R.color.colorTrendFlat));
+                colorsArray.add(resources.getColor(R.color.draw_grey));
             }
         }
         CandleDataSet candleDataSet = new CandleDataSet(entries, null);
@@ -125,11 +125,11 @@ public class YahooStxChartTaRenderer {
         candleDataSet.setColor(Color.rgb(80, 80, 80));
         candleDataSet.setShadowColor(Color.DKGRAY);
         candleDataSet.setShadowWidth(0.7f);
-        candleDataSet.setDecreasingColor(resources.getColor(R.color.colorTrendDown));
+        candleDataSet.setDecreasingColor(resources.getColor(R.color.trend_green));
         candleDataSet.setDecreasingPaintStyle(Paint.Style.FILL);
-        candleDataSet.setIncreasingColor(resources.getColor(R.color.colorTrendUp));
+        candleDataSet.setIncreasingColor(resources.getColor(R.color.trend_red));
         candleDataSet.setIncreasingPaintStyle(Paint.Style.FILL);
-        candleDataSet.setNeutralColor(resources.getColor(R.color.colorTrendFlat));
+        candleDataSet.setNeutralColor(resources.getColor(R.color.draw_grey));
         CandleData data = new CandleData(candleDataSet);
 
         mCandleStickChart.setData(data);
@@ -206,7 +206,7 @@ public class YahooStxChartTaRenderer {
         yRightAxis.setYOffset(-7);
 
         YAxis yRightAxisVolume = mVolumeBarChart.getAxisRight();
-        yRightAxisVolume.setTextColor(context.getResources().getColor(R.color.colorTrendUp));
+        yRightAxisVolume.setTextColor(context.getResources().getColor(R.color.trend_red));
         yRightAxisVolume.setTextSize(10f);
         yRightAxisVolume.setDrawAxisLine(false);
         yRightAxisVolume.setDrawGridLines(true);

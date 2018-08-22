@@ -37,7 +37,7 @@
         android:maxLines="1"
         android:textColor="@color/black"
         android:textSize="16sp"
-        android:fontFamily="sans-serif"
+        android:fontFamily="sans-serif-medium"
         android:text="@string/main_page_news_ranking"
         android:layout_marginStart="12dp"
         android:layout_marginTop="32dp"

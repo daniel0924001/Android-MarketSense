@@ -116,7 +116,7 @@ public class YahooStxChartTaRenderer {
             } else if(closePrice < openPrice) {
                 colorsArray.add(resources.getColor(R.color.colorTrendDown));
             } else {
-                colorsArray.add(resources.getColor(R.color.colorTrendFlatGray));
+                colorsArray.add(resources.getColor(R.color.colorTrendFlat));
             }
         }
         CandleDataSet candleDataSet = new CandleDataSet(entries, null);

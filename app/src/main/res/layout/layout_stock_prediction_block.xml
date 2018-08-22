@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.335"/>
+        app:layout_constraintGuide_percent="0.334"/>
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline_right_part"
@@ -23,9 +23,8 @@
         android:id="@+id/today_block"
         android:layout_width="0dp"
         android:layout_height="64dp"
-        android:layout_marginStart="18dp"
+        android:layout_marginStart="16dp"
         android:background="@drawable/block_gray_border_with_radius_corner"
-        app:layout_constraintTop_toTopOf="@id/guideline_bottom_part"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/guideline_left_part">
 
@@ -65,7 +64,6 @@
         android:layout_height="64dp"
         android:layout_marginStart="8dp"
         android:background="@drawable/block_predict_unavailable"
-        app:layout_constraintTop_toTopOf="@id/guideline_bottom_part"
         app:layout_constraintStart_toEndOf="@id/guideline_left_part"
         app:layout_constraintEnd_toEndOf="@id/guideline_right_part">
 
@@ -106,7 +104,6 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/block_predict_unavailable"
-        app:layout_constraintTop_toTopOf="@id/guideline_bottom_part"
         app:layout_constraintStart_toStartOf="@id/guideline_right_part"
         app:layout_constraintEnd_toEndOf="parent">
 

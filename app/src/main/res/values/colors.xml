@@ -36,10 +36,9 @@
 
     <color name="marketsense_rich_edit_black_background">#4a4a4a</color>
 
-    <color name="colorTrendUp">#e64a19</color>
-    <color name="colorTrendDown">#0f9d58</color>
-    <color name="colorTrendFlat">#4a4a4a</color>
-    <color name="colorTrendFlatGray">#dfdfdf</color>
+    <color name="colorTrendUp">#ff6358</color>
+    <color name="colorTrendDown">#00cf7a</color>
+    <color name="colorTrendFlat">#bfcad7</color>
 
     <color name="color_volume_line">#e64a19</color>
     <color name="color_price_line">#e73b76ec</color>
@@ -65,6 +64,8 @@
     <color name="light_red">#ff4248</color>
     <color name="pinkish_grey">#bdbdbd</color>
     <color name="white_two">#eeeeee</color>
+    <color name="white_seven">#e4e4e4</color>
+    <color name="white_eight">#fbfbfb</color>
     <color name="white_three">#f6f6f6</color>
     <color name="white_four">#f3f3f3</color>
     <color name="warm_grey">#959595</color>
@@ -90,4 +91,5 @@
     <color name="cornflower">#5680f7</color>
     <color name="white_six">#ebebeb</color>
     <color name="battleship_grey">#717886</color>
+    <color name="warm_grey_87">#de727272</color>
 </resources>

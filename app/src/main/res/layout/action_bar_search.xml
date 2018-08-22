@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/action_bar_background_with_border"
     android:layout_width="match_parent"
     android:layout_height="56dp" >
 
@@ -8,9 +10,8 @@
         android:id="@+id/go_back"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:src="@drawable/ic_keyboard_backspace_black_24px"
+        android:src="@mipmap/ic_arrow_left_black"
         android:background="@null"
-        android:layout_marginStart="16dp"
         android:contentDescription="@string/title_search_cancel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -21,14 +22,13 @@
         android:id="@+id/search_text"
         android:layout_height="36dp"
         android:layout_width="0dp"
-        android:background="@color/text_white"
+        android:background="@color/white_eight"
         android:imeOptions="actionDone"
         android:singleLine="true"
         android:inputType="text"
         android:hint="@string/title_search_hint_stock"
-        android:textColorHint="@color/marketsense_text_gray"
+        android:textColorHint="@color/warm_grey_87"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:textSize="16sp"
         android:letterSpacing="0.04"
         android:fontFamily="sans-serif"

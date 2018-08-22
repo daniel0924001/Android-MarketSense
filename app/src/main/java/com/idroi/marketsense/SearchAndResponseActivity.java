@@ -93,7 +93,7 @@ public class SearchAndResponseActivity extends AppCompatActivity {
 
         if(actionBar != null) {
             actionBar.setElevation(0);
-            actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.text_white)));
+            actionBar.setBackgroundDrawable(getDrawable(R.drawable.action_bar_background_with_border));
             View view = LayoutInflater.from(actionBar.getThemedContext())
                     .inflate(R.layout.action_bar_search, null);
 

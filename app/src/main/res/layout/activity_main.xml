@@ -61,7 +61,8 @@
         android:layout_marginBottom="30dp"
         android:layout_marginEnd="30dp"
         android:visibility="gone"
-        app:backgroundTint="@color/colorPrimary"
+        android:alpha="0.9"
+        app:backgroundTint="@color/trend_red"
         app:layout_constraintBottom_toTopOf="@id/navigation"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_add_white_24px" />

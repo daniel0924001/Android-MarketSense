@@ -2,12 +2,12 @@ package com.idroi.marketsense;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -15,16 +15,11 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.drawee.generic.RoundingParams;
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
@@ -35,8 +30,8 @@ import com.idroi.marketsense.adapter.MainPageScreenSlidePagerAdapter;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.adapter.BaseScreenSlidePagerAdapter;
 import com.idroi.marketsense.adapter.ChoiceScreenSlidePagerAdapter;
-import com.idroi.marketsense.adapter.ChoicesNewsScreenSlidePagerAdapter;
-import com.idroi.marketsense.adapter.PredictScreenSlidePagerAdapter;
+import com.idroi.marketsense.adapter.ProfileScreenSlidePagerAdapter;
+import com.idroi.marketsense.adapter.TrendScreenSlidePagerAdapter;
 import com.idroi.marketsense.adapter.NewsScreenSlidePagerAdapter;
 import com.idroi.marketsense.common.BottomNavigationViewHelper;
 import com.idroi.marketsense.common.ClientData;
@@ -51,6 +46,7 @@ import com.idroi.marketsense.datasource.MarketSenseCommentsFetcher;
 import com.idroi.marketsense.datasource.MarketSenseNewsFetcher;
 import com.idroi.marketsense.datasource.MarketSenseStockFetcher;
 import com.idroi.marketsense.fragments.MainFragment;
+import com.idroi.marketsense.util.ActionBarHelper;
 import com.idroi.marketsense.util.MarketSenseUtils;
 
 import net.lucode.hackware.magicindicator.MagicIndicator;
@@ -82,19 +78,12 @@ public class MainActivity extends AppCompatActivity {
     private MagicIndicator mMagicIndicator;
     private FloatingActionButton mFab;
 
-    private Button mLeftButton, mRightButton;
-    private TextView mActionTitleBar;
-    private TextView mFindKeywordEditText;
-    private ImageView mActionRightImage;
-
     private int mLastSelectedItemId = -1;
 
     public final static int sSearchAndAddRequestCode = 1;
-    public final static int sSettingRequestCode = 2;
     public final static int sSearchAndOpenRequestCode = 3;
     public final static int sSearchAndQueryCommentRequestCode = 4;
     public final static int sEditorRequestCode = 5;
-    private SimpleDraweeView mAvatarImageView;
 
     // fb login part when the user click fab
     private AlertDialog mLoginAlertDialog, mStarAlertDialog;
@@ -108,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
     public final static int LAST_CLICK_IS_ADD_FAVORITE = 2;
     private int mLastClick;
 
-    private boolean mClickable, mSwitchable, mCanReturn = false, mIsDiscussion;
+    private boolean mCanReturn = false;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -121,41 +110,21 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.navigation_main_page:
                         setViewPager(R.id.navigation_main_page);
                         return true;
-                    case R.id.navigation_predict:
-                        setViewPager(R.id.navigation_predict);
+                    case R.id.navigation_trend:
+                        setViewPager(R.id.navigation_trend);
                         return true;
-                    case R.id.navigation_news:
-                        setViewPager(R.id.navigation_news);
+                    case R.id.navigation_post:
+                        setViewPager(R.id.navigation_post);
                         return true;
-                    case R.id.navigation_discussion:
-                        setViewPager(R.id.navigation_discussion);
+                    case R.id.navigation_profile:
+                        setViewPager(R.id.navigation_profile);
                         return true;
-                    case R.id.navigation_choices:
-                        setViewPager(R.id.navigation_choices);
+                    case R.id.navigation_favorites:
+                        setViewPager(R.id.navigation_favorites);
                         return true;
                 }
             }
             return false;
-        }
-    };
-
-    private ViewPager.OnPageChangeListener mOnPageChangeListener
-            = new ViewPager.OnPageChangeListener() {
-        @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        }
-
-        @Override
-        public void onPageSelected(int position) {
-            if(position == 0) {
-                setFab(false);
-            } else if(position == 1) {
-                setFab(true);
-            }
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int state) {
         }
     };
 
@@ -165,10 +134,10 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View view) {
             if(FBHelper.checkFBLogin()) {
                 Intent intent = new Intent(MainActivity.this, SearchAndResponseActivity.class);
+                intent.putExtra(EXTRA_SEARCH_TYPE, SEARCH_CODE_ONLY);
                 startActivityForResult(intent, sSearchAndAddRequestCode);
                 overridePendingTransition(0, 0);
             } else {
-//                initFBLogin();
                 showLoginAlertDialog(LAST_CLICK_IS_ADD_FAVORITE);
             }
         }
@@ -199,11 +168,9 @@ public class MainActivity extends AppCompatActivity {
             public void onGlobalBroadcast(int notifyId, Object payload) {
                 if(notifyId == NOTIFY_USER_HAS_LOGIN) {
                     MSLog.i("[user login]: notify user login success");
-                    internalSetAvatarImage(true);
                 } else if(notifyId == NOTIFY_USER_LOGIN_FAILED) {
                     Toast.makeText(MainActivity.this, R.string.login_failed_description, Toast.LENGTH_SHORT).show();
                     LoginManager.getInstance().logOut();
-                    internalSetAvatarImage(false);
                 } else if(notifyId == NOTIFY_ID_MAIN_ACTIVITY_FUNCTION_CLICK) {
                     switch (mLastClick) {
                         case LAST_CLICK_IS_WRITE_COMMENT:
@@ -214,6 +181,7 @@ public class MainActivity extends AppCompatActivity {
                             break;
                         case LAST_CLICK_IS_ADD_FAVORITE:
                             Intent intent = new Intent(MainActivity.this, SearchAndResponseActivity.class);
+                            intent.putExtra(EXTRA_SEARCH_TYPE, SEARCH_CODE_ONLY);
                             startActivityForResult(intent, sSearchAndAddRequestCode);
                             overridePendingTransition(0, 0);
                             break;
@@ -234,24 +202,14 @@ public class MainActivity extends AppCompatActivity {
         FrescoHelper.initialize(getApplicationContext());
         setContentView(R.layout.activity_main);
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         BottomNavigationViewHelper.disableShiftMode(navigation);
 
         mFab = findViewById(R.id.fab_add);
 
         initFBLogin();
-        setActionBar();
         setViewPager();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if(!mCanReturn) {
-            setAvatarImage();
-        }
     }
 
     @Override
@@ -282,8 +240,7 @@ public class MainActivity extends AppCompatActivity {
         super.onBackPressed();
         if(mCanReturn) {
             mCanReturn = false;
-            setActionBar();
-            setActionBarTwoButton(mClickable, mSwitchable, mIsDiscussion);
+            ActionBarHelper.setActionBarForMain(this, true);
         }
     }
 
@@ -291,97 +248,6 @@ public class MainActivity extends AppCompatActivity {
         MarketSenseCommentsFetcher.prefetchGeneralComments(this);
         MarketSenseNewsFetcher.prefetchNewsFirstPage(this);
         MarketSenseStockFetcher.prefetchWPCTStockList(this);
-    }
-
-    private void setAvatarImage() {
-        if(mAvatarImageView != null) {
-            if (FBHelper.checkFBLogin()) {
-                UserProfile userProfile = ClientData.getInstance(this).getUserProfile();
-                if(userProfile != null) {
-                    MSLog.i("[user login]: fb is login so we try to login. it will notify NOTIFY_USER_HAS_LOGIN event when it successes");
-                    userProfile.tryToLoginAndInitUserData(this);
-                } else {
-                    MSLog.e("User profile is null in setAvatarImage.");
-                    internalSetAvatarImage(false);
-                }
-            } else {
-                MSLog.i("[user login]: fb is not login so set avatar image to false");
-                internalSetAvatarImage(false);
-            }
-        }
-    }
-
-    private void internalSetAvatarImage(boolean isLogin) {
-        if(isLogin) {
-            mAvatarImageView.setImageURI(
-                    ClientData.getInstance(this).getUserProfile().getUserAvatarLink());
-            RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
-            roundingParams.setRoundAsCircle(true);
-            mAvatarImageView.getHierarchy().setRoundingParams(roundingParams);
-        } else {
-            mAvatarImageView.setImageResource(R.drawable.ic_account_circle_white_24px);
-            RoundingParams roundingParams = RoundingParams.fromCornersRadius(0);
-            roundingParams.setRoundAsCircle(false);
-            mAvatarImageView.getHierarchy().setRoundingParams(roundingParams);
-        }
-    }
-
-    private void setActionBar() {
-        final ActionBar actionBar = getSupportActionBar();
-
-        if(actionBar != null) {
-            actionBar.setElevation(0);
-            View view = LayoutInflater.from(actionBar.getThemedContext())
-                    .inflate(R.layout.action_bar_middle_button, null);
-            actionBar.setDisplayShowHomeEnabled(false);
-            actionBar.setDisplayShowTitleEnabled(false);
-            actionBar.setCustomView(view,
-                    new ActionBar.LayoutParams(
-                            ActionBar.LayoutParams.MATCH_PARENT,
-                            ActionBar.LayoutParams.MATCH_PARENT));
-            actionBar.setDisplayShowCustomEnabled(true);
-
-            mAvatarImageView = view.findViewById(R.id.action_bar_avatar);
-            if(mAvatarImageView != null) {
-                mAvatarImageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(MainActivity.this, SettingActivity.class);
-                        startActivityForResult(intent, sSettingRequestCode);
-                        overridePendingTransition(R.anim.left_to_right, R.anim.stop);
-                    }
-                });
-                setAvatarImage();
-            }
-
-            mActionRightImage = view.findViewById(R.id.action_bar_search);
-            if(mActionRightImage != null) {
-                mActionRightImage.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(MainActivity.this, SearchAndResponseActivity.class);
-                        startActivityForResult(intent, sSearchAndOpenRequestCode);
-                        overridePendingTransition(0, 0);
-                    }
-                });
-            }
-
-            mFindKeywordEditText = view.findViewById(R.id.search_edit_text);
-            if(mFindKeywordEditText != null) {
-                mFindKeywordEditText.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(MainActivity.this, SearchAndResponseActivity.class);
-                        intent.putExtra(EXTRA_SEARCH_TYPE, SEARCH_CODE_ONLY);
-                        startActivityForResult(intent, sSearchAndQueryCommentRequestCode);
-                        overridePendingTransition(0, 0);
-                    }
-                });
-            }
-            mActionTitleBar = view.findViewById(R.id.action_bar_name);
-            mLeftButton = view.findViewById(R.id.btn_left);
-            mRightButton = view.findViewById(R.id.btn_right);
-        }
     }
 
     private void setFab(boolean show) {
@@ -396,96 +262,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void setActionBarTwoButton(boolean clickable, final boolean switchable, final boolean isDiscussion) {
-
-        if(!isDiscussion && switchable && !clickable) {
-            throw new IllegalStateException();
-        }
-
-        if(isDiscussion) {
-            mFindKeywordEditText.setVisibility(View.VISIBLE);
-            mLeftButton.setOnClickListener(null);
-            mRightButton.setOnClickListener(null);
-            mLeftButton.setVisibility(View.GONE);
-            mRightButton.setVisibility(View.GONE);
-            mActionTitleBar.setVisibility(View.GONE);
-            mActionRightImage.setImageResource(R.drawable.ic_create_white_24px);
-            mActionRightImage.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(FBHelper.checkFBLogin()) {
-                        startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
-                                MainActivity.this, RichEditorActivity.TYPE.NO_CONTENT, null),
-                                sEditorRequestCode);
-                        overridePendingTransition(R.anim.enter, R.anim.stop);
-                    } else {
-                        showLoginAlertDialog(LAST_CLICK_IS_WRITE_COMMENT);
-                    }
-                }
-            });
-        } else {
-            mActionRightImage.setImageResource(R.drawable.ic_search_white_24px);
-            mActionRightImage.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent(MainActivity.this, SearchAndResponseActivity.class);
-                    startActivityForResult(intent, sSearchAndOpenRequestCode);
-                    overridePendingTransition(0, 0);
-                }
-            });
-            mFindKeywordEditText.setVisibility(View.GONE);
-            if (clickable) {
-                mLeftButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        mRightButton.setTextColor(getResources().getColor(R.color.text_white));
-                        mRightButton.setBackground(getDrawable(R.drawable.btn_oval_right_black));
-                        mLeftButton.setTextColor(getResources().getColor(R.color.text_black));
-                        mLeftButton.setBackground(getDrawable(R.drawable.btn_oval_left_white));
-                        if (switchable) {
-                            mViewPager.setCurrentItem(0, false);
-                        } else {
-                            setViewPager(R.id.navigation_news);
-                        }
-                    }
-                });
-
-                mRightButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        mRightButton.setTextColor(getResources().getColor(R.color.text_black));
-                        mRightButton.setBackground(getDrawable(R.drawable.btn_oval_right_white));
-                        mLeftButton.setTextColor(getResources().getColor(R.color.text_white));
-                        mLeftButton.setBackground(getDrawable(R.drawable.btn_oval_left_black));
-                        if (switchable) {
-                            mViewPager.setCurrentItem(1, false);
-                        } else {
-                            setViewPager(SELF_CHOICE_NEWS_SLIDE_PAGER);
-                        }
-                    }
-                });
-                mLeftButton.setVisibility(View.VISIBLE);
-                mRightButton.setVisibility(View.VISIBLE);
-                mActionTitleBar.setVisibility(View.GONE);
-            } else {
-                mLeftButton.setOnClickListener(null);
-                mRightButton.setOnClickListener(null);
-                mLeftButton.setVisibility(View.GONE);
-                mRightButton.setVisibility(View.GONE);
-                mActionTitleBar.setVisibility(View.VISIBLE);
-            }
-        }
-    }
-
-    private void initActionBarTwoButton() {
-        if(mLeftButton != null && mRightButton != null) {
-            mRightButton.setTextColor(getResources().getColor(R.color.text_white));
-            mRightButton.setBackground(getDrawable(R.drawable.btn_oval_right_black));
-            mLeftButton.setTextColor(getResources().getColor(R.color.text_black));
-            mLeftButton.setBackground(getDrawable(R.drawable.btn_oval_left_white));
-        }
-    }
-
     private void setViewPager() {
         mViewPager = findViewById(R.id.pager);
         if(mViewPager != null) {
@@ -495,7 +271,7 @@ public class MainActivity extends AppCompatActivity {
         setViewPager(R.id.navigation_main_page);
     }
 
-    private static final int SELF_CHOICE_NEWS_SLIDE_PAGER = 1;
+    private static final int SELF_NEWS_SLIDE_PAGER = 1;
 
     private void setViewPager(int itemId) {
 
@@ -505,116 +281,131 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = findViewById(R.id.pager);
         mMagicIndicator = findViewById(R.id.tabs);
 
-        BaseScreenSlidePagerAdapter baseScreenSlidePagerAdapter = null;
+        BaseScreenSlidePagerAdapter baseScreenSlidePagerAdapter;
         switch (itemId) {
             case R.id.navigation_main_page:
                 baseScreenSlidePagerAdapter =
                         new MainPageScreenSlidePagerAdapter(this, getSupportFragmentManager(), new MainFragment.OnActionBarChangeListener() {
                             @Override
                             public void onActionBarChange(String title, boolean canReturn) {
+                                if(canReturn) {
+                                    ActionBarHelper.setActionBarForSimpleTitleAndBack(MainActivity.this, title);
+                                }
                                 mCanReturn = canReturn;
-                                if(mActionTitleBar != null) {
-                                    mActionTitleBar.setText(title);
-                                }
-                                if(mAvatarImageView != null) {
-                                    if (mCanReturn) {
-                                        mAvatarImageView.setImageResource(R.mipmap.ic_arrow_left);
-                                        mAvatarImageView.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View view) {
-                                                onBackPressed();
-                                            }
-                                        });
-                                    } else {
-                                        mAvatarImageView.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View view) {
-                                                Intent intent = new Intent(MainActivity.this, SettingActivity.class);
-                                                startActivityForResult(intent, sSettingRequestCode);
-                                                overridePendingTransition(R.anim.left_to_right, R.anim.stop);
-                                            }
-                                        });
-                                        setAvatarImage();
-                                    }
-                                }
                             }
                         });
                 setFab(false);
                 mViewPager.setSwipeable(false);
                 mMagicIndicator.setVisibility(View.GONE);
-//                setActionBarTwoButton(false, false);
-                mClickable = false;
-                mSwitchable = false;
-                mIsDiscussion = false;
+                ActionBarHelper.setActionBarForMain(this);
                 break;
-            case R.id.navigation_predict:
+            case R.id.navigation_trend:
                 baseScreenSlidePagerAdapter =
-                        new PredictScreenSlidePagerAdapter(this, getSupportFragmentManager());
+                        new TrendScreenSlidePagerAdapter(this, getSupportFragmentManager());
                 setFab(false);
                 mViewPager.setSwipeable(false);
                 mMagicIndicator.setVisibility(View.GONE);
-                mViewPager.addOnPageChangeListener(mOnPageChangeListener);
-//                setActionBarTwoButton(true, true);
-                mClickable = true;
-                mSwitchable = true;
-                mIsDiscussion = false;
-                initActionBarTwoButton();
+                ActionBarHelper.setActionBarForTrend(this,
+                        ActionBarHelper.ACTION_BAR_TYPE_TREND,
+                        new ActionBarHelper.ActionBarEventNotificationListener() {
+                    @Override
+                    public void onEventNotification(int eventId) {
+                        final ActionBar actionBar = getSupportActionBar();
+                        if(eventId == R.id.btn_trend) {
+                            setViewPager(R.id.navigation_trend);
+                            if(actionBar != null) {
+                                actionBar.setBackgroundDrawable(getDrawable(R.drawable.action_bar_background_with_border));
+                                actionBar.getCustomView().setBackground(getDrawable(R.drawable.action_bar_background_with_border));
+                            }
+                        } else if(eventId == R.id.btn_news) {
+                            setViewPager(SELF_NEWS_SLIDE_PAGER);
+                            if(actionBar != null) {
+                                actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.white_eight)));
+                                actionBar.getCustomView().setBackground(new ColorDrawable(getResources().getColor(R.color.white_eight)));
+                            }
+                        }
+                    }
+                });
                 break;
-            case R.id.navigation_news:
+            case SELF_NEWS_SLIDE_PAGER:
                 baseScreenSlidePagerAdapter =
                         new NewsScreenSlidePagerAdapter(this, getSupportFragmentManager());
-                setFab(false);
                 mViewPager.setSwipeable(true);
                 mMagicIndicator.setVisibility(View.VISIBLE);
-//                setActionBarTwoButton(true, false);
-                mClickable = true;
-                mSwitchable = false;
-                mIsDiscussion = false;
-                initActionBarTwoButton();
+                ActionBarHelper.setActionBarForTrend(this,
+                        ActionBarHelper.ACTION_BAR_TYPE_TREND,
+                        new ActionBarHelper.ActionBarEventNotificationListener() {
+                    @Override
+                    public void onEventNotification(int eventId) {
+                        final ActionBar actionBar = getSupportActionBar();
+                        if(eventId == R.id.btn_trend) {
+                            setViewPager(R.id.navigation_trend);
+                            if(actionBar != null) {
+                                actionBar.setBackgroundDrawable(getDrawable(R.drawable.action_bar_background_with_border));
+                                actionBar.getCustomView().setBackground(getDrawable(R.drawable.action_bar_background_with_border));
+                            }
+                        } else if(eventId == R.id.btn_news) {
+                            setViewPager(SELF_NEWS_SLIDE_PAGER);
+                            if(actionBar != null) {
+                                actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.white_eight)));
+                                actionBar.getCustomView().setBackground(new ColorDrawable(getResources().getColor(R.color.white_eight)));
+                            }
+                        }
+                    }
+                });
                 break;
-            case SELF_CHOICE_NEWS_SLIDE_PAGER:
+            case R.id.navigation_favorites:
                 baseScreenSlidePagerAdapter =
-                        new ChoicesNewsScreenSlidePagerAdapter(this, getSupportFragmentManager());
-                setFab(false);
+                        new ChoiceScreenSlidePagerAdapter(this, getSupportFragmentManager());
+                setFab(true);
                 mViewPager.setSwipeable(false);
                 mMagicIndicator.setVisibility(View.GONE);
-//                setActionBarTwoButton(true, false);
-                mClickable = true;
-                mSwitchable = false;
-                mIsDiscussion = false;
+                ActionBarHelper.setActionBarForTrend(this,
+                        ActionBarHelper.ACTION_BAR_TYPE_FAVORITE,
+                        new ActionBarHelper.ActionBarEventNotificationListener() {
+                            @Override
+                            public void onEventNotification(int eventId) {
+                                if(eventId == R.id.btn_trend) {
+                                    mViewPager.setCurrentItem(0, false);
+                                } else if(eventId == R.id.btn_news) {
+                                    mViewPager.setCurrentItem(1, false);
+                                }
+                            }
+                        });
                 break;
-            case R.id.navigation_discussion:
+            case R.id.navigation_post:
                 baseScreenSlidePagerAdapter =
                         new DiscussionScreenSlidePagerAdapter(this, getSupportFragmentManager());
                 setFab(false);
                 mViewPager.setSwipeable(false);
                 mMagicIndicator.setVisibility(View.GONE);
-                mClickable = false;
-                mSwitchable = false;
-                mIsDiscussion = true;
+                ActionBarHelper.setActionBarForDiscussion(this, new ActionBarHelper.ActionBarEventNotificationListener() {
+                    @Override
+                    public void onEventNotification(int eventId) {
+                        if(eventId == R.id.action_bar_post) {
+                            showLoginAlertDialog(LAST_CLICK_IS_WRITE_COMMENT);
+                        }
+                    }
+                });
                 break;
-            case R.id.navigation_choices:
+            case R.id.navigation_profile:
                 baseScreenSlidePagerAdapter =
-                        new ChoiceScreenSlidePagerAdapter(this, getSupportFragmentManager());
-                setFab(true);
-                mViewPager.setSwipeable(true);
-                mMagicIndicator.setVisibility(View.VISIBLE);
-//                setActionBarTwoButton(false, false);
-                mClickable = false;
-                mSwitchable = false;
-                mIsDiscussion = false;
+                        new ProfileScreenSlidePagerAdapter(this, getSupportFragmentManager());
+                setFab(false);
+                mViewPager.setSwipeable(false);
+                mMagicIndicator.setVisibility(View.GONE);
+                ActionBarHelper.setActionBarForProfile(this);
                 break;
             default:
                 // invalid category
                 return;
         }
-        setActionBarTwoButton(mClickable, mSwitchable, mIsDiscussion);
         mViewPager.setAdapter(baseScreenSlidePagerAdapter);
 
         MarketSenseCommonNavigator commonNavigator =
                 new MarketSenseCommonNavigator(this, mViewPager,
                         baseScreenSlidePagerAdapter.getTitles());
-        mMagicIndicator.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+        mMagicIndicator.setBackgroundColor(getResources().getColor(R.color.white_eight));
 
         mMagicIndicator.setNavigator(commonNavigator);
         ViewPagerHelper.bind(mMagicIndicator, mViewPager);
@@ -647,8 +438,6 @@ public class MainActivity extends AppCompatActivity {
                         this, stock.getName(), stock.getCode(), stock.getRaiseNum(), stock.getFallNum(),
                         stock.getPrice(), stock.getDiffNumber(), stock.getDiffPercentage()));
             }
-        } else if(requestCode == sSettingRequestCode) {
-            setAvatarImage();
         } else if(requestCode == sSearchAndQueryCommentRequestCode) {
             if(resultCode == RESULT_OK) {
                 String code = data.getStringExtra(EXTRA_SELECTED_COMPANY_CODE_KEY);
@@ -751,14 +540,12 @@ public class MainActivity extends AppCompatActivity {
                                     MSLog.e("[user login]: notify user login failed");
                                     Toast.makeText(MainActivity.this, R.string.login_failed_description, Toast.LENGTH_SHORT).show();
                                     LoginManager.getInstance().logOut();
-                                    internalSetAvatarImage(false);
                                 } else {
                                     UserProfile userProfile = ClientData.getInstance(MainActivity.this).getUserProfile();
                                     userProfile.globalBroadcast(NOTIFY_ID_MAIN_ACTIVITY_FUNCTION_CLICK);
                                 }
                             }
                         });
-                setAvatarImage();
             }
         });
     }

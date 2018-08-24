@@ -10,7 +10,7 @@
     <net.lucode.hackware.magicindicator.MagicIndicator
         android:id="@+id/tabs"
         android:layout_width="0dp"
-        android:layout_height="48dp"
+        android:layout_height="43dp"
         android:background="@drawable/background_tab"
         android:fontFamily="sans-serif"
         android:textSize="18sp"

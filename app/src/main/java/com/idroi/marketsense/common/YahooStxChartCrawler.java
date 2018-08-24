@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
 import android.view.View;
-import android.widget.TextView;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -12,13 +11,12 @@ import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.CandleStickChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.idroi.marketsense.Logging.MSLog;
-import com.idroi.marketsense.data.StockTaData;
+import com.idroi.marketsense.R;
 import com.idroi.marketsense.data.StockTradeData;
 import com.idroi.marketsense.datasource.Networking;
 import com.idroi.marketsense.request.StockChartDataRequest;
 import com.idroi.marketsense.viewholders.ChartTaTopItemsViewHolder;
 import com.idroi.marketsense.viewholders.ChartTickBottomItemsViewHolder;
-import com.idroi.marketsense.viewholders.StockActivityRealPriceBlockViewHolder;
 
 import java.lang.ref.WeakReference;
 import java.util.Locale;
@@ -156,9 +154,9 @@ public class YahooStxChartCrawler {
                 MarketSenseRendererHelper.addNumberStringToTextView(mChartTickBottomItemsViewHolder.sellTextView,
                         String.valueOf(mStockTradeData.getTickSellPrice()), "--", mStockTradeData.getTickSellPrice(), mStockTradeData.getYesterdayPrice());
                 MarketSenseRendererHelper.addNumberStringToTextView(mChartTickBottomItemsViewHolder.moneyTextView,
-                        String.format(Locale.US, "%.2f", mStockTradeData.getTradeMoney()), "--");
+                        String.format(Locale.US, "%.2f", mStockTradeData.getTradeMoney()), "--", R.color.stock_blue);
                 MarketSenseRendererHelper.addNumberStringToTextView(mChartTickBottomItemsViewHolder.yesterdayVolumeTextView,
-                        String.valueOf(mStockTradeData.getYesterdayVolume()), "--");
+                        String.valueOf(mStockTradeData.getYesterdayVolume()), "--", R.color.stock_blue);
 
                 ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) mVolumeBarChart.getLayoutParams();
                 params.topToBottom = mPriceLineChart.getId();

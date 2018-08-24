@@ -3,26 +3,26 @@
 
     <item
         android:id="@+id/navigation_main_page"
-        android:icon="@drawable/ic_home_black_24dp"
+        android:icon="@mipmap/ic_tab_home_w"
         android:title="@string/title_main_page" />
 
     <item
-        android:id="@+id/navigation_predict"
-        android:icon="@drawable/ic_poll_black_24px"
+        android:id="@+id/navigation_trend"
+        android:icon="@mipmap/ic_tab_trend_w"
         android:title="@string/title_predict_tab" />
 
     <item
-        android:id="@+id/navigation_choices"
-        android:icon="@drawable/ic_dashboard_black_24dp"
+        android:id="@+id/navigation_favorites"
+        android:icon="@mipmap/ic_tab_fav_w"
         android:title="@string/title_choices_tab" />
 
     <item
-        android:id="@+id/navigation_news"
-        android:icon="@drawable/ic_public_black_24px"
-        android:title="@string/title_news_tab" />
-
-    <item android:id="@+id/navigation_discussion"
-        android:icon="@drawable/ic_comment_theme_color_24px"
+        android:id="@+id/navigation_post"
+        android:icon="@mipmap/ic_tab_post_w"
         android:title="@string/title_discussion" />
+
+    <item android:id="@+id/navigation_profile"
+        android:icon="@mipmap/ic_tab_profile_w"
+        android:title="@string/title_profile" />
 
 </menu>

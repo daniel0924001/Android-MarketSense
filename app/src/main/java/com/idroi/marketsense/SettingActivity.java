@@ -49,6 +49,7 @@ import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
  * Created by daniel.hsieh on 2018/4/27.
  */
 
+@Deprecated
 public class SettingActivity extends AppCompatActivity {
 
     private AlertDialog mLoginAlertDialog, mStarAlertDialog;
@@ -62,7 +63,7 @@ public class SettingActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FrescoHelper.initialize(getApplicationContext());
-        setContentView(R.layout.activity_setting);
+        setContentView(R.layout.fragment_profile);
 
         setListView();
         setActionBar();

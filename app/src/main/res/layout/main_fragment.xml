@@ -32,9 +32,16 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <include
+                <ImageView
                     android:id="@+id/top_banner_1"
-                    layout="@layout/top_banner_card" />
+                    android:layout_width="0dp"
+                    android:layout_height="159dp"
+                    android:src="@mipmap/img_banner_top10"
+                    android:contentDescription="@string/main_page_card_sub_title"
+                    android:scaleType="centerCrop"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
 
             </android.support.constraint.ConstraintLayout>
 

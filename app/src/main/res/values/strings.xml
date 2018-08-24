@@ -16,10 +16,13 @@
     <string name="title_choices_tab">自選</string>
     <string name="title_predict_tab">風向</string>
     <string name="title_main_page">首頁</string>
-    <string name="title_discussion">討論</string>
+    <string name="title_discussion">動態</string>
     <string name="title_no_comment">目前暫無評論</string>
     <string name="title_send_first">立馬搶頭香</string>
     <string name="title_more">更多</string>
+    <string name="title_profile">我的</string>
+    <string name="title_profile_account">我的帳戶</string>
+    <string name="title_market_trend">行情</string>
 
     <string name="main_page_tech_ranking">技術面預測排行</string>
     <string name="main_page_news_ranking">新聞面排行</string>

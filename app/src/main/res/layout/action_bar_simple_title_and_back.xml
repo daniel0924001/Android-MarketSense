@@ -30,17 +30,4 @@
         app:layout_constraintStart_toEndOf="@id/action_bar_back"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-    <TextView
-        android:id="@+id/action_bar_complete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/text_black"
-        android:textSize="18sp"
-        android:fontFamily="sans-serif"
-        android:textStyle="normal"
-        android:text="@string/complete"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
 </android.support.constraint.ConstraintLayout>

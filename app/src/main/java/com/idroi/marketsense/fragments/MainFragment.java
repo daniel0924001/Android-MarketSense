@@ -248,7 +248,7 @@ public class MainFragment extends Fragment {
         bundle.putInt(StockListFragment.TASK_NAME, StockListFragment.TASK.WPCT.getTaskId());
         mStockListFragment.setArguments(bundle);
 
-        ConstraintLayout card1 = view.findViewById(R.id.top_banner_1);
+        ImageView card1 = view.findViewById(R.id.top_banner_1);
         card1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

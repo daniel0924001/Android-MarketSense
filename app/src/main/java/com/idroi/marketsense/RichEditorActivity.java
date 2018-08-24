@@ -12,10 +12,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FrescoHelper;
@@ -210,12 +210,13 @@ public class RichEditorActivity extends AppCompatActivity {
 
         if(actionBar != null) {
             actionBar.setElevation(0);
+            actionBar.setBackgroundDrawable(
+                    getDrawable(R.drawable.action_bar_background_with_border));
             View view = LayoutInflater.from(actionBar.getThemedContext())
                     .inflate(R.layout.action_bar_right_text, null);
 
-            SimpleDraweeView imageView = view.findViewById(R.id.action_bar_avatar);
+            ImageView imageView = view.findViewById(R.id.action_bar_back);
             if(imageView != null) {
-                imageView.setImageResource(R.mipmap.ic_close_white);
                 imageView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -224,7 +225,7 @@ public class RichEditorActivity extends AppCompatActivity {
                 });
             }
 
-            TextView titleTextView = view.findViewById(R.id.action_bar_name);
+            TextView titleTextView = view.findViewById(R.id.action_bar_title);
             if(titleTextView != null) {
                 if(mType.equals(TYPE.REPLY.getType())) {
                     titleTextView.setText(getResources().getText(R.string.reply_comment));
@@ -233,7 +234,7 @@ public class RichEditorActivity extends AppCompatActivity {
                 }
             }
 
-            mCompletedTextView = view.findViewById(R.id.action_bar_right_text);
+            mCompletedTextView = view.findViewById(R.id.action_bar_complete);
             if(mCompletedTextView != null) {
                 mCompletedTextView.setOnClickListener(new View.OnClickListener() {
                     @Override

@@ -142,14 +142,23 @@ public class MarketSenseRendererHelper {
 
     public static void addNumberStringToTextView(@Nullable final TextView textView,
                                                  @Nullable final String contents,
-                                                 final String defaultContents) {
-        addNumberStringToTextView(textView, contents, defaultContents, 0, 0);
+                                                 final String defaultContents,
+                                                 int drawColorResourceId) {
+        addNumberStringToTextView(textView, contents, defaultContents, 0, 0, drawColorResourceId);
     }
 
     public static void addNumberStringToTextView(@Nullable final TextView textView,
                                                  @Nullable final String contents,
                                                  final String defaultContents,
                                                  float value, float baseline) {
+        addNumberStringToTextView(textView, contents, defaultContents, value, baseline, R.color.draw_grey);
+    }
+
+    public static void addNumberStringToTextView(@Nullable final TextView textView,
+                                                 @Nullable final String contents,
+                                                 final String defaultContents,
+                                                 float value, float baseline,
+                                                 int drawColorResourceId) {
         if (textView == null) {
             MSLog.w("Attempted to add text (" + contents + ") to null TextView.");
             return;
@@ -171,7 +180,7 @@ public class MarketSenseRendererHelper {
                 } else if(value < baseline) {
                     addTextViewWithColor(textView, contents, R.color.trend_green);
                 } else {
-                    addTextViewWithColor(textView, contents, R.color.draw_grey);
+                    addTextViewWithColor(textView, contents, drawColorResourceId);
                 }
             }
         }

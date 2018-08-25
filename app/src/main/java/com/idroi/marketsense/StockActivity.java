@@ -402,9 +402,7 @@ public class StockActivity extends AppCompatActivity {
                 final DisplayMetrics metrics = getResources().getDisplayMetrics();
                 Point childOffset = new Point();
                 MarketSenseUtils.getDeepChildOffset(mNestedScrollView, child.getParent(), child, childOffset);
-                if(mUserProfile.canVoteAgain(mCode)) {
-                    childOffset.y = childOffset.y - (int)(56 * metrics.density);
-                }
+                childOffset.y = childOffset.y - (int)(mStockActivityRealPriceBlockViewHolder.mainView.getHeight() * metrics.density);
                 mNestedScrollView.scrollTo(0, childOffset.y);
             }
         });

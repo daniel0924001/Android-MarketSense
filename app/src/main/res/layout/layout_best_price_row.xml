@@ -46,7 +46,6 @@
         app:layout_constraintBottom_toBottomOf="@id/buy_volume" />
 
     <View
-        android:id="@+id/sell_bar"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@color/bluey_grey"

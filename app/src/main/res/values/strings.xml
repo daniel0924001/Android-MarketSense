@@ -8,10 +8,8 @@
     <string name="activity_news_search">搜尋</string>
     <string name="activity_rich_editor">撰寫評論</string>
     <string name="activity_comment">貼文</string>
-    <string name="activity_splash">市覺</string>
     <string name="user_avatar">大頭照</string>
     <string name="notification">推播</string>
-    <string name="preview">預覽</string>
     <string name="title_news_tab">新聞</string>
     <string name="title_choices_tab">自選</string>
     <string name="title_predict_tab">風向</string>
@@ -27,7 +25,6 @@
     <string name="main_page_tech_ranking">技術面預測排行</string>
     <string name="main_page_news_ranking">新聞面排行</string>
     <string name="main_page_news">最新消息</string>
-    <string name="main_page_card_title">本週市覺評選</string>
     <string name="main_page_card_sub_title">十大焦點個股</string>
     <string name="main_stock_name_is_too_long">股票名稱真的很長</string>
     <string name="main_stock_name">股票名稱</string>
@@ -44,11 +41,7 @@
     <string name="title_news_bad1">利空</string>
 
     <string name="title_news_win_predict">預測漲最多股票</string>
-    <string name="title_news_lose_predict">預測跌最多股票</string>
-    <string name="title_news_win_today">今日漲最多股票</string>
-    <string name="title_news_lose_today">今日跌最多股票</string>
     <string name="title_news_read_original">閱讀完整報導</string>
-    <string name="title_news_read_middle">返回新聞節錄</string>
 
     <string name="title_focus_news">熱門焦點</string>
     <string name="title_recent_news">台股動態</string>
@@ -58,15 +51,12 @@
     <string name="title_choices_list">自選列表</string>
     <string name="title_choices_news">自選新聞</string>
     <string name="title_search_hint_stock">輸入股票名稱/代碼</string>
-    <string name="title_search_add">加入自選</string>
     <string name="title_add_complete">已加入自選股 %s(%s)</string>
     <string name="title_add_duplicated">%s(%s) 已在您的自選股清單</string>
     <string name="title_delete_complete">已刪除自選股 %s(%s)</string>
-    <string name="title_search">搜尋</string>
     <string name="title_search_cancel">取消</string>
     <string name="title_search_result_stock">相關股票</string>
     <string name="title_search_result_news">相關新聞</string>
-    <string name="title_hint_delete">長按自選列表裡的項目可刪除你的自選個股</string>
     <string name="title_delete">請問你要刪除以下這支股票嗎？</string>
     <string name="message_delete">股票名稱：%s\n股票代碼：%s</string>
     <string name="cancel">取消</string>
@@ -77,53 +67,33 @@
     <string name="title_comment_user_name">使用者名稱</string>
     <string name="title_comment_create_time">留言時間</string>
 
-    <string name="title_notification_list">自選推播</string>
-    <string name="title_notification_hot">熱門推播</string>
-
     <string name="title_stock_overview">總覽</string>
     <string name="title_stock_related_news">相關新聞</string>
 
-    <string name="title_action_bar_search">搜尋</string>
     <string name="title_action_bar_setting">設定</string>
-    <string name="title_action_bar_market">市場</string>
-    <string name="title_action_bar_choice">自選</string>
 
     <string name="title_company_name">公司名稱</string>
     <string name="title_company_code">公司代號</string>
     <string name="title_company_name_code_format">%s (%s)</string>
     <string name="title_company_name_code_format_no_decoration">%s %s</string>
-    <string name="title_company_name_and_code">公司名稱/代號</string>
     <string name="title_company_price">1467.32</string>
-    <string name="title_company_price_diff_num">股價漲跌數字</string>
     <string name="title_company_price_diff_percentage">+10.00%</string>
-    <string name="title_company_confidence">公司信心指數</string>
 
-    <string name="title_sort_by">排序依：</string>
     <string name="title_company_predict_name">名稱</string>
     <string name="title_company_predict_price">當前價</string>
     <string name="title_company_predict_fluctuation">漲跌幅</string>
     <string name="title_company_predict_news_title">新聞</string>
     <string name="title_company_predict_people_title">鄉民</string>
-    <string name="title_company_predict_tech_title">技術</string>
 
-    <string name="title_predict_yesterday">前日預測</string>
-    <string name="title_predict_today">今日預測</string>
-    <string name="title_predict_today_answer_disclosure">今日收盤預測</string>
-    <string name="title_predict_tomorrow">明日預測</string>
-    <string name="title_predict_none">無法預測</string>
     <string name="title_hit">命中</string>
-    <string name="title_miss">未命中</string>
     <string name="title_disclosure_at_1500">15:00 公布</string>
     <string name="title_month_day_close_predict">%d/%d 收盤預測</string>
 
-    <string name="title_fundamental">基本面</string>
-    <string name="title_people">鄉民面</string>
     <string name="title_news">新聞面</string>
     <string name="title_tech">技術面</string>
     <string name="title_news_unavailable">近期無新聞</string>
     <string name="title_tech_unavailable">冷門股</string>
 
-    <string name="title_level_flat">？？？</string>
     <string name="title_level_up_highest">超看漲</string>
     <string name="title_level_up_high">看漲</string>
     <string name="title_level_down_highest">超看跌</string>
@@ -144,28 +114,15 @@
     <string name="title_people_look_flat">快來底下留言！</string>
     <string name="title_people_look_bad">鄉民看跌</string>
     <string name="title_no_prediction">無預測</string>
-    <string name="title_news_join">%d則相關新聞報導</string>
-    <string name="title_people_join">%d位鄉民參與評論</string>
-    <string name="title_vote_to_see">查看投票結果，請先進行投票</string>
     <string name="title_diff_format">%s (%s)</string>
-    <string name="title_volume_format">%s量(張)</string>
     <string name="title_date_time_format">%02d/%02d %02d:%02d</string>
-    <string name="title_unavailable_even_percentage">50%</string>
-    <string name="title_unavailable_score">0.0</string>
     <string name="title_unavailable_score_int">0</string>
     <string name="title_unavailable_score_double">0.33 (0.23%)</string>
     <string name="title_unavailable_time">09/24 14:21</string>
     <string name="title_unavailable_volume">28,707</string>
     <string name="title_unavailable_price">5,600</string>
     <string name="title_unavailable_number">283</string>
-    <string name="title_max_score"> / 5.0</string>
-    <string name="title_you_look_good">你 <![CDATA[<font color="#EF476F">看漲</font>]]> 這支股票</string>
-    <string name="title_you_look_bad">你 <![CDATA[<font color="#00BE9F">看跌</font>]]> 這支股票</string>
     <string name="title_publish_comment">發表評論</string>
-    <string name="title_vote_people_number">人參與投票</string>
-    <string name="title_vote_look_good_number">看漲票數</string>
-    <string name="title_vote_look_bad_number">看跌票數</string>
-    <string name="title_look_more_information">點此查看更多資訊</string>
 
     <string name="title_stock_price_open">開盤</string>
     <string name="title_stock_price_high">最高</string>
@@ -190,36 +147,19 @@
     <string name="title_predict_5d">5日預測</string>
     <string name="title_predict_20d">20日預測</string>
 
-    <string name="title_up">漲</string>
-    <string name="title_down">跌</string>
-    <string name="title_percent">%</string>
-    <string name="title_go_up"> 可能漲</string>
-    <string name="title_go_down">可能跌</string>
-    <string name="title_go_flat"> 持平</string>
-    <string name="title_rank">名次</string>
-    <string name="title_predict">未來 </string>
-    <string name="title_confidence">信心</string>
-    <string name="iv_up_down">升降圖</string>
     <string name="iv_alarm">警告</string>
     <string name="title_predict_up">看多:</string>
     <string name="title_predict_down">看空:</string>
     <string name="title_vote">投票</string>
-    <string name="title_go_top">TOP</string>
     <string name="title_comment">留言</string>
     <string name="title_comment_format">留言(%d)</string>
     <string name="title_comment_colon">留言:</string>
     <string name="title_comment_hint">留下你的評論 &#8230;</string>
     <string name="title_go_back">返回</string>
-    <string name="title_reply">回覆</string>
     <string name="title_good">讚</string>
-    <string name="title_good_already">已讚</string>
-    <string name="title_reply_number">回覆 %d</string>
-    <string name="title_good_number">讚 %d</string>
     <string name="title_read_more">繼續閱讀 &#8230;</string>
     <string name="title_action_seven">快來表達你對這支股票一週內的想法吧！</string>
     <string name="title_welcome_tomorrow">歡迎您明日八點過後再來表達您的看法唷！</string>
-    <string name="title_welcome_but_you_have_voted">歡迎回來，今日你已經於稍早時表達過看法了！</string>
-    <string name="title_comment_create">發佈</string>
     <string name="title_leave_rich_editor">
         看起來你只編輯到一半，你確定要離開編輯頁面嗎？假如是，請在「點擊返回一次」。</string>
     <string name="title_comment_create_null">不好意思，不能留下空白言論。</string>
@@ -236,12 +176,7 @@
     <string name="preference_icon">設定圖示</string>
     <string name="preference_switch">開關</string>
     <string name="preference_notification">推播通知</string>
-    <string name="preference_category">分類設定</string>
     <string name="preference_share">分享 APP</string>
-    <string name="preference_line">加入市覺 Line@</string>
-    <string name="preference_copyright">著作權</string>
-    <string name="preference_about">關於</string>
-    <string name="preference_feedback_and_start">意見與評價</string>
     <string name="preference_feedback">意見回饋</string>
     <string name="preference_star">給予鼓勵</string>
     <string name="preference_privacy_statement">隱私權暨個人資料保護聲明</string>
@@ -265,15 +200,10 @@
 
     <string name="hello">Hello, 市覺使用者</string>
     <string name="login">登入</string>
-    <string name="login_failed">登入失敗</string>
     <string name="login_failed_description">不好意思，登入失敗，請待會再嘗試一次。</string>
     <string name="logout">登出</string>
-    <string name="login_facebook">以Facebook登入</string>
-    <string name="login_google">以Google登入</string>
     <string name="login_page_title">登入市覺會員</string>
     <string name="login_page_subtitle">快來追蹤你的喜好標的吧！</string>
-    <string name="choice_name_or_code_are_invalid">
-        不好意思，似乎有什麼出錯了，目前無法添加您所喜好的標的。</string>
 
     <string name="publish_comment">發布貼文</string>
     <string name="reply_comment">回覆貼文</string>
@@ -281,19 +211,6 @@
     <string name="tag_stock_code">標註個股</string>
     <string name="complete">完成</string>
     <string name="comment_hint">輸入文字&#8230;</string>
-
-    <string name="comment_warning">我們歡迎各位在此留言，請不要散播垃圾訊息，
-        並且謹記勿用任何具有不雅、歧視或仇恨的字眼與言論，讓我們共同維護與創造良好的交流環境。</string>
-    <string name="image_alt">無此圖片</string>
-    <string name="hint_input_image_url">輸入圖片連結</string>
-    <string name="title_hyperlink_title">超連結標題</string>
-    <string name="title_hyperlink_url">超連結網址</string>
-    <string name="hint_input_hyperlink_title">輸入超連結標題</string>
-    <string name="hint_input_hyperlink_url">輸入超連結網址</string>
-    <string name="insert_hyperlink">插入超連結</string>
-    <string name="insert_image_url">插入圖片</string>
-    <string name="insert_ok">插入</string>
-    <string name="insert_cancel">取消</string>
 
     <string name="share_description">下載「市覺」App掌握即時鄉民與新聞動態！ </string>
 

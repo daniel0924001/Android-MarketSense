@@ -6,22 +6,15 @@
     <color name="colorAccent">#F20060</color>
 
     <color name="text_white">#ffffff</color>
-    <color name="text_red">#F20060</color>
-    <color name="text_green">#00BE9F</color>
-    <color name="text_dark_gray">#b3b3b3</color>
     <color name="text_gray">#bababa</color>
-    <color name="text_middle_gray">#bebebe</color>
     <color name="text_light_gray">#f5f5f5</color>
     <color name="text_pink">#ff5448</color>
     <color name="border_gray">#f4f4f4</color>
     <color name="card_gray_background">#f1f1f1</color>
-    <color name="border_dark_gray">#585858</color>
     <color name="border_light_gray">#eeeeee</color>
 
-    <color name="bottom_navigation_item_checked_false">#5B737373</color>
     <color name="bottom_navigation_item_checked_false_bg">#FAFAFA</color>
 
-    <color name="btn_gray">#f7f7f7</color>
     <color name="btn_gray_border">#ecf0f5</color>
 
     <color name="marketsense_text_black">#4a4a4a</color>
@@ -30,22 +23,17 @@
     <color name="marketsense_text_white">#fff</color>
     <color name="marketsense_trans_black">#4c000000</color>
     <color name="marketsense_trans_light_black">#28000000</color>
-    <color name="marketsense_trans">#00ffffff</color>
 
     <color name="marketsense_rich_edit_black_background">#4a4a4a</color>
 
     <color name="color_volume_line">#e64a19</color>
     <color name="color_price_line">#e73b76ec</color>
 
-    <color name="card_top_color">#ff6a00</color>
-    <color name="card_bottom_color">#ee0979</color>
-
     <color name="foreground_shadow">#b3ffffff</color>
 
     <!-- new version -->
     <color name="white">#ffffff</color>
     <color name="silver">#c8c7cc</color>
-    <color name="pinkish_grey">#bdbdbd</color>
     <color name="white_two">#eeeeee</color>
     <color name="white_seven">#e4e4e4</color>
     <color name="white_eight">#fbfbfb</color>
@@ -53,7 +41,6 @@
     <color name="warm_grey">#959595</color>
     <color name="warm_grey_two">#7d7d7d</color>
     <color name="pinkish_grey_two">#c1c1c1</color>
-    <color name="warm_grey_three">#777777</color>
     <color name="pinkish_grey_four">#c3c3c3</color>
     <color name="warm_grey_four">#6f6f6f</color>
     <color name="cool_grey">#abb1bc</color>
@@ -77,5 +64,4 @@
     <color name="text_black">#2b2b2b</color>
     <color name="draw_grey">#bfcad7</color>
     <color name="background">#ebedf0</color>
-    <color name="grid_grey">#f6f7fb</color>
 </resources>

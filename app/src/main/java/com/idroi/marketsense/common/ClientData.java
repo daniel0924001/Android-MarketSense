@@ -37,6 +37,7 @@ public class ClientData {
 
     private int mScreenWidth, mScreenHeight;
     private int mScreenWidthPixels, mScreenHeightPixels;
+    private float mScreenDensity;
     @NonNull private UserProfile mUserProfile;
     private String mUserToken;
 
@@ -127,9 +128,14 @@ public class ClientData {
         mScreenHeightPixels = heightPixels;
     }
 
-    public void setScreenSize(int width, int height) {
+    public void setScreenSize(int width, int height, float density) {
         mScreenWidth = width;
         mScreenHeight = height;
+        mScreenDensity = density;
+    }
+
+    public float getScreenDensity() {
+        return mScreenDensity;
     }
 
     private void setAllStocksListInfo(ArrayList<Stock> stocksListInfo) {

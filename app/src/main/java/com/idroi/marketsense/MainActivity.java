@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
         int width = (int)Math.ceil((double)metrics.widthPixels/metrics.density);
         int height = (int)Math.ceil((double)metrics.heightPixels/metrics.density);
         clientData.setScreenSizeInPixels(metrics.widthPixels, metrics.heightPixels);
-        clientData.setScreenSize(width, height);
+        clientData.setScreenSize(width, height, metrics.density);
 
         prefetchData();
 

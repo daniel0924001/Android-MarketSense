@@ -165,6 +165,8 @@ public class StockActivity extends AppCompatActivity {
 
     private AlertDialog mMoreAlertDialog;
 
+    private boolean mIsTopShrink = false;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -377,6 +379,20 @@ public class StockActivity extends AppCompatActivity {
         });
 
         mNestedScrollView = findViewById(R.id.body_scroll_view);
+        mNestedScrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                if(!mIsTopShrink && scrollY > 50) {
+                    mIsTopShrink = true;
+                    mStockActivityRealPriceBlockViewHolder.shrink();
+                }
+
+                if(mIsTopShrink && scrollY < 100) {
+                    mIsTopShrink = false;
+                    mStockActivityRealPriceBlockViewHolder.expand();
+                }
+            }
+        });
     }
 
     private void slideToView(final View child) {

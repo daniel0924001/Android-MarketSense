@@ -12,7 +12,8 @@
         android:roundIcon="@mipmap/ic_logo_round_3"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:fullBackupContent="@xml/backup_descriptor">
+        android:fullBackupContent="@xml/backup_descriptor"
+        android:name=".App">
 
         <activity
             android:name=".MainActivity"

@@ -1,5 +1,7 @@
 package com.idroi.marketsense.viewholders;
 
+import android.support.constraint.ConstraintLayout;
+import android.support.constraint.Group;
 import android.view.View;
 import android.widget.TextView;
 
@@ -23,7 +25,7 @@ public class ChartTickBottomItemsViewHolder {
     public TextView moneyTextView;
     public TextView yesterdayVolumeTextView;
 
-    public View buyBlock, sellBlock, moneyBlock, yesterdayVolumeBlock;
+    private Group secondRowGroup;
 
     static final ChartTickBottomItemsViewHolder EMPTY_VIEW_HOLDER = new ChartTickBottomItemsViewHolder();
 
@@ -42,10 +44,7 @@ public class ChartTickBottomItemsViewHolder {
             viewHolder.moneyTextView = view.findViewById(R.id.top_2_3_value);
             viewHolder.yesterdayVolumeTextView = view.findViewById(R.id.top_2_4_value);
 
-            viewHolder.buyBlock = view.findViewById(R.id.top_2_1_block);
-            viewHolder.sellBlock = view.findViewById(R.id.top_2_2_block);
-            viewHolder.moneyBlock = view.findViewById(R.id.top_2_3_block);
-            viewHolder.yesterdayVolumeBlock = view.findViewById(R.id.top_2_4_block);
+            viewHolder.secondRowGroup = view.findViewById(R.id.second_row_group);
 
             return viewHolder;
         } catch (ClassCastException exception) {
@@ -55,16 +54,10 @@ public class ChartTickBottomItemsViewHolder {
     }
 
     public void showSecondRow() {
-        buyBlock.setVisibility(View.VISIBLE);
-        sellBlock.setVisibility(View.VISIBLE);
-        moneyBlock.setVisibility(View.VISIBLE);
-        yesterdayVolumeBlock.setVisibility(View.VISIBLE);
+        secondRowGroup.setVisibility(View.VISIBLE);
     }
 
     public void hideSecondRow() {
-        buyBlock.setVisibility(View.GONE);
-        sellBlock.setVisibility(View.GONE);
-        moneyBlock.setVisibility(View.GONE);
-        yesterdayVolumeBlock.setVisibility(View.GONE);
+        secondRowGroup.setVisibility(View.GONE);
     }
 }

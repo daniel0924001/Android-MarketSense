@@ -346,6 +346,8 @@ public class PostEvent {
                 jsonObject.optString(RESPONSE_RESULT).equals(RESPONSE_DUPLICATE_REGISTER)) {
             // {"status":false,"result":"You have registered before!"}
             sendLogin(null, mUserId, mUserPassword, mUserEmail, mListener);
+        } else {
+            MSLog.e("error in processRegister: " + jsonObject);
         }
     }
 

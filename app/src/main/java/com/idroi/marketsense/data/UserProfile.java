@@ -513,6 +513,7 @@ public class UserProfile implements Serializable {
             return;
         }
 
+        MSLog.i("[user login]: is login on going: " + mLoginOnGoing);
         if(!mLoginOnGoing) {
             mLoginOnGoing = true;
             MSLog.i("[user login]: start to login");

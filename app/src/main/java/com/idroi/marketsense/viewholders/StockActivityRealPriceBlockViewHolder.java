@@ -2,7 +2,9 @@ package com.idroi.marketsense.viewholders;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
+import android.support.transition.AutoTransition;
 import android.support.transition.TransitionManager;
 import android.util.TypedValue;
 import android.view.View;
@@ -27,11 +29,15 @@ public class StockActivityRealPriceBlockViewHolder {
     private ViewGroup container;
     public View mainView;
 
+    public StockActivityBottomSelector stockActivityBottomSelector;
+
     public TextView priceTextView;
     public TextView diffTextView;
 
     public TextView tradingTextView;
     public TextView timeTextView;
+
+    private AutoTransition autoTransition;
 
     static final StockActivityRealPriceBlockViewHolder EMPTY_VIEW_HOLDER = new StockActivityRealPriceBlockViewHolder();
 
@@ -48,6 +54,12 @@ public class StockActivityRealPriceBlockViewHolder {
             viewHolder.diffTextView = view.findViewById(R.id.stock_diff_tv);
             viewHolder.tradingTextView = view.findViewById(R.id.stock_trade_now_tv);
             viewHolder.timeTextView = view.findViewById(R.id.stock_time_tv);
+
+            viewHolder.stockActivityBottomSelector = StockActivityBottomSelector
+                    .convertToViewHolder(view.findViewById(R.id.bottom_content_selector));
+
+            viewHolder.autoTransition = new AutoTransition();
+            viewHolder.autoTransition.setDuration(50);
 
             return viewHolder;
         } catch (ClassCastException exception) {
@@ -130,33 +142,33 @@ public class StockActivityRealPriceBlockViewHolder {
     }
 
     public void shrink() {
-        TransitionManager.beginDelayedTransition(container);
+        TransitionManager.beginDelayedTransition(container, autoTransition);
 
         float density = ClientData.getInstance().getScreenDensity();
         priceTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         ConstraintLayout.LayoutParams priceLayoutParams =
                 (ConstraintLayout.LayoutParams) priceTextView.getLayoutParams();
-        priceLayoutParams.setMargins(0, 0, 0, (int) (density * 13));
+        priceLayoutParams.setMargins(0, 0, 0, 0);
         priceLayoutParams.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
-        priceLayoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
-        priceLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
+        priceLayoutParams.topToTop = diffTextView.getId();
+        priceLayoutParams.bottomToBottom = diffTextView.getId();
         priceTextView.setLayoutParams(priceLayoutParams);
 
         diffTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         ConstraintLayout.LayoutParams diffLayoutParams =
                 (ConstraintLayout.LayoutParams) diffTextView.getLayoutParams();
-        diffLayoutParams.setMargins(18, 0, 0, 0);
+        diffLayoutParams.setMargins(18, 0, 0, (int) (density * 13));
         diffLayoutParams.setMarginStart((int) (18 * density));
         diffLayoutParams.startToEnd = priceTextView.getId();
-        diffLayoutParams.topToTop = priceTextView.getId();
+        diffLayoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
         diffLayoutParams.topToBottom = ConstraintLayout.LayoutParams.UNSET;
         diffLayoutParams.startToStart = ConstraintLayout.LayoutParams.UNSET;
-        diffLayoutParams.bottomToBottom = priceTextView.getId();
+        diffLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
         diffTextView.setLayoutParams(diffLayoutParams);
     }
 
     public void expand() {
-        TransitionManager.beginDelayedTransition(container);
+        TransitionManager.beginDelayedTransition(container, autoTransition);
 
         float density = ClientData.getInstance().getScreenDensity();
         priceTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30);
@@ -180,5 +192,20 @@ public class StockActivityRealPriceBlockViewHolder {
         diffLayoutParams.startToStart = priceTextView.getId();
         diffLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
         diffTextView.setLayoutParams(diffLayoutParams);
+    }
+
+    public void showSelector() {
+        stockActivityBottomSelector.setVisibility(View.VISIBLE);
+    }
+
+    public void hideSelector() {
+        // in order to address the problem when the hideSelector is triggered by click comment
+        // and automatically hide it.
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                stockActivityBottomSelector.setVisibility(View.GONE);
+            }
+        });
     }
 }

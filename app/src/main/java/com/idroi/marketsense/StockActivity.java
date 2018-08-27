@@ -8,8 +8,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.constraint.Guideline;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -46,7 +44,6 @@ import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.common.FrescoHelper;
 import com.idroi.marketsense.common.MarketSenseError;
-import com.idroi.marketsense.common.MarketSenseRendererHelper;
 import com.idroi.marketsense.common.YahooStxChartCrawler;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
@@ -60,7 +57,6 @@ import com.idroi.marketsense.request.NewsRequest;
 import com.idroi.marketsense.request.CommentAndVoteRequest;
 import com.idroi.marketsense.request.StockChartDataRequest;
 import com.idroi.marketsense.util.MarketSenseUtils;
-import com.idroi.marketsense.viewholders.BestPriceRowViewHolder;
 import com.idroi.marketsense.viewholders.ChartPeriodSelectorViewHolder;
 import com.idroi.marketsense.viewholders.ChartTaTopItemsViewHolder;
 import com.idroi.marketsense.viewholders.ChartTickBottomItemsViewHolder;
@@ -68,17 +64,15 @@ import com.idroi.marketsense.viewholders.ChartTickTopItemsViewHolder;
 import com.idroi.marketsense.viewholders.FiveBestPriceViewHolder;
 import com.idroi.marketsense.viewholders.PredictForDifferentPeriodViewHolder;
 import com.idroi.marketsense.viewholders.StockActivityActionBarViewHolder;
-import com.idroi.marketsense.viewholders.StockActivityBottomSelector;
+import com.idroi.marketsense.viewholders.StockActivityBottomContent;
 import com.idroi.marketsense.viewholders.StockActivityRealPriceBlockViewHolder;
 import com.idroi.marketsense.viewholders.StockPredictionBlockViewHolder;
 
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import static com.idroi.marketsense.CommentActivity.EXTRA_COMMENT;
 import static com.idroi.marketsense.CommentActivity.EXTRA_NEED_TO_CHANGE;
@@ -162,7 +156,12 @@ public class StockActivity extends AppCompatActivity {
     private ChartTickBottomItemsViewHolder mChartTickBottomItemsViewHolder;
     private FiveBestPriceViewHolder mBestPriceRowViewHolder;
     private PredictForDifferentPeriodViewHolder mPredictForDifferentPeriodViewHolder;
-    private StockActivityBottomSelector mStockActivityBottomSelector;
+    private StockActivityBottomContent mStockActivityBottomContent;
+
+    private View.OnLayoutChangeListener mOnLayoutChangeListener;
+    private int mRealTimeContainerShrinkHeight = Integer.MAX_VALUE;
+    private int mSelectorTop = Integer.MAX_VALUE;
+    private boolean mIsSelectorFixed = false;
 
     private AlertDialog mMoreAlertDialog;
 
@@ -222,8 +221,8 @@ public class StockActivity extends AppCompatActivity {
         mPredictForDifferentPeriodViewHolder =
                 PredictForDifferentPeriodViewHolder
                         .convertToViewHolder(findViewById(R.id.predict_for_different_period));
-        mStockActivityBottomSelector =
-                StockActivityBottomSelector
+        mStockActivityBottomContent =
+                StockActivityBottomContent
                         .convertToViewHolder(findViewById(R.id.stock_activity_bottom_selector));
     }
 
@@ -241,6 +240,7 @@ public class StockActivity extends AppCompatActivity {
         mUserProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
         mYahooStxChartCrawler.destroy();
         mHandler.removeCallbacks(mExpandRunnable);
+        mStockActivityRealPriceBlockViewHolder.mainView.removeOnLayoutChangeListener(mOnLayoutChangeListener);
         super.onDestroy();
     }
 
@@ -377,13 +377,25 @@ public class StockActivity extends AppCompatActivity {
     }
 
     private void initSelector() {
-        mStockActivityBottomSelector.commentSelector.setOnClickListener(new View.OnClickListener() {
+        mStockActivityBottomContent.stockActivityBottomSelector.commentSelector.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 chooseBottomBlock(0);
             }
         });
-        mStockActivityBottomSelector.newsSelector.setOnClickListener(new View.OnClickListener() {
+        mStockActivityBottomContent.stockActivityBottomSelector.newsSelector.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chooseBottomBlock(1);
+            }
+        });
+        mStockActivityRealPriceBlockViewHolder.stockActivityBottomSelector.commentSelector.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chooseBottomBlock(0);
+            }
+        });
+        mStockActivityRealPriceBlockViewHolder.stockActivityBottomSelector.newsSelector.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 chooseBottomBlock(1);
@@ -391,6 +403,28 @@ public class StockActivity extends AppCompatActivity {
         });
 
         mNestedScrollView = findViewById(R.id.body_scroll_view);
+
+        mOnLayoutChangeListener = new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
+                int height = view.getHeight();
+                if(height != 0) {
+                    if(height < mRealTimeContainerShrinkHeight) {
+                        mRealTimeContainerShrinkHeight = view.getHeight();
+
+                        Point childOffset = new Point();
+                        MarketSenseUtils.getDeepChildOffset(mNestedScrollView,
+                                mStockActivityBottomContent.stockActivityBottomSelector.newsSelector.getParent(),
+                                mStockActivityBottomContent.stockActivityBottomSelector.newsSelector,
+                                childOffset);
+                        mSelectorTop = childOffset.y - mRealTimeContainerShrinkHeight;
+                    }
+                }
+            }
+        };
+
+        mStockActivityRealPriceBlockViewHolder.mainView.addOnLayoutChangeListener(mOnLayoutChangeListener);
+
         mNestedScrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
             @Override
             public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
@@ -402,6 +436,18 @@ public class StockActivity extends AppCompatActivity {
                 if(mIsTopShrink && scrollY < 100) {
                     mIsTopShrink = false;
                     mStockActivityRealPriceBlockViewHolder.expand();
+                }
+
+                if(!mIsSelectorFixed && scrollY >= mSelectorTop) {
+                    MSLog.e("mIsSelectorFixed = true");
+                    mStockActivityRealPriceBlockViewHolder.showSelector();
+                    mIsSelectorFixed = true;
+                }
+
+                if(mIsSelectorFixed && scrollY < mSelectorTop) {
+                    MSLog.e("mIsSelectorFixed = false");
+                    mStockActivityRealPriceBlockViewHolder.hideSelector();
+                    mIsSelectorFixed = false;
                 }
             }
         });
@@ -423,14 +469,14 @@ public class StockActivity extends AppCompatActivity {
     private void chooseBottomBlock(int position) {
         switch (position) {
             case 0:
-                mStockActivityBottomSelector.setSelected(this,
-                        mStockActivityBottomSelector.commentSelector,
-                        mStockActivityBottomSelector.commentBlock);
+                mStockActivityBottomContent.setSelected(this,
+                        mStockActivityBottomContent.stockActivityBottomSelector.commentSelector,
+                        mStockActivityBottomContent.commentBlock);
                 break;
             case 1:
-                mStockActivityBottomSelector.setSelected(this,
-                        mStockActivityBottomSelector.newsSelector,
-                        mStockActivityBottomSelector.newsBlock);
+                mStockActivityBottomContent.setSelected(this,
+                        mStockActivityBottomContent.stockActivityBottomSelector.newsSelector,
+                        mStockActivityBottomContent.newsBlock);
                 break;
         }
     }
@@ -989,7 +1035,7 @@ public class StockActivity extends AppCompatActivity {
                 showCommentBlock();
 
                 chooseBottomBlock(0);
-                slideToView(mStockActivityBottomSelector.commentSelector);
+                slideToView(mStockActivityBottomContent.stockActivityBottomSelector.commentSelector);
 
                 MSLog.d(String.format("user send a comment on (%s, %s, %s): %s", type, id, eventId, html));
             }

@@ -48,6 +48,7 @@ import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_USER_SETT
 import static com.idroi.marketsense.common.Constants.SHARE_APP_INSTALL_LINK;
 import static com.idroi.marketsense.common.Constants.USER_SETTING_NOTIFICATION_KEY;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_MAIN_ACTIVITY_FUNCTION_CLICK;
 
 /**
  * Created by daniel.hsieh on 2018/8/23.
@@ -62,6 +63,8 @@ public class ProfileFragment extends Fragment {
     private SettingAdapter mSettingAdapter;
     private SettingSource mSettingSource;
 
+    private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -75,6 +78,18 @@ public class ProfileFragment extends Fragment {
 
         setListView(view);
         initFBLogin();
+
+        mGlobalBroadcastListener = new UserProfile.GlobalBroadcastListener() {
+            @Override
+            public void onGlobalBroadcast(int notifyId, Object payload) {
+                if(notifyId == NOTIFY_ID_MAIN_ACTIVITY_FUNCTION_CLICK) {
+                    getFBUserProfile(true);
+                }
+            }
+        };
+
+        ClientData clientData = ClientData.getInstance();
+        clientData.getUserProfile().addGlobalBroadcastListener(mGlobalBroadcastListener);
     }
 
     private void setListView(View view) {
@@ -128,25 +143,6 @@ public class ProfileFragment extends Fragment {
     private void initFBLogin() {
 
         MSLog.d("The user has logged in Facebook: " + FBHelper.checkFBLogin());
-
-        mFBCallbackManager = CallbackManager.Factory.create();
-        LoginManager.getInstance().registerCallback(mFBCallbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                MSLog.d("facebook registerCallback onSuccess in SettingActivity");
-                getFBUserProfile(true);
-            }
-
-            @Override
-            public void onCancel() {
-                MSLog.d("facebook registerCallback onCancel");
-            }
-
-            @Override
-            public void onError(FacebookException exception) {
-                MSLog.d("facebook registerCallback onError: " + exception.toString());
-            }
-        });
 
         if(FBHelper.checkFBLogin()) {
             getFBUserProfile(false);
@@ -400,6 +396,10 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onDestroyView() {
         mSettingSource.destroy();
+        UserProfile userProfile = ClientData.getInstance().getUserProfile();
+        if(userProfile != null) {
+            userProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
+        }
         super.onDestroyView();
     }
 }

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.Guideline;
@@ -167,6 +168,16 @@ public class StockActivity extends AppCompatActivity {
 
     private boolean mIsTopShrink = false;
 
+    private Handler mHandler = new Handler();
+    private Runnable mExpandRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if(mNewsRecyclerAdapter != null) {
+                mNewsRecyclerAdapter.expand(7);
+            }
+        }
+    };
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -229,6 +240,7 @@ public class StockActivity extends AppCompatActivity {
         mCommentsRecyclerViewAdapter.destroy();
         mUserProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
         mYahooStxChartCrawler.destroy();
+        mHandler.removeCallbacks(mExpandRunnable);
         super.onDestroy();
     }
 
@@ -494,7 +506,7 @@ public class StockActivity extends AppCompatActivity {
                 int totalItemCount = layoutManager.getItemCount();
                 int pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
                 if (pastVisibleItems + visibleItemCount >= totalItemCount) {
-                    mNewsRecyclerAdapter.expand(7);
+                    mHandler.post(mExpandRunnable);
                 }
             }
         });

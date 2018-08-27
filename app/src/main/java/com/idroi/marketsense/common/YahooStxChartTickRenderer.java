@@ -95,7 +95,9 @@ public class YahooStxChartTickRenderer {
         }
 
         LineDataSet lineDataSet = new LineDataSet(yPrices, null);
-        lineDataSet.setColor(context.getResources().getColor(R.color.color_price_line));
+        lineDataSet.setColor(context.getResources().getColor(R.color.stock_blue));
+        lineDataSet.setDrawFilled(true);
+        lineDataSet.setFillColor(context.getResources().getColor(R.color.stock_blue));
         lineDataSet.setDrawValues(false);
         lineDataSet.setDrawCircles(false);
         lineDataSet.setDrawCircleHole(false);

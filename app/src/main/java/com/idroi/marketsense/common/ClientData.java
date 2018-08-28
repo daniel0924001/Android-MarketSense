@@ -267,7 +267,7 @@ public class ClientData {
             MSLog.i("Loading all stocks list...(cache): " + url);
             Cache cache = Networking.getRequestQueue(mContext).getCache();
             Cache.Entry entry = cache.get(url);
-            if (entry != null) {
+            if (entry != null && !entry.isExpired()) {
                 try {
                     ArrayList<Stock> stockArrayList = StocksListRequest.stockParseResponse(entry.data);
                     MSLog.i("Loading all stock list...(cache hit): " + new String(entry.data));
@@ -276,7 +276,7 @@ public class ClientData {
                     MSLog.e("Loading all stocks list...(cache failed JSONException)");
                 }
             } else {
-                MSLog.i("Loading all stocks list...(cache miss)");
+                MSLog.i("Loading all stocks list...(cache miss or expired)");
             }
         }
 

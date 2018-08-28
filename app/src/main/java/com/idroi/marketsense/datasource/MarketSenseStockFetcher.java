@@ -110,7 +110,7 @@ public class MarketSenseStockFetcher {
         MSLog.i("Loading stock list...(cache): " + cacheUrl);
         final Cache cache = Networking.getRequestQueue(context).getCache();
         Cache.Entry entry = cache.get(cacheUrl);
-        if(entry != null) {
+        if(entry != null && !entry.isExpired()) {
             try {
                 ArrayList<Stock> stockArrayList = StockRequest.stockParseResponse(entry.data);
                 MSLog.i("Loading stock list...(cache hit): " + new String(entry.data));
@@ -119,7 +119,7 @@ public class MarketSenseStockFetcher {
                 MSLog.e("Loading stock list...(cache failed JSONException)");
             }
         } else {
-            MSLog.i("Loading stock list...(cache miss)");
+            MSLog.i("Loading stock list...(cache miss or expired)");
         }
 
         mStockRequest = new StockRequest(Request.Method.GET, networkUrl, null, new Response.Listener<ArrayList<Stock>>() {

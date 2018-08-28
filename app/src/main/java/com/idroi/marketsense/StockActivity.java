@@ -668,35 +668,37 @@ public class StockActivity extends AppCompatActivity {
         ClientData clientData = ClientData.getInstance(this);
         Stock stock = clientData.getPriceFromCode(mCode);
 
-        Stock.renderTitleAndStars(this, stock.getPredictTechDirection(),
-                stock.getPredictTechLevel(),
-                mStockPredictionBlockViewHolder.techBlockView,
-                mStockPredictionBlockViewHolder.techTitleTextView,
-                mStockPredictionBlockViewHolder.techUnavailableTextView,
-                mStockPredictionBlockViewHolder.techImageViews);
+        if(stock != null) {
+            Stock.renderTitleAndStars(this, stock.getPredictTechDirection(),
+                    stock.getPredictTechLevel(),
+                    mStockPredictionBlockViewHolder.techBlockView,
+                    mStockPredictionBlockViewHolder.techTitleTextView,
+                    mStockPredictionBlockViewHolder.techUnavailableTextView,
+                    mStockPredictionBlockViewHolder.techImageViews);
 
-        Stock.renderTitleAndStars(this, stock.getConfidenceDirection(),
-                stock.getPredictNewsLevel(),
-                mStockPredictionBlockViewHolder.newsBlockView,
-                mStockPredictionBlockViewHolder.newsTitleTextView,
-                mStockPredictionBlockViewHolder.newsUnavailableTextView,
-                mStockPredictionBlockViewHolder.newsImageViews);
+            Stock.renderTitleAndStars(this, stock.getConfidenceDirection(),
+                    stock.getPredictNewsLevel(),
+                    mStockPredictionBlockViewHolder.newsBlockView,
+                    mStockPredictionBlockViewHolder.newsTitleTextView,
+                    mStockPredictionBlockViewHolder.newsUnavailableTextView,
+                    mStockPredictionBlockViewHolder.newsImageViews);
 
 
-        stock.renderTodayBlock(this,
-                mStockPredictionBlockViewHolder.todayBlock,
-                mStockPredictionBlockViewHolder.todayTitleTextView,
-                mStockPredictionBlockViewHolder.todayStatusTextView);
+            stock.renderTodayBlock(this,
+                    mStockPredictionBlockViewHolder.todayBlock,
+                    mStockPredictionBlockViewHolder.todayTitleTextView,
+                    mStockPredictionBlockViewHolder.todayStatusTextView);
 
-        stock.renderTomorrowBlock(this,
-                mStockPredictionBlockViewHolder.tomorrowBlock,
-                mStockPredictionBlockViewHolder.tomorrowTitleTextView,
-                mStockPredictionBlockViewHolder.tomorrowStatusTextView);
+            stock.renderTomorrowBlock(this,
+                    mStockPredictionBlockViewHolder.tomorrowBlock,
+                    mStockPredictionBlockViewHolder.tomorrowTitleTextView,
+                    mStockPredictionBlockViewHolder.tomorrowStatusTextView);
 
-        PredictForDifferentPeriodViewHolder.update(mPredictForDifferentPeriodViewHolder,
-                stock.getTomorrowPredictionDiffDirection(),
-                stock.get5DPredictionDirection(),
-                stock.get20DPredictionDirection());
+            PredictForDifferentPeriodViewHolder.update(mPredictForDifferentPeriodViewHolder,
+                    stock.getTomorrowPredictionDiffDirection(),
+                    stock.get5DPredictionDirection(),
+                    stock.get20DPredictionDirection());
+        }
     }
 
     private void initStockChart() {

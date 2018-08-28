@@ -106,6 +106,12 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             if(mLastSelectedItemId != item.getItemId()) {
                 mLastSelectedItemId = item.getItemId();
+
+                // we have to overcome when the user profile is not initialized
+                // since FB is not ready.
+                UserProfile userProfile = ClientData.getInstance().getUserProfile();
+                userProfile.tryToLoginAndInitUserData(MainActivity.this);
+
                 switch (item.getItemId()) {
                     case R.id.navigation_main_page:
                         setViewPager(R.id.navigation_main_page);

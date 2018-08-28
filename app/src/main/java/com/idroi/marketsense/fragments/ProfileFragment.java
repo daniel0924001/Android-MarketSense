@@ -64,6 +64,7 @@ public class ProfileFragment extends Fragment {
     private SettingSource mSettingSource;
 
     private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
+    private UserProfile mUserProfile;
 
     @Nullable
     @Override
@@ -76,9 +77,6 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        setListView(view);
-        initFBLogin();
-
         mGlobalBroadcastListener = new UserProfile.GlobalBroadcastListener() {
             @Override
             public void onGlobalBroadcast(int notifyId, Object payload) {
@@ -88,8 +86,11 @@ public class ProfileFragment extends Fragment {
             }
         };
 
-        ClientData clientData = ClientData.getInstance();
-        clientData.getUserProfile().addGlobalBroadcastListener(mGlobalBroadcastListener);
+        mUserProfile = ClientData.getInstance().getUserProfile();
+        mUserProfile.addGlobalBroadcastListener(mGlobalBroadcastListener);
+
+        setListView(view);
+        initFBLogin();
     }
 
     private void setListView(View view) {
@@ -106,10 +107,11 @@ public class ProfileFragment extends Fragment {
                         LoginManager.getInstance().logOut();
                         internalRefreshFBUi(null, null);
 
-                        UserProfile userProfile = ClientData.getInstance(getActivity()).getUserProfile();
-                        userProfile.saveFavoriteStocksAndEvents(getActivity());
-                        userProfile.clearUserProfile();
-                        userProfile.globalBroadcast(NOTIFY_ID_FAVORITE_LIST);
+                        if(mUserProfile != null) {
+                            mUserProfile.saveFavoriteStocksAndEvents(getActivity());
+                            mUserProfile.clearUserProfile();
+                            mUserProfile.globalBroadcast(NOTIFY_ID_FAVORITE_LIST);
+                        }
                     } else {
                         MSLog.d("perform login");
                         showLoginAlertDialog();
@@ -142,7 +144,7 @@ public class ProfileFragment extends Fragment {
 
     private void initFBLogin() {
 
-        MSLog.d("The user has logged in Facebook: " + FBHelper.checkFBLogin());
+        MSLog.d("In ProfileFragment, the user has logged in Facebook: " + FBHelper.checkFBLogin());
 
         if(FBHelper.checkFBLogin()) {
             getFBUserProfile(false);
@@ -225,9 +227,9 @@ public class ProfileFragment extends Fragment {
         if(userName != null && avatarUrl != null) {
             internalRefreshFBUi(userName, avatarUrl);
         } else {
-            ClientData clientData = ClientData.getInstance();
-            UserProfile userProfile = clientData.getUserProfile();
-            internalRefreshFBUi(userProfile.getUserName(), userProfile.getUserAvatarLink());
+            if(mUserProfile != null) {
+                internalRefreshFBUi(mUserProfile.getUserName(), mUserProfile.getUserAvatarLink());
+            }
         }
     }
 
@@ -396,9 +398,8 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onDestroyView() {
         mSettingSource.destroy();
-        UserProfile userProfile = ClientData.getInstance().getUserProfile();
-        if(userProfile != null) {
-            userProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
+        if(mUserProfile != null) {
+            mUserProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
         }
         super.onDestroyView();
     }

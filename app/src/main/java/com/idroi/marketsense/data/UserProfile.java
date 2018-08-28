@@ -126,6 +126,9 @@ public class UserProfile implements Serializable {
 
             if(FBHelper.checkFBLogin()) {
                 tryToLoginAndInitUserData(context);
+            } else {
+                MSLog.w("we failed to login and initialize user data " +
+                        "since user has not logged in facebook, is expired: " + FBHelper.isExpired());
             }
         }
     }

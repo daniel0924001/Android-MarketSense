@@ -116,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
 
                 switch (item.getItemId()) {
                     case R.id.navigation_main_page:
-                        MSLog.e("R.id.navigation_main_page~~~~: " + mForceChangeBottomNavigation);
                         setViewPager(R.id.navigation_main_page, mForceChangeBottomNavigation);
                         return true;
                     case R.id.navigation_trend:

@@ -71,7 +71,7 @@ public class Stock {
 
     private int mTodayPredictionDiffDirection, mTomorrowPredictionDiffDirection, mPredictionDiffDirection;
     private double mTodayPredictionDiffPercentage, mTomorrowPredictionDiffPercentage, mPredictionDiffPercentage;
-    private double mPredictionError;
+    private double mPredictionError, mPredictionErrorWhenClosed;
 
     private int m5DPredictionDirection, m20DPredictionDirection;
 
@@ -438,6 +438,12 @@ public class Stock {
         }
         error += Math.abs(mTodayPredictionDiffDirection * mTodayPredictionDiffPercentage - mDiffDirection * mDiffPercentage);
         mPredictionError = -error;
+
+        if(isHitPredictionDirection(false)) {
+            mPredictionErrorWhenClosed = 10 + mPredictionDiffDirection * mPredictionDiffPercentage;
+        } else {
+            mPredictionErrorWhenClosed = mPredictionDiffDirection * mPredictionDiffPercentage;
+        }
     }
 
     public boolean isHitPredictionDirection(boolean isCountZero) {
@@ -475,11 +481,7 @@ public class Stock {
         if(clientData.isWorkDayAndStockMarketIsOpen() || clientData.isWorkDayAfterStockClosedBeforeAnswerDisclosure()) {
             return mPredictionError;
         } else {
-            if(isHitPredictionDirection(false)) {
-                return 10 + mPredictionDiffDirection * mPredictionDiffPercentage;
-            } else {
-                return mPredictionDiffDirection * mPredictionDiffPercentage;
-            }
+            return mPredictionErrorWhenClosed;
         }
     }
 

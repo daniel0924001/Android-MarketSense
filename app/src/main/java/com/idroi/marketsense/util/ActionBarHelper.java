@@ -69,13 +69,18 @@ public class ActionBarHelper {
         return equal;
     }
 
+    private void internalSetCurrentActionBarType(int type) {
+        mCurrentActionBarType = type;
+    }
+
     private static boolean isSameTypeAndChangeType(int type) {
         ActionBarHelper actionBarHelper = ActionBarHelper.getInstance();
         return actionBarHelper.checkSameTypeAndChangeType(type);
     }
 
-    public static void setActionBarForMain(AppCompatActivity activity) {
-        setActionBarForMain(activity, false);
+    private static void setCurrentActionBarType(int type) {
+        ActionBarHelper actionBarHelper = ActionBarHelper.getInstance();
+        actionBarHelper.internalSetCurrentActionBarType(type);
     }
 
     public static void setActionBarForMain(AppCompatActivity activity, boolean forceRefresh) {
@@ -83,6 +88,7 @@ public class ActionBarHelper {
         if(!forceRefresh && isSameTypeAndChangeType(ACTION_BAR_TYPE_MAIN)) {
             return;
         }
+        setCurrentActionBarType(ACTION_BAR_TYPE_MAIN);
 
         final ActionBar actionBar = activity.getSupportActionBar();
 
@@ -121,12 +127,13 @@ public class ActionBarHelper {
     }
 
     public static void setActionBarForTrend(AppCompatActivity activity,
-                                            int typeId,
+                                            int typeId, boolean forceRefresh,
                                             final ActionBarEventNotificationListener eventNotificationListener) {
 
-        if(isSameTypeAndChangeType(typeId)) {
+        if(!forceRefresh && isSameTypeAndChangeType(typeId)) {
             return;
         }
+        setCurrentActionBarType(typeId);
 
         final ActionBar actionBar = activity.getSupportActionBar();
 
@@ -208,11 +215,13 @@ public class ActionBarHelper {
     }
 
     public static void setActionBarForDiscussion(AppCompatActivity activity,
+                                                 boolean forceRefresh,
                                                  final ActionBarEventNotificationListener eventNotificationListener) {
 
-        if(isSameTypeAndChangeType(ACTION_BAR_TYPE_POST)) {
+        if(!forceRefresh && isSameTypeAndChangeType(ACTION_BAR_TYPE_POST)) {
             return;
         }
+        setCurrentActionBarType(ACTION_BAR_TYPE_POST);
 
         final ActionBar actionBar = activity.getSupportActionBar();
 
@@ -272,11 +281,12 @@ public class ActionBarHelper {
         }
     }
 
-    public static void setActionBarForProfile(AppCompatActivity activity) {
+    public static void setActionBarForProfile(AppCompatActivity activity, boolean forceRefresh) {
 
-        if(isSameTypeAndChangeType(ACTION_BAR_TYPE_PROFILE)) {
+        if(!forceRefresh && isSameTypeAndChangeType(ACTION_BAR_TYPE_PROFILE)) {
             return;
         }
+        setCurrentActionBarType(ACTION_BAR_TYPE_PROFILE);
 
         final ActionBar actionBar = activity.getSupportActionBar();
 

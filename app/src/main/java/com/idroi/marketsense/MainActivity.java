@@ -66,6 +66,7 @@ import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FUNCTION_INSERT_C
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FUNCTION_SEARCH_COMMENT;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_MAIN_ACTIVITY_FUNCTION_CLICK;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_NEED_TO_APK_UPDATED;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_NEED_TO_REOPEN;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_USER_HAS_LOGIN;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_USER_LOGIN_FAILED;
 import static com.idroi.marketsense.notification.NotificationHelper.NEWS_GENERAL_ALL;
@@ -77,7 +78,9 @@ public class MainActivity extends AppCompatActivity {
     private SwipeableViewPager mViewPager;
     private MagicIndicator mMagicIndicator;
     private FloatingActionButton mFab;
+    private BottomNavigationView mBottomNavigationView;
 
+    private boolean mForceChangeBottomNavigation = false;
     private int mLastSelectedItemId = -1;
 
     public final static int sSearchAndAddRequestCode = 1;
@@ -104,9 +107,8 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            if(mLastSelectedItemId != item.getItemId()) {
+            if(mForceChangeBottomNavigation || mLastSelectedItemId != item.getItemId()) {
                 mLastSelectedItemId = item.getItemId();
-
                 // we have to overcome when the user profile is not initialized
                 // since FB is not ready.
                 UserProfile userProfile = ClientData.getInstance().getUserProfile();
@@ -114,19 +116,20 @@ public class MainActivity extends AppCompatActivity {
 
                 switch (item.getItemId()) {
                     case R.id.navigation_main_page:
-                        setViewPager(R.id.navigation_main_page);
+                        MSLog.e("R.id.navigation_main_page~~~~: " + mForceChangeBottomNavigation);
+                        setViewPager(R.id.navigation_main_page, mForceChangeBottomNavigation);
                         return true;
                     case R.id.navigation_trend:
-                        setViewPager(R.id.navigation_trend);
+                        setViewPager(R.id.navigation_trend, mForceChangeBottomNavigation);
                         return true;
                     case R.id.navigation_post:
-                        setViewPager(R.id.navigation_post);
+                        setViewPager(R.id.navigation_post, mForceChangeBottomNavigation);
                         return true;
                     case R.id.navigation_profile:
-                        setViewPager(R.id.navigation_profile);
+                        setViewPager(R.id.navigation_profile, mForceChangeBottomNavigation);
                         return true;
                     case R.id.navigation_favorites:
-                        setViewPager(R.id.navigation_favorites);
+                        setViewPager(R.id.navigation_favorites, mForceChangeBottomNavigation);
                         return true;
                 }
             }
@@ -198,6 +201,11 @@ public class MainActivity extends AppCompatActivity {
                             R.string.need_to_update_description,
                             R.string.need_to_update_positive,
                             R.string.need_to_update_negative);
+                } else if(notifyId == NOTIFY_ID_NEED_TO_REOPEN) {
+                    if(mBottomNavigationView != null) {
+                        mForceChangeBottomNavigation = true;
+                        mBottomNavigationView.setSelectedItemId(mLastSelectedItemId);
+                    }
                 }
             }
         };
@@ -208,14 +216,14 @@ public class MainActivity extends AppCompatActivity {
         FrescoHelper.initialize(getApplicationContext());
         setContentView(R.layout.activity_main);
 
-        BottomNavigationView navigation = findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        BottomNavigationViewHelper.disableShiftMode(navigation);
+        mBottomNavigationView = findViewById(R.id.navigation);
+        mBottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        BottomNavigationViewHelper.disableShiftMode(mBottomNavigationView);
 
         mFab = findViewById(R.id.fab_add);
 
         initFBLogin();
-        setViewPager();
+        mBottomNavigationView.setSelectedItemId(R.id.navigation_main_page);
     }
 
     @Override
@@ -268,18 +276,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void setViewPager() {
-        mViewPager = findViewById(R.id.pager);
-        if(mViewPager != null) {
-            mViewPager.setCurrentItem(0, false);
-        }
-
-        setViewPager(R.id.navigation_main_page);
-    }
-
     private static final int SELF_NEWS_SLIDE_PAGER = 1;
 
-    private void setViewPager(int itemId) {
+    private void setViewPager(int itemId, boolean force) {
 
         clearViewPager();
 
@@ -303,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
                 setFab(false);
                 mViewPager.setSwipeable(false);
                 mMagicIndicator.setVisibility(View.GONE);
-                ActionBarHelper.setActionBarForMain(this);
+                ActionBarHelper.setActionBarForMain(this, force);
                 break;
             case R.id.navigation_trend:
                 baseScreenSlidePagerAdapter =
@@ -312,19 +311,19 @@ public class MainActivity extends AppCompatActivity {
                 mViewPager.setSwipeable(false);
                 mMagicIndicator.setVisibility(View.GONE);
                 ActionBarHelper.setActionBarForTrend(this,
-                        ActionBarHelper.ACTION_BAR_TYPE_TREND,
+                        ActionBarHelper.ACTION_BAR_TYPE_TREND, force,
                         new ActionBarHelper.ActionBarEventNotificationListener() {
                     @Override
                     public void onEventNotification(int eventId) {
                         final ActionBar actionBar = getSupportActionBar();
                         if(eventId == R.id.btn_trend) {
-                            setViewPager(R.id.navigation_trend);
+                            setViewPager(R.id.navigation_trend, false);
                             if(actionBar != null) {
                                 actionBar.setBackgroundDrawable(getDrawable(R.drawable.action_bar_background_with_border));
                                 actionBar.getCustomView().setBackground(getDrawable(R.drawable.action_bar_background_with_border));
                             }
                         } else if(eventId == R.id.btn_news) {
-                            setViewPager(SELF_NEWS_SLIDE_PAGER);
+                            setViewPager(SELF_NEWS_SLIDE_PAGER, false);
                             if(actionBar != null) {
                                 actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.white_eight)));
                                 actionBar.getCustomView().setBackground(new ColorDrawable(getResources().getColor(R.color.white_eight)));
@@ -339,19 +338,19 @@ public class MainActivity extends AppCompatActivity {
                 mViewPager.setSwipeable(true);
                 mMagicIndicator.setVisibility(View.VISIBLE);
                 ActionBarHelper.setActionBarForTrend(this,
-                        ActionBarHelper.ACTION_BAR_TYPE_TREND,
+                        ActionBarHelper.ACTION_BAR_TYPE_TREND, force,
                         new ActionBarHelper.ActionBarEventNotificationListener() {
                     @Override
                     public void onEventNotification(int eventId) {
                         final ActionBar actionBar = getSupportActionBar();
                         if(eventId == R.id.btn_trend) {
-                            setViewPager(R.id.navigation_trend);
+                            setViewPager(R.id.navigation_trend, false);
                             if(actionBar != null) {
                                 actionBar.setBackgroundDrawable(getDrawable(R.drawable.action_bar_background_with_border));
                                 actionBar.getCustomView().setBackground(getDrawable(R.drawable.action_bar_background_with_border));
                             }
                         } else if(eventId == R.id.btn_news) {
-                            setViewPager(SELF_NEWS_SLIDE_PAGER);
+                            setViewPager(SELF_NEWS_SLIDE_PAGER, false);
                             if(actionBar != null) {
                                 actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.white_eight)));
                                 actionBar.getCustomView().setBackground(new ColorDrawable(getResources().getColor(R.color.white_eight)));
@@ -367,7 +366,7 @@ public class MainActivity extends AppCompatActivity {
                 mViewPager.setSwipeable(false);
                 mMagicIndicator.setVisibility(View.GONE);
                 ActionBarHelper.setActionBarForTrend(this,
-                        ActionBarHelper.ACTION_BAR_TYPE_FAVORITE,
+                        ActionBarHelper.ACTION_BAR_TYPE_FAVORITE, force,
                         new ActionBarHelper.ActionBarEventNotificationListener() {
                             @Override
                             public void onEventNotification(int eventId) {
@@ -385,7 +384,7 @@ public class MainActivity extends AppCompatActivity {
                 setFab(false);
                 mViewPager.setSwipeable(false);
                 mMagicIndicator.setVisibility(View.GONE);
-                ActionBarHelper.setActionBarForDiscussion(this, new ActionBarHelper.ActionBarEventNotificationListener() {
+                ActionBarHelper.setActionBarForDiscussion(this, force, new ActionBarHelper.ActionBarEventNotificationListener() {
                     @Override
                     public void onEventNotification(int eventId) {
                         if(eventId == R.id.action_bar_post) {
@@ -400,7 +399,7 @@ public class MainActivity extends AppCompatActivity {
                 setFab(false);
                 mViewPager.setSwipeable(false);
                 mMagicIndicator.setVisibility(View.GONE);
-                ActionBarHelper.setActionBarForProfile(this);
+                ActionBarHelper.setActionBarForProfile(this, force);
                 break;
             default:
                 // invalid category
@@ -472,6 +471,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void clearViewPager() {
+        mForceChangeBottomNavigation = false;
         if(mViewPager != null) {
             mViewPager.clearOnPageChangeListeners();
             mViewPager.setAdapter(null);

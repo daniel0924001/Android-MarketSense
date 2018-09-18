@@ -1,9 +1,7 @@
 package com.idroi.marketsense;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,7 +30,6 @@ import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.common.FrescoHelper;
 import com.idroi.marketsense.common.MarketSenseRendererHelper;
-import com.idroi.marketsense.common.SharedPreferencesCompat;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.datasource.SettingSource;
@@ -40,10 +37,7 @@ import com.idroi.marketsense.datasource.SettingSource;
 import org.json.JSONObject;
 
 import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
-import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_USER_SETTING;
 import static com.idroi.marketsense.common.Constants.SHARE_APP_INSTALL_LINK;
-import static com.idroi.marketsense.common.Constants.USER_SETTING_NOTIFICATION_KEY;
-import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 
 /**
  * Created by daniel.hsieh on 2018/4/27.
@@ -177,7 +171,7 @@ public class SettingActivity extends AppCompatActivity {
             button.setText(R.string.logout);
         } else {
             imageView.setImageResource(R.drawable.ic_account_circle_gray_24px);
-            textView.setText(getResources().getString(R.string.hello));
+            textView.setText(getResources().getString(R.string.first_line_state_not_login));
             button.setText(R.string.login);
         }
     }
@@ -204,35 +198,35 @@ public class SettingActivity extends AppCompatActivity {
         mListView = findViewById(R.id.setting_listview);
         mSettingSource = new SettingSource(this);
 
-        mSettingAdapter = new SettingAdapter(this, mSettingSource);
-        mSettingAdapter.setSettingOnClickListener(new SettingAdapter.SettingOnClickListener() {
-            @Override
-            public void onLoginBtnClick() {
-                if(FBHelper.checkFBLogin()) {
-                    MSLog.d("perform logout");
-                    LoginManager.getInstance().logOut();
-                    internalRefreshFBUi(null, null);
-
-                    UserProfile userProfile = ClientData.getInstance(SettingActivity.this).getUserProfile();
-                    userProfile.saveFavoriteStocksAndEvents(SettingActivity.this);
-                    userProfile.clearUserProfile();
-                    userProfile.globalBroadcast(NOTIFY_ID_FAVORITE_LIST);
-                } else {
-                    MSLog.d("perform login");
-                    showLoginAlertDialog();
-                }
-            }
-
-            @Override
-            public void onSwitchClick(boolean isChecked) {
-                MSLog.d("user set notification to: " + isChecked);
-                SharedPreferences.Editor editor =
-                        SettingActivity.this.getSharedPreferences(SHARED_PREFERENCE_USER_SETTING, Context.MODE_PRIVATE).edit();
-                editor.putBoolean(USER_SETTING_NOTIFICATION_KEY, isChecked);
-                SharedPreferencesCompat.apply(editor);
-            }
-        });
-        mListView.setAdapter(mSettingAdapter);
+        mSettingAdapter = new SettingAdapter(this, mSettingSource, null);
+//        mSettingAdapter.setSettingOnClickListener(new SettingAdapter.SettingOnClickListener() {
+//            @Override
+//            public void onLoginBtnClick() {
+//                if(FBHelper.checkFBLogin()) {
+//                    MSLog.d("perform logout");
+//                    LoginManager.getInstance().logOut();
+//                    internalRefreshFBUi(null, null);
+//
+//                    UserProfile userProfile = ClientData.getInstance(SettingActivity.this).getUserProfile();
+//                    userProfile.saveFavoriteStocksAndEvents(SettingActivity.this);
+//                    userProfile.clearUserProfile();
+//                    userProfile.globalBroadcast(NOTIFY_ID_FAVORITE_LIST);
+//                } else {
+//                    MSLog.d("perform login");
+//                    showLoginAlertDialog();
+//                }
+//            }
+//
+//            @Override
+//            public void onSwitchClick(boolean isChecked) {
+//                MSLog.d("user set notification to: " + isChecked);
+//                SharedPreferences.Editor editor =
+//                        SettingActivity.this.getSharedPreferences(SHARED_PREFERENCE_USER_SETTING, Context.MODE_PRIVATE).edit();
+//                editor.putBoolean(USER_SETTING_NOTIFICATION_KEY, isChecked);
+//                SharedPreferencesCompat.apply(editor);
+//            }
+//        });
+//        mListView.setAdapter(mSettingAdapter);
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

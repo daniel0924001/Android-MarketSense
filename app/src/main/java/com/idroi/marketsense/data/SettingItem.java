@@ -33,11 +33,15 @@ public class SettingItem {
         private String mTitle;
         private Drawable mDrawableResourceId;
         private boolean mIsClickable;
+        private boolean mIsLargeMargin;
+        private boolean mHideArrow;
 
         public Builder(final SettingType settingType, int id) {
             mType = settingType;
             mId = id;
             mIsClickable = true;
+            mIsLargeMargin = false;
+            mHideArrow = false;
         }
 
         public Builder title(final String title) {
@@ -55,6 +59,16 @@ public class SettingItem {
             return this;
         }
 
+        public Builder isLargeMargin(boolean isLargeMargin) {
+            mIsLargeMargin = isLargeMargin;
+            return this;
+        }
+
+        public Builder hideArrow(boolean hideArrow) {
+            mHideArrow = hideArrow;
+            return this;
+        }
+
         public SettingItem build() {
             return new SettingItem(this);
         }
@@ -65,6 +79,8 @@ public class SettingItem {
     private final String mTitle;
     private final Drawable mDrawableResourceId;
     private final boolean mIsClickable;
+    private final boolean mLargeMargin;
+    private final boolean mHideArrow;
 
     private SettingItem(final Builder builder) {
         mId = builder.mId;
@@ -72,6 +88,8 @@ public class SettingItem {
         mTitle = builder.mTitle;
         mDrawableResourceId = builder.mDrawableResourceId;
         mIsClickable = builder.mIsClickable;
+        mLargeMargin = builder.mIsLargeMargin;
+        mHideArrow = builder.mHideArrow;
     }
 
     public int getId() {
@@ -92,5 +110,13 @@ public class SettingItem {
 
     public boolean isClickable() {
         return mIsClickable;
+    }
+
+    public boolean isLargeMargin() {
+        return mLargeMargin;
+    }
+
+    public boolean hideArrow() {
+        return mHideArrow;
     }
 }

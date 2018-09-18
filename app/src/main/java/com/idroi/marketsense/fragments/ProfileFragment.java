@@ -12,21 +12,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.idroi.marketsense.BuildConfig;
 import com.idroi.marketsense.Logging.MSLog;
@@ -35,7 +28,6 @@ import com.idroi.marketsense.WebViewActivity;
 import com.idroi.marketsense.adapter.SettingAdapter;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
-import com.idroi.marketsense.common.MarketSenseRendererHelper;
 import com.idroi.marketsense.common.SharedPreferencesCompat;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
@@ -57,9 +49,8 @@ import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_MAIN_ACTIVITY_FUN
 public class ProfileFragment extends Fragment {
 
     private AlertDialog mLoginAlertDialog, mStarAlertDialog;
-    private CallbackManager mFBCallbackManager;
     private LoginButton mFBLoginBtn;
-    private ListView mListView;
+    private RecyclerView mSettingRecyclerView;
     private SettingAdapter mSettingAdapter;
     private SettingSource mSettingSource;
 
@@ -94,10 +85,10 @@ public class ProfileFragment extends Fragment {
     }
 
     private void setListView(View view) {
-        mListView = view.findViewById(R.id.setting_listview);
+        mSettingRecyclerView = view.findViewById(R.id.setting_listview);
         mSettingSource = new SettingSource(getActivity());
 
-        mSettingAdapter = new SettingAdapter(getActivity(), mSettingSource);
+        mSettingAdapter = new SettingAdapter(getActivity(), mSettingSource, view.findViewById(R.id.logout_item));
         mSettingAdapter.setSettingOnClickListener(new SettingAdapter.SettingOnClickListener() {
             @Override
             public void onLoginBtnClick() {
@@ -105,7 +96,7 @@ public class ProfileFragment extends Fragment {
                     if (FBHelper.checkFBLogin()) {
                         MSLog.d("perform logout");
                         LoginManager.getInstance().logOut();
-                        internalRefreshFBUi(null, null);
+                        mSettingAdapter.notifyUserLogin(null, null);
 
                         if(mUserProfile != null) {
                             mUserProfile.saveFavoriteStocksAndEvents(getActivity());
@@ -129,17 +120,17 @@ public class ProfileFragment extends Fragment {
                     SharedPreferencesCompat.apply(editor);
                 }
             }
-        });
-        mListView.setAdapter(mSettingAdapter);
 
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+            public void onItemClick(int position) {
                 if(mSettingSource.getItem(position).isClickable()) {
                     handleListClick(position);
                 }
             }
         });
+        mSettingRecyclerView.setAdapter(mSettingAdapter);
+        mSettingRecyclerView.setNestedScrollingEnabled(false);
+        mSettingRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
     private void initFBLogin() {
@@ -148,40 +139,6 @@ public class ProfileFragment extends Fragment {
 
         if(FBHelper.checkFBLogin()) {
             getFBUserProfile(false);
-        }
-    }
-
-    private void internalRefreshFBUi(String userName, String avatarLink) {
-
-        boolean isLogin = FBHelper.checkFBLogin();
-        MSLog.d("internalRefreshFBUi isLogin: " + isLogin);
-
-        View view = getViewByPosition(0, mListView);
-        SimpleDraweeView imageView = view.findViewById(R.id.user_name_block_avatar);
-        TextView textView = view.findViewById(R.id.user_name_tv);
-        Button button = view.findViewById(R.id.setting_login_btn);
-        if(isLogin) {
-            if(avatarLink != null) {
-                imageView.setImageURI(Uri.parse(avatarLink));
-            }
-            MarketSenseRendererHelper.addTextView(textView, userName);
-            button.setText(R.string.logout);
-        } else {
-            imageView.setImageResource(R.drawable.ic_account_circle_gray_24px);
-            textView.setText(getResources().getString(R.string.hello));
-            button.setText(R.string.login);
-        }
-    }
-
-    private View getViewByPosition(int pos, ListView listView) {
-        final int firstListItemPosition = listView.getFirstVisiblePosition();
-        final int lastListItemPosition = firstListItemPosition + listView.getChildCount() - 1;
-
-        if (pos < firstListItemPosition || pos > lastListItemPosition ) {
-            return listView.getAdapter().getView(pos, null, listView);
-        } else {
-            final int childIndex = pos - firstListItemPosition;
-            return listView.getChildAt(childIndex);
         }
     }
 
@@ -225,10 +182,10 @@ public class ProfileFragment extends Fragment {
 
     private void refreshFBUi(@Nullable String userName, String avatarUrl) {
         if(userName != null && avatarUrl != null) {
-            internalRefreshFBUi(userName, avatarUrl);
+            mSettingAdapter.notifyUserLogin(userName, avatarUrl);
         } else {
             if(mUserProfile != null) {
-                internalRefreshFBUi(mUserProfile.getUserName(), mUserProfile.getUserAvatarLink());
+                mSettingAdapter.notifyUserLogin(mUserProfile.getUserName(), mUserProfile.getUserAvatarLink());
             }
         }
     }
@@ -242,6 +199,9 @@ public class ProfileFragment extends Fragment {
         int id = mSettingSource.getId(position);
         String title = getResources().getString(id);
         switch (id) {
+            case R.string.preference_knowledge:
+                // TODO: add knowledge page
+                break;
             // https://play.google.com/store/apps/details?id=com.idroi.marketsense&referrer=utm_source%3Dandroid_app%26utm_medium%3Dinapp%26utm_campaign%3Dshare%26
             case R.string.preference_share:
                 Intent sendIntent = new Intent();

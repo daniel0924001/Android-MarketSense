@@ -175,6 +175,7 @@
 
     <string name="preference_icon">設定圖示</string>
     <string name="preference_switch">開關</string>
+    <string name="preference_knowledge">股票知識王</string>
     <string name="preference_notification">推播通知</string>
     <string name="preference_share">分享 APP</string>
     <string name="preference_feedback">意見回饋</string>
@@ -198,7 +199,9 @@
     <string name="need_to_update_positive">馬上更新</string>
     <string name="need_to_update_negative">等一下</string>
 
-    <string name="hello">Hello, 市覺使用者</string>
+    <string name="first_line_state_not_login">尚未登入</string>
+    <string name="second_line_state_not_login">立即登入解鎖更多功能</string>
+    <string name="second_line_state_login">已登入</string>
     <string name="login">登入</string>
     <string name="login_failed_description">不好意思，登入失敗，請待會再嘗試一次。</string>
     <string name="logout">登出</string>

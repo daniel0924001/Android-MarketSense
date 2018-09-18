@@ -1,7 +1,6 @@
 package com.idroi.marketsense.datasource;
 
 import android.content.Context;
-import android.content.pm.PackageInfo;
 import android.graphics.drawable.Drawable;
 
 import com.idroi.marketsense.BuildConfig;
@@ -10,8 +9,6 @@ import com.idroi.marketsense.data.SettingItem;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.idroi.marketsense.adapter.SettingAdapter.TYPE_USER;
 
 /**
  * Created by daniel.hsieh on 2018/6/29.
@@ -28,6 +25,15 @@ public class SettingSource {
         mSettingItemList.add(
                 new SettingItem
                         .Builder(SettingItem.SettingType.TYPE_USER, 1)
+                        .build()
+
+        );
+        mSettingItemList.add(
+                new SettingItem
+                        .Builder(SettingItem.SettingType.TYPE_OTHER, R.string.preference_knowledge)
+                        .title(mContext.getResources().getString(R.string.preference_knowledge))
+                        .drawableResourceId(mContext.getResources().getDrawable(R.drawable.setting_about))
+                        .isLargeMargin(true)
                         .build()
 
         );
@@ -65,25 +71,23 @@ public class SettingSource {
         );
         mSettingItemList.add(
                 new SettingItem
-                        .Builder(SettingItem.SettingType.TYPE_OTHER, R.string.preference_privacy_statement)
+                        .Builder(SettingItem.SettingType.TYPE_NO_DRAWABLE, R.string.preference_privacy_statement)
                         .title(mContext.getResources().getString(R.string.preference_privacy_statement))
-                        .drawableResourceId(mContext.getResources().getDrawable(R.drawable.setting_about))
+                        .isLargeMargin(true)
                         .build()
 
         );
         mSettingItemList.add(
                 new SettingItem
-                        .Builder(SettingItem.SettingType.TYPE_OTHER, R.string.preference_term_of_service)
+                        .Builder(SettingItem.SettingType.TYPE_NO_DRAWABLE, R.string.preference_term_of_service)
                         .title(mContext.getResources().getString(R.string.preference_term_of_service))
-                        .drawableResourceId(mContext.getResources().getDrawable(R.drawable.setting_about))
                         .build()
 
         );
         mSettingItemList.add(
                 new SettingItem
-                        .Builder(SettingItem.SettingType.TYPE_OTHER, R.string.preference_disclaimer)
+                        .Builder(SettingItem.SettingType.TYPE_NO_DRAWABLE, R.string.preference_disclaimer)
                         .title(mContext.getResources().getString(R.string.preference_disclaimer))
-                        .drawableResourceId(mContext.getResources().getDrawable(R.drawable.setting_about))
                         .build()
 
         );
@@ -91,6 +95,7 @@ public class SettingSource {
                 new SettingItem
                         .Builder(SettingItem.SettingType.TYPE_NO_DRAWABLE, R.string.preference_email)
                         .title(mContext.getResources().getString(R.string.preference_email))
+                        .hideArrow(true)
                         .build()
 
         );
@@ -99,6 +104,7 @@ public class SettingSource {
                         .Builder(SettingItem.SettingType.TYPE_NO_DRAWABLE, R.string.preference_version)
                         .title(String.format(mContext.getResources().getString(R.string.preference_version), BuildConfig.VERSION_NAME))
                         .isClickable(false)
+                        .hideArrow(true)
                         .build()
 
         );
@@ -129,6 +135,16 @@ public class SettingSource {
     public Drawable getDrawable(int position) {
         SettingItem settingItem = mSettingItemList.get(position);
         return settingItem.getDrawable();
+    }
+
+    public boolean isLargeMargin(int position) {
+        SettingItem settingItem = mSettingItemList.get(position);
+        return settingItem.isLargeMargin();
+    }
+
+    public boolean hideArrow(int position) {
+        SettingItem settingItem = mSettingItemList.get(position);
+        return settingItem.hideArrow();
     }
 
     public void destroy() {

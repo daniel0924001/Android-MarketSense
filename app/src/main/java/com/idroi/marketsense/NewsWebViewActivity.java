@@ -513,7 +513,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
 
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-                if(url.contains("adsbygoogle.js") || url.contains("ebay") || url.contains("amazon")) {
+                if(url.contains("adsbygoogle.js") || url.contains("ebay") || url.contains("amazon") || url.contains("taboola")) {
                     return new WebResourceResponse("text/plain", "utf-8", new ByteArrayInputStream("".getBytes()));
                 }
                 return super.shouldInterceptRequest(view, url);

@@ -85,6 +85,7 @@ public class SettingAdapter extends RecyclerView.Adapter {
             }
         });
         TextView loginStatusTextView = mLogoutItemView.findViewById(R.id.setting_title_tv);
+        loginStatusTextView.setTextColor(activity.getResources().getColor(R.color.trend_red));
         loginStatusTextView.setText(R.string.logout);
     }
 

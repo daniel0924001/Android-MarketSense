@@ -35,6 +35,7 @@ import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
+import com.idroi.marketsense.util.ActionBarHelper;
 
 import org.json.JSONObject;
 
@@ -92,40 +93,7 @@ public class CommentActivity extends AppCompatActivity {
     }
 
     private void setActionBar() {
-        final ActionBar actionBar = getSupportActionBar();
-
-        if(actionBar != null) {
-            actionBar.setElevation(0);
-            View view = LayoutInflater.from(actionBar.getThemedContext())
-                    .inflate(R.layout.main_action_bar, null);
-
-            SimpleDraweeView imageView = view.findViewById(R.id.action_bar_avatar);
-            if(imageView != null) {
-                imageView.setImageResource(R.mipmap.ic_arrow_left);
-                imageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        onBackPressed();
-                    }
-                });
-            }
-
-            TextView textview = view.findViewById(R.id.action_bar_name);
-            if(textview != null) {
-                textview.setText(getString(R.string.activity_comment));
-            }
-
-            ImageView additionFunction = view.findViewById(R.id.action_bar_notification);
-            additionFunction.setVisibility(View.GONE);
-
-            actionBar.setDisplayShowHomeEnabled(false);
-            actionBar.setDisplayShowTitleEnabled(false);
-            actionBar.setCustomView(view,
-                    new ActionBar.LayoutParams(
-                            ActionBar.LayoutParams.MATCH_PARENT,
-                            ActionBar.LayoutParams.MATCH_PARENT));
-            actionBar.setDisplayShowCustomEnabled(true);
-        }
+        ActionBarHelper.setActionBarForSimpleTitleAndBack(this, getString(R.string.activity_comment));
     }
 
     private void setUpperBlock() {

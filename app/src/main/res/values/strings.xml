@@ -175,7 +175,7 @@
 
     <string name="preference_icon">設定圖示</string>
     <string name="preference_switch">開關</string>
-    <string name="preference_knowledge">股票知識王</string>
+    <string name="preference_knowledge">股票知識站</string>
     <string name="preference_notification">推播通知</string>
     <string name="preference_share">分享 APP</string>
     <string name="preference_feedback">意見回饋</string>

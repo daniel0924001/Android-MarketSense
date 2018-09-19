@@ -167,7 +167,7 @@ public class MarketSenseStockFetcher {
             }
         });
 
-        mTimeoutHandler.postDelayed(mTimeoutRunnable, 5000);
+        mTimeoutHandler.postDelayed(mTimeoutRunnable, 10000);
         Networking.getRequestQueue(context).add(mStockRequest);
     }
 

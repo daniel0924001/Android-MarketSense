@@ -389,6 +389,7 @@ public class ActionBarHelper {
                         // TODO: search
                     }
                 });
+                searchImageView.setVisibility(View.GONE);
             }
 
             actionBar.setDisplayShowHomeEnabled(false);

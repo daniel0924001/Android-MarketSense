@@ -4,11 +4,27 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import com.idroi.marketsense.adapter.NewsRecyclerAdapter;
 import com.idroi.marketsense.data.Knowledge;
+import com.idroi.marketsense.data.News;
+import com.idroi.marketsense.request.NewsRequest;
 import com.idroi.marketsense.util.ActionBarHelper;
 import com.idroi.marketsense.viewholders.KnowledgeContentItemViewHolder;
+
+import java.util.ArrayList;
+
+import static com.idroi.marketsense.adapter.NewsRecyclerAdapter.NEWS_SINGLE_LAYOUT;
+import static com.idroi.marketsense.fragments.NewsFragment.KEYWORD_TASK_ID;
 
 /**
  * Created by daniel.hsieh on 2018/9/20.
@@ -30,6 +46,11 @@ public class KnowledgeActivity extends AppCompatActivity {
     private KnowledgeContentItemViewHolder mStrategyViewHolder;
     private KnowledgeContentItemViewHolder mExampleViewHolder;
 
+    private NestedScrollView mNestedScrollView;
+    private RecyclerView mNewsRecyclerView;
+    private NewsRecyclerAdapter mNewsRecyclerAdapter;
+    private ProgressBar mLoadingProgressBar;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,10 +60,11 @@ public class KnowledgeActivity extends AppCompatActivity {
         setInformation();
         setActionBar();
         setViewHolder();
+        setNewsBlock();
     }
 
     private void setActionBar() {
-        ActionBarHelper.setActionBarForSimpleTitleAndBack(this, mTitle);
+        ActionBarHelper.setActionBarForSimpleTitleAndBack(this, getString(R.string.knowledge_tutorial));
     }
 
     private void setViewHolder() {
@@ -61,6 +83,72 @@ public class KnowledgeActivity extends AppCompatActivity {
                 getString(R.string.knowledge_example_const), mExample);
     }
 
+    private void setNewsBlock() {
+        Bundle bundle = new Bundle();
+        bundle.putString(EXTRA_TITLE, mTitle);
+
+        mLoadingProgressBar = findViewById(R.id.news_list_progress_bar);
+        mNestedScrollView = findViewById(R.id.body_scroll_view);
+        mNewsRecyclerView = findViewById(R.id.news_recycler_view);
+
+        mNewsRecyclerAdapter = new NewsRecyclerAdapter(this, KEYWORD_TASK_ID, bundle);
+        mNewsRecyclerAdapter.setNewsLayoutType(NEWS_SINGLE_LAYOUT);
+        mNewsRecyclerView.setNestedScrollingEnabled(false);
+        mNewsRecyclerView.setAdapter(mNewsRecyclerAdapter);
+        mNewsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        mNewsRecyclerAdapter.setNewsAvailableListener(new NewsRecyclerAdapter.NewsAvailableListener() {
+            @Override
+            public void onNewsAvailable() {
+                if(mLoadingProgressBar != null) {
+                    mLoadingProgressBar.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onNewsEmpty() {
+                if(mLoadingProgressBar != null) {
+                    mLoadingProgressBar.setVisibility(View.GONE);
+                }
+                TextView newsTitle = findViewById(R.id.tv_news);
+                newsTitle.setVisibility(View.GONE);
+                mNewsRecyclerView.setVisibility(View.GONE);
+            }
+        });
+
+        mNestedScrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                if(v.getChildAt(v.getChildCount() - 1) != null) {
+                    if ((scrollY >= (v.getChildAt(v.getChildCount() - 1).getMeasuredHeight() - v.getMeasuredHeight())) &&
+                            scrollY > oldScrollY) {
+                        mNewsRecyclerAdapter.expand(7);
+                    }
+                }
+            }
+        });
+
+        mNewsRecyclerAdapter.setOnItemClickListener(new NewsRecyclerAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(News news) {
+                mNewsRecyclerAdapter.notifyNewsIsClicked(news);
+                startActivity(NewsWebViewActivity.generateNewsWebViewActivityIntent(
+                        KnowledgeActivity.this, news.getId(), news.getTitle(),
+                        news.getUrlImage(), news.getDate(),
+                        news.getPageLink(), news.getOriginLink(),
+                        news.getVoteRaiseNum(), news.getVoteFallNum(), news.getStockKeywords(), news.getLevel()));
+                overridePendingTransition(R.anim.enter, R.anim.stop);
+            }
+        });
+
+        ArrayList<String> networkUrls = new ArrayList<>();
+        ArrayList<String> cacheUrls = new ArrayList<>();
+        networkUrls.add(NewsRequest.queryKeywordNewsUrl(this, mTitle, true));
+        cacheUrls.add(NewsRequest.queryKeywordNewsUrl(this, mTitle, false));
+
+        mNewsRecyclerAdapter.loadNews(networkUrls, cacheUrls);
+    }
+
     private void setInformation() {
         Intent intent = getIntent();
         mTitle = intent.getStringExtra(EXTRA_TITLE);
@@ -72,10 +160,14 @@ public class KnowledgeActivity extends AppCompatActivity {
     public static Intent generateKnowledgeActivityIntent(Context context, Knowledge knowledge) {
         Intent intent = new Intent(context, KnowledgeActivity.class);
         intent.putExtra(EXTRA_TITLE, knowledge.getKeyword());
-        intent.putExtra(EXTRA_DESCRIPTION, knowledge.getDefinition());
-        intent.putExtra(EXTRA_EXAMPLE, knowledge.getExample());
-        intent.putExtra(EXTRA_STRATEGY, knowledge.getStrategy());
+        intent.putExtra(EXTRA_DESCRIPTION, getContent(context, knowledge.getDefinition()));
+        intent.putExtra(EXTRA_EXAMPLE, getContent(context, knowledge.getExample()));
+        intent.putExtra(EXTRA_STRATEGY, getContent(context, knowledge.getStrategy()));
         return intent;
+    }
+
+    public static String getContent(Context context, String text) {
+        return text.isEmpty() ? context.getString(R.string.knowledge_content_unavailable) : text;
     }
 
     @Override

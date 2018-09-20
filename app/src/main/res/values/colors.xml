@@ -63,4 +63,7 @@
     <color name="text_black">#2b2b2b</color>
     <color name="draw_grey">#bfcad7</color>
     <color name="background">#ebedf0</color>
+
+    <color name="text_first">#2e4057</color>
+    <color name="text_second">#b72e4057</color>
 </resources>

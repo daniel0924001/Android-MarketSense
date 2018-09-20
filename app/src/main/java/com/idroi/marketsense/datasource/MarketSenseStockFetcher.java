@@ -125,6 +125,10 @@ public class MarketSenseStockFetcher {
         mStockRequest = new StockRequest(Request.Method.GET, networkUrl, null, new Response.Listener<ArrayList<Stock>>() {
             @Override
             public void onResponse(ArrayList<Stock> response) {
+                final Context context = getContextOrDestroy();
+                if(context == null) {
+                    return;
+                }
 
                 SharedPreferences.Editor editor =
                         context.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE).edit();
@@ -138,10 +142,6 @@ public class MarketSenseStockFetcher {
                 }
                 SharedPreferencesCompat.apply(editor);
 
-                final Context context = getContextOrDestroy();
-                if(context == null) {
-                    return;
-                }
                 mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
                 mMarketSenseStockNetworkListener.onStockListLoad(response, isAutoRefresh);
             }

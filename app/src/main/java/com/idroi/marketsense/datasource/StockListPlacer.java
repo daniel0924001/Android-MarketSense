@@ -127,7 +127,9 @@ public class StockListPlacer {
 
                 increaseRetryTime();
                 if(isRetry()) {
-                    mMarketSenseStockFetcher.makeRequest(mNetworkUrl, mCacheUrl);
+                    if(mMarketSenseStockFetcher != null) {
+                        mMarketSenseStockFetcher.makeRequest(mNetworkUrl, mCacheUrl);
+                    }
                 } else {
                     if(mStockListListener != null) {
                         mStockListListener.onStockListLoaded();

@@ -349,4 +349,55 @@ public class ActionBarHelper {
         }
 
     }
+
+    public static void setActionBarForRightImage(AppCompatActivity activity) {
+        final ActionBar actionBar = activity.getSupportActionBar();
+
+        final WeakReference<AppCompatActivity> activityWeakReference
+                = new WeakReference<AppCompatActivity>(activity);
+
+        if(actionBar != null) {
+            actionBar.setElevation(0);
+            actionBar.setBackgroundDrawable(
+                    activity.getDrawable(R.drawable.action_bar_background_with_border));
+            View view = LayoutInflater.from(actionBar.getThemedContext())
+                    .inflate(R.layout.action_bar_right_image, null);
+
+            ImageView imageView = view.findViewById(R.id.action_bar_back);
+            if(imageView != null) {
+                imageView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        AppCompatActivity appCompatActivity = activityWeakReference.get();
+                        if(appCompatActivity != null) {
+                            appCompatActivity.onBackPressed();
+                        }
+                    }
+                });
+            }
+
+            TextView titleTextView = view.findViewById(R.id.action_bar_title);
+            if(titleTextView != null) {
+                titleTextView.setText(R.string.preference_knowledge);
+            }
+
+            ImageView searchImageView = view.findViewById(R.id.action_bar_action);
+            if(searchImageView != null) {
+                searchImageView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // TODO: search
+                    }
+                });
+            }
+
+            actionBar.setDisplayShowHomeEnabled(false);
+            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setCustomView(view,
+                    new ActionBar.LayoutParams(
+                            ActionBar.LayoutParams.MATCH_PARENT,
+                            ActionBar.LayoutParams.MATCH_PARENT));
+            actionBar.setDisplayShowCustomEnabled(true);
+        }
+    }
 }

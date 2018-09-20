@@ -8,6 +8,8 @@
     <string name="activity_news_search">搜尋</string>
     <string name="activity_rich_editor">撰寫評論</string>
     <string name="activity_comment">貼文</string>
+    <string name="activity_knowledge_list">知識列表</string>
+    <string name="activity_knowledge">知識</string>
     <string name="user_avatar">大頭照</string>
     <string name="notification">推播</string>
     <string name="title_news_tab">新聞</string>
@@ -216,7 +218,12 @@
     <string name="comment_hint">輸入文字&#8230;</string>
 
     <string name="knowledge_title">多頭(牛市)</string>
+    <string name="knowledge_like">%s 人認為這個知識有幫助</string>
     <string name="knowledge_description">現在人們通常把股價長期保持上漲勢頭的股票市場稱為多頭市場，多頭市場股價變化主要特征是一連串的大漲小跌。</string>
+    <string name="knowledge_description_const">名詞解釋</string>
+    <string name="knowledge_strategy_const">你該怎麼做</string>
+    <string name="knowledge_example_const">範例</string>
+    <string name="knowledge_many_words">當目前的狀態為多頭時，應該冷靜判斷…當目前的狀態為多頭時，應該冷靜判斷…當目前的狀態為多頭時，應該冷靜判斷…當目前的狀態為多頭時，應該冷靜判斷…</string>
 
     <string name="share_description">下載「市覺」App掌握即時鄉民與新聞動態！ </string>
 

@@ -68,7 +68,11 @@
         </activity>
 
         <activity android:name=".StockKnowledgeListActivity"
-            android:label="@string/activity_comment">
+            android:label="@string/activity_knowledge_list">
+        </activity>
+
+        <activity android:name=".KnowledgeActivity"
+            android:label="@string/activity_knowledge">
         </activity>
 
         <meta-data android:name="com.facebook.sdk.ApplicationId"

@@ -50,11 +50,19 @@ public class StockKnowledgeListActivity extends AppCompatActivity {
         mKnowledgeRecyclerAdapter.setOnItemClickListener(new KnowledgeRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Knowledge knowledge) {
-                MSLog.e("click keyword: " + knowledge.getKeyword());
+                startActivity(KnowledgeActivity.generateKnowledgeActivityIntent(
+                        StockKnowledgeListActivity.this, knowledge));
+                overridePendingTransition(R.anim.enter, R.anim.stop);
             }
         });
         mKnowledgeRecyclerAdapter.loadKnowledgeList(
                 KnowledgeListRequest.queryKnowledgeList(),
                 KnowledgeListRequest.queryKnowledgeList());
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.stop, R.anim.right_to_left);
     }
 }

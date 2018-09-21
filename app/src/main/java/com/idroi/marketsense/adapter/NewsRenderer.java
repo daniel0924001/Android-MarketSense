@@ -54,7 +54,7 @@ public class NewsRenderer implements MarketSenseRenderer<News>{
 
         UserProfile userProfile = ClientData.getInstance().getUserProfile();
         if(userProfile.hasReadThisNews(content.getId())) {
-            newsViewHolder.titleView.setTextColor(context.getResources().getColor(R.color.warm_grey));
+            newsViewHolder.titleView.setTextColor(context.getResources().getColor(R.color.text_second));
         }
 
         // related stock news

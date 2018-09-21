@@ -152,7 +152,7 @@ public class RichEditorActivity extends AppCompatActivity {
         mEditor.loadCSS("file:///android_asset/img.css");
         mEditor.setEditorHeight(200);
         mEditor.setEditorFontSize(22);
-        mEditor.setEditorFontColor(getResources().getColor(R.color.marketsense_text_black));
+        mEditor.setEditorFontColor(getResources().getColor(R.color.text_first));
         //mEditor.setEditorBackgroundColor(Color.BLUE);
         //mEditor.setBackgroundColor(Color.BLUE);
         //mEditor.setBackgroundResource(R.drawable.bg);

@@ -27,7 +27,7 @@
         android:singleLine="true"
         android:inputType="text"
         android:hint="@string/title_search_hint_stock"
-        android:textColorHint="@color/warm_grey_87"
+        android:textColorHint="@color/text_second"
         android:layout_marginStart="16dp"
         android:textSize="16sp"
         android:letterSpacing="0.04"

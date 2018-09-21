@@ -59,13 +59,13 @@ public class MarketSenseCommonNavigator extends CommonNavigator{
                 commonPagerTitleView.setOnPagerTitleChangeListener(new CommonPagerTitleView.OnPagerTitleChangeListener() {
                     @Override
                     public void onSelected(int i, int i1) {
-                        textview.setTextColor(getResources().getColor(R.color.trend_red));
+                        textview.setTextColor(getResources().getColor(R.color.text_first));
                         textview.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
                     }
 
                     @Override
                     public void onDeselected(int i, int i1) {
-                        textview.setTextColor(getResources().getColor(R.color.text_black));
+                        textview.setTextColor(getResources().getColor(R.color.text_third));
                         textview.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
                     }
 

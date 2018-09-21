@@ -46,10 +46,10 @@ public class StockActivityBottomSelector {
         for(TextView other : selectors) {
             if(other != selected) {
                 other.setBackground(context.getDrawable(R.drawable.border_selector));
-                other.setTextColor(context.getResources().getColor(R.color.text_black));
+                other.setTextColor(context.getResources().getColor(R.color.text_third));
             } else {
                 other.setBackground(context.getDrawable(R.drawable.border_selector_selected));
-                other.setTextColor(context.getResources().getColor(R.color.trend_red));
+                other.setTextColor(context.getResources().getColor(R.color.text_first));
             }
         }
     }

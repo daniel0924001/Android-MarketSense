@@ -439,13 +439,11 @@ public class StockActivity extends AppCompatActivity {
                 }
 
                 if(!mIsSelectorFixed && scrollY >= mSelectorTop) {
-                    MSLog.e("mIsSelectorFixed = true");
                     mStockActivityRealPriceBlockViewHolder.showSelector();
                     mIsSelectorFixed = true;
                 }
 
                 if(mIsSelectorFixed && scrollY < mSelectorTop) {
-                    MSLog.e("mIsSelectorFixed = false");
                     mStockActivityRealPriceBlockViewHolder.hideSelector();
                     mIsSelectorFixed = false;
                 }

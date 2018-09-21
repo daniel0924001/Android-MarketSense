@@ -8,7 +8,7 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="@drawable/item_foreground_with_clicked_shadow"
-    android:background="@drawable/btn_oval_small_corner_gray">
+    android:background="@drawable/block_flat_border_gray_solid_with_radius_corner">
 
     <TextView
         android:id="@+id/related_stock_name"
@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:textSize="12sp"
         android:fontFamily="sans-serif"
-        android:textColor="@color/warm_grey_two"
+        android:textColor="@color/text_first"
         android:text="@string/title_company_name"
         android:layout_marginTop="3dp"
         android:layout_marginBottom="3dp"
@@ -31,7 +31,7 @@
         android:layout_height="wrap_content"
         android:textSize="12sp"
         android:fontFamily="sans-serif"
-        android:textColor="@color/warm_grey_two"
+        android:textColor="@color/draw_grey"
         android:text="@string/title_company_price"
         android:layout_marginTop="3dp"
         android:layout_marginBottom="3dp"

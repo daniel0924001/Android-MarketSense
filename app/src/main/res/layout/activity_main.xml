@@ -50,7 +50,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:menu="@menu/navigation"
         app:itemIconTint="@drawable/bottom_navigation_item"
-        app:itemTextColor="@drawable/bottom_navigation_item"
+        app:itemTextColor="@drawable/bottom_navigation_item_text"
         app:itemBackground="@drawable/bottom_navigation_item_background"/>
 
     <android.support.design.widget.FloatingActionButton

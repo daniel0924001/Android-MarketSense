@@ -49,10 +49,10 @@ public class ChartPeriodSelectorViewHolder {
 
     public void setSelected(Context context, TextView selectedTextView) {
         for(TextView other : chartTypesTextView) {
-            other.setTextColor(context.getResources().getColor(R.color.text_black));
+            other.setTextColor(context.getResources().getColor(R.color.text_third));
             other.setBackground(context.getDrawable(R.drawable.border_selector));
         }
-        selectedTextView.setTextColor(context.getResources().getColor(R.color.trend_red));
+        selectedTextView.setTextColor(context.getResources().getColor(R.color.text_first));
         selectedTextView.setBackground(context.getDrawable(R.drawable.border_selector_selected));
     }
 }

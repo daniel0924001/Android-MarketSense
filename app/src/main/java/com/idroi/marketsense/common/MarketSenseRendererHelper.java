@@ -173,7 +173,7 @@ public class MarketSenseRendererHelper {
         } else {
             textView.setVisibility(View.VISIBLE); // 20161203 Ansel: to display CTA button and text view with content
             if(contents.equals("NaN")) {
-                addTextViewWithColor(textView, defaultContents, R.color.text_black);
+                addTextViewWithColor(textView, defaultContents, R.color.text_second);
             } else {
                 if(value > baseline) {
                     addTextViewWithColor(textView, contents, R.color.trend_red);

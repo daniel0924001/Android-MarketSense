@@ -179,7 +179,7 @@ public class ActionBarHelper {
                 public void onClick(View view) {
                     AppCompatActivity appCompatActivity = activityWeakReference.get();
                     if(appCompatActivity != null) {
-                        newsButton.setTextColor(appCompatActivity.getResources().getColor(R.color.text_black));
+                        newsButton.setTextColor(appCompatActivity.getResources().getColor(R.color.text_first));
                         newsButton.setBackground(appCompatActivity.getDrawable(R.drawable.btn_oval_right_not_selected));
                         newsButton.setEnabled(true);
                         trendButton.setTextColor(appCompatActivity.getResources().getColor(R.color.text_white));
@@ -198,7 +198,7 @@ public class ActionBarHelper {
                 public void onClick(View view) {
                     AppCompatActivity appCompatActivity = activityWeakReference.get();
                     if(appCompatActivity != null) {
-                        trendButton.setTextColor(appCompatActivity.getResources().getColor(R.color.text_black));
+                        trendButton.setTextColor(appCompatActivity.getResources().getColor(R.color.text_first));
                         trendButton.setBackground(appCompatActivity.getDrawable(R.drawable.btn_oval_left_not_selected));
                         trendButton.setEnabled(true);
                         newsButton.setTextColor(appCompatActivity.getResources().getColor(R.color.text_white));

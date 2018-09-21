@@ -28,7 +28,7 @@
         android:background="@drawable/btn_oval_right_not_selected"
         android:textSize="14sp"
         android:text="@string/title_news_tab"
-        android:textColor="@color/text_black"
+        android:textColor="@color/text_first"
         android:stateListAnimator="@null"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"

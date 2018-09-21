@@ -188,7 +188,7 @@
             android:paddingStart="100dp"
             android:paddingEnd="100dp"
             android:text="@string/title_publish_comment"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@color/text_first"
             android:textSize="16sp"
             android:drawableStart="@mipmap/ic_activity_comment"
             android:drawablePadding="4dp"

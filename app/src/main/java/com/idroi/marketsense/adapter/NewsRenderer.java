@@ -68,12 +68,12 @@ public class NewsRenderer implements MarketSenseRenderer<News>{
 
         // fire text
         if(content.isOptimistic()) {
-            newsViewHolder.predictionView.setBackground(context.getResources().getDrawable(R.drawable.btn_oval_small_corner_red));
             newsViewHolder.predictionView.setVisibility(View.VISIBLE);
+            newsViewHolder.predictionView.setTextColor(context.getResources().getColor(R.color.trend_red));
             newsViewHolder.relatedStockNameAdapter.setMaxItemCount(2);
         } else if(content.isPessimistic()) {
-            newsViewHolder.predictionView.setBackground(context.getResources().getDrawable(R.drawable.btn_oval_small_corner_green));
             newsViewHolder.predictionView.setVisibility(View.VISIBLE);
+            newsViewHolder.predictionView.setTextColor(context.getResources().getColor(R.color.trend_green));
             newsViewHolder.relatedStockNameAdapter.setMaxItemCount(2);
         } else {
             newsViewHolder.predictionView.setVisibility(View.GONE);

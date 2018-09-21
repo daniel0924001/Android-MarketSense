@@ -24,8 +24,6 @@ import java.util.Locale;
 
 public class NewsRecyclerAdapter extends RecyclerView.Adapter {
 
-    public static final String TAG = "NewsRecyclerAdapter";
-
     public interface NewsExpandListener {
         void onExpandSuccess(int start, int amount);
         void onExpandFailed();

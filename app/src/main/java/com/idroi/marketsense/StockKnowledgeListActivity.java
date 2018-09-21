@@ -26,7 +26,6 @@ public class StockKnowledgeListActivity extends AppCompatActivity {
     private RecyclerView mKnowledgeRecyclerView;
     private KnowledgeRecyclerAdapter mKnowledgeRecyclerAdapter;
 
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

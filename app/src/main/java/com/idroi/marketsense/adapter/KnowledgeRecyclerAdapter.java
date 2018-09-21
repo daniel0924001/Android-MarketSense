@@ -6,10 +6,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.data.Knowledge;
-import com.idroi.marketsense.datasource.KnowledgeFetcher;
 import com.idroi.marketsense.datasource.KnowledgePlacer;
+
+import java.util.ArrayList;
 
 /**
  * Created by daniel.hsieh on 2018/9/19.
@@ -68,6 +68,11 @@ public class KnowledgeRecyclerAdapter extends RecyclerView.Adapter {
 
     public void loadKnowledgeList(String networkUrl, String cacheUrl) {
         mKnowledgePlacer.loadKnowledgeList(networkUrl, cacheUrl);
+    }
+
+    public void setKnowledgeList(ArrayList<Knowledge> knowledgeList) {
+        mKnowledgePlacer.setKnowledgeList(knowledgeList);
+        notifyDataSetChanged();
     }
 
     @Override

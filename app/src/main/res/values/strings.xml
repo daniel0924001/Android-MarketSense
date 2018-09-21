@@ -224,6 +224,7 @@
     <string name="knowledge_strategy_const">你該怎麼做</string>
     <string name="knowledge_example_const">範例</string>
     <string name="knowledge_tutorial">術語解說</string>
+    <string name="knowledge_you_may_want_know">你可能會想知道</string>
     <string name="knowledge_content_unavailable">待更新</string>
     <string name="knowledge_many_words">當目前的狀態為多頭時，應該冷靜判斷…當目前的狀態為多頭時，應該冷靜判斷…當目前的狀態為多頭時，應該冷靜判斷…當目前的狀態為多頭時，應該冷靜判斷…</string>
 

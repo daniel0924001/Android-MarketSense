@@ -2,6 +2,7 @@ package com.idroi.marketsense.datasource;
 
 import android.app.Activity;
 
+import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.data.Knowledge;
 
@@ -85,6 +86,10 @@ public class KnowledgePlacer {
         mCurrentRetries = 0;
     }
 
+    public void setKnowledgeList(ArrayList<Knowledge> knowledgeList) {
+        mKnowledgeArrayList = knowledgeList;
+    }
+
     public void setKnowledgeListListener(KnowledgeListListener listListener) {
         mKnowledgeListListener = listListener;
     }
@@ -114,7 +119,6 @@ public class KnowledgePlacer {
         if(mKnowledgeArrayList == null || position >= mKnowledgeArrayList.size() || position < 0) {
             return null;
         }
-
         return mKnowledgeArrayList.get(position);
     }
 

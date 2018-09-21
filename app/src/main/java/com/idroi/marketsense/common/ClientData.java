@@ -9,6 +9,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.data.Knowledge;
 import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.datasource.Networking;
@@ -34,6 +35,7 @@ public class ClientData {
     private Context mContext;
     private ArrayList<Stock> mAllStocksListInfo;
     private HashMap<String, Stock> mRealTimePricesHashMap;
+    private HashMap<String, Knowledge> mKnowledgeHashMap;
 
     private int mScreenWidth, mScreenHeight;
     private int mScreenWidthPixels, mScreenHeightPixels;
@@ -93,6 +95,7 @@ public class ClientData {
         mContext = context.getApplicationContext();
         mUserProfile = new UserProfile(context, true);
         mRealTimePricesHashMap = new HashMap<>();
+        mKnowledgeHashMap = new HashMap<>();
 
         updateClockInformation();
         loadAllStocksListTask(true);
@@ -150,6 +153,14 @@ public class ClientData {
 
     public void setRealTimeStockPriceHashMap(Stock stock) {
         mRealTimePricesHashMap.put(stock.getCode(), stock);
+    }
+
+    public void setKnowledgeHashMap(Knowledge knowledge) {
+        mKnowledgeHashMap.put(knowledge.getKeyword(), knowledge);
+    }
+
+    public Knowledge getKnowledgeFromKeyword(String keyword) {
+        return mKnowledgeHashMap.get(keyword);
     }
 
     public void setUserToken(String token) {

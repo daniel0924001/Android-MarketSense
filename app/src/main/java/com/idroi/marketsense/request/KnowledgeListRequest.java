@@ -5,6 +5,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.common.MarketSenseNetworkError;
 import com.idroi.marketsense.data.Knowledge;
@@ -52,10 +53,14 @@ public class KnowledgeListRequest extends Request<ArrayList<Knowledge>> {
         if(jsonObject.optBoolean(PARAM_STATUS)) {
             ArrayList<Knowledge> knowledgeArrayList = new ArrayList<>();
             JSONArray jsonArray = jsonObject.optJSONArray(PARAM_RESULT);
+
+            ClientData clientData = ClientData.getInstance();
+
             for(int i = 0; i < jsonArray.length(); i++) {
                 Knowledge knowledge = parseKnowledge(jsonArray.getJSONObject(i));
                 if(knowledge != null) {
                     knowledgeArrayList.add(knowledge);
+                    clientData.setKnowledgeHashMap(knowledge);
                 }
             }
             return knowledgeArrayList;

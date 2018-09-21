@@ -23,14 +23,9 @@ import java.util.WeakHashMap;
 public class StockListRenderer implements MarketSenseRenderer<Stock>{
 
     @NonNull private final WeakHashMap<View, StockViewHolder> mViewHolderMap;
-    private final int[] mBarRedResourceId, mBarGreenResourceId, mAttitudeRedResourceId, mAttitudeGreenResourceId;
 
     StockListRenderer() {
         mViewHolderMap = new WeakHashMap<>();
-        mBarRedResourceId = new int[] {R.mipmap.ic_bar1_overview_red, R.mipmap.ic_bar2_overview_red, R.mipmap.ic_bar3_overview_red};
-        mBarGreenResourceId = new int[] {R.mipmap.ic_bar1_overview_green, R.mipmap.ic_bar2_overview_green, R.mipmap.ic_bar3_overview_green};
-        mAttitudeRedResourceId = new int[] {R.string.title_level_up_high, R.string.title_level_up_high, R.string.title_level_up_highest};
-        mAttitudeGreenResourceId = new int[] {R.string.title_level_down_high, R.string.title_level_down_high, R.string.title_level_down_highest};
     }
 
     @Override

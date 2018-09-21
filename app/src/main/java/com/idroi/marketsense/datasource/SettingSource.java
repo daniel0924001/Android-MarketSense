@@ -32,7 +32,7 @@ public class SettingSource {
                 new SettingItem
                         .Builder(SettingItem.SettingType.TYPE_OTHER, R.string.preference_knowledge)
                         .title(mContext.getResources().getString(R.string.preference_knowledge))
-                        .drawableResourceId(mContext.getResources().getDrawable(R.drawable.setting_about))
+                        .drawableResourceId(mContext.getResources().getDrawable(R.mipmap.ic_profile_wiki))
                         .isLargeMargin(true)
                         .build()
 
@@ -41,7 +41,7 @@ public class SettingSource {
                 new SettingItem
                         .Builder(SettingItem.SettingType.TYPE_SWITCH, R.string.preference_notification)
                         .title(mContext.getResources().getString(R.string.preference_notification))
-                        .drawableResourceId(mContext.getResources().getDrawable(R.drawable.setting_notification))
+                        .drawableResourceId(mContext.getResources().getDrawable(R.mipmap.ic_profile_notify))
                         .build()
 
         );
@@ -49,7 +49,7 @@ public class SettingSource {
                 new SettingItem
                         .Builder(SettingItem.SettingType.TYPE_OTHER, R.string.preference_share)
                         .title(mContext.getResources().getString(R.string.preference_share))
-                        .drawableResourceId(mContext.getResources().getDrawable(R.drawable.setting_share))
+                        .drawableResourceId(mContext.getResources().getDrawable(R.mipmap.ic_profile_share))
                         .build()
 
         );
@@ -57,7 +57,7 @@ public class SettingSource {
                 new SettingItem
                         .Builder(SettingItem.SettingType.TYPE_OTHER, R.string.preference_feedback)
                         .title(mContext.getResources().getString(R.string.preference_feedback))
-                        .drawableResourceId(mContext.getResources().getDrawable(R.drawable.setting_feedback))
+                        .drawableResourceId(mContext.getResources().getDrawable(R.mipmap.ic_profile_feedback))
                         .build()
 
         );
@@ -65,7 +65,7 @@ public class SettingSource {
                 new SettingItem
                         .Builder(SettingItem.SettingType.TYPE_OTHER, R.string.preference_star)
                         .title(mContext.getResources().getString(R.string.preference_star))
-                        .drawableResourceId(mContext.getResources().getDrawable(R.drawable.setting_star))
+                        .drawableResourceId(mContext.getResources().getDrawable(R.mipmap.ic_profile_like))
                         .build()
 
         );

@@ -15,7 +15,7 @@
         android:fontFamily="sans-serif"
         android:textSize="18sp"
         android:textStyle="normal"
-        android:textColor="@color/marketsense_text_black"
+        android:textColor="@color/text_first"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

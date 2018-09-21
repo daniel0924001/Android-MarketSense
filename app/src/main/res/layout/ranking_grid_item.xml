@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:fontFamily="sans-serif"
-        android:textColor="@color/text_black"
+        android:textColor="@color/text_first"
         android:text="@string/title_company_name"
         android:layout_marginTop="16dp"
         android:layout_marginStart="8dp"

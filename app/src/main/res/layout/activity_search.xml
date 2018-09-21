@@ -78,7 +78,7 @@
         android:layout_height="match_parent"
         android:visibility="gone"
         android:gravity="center"
-        android:textColor="@color/text_black"
+        android:textColor="@color/text_first"
         android:textSize="18sp"
         android:fontFamily="sans-serif"
         android:background="@color/text_white"

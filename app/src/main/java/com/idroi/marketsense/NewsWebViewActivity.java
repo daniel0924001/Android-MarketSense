@@ -383,18 +383,18 @@ public class NewsWebViewActivity extends AppCompatActivity {
 
             Event event = userProfile.getRecentVoteForNewsEvent(mId);
             if(event.getEventType().equals(PostEvent.EventVars.VOTE_RAISE.getEventVar())) {
-                mVoteUpTextView.setTextColor(getResources().getColor(R.color.text_black));
+                mVoteUpTextView.setTextColor(getResources().getColor(R.color.text_first));
                 mVoteUpImageView.setAlpha(CONST_DISABLE_ALPHA);
             } else {
-                mVoteDownTextView.setTextColor(getResources().getColor(R.color.text_black));
+                mVoteDownTextView.setTextColor(getResources().getColor(R.color.text_first));
                 mVoteDownImageView.setAlpha(CONST_DISABLE_ALPHA);
             }
         } else {
             mVoteUpBlock.setEnabled(true);
             mVoteDownBlock.setEnabled(true);
 
-            mVoteUpTextView.setTextColor(getResources().getColor(R.color.text_gray));
-            mVoteDownTextView.setTextColor(getResources().getColor(R.color.text_gray));
+            mVoteUpTextView.setTextColor(getResources().getColor(R.color.text_third));
+            mVoteDownTextView.setTextColor(getResources().getColor(R.color.text_third));
             mVoteUpImageView.setAlpha(CONST_ENABLE_ALPHA);
             mVoteDownImageView.setAlpha(CONST_ENABLE_ALPHA);
         }
@@ -462,8 +462,8 @@ public class NewsWebViewActivity extends AppCompatActivity {
             mNewsWebViewMiddleDateTextView.setTextColor(getResources().getColor(R.color.text_white));
         } else {
             mImageMask.setVisibility(View.GONE);
-            mNewsWebViewMiddleTitleTextView.setTextColor(getResources().getColor(R.color.text_black));
-            mNewsWebViewMiddleDateTextView.setTextColor(getResources().getColor(R.color.text_black));
+            mNewsWebViewMiddleTitleTextView.setTextColor(getResources().getColor(R.color.text_first));
+            mNewsWebViewMiddleDateTextView.setTextColor(getResources().getColor(R.color.text_first));
             ConstraintLayout upperBlock = findViewById(R.id.marketsense_webview_upper_block);
             ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) upperBlock.getLayoutParams();
             params.dimensionRatio = "1.55";

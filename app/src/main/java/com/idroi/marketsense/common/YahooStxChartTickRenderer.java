@@ -126,7 +126,7 @@ public class YahooStxChartTickRenderer {
                 context.getResources().getString(R.string.title_company_name_code_format),
                 mName, mCode));
         description.setTextSize(16);
-        description.setTextColor(context.getResources().getColor(R.color.marketsense_text_black));
+        description.setTextColor(context.getResources().getColor(R.color.text_first));
         description.setEnabled(false);
 
         Description description1 = mVolumeBarChart.getDescription();
@@ -137,7 +137,7 @@ public class YahooStxChartTickRenderer {
 
         XAxis xAxis = mPriceLineChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setTextColor(context.getResources().getColor(R.color.marketsense_text_black));
+        xAxis.setTextColor(context.getResources().getColor(R.color.text_second));
         xAxis.setTextSize(10f);
         xAxis.setDrawAxisLine(false);
         xAxis.setDrawGridLines(true);
@@ -150,7 +150,7 @@ public class YahooStxChartTickRenderer {
 
         XAxis xAxisVolume = mVolumeBarChart.getXAxis();
         xAxisVolume.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxisVolume.setTextColor(context.getResources().getColor(R.color.marketsense_text_black));
+        xAxisVolume.setTextColor(context.getResources().getColor(R.color.text_second));
         xAxisVolume.setTextSize(10f);
         xAxisVolume.setDrawAxisLine(false);
         xAxisVolume.setDrawGridLines(true);
@@ -164,7 +164,7 @@ public class YahooStxChartTickRenderer {
     private void setYAxis(Context context) {
 
         YAxis yRightAxis = mPriceLineChart.getAxisRight();
-        yRightAxis.setTextColor(context.getResources().getColor(R.color.marketsense_text_black));
+        yRightAxis.setTextColor(context.getResources().getColor(R.color.text_second));
         yRightAxis.setTextSize(10f);
         yRightAxis.setDrawAxisLine(false);
         yRightAxis.setDrawGridLines(true);
@@ -177,7 +177,7 @@ public class YahooStxChartTickRenderer {
         yRightAxis.setYOffset(-7);
 
         LimitLine limitLine = new LimitLine(mStockTradeData.getYesterdayPrice());
-        limitLine.setLineColor(context.getResources().getColor(R.color.marketsense_text_gray));
+        limitLine.setLineColor(context.getResources().getColor(R.color.text_second));
         limitLine.setLineWidth(0.8f);
         yRightAxis.addLimitLine(limitLine);
         yRightAxis.setDrawLimitLinesBehindData(true);

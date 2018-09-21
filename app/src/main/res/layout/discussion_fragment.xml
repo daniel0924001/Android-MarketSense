@@ -53,7 +53,7 @@
             android:paddingEnd="20dp"
             android:textSize="20sp"
             android:text="@string/ops_something_wrong"
-            android:textColor="@color/marketsense_text_light_gray"
+            android:textColor="@color/text_third"
             android:fontFamily="sans-serif"
             android:gravity="center"
             app:layout_constraintTop_toBottomOf="@id/no_comment_iv"

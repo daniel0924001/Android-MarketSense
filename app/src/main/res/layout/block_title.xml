@@ -19,7 +19,7 @@
         android:layout_marginStart="20dp"
         android:maxLines="1"
         android:ellipsize="end"
-        android:textColor="@color/marketsense_text_black"
+        android:textColor="@color/text_first"
         android:textSize="18sp"
         android:fontFamily="sans-serif"
         android:textStyle="bold"

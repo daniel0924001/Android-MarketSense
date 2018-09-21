@@ -65,7 +65,7 @@ public class NewsSecondRowRenderer implements MarketSenseRenderer<News> {
             newsViewHolder.leftAlarmImageView.setVisibility(View.VISIBLE);
         } else {
             newsViewHolder.leftDateView.setBackgroundColor(context.getResources().getColor(R.color.marketsense_text_white));
-            newsViewHolder.leftDateView.setTextColor(context.getResources().getColor(R.color.marketsense_text_gray));
+            newsViewHolder.leftDateView.setTextColor(context.getResources().getColor(R.color.text_third));
             newsViewHolder.leftAlarmImageView.setVisibility(View.GONE);
         }
         if(!TextUtils.isEmpty(content.getUrlImage())) {
@@ -95,7 +95,7 @@ public class NewsSecondRowRenderer implements MarketSenseRenderer<News> {
             newsViewHolder.rightAlarmImageView.setVisibility(View.VISIBLE);
         } else {
             newsViewHolder.rightDateView.setBackgroundColor(context.getResources().getColor(R.color.marketsense_text_white));
-            newsViewHolder.rightDateView.setTextColor(context.getResources().getColor(R.color.marketsense_text_gray));
+            newsViewHolder.rightDateView.setTextColor(context.getResources().getColor(R.color.text_third));
             newsViewHolder.rightAlarmImageView.setVisibility(View.GONE);
         }
         if(!TextUtils.isEmpty(nextContent.getUrlImage())) {

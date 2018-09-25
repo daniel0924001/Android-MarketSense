@@ -121,12 +121,12 @@ public class StockRequest extends Request<ArrayList<Stock>> {
     }
 
     public static String queryStockList(Context context, boolean isNetworkUrl) {
-        if(isNetworkUrl) {
+        if(isNetworkUrl && ClientData.getInstance().isWorkDayAndStockMarketIsOpen()) {
             return API_URL + "?timestamp=" + System.currentTimeMillis() / (STOCK_REQUEST_SOFT_TTL);
         } else {
             SharedPreferences sharedPreferences =
                     context.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE);
-            return sharedPreferences.getString(API_URL, API_URL + "?timestamp=" + System.currentTimeMillis() / (30 * 1000));
+            return sharedPreferences.getString(API_URL, API_URL + "?timestamp=" + System.currentTimeMillis() / (STOCK_REQUEST_SOFT_TTL));
         }
     }
 }

@@ -11,6 +11,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.common.MarketSenseNetworkError;
 import com.idroi.marketsense.common.SharedPreferencesCompat;
@@ -55,6 +56,7 @@ public class MarketSenseStockFetcher {
     private MarketSenseStockNetworkListener mMarketSenseStockNetworkListener;
     private StockRequest mStockRequest;
     private String mMode;
+    private boolean mStockIsOpen;
 
     MarketSenseStockFetcher(Context context,
                             MarketSenseStockNetworkListener marketSenseStockNetworkListener,
@@ -74,6 +76,7 @@ public class MarketSenseStockFetcher {
             }
         };
         mMode = mode;
+        mStockIsOpen = ClientData.getInstance().isWorkDayAndStockMarketIsOpen();
     }
 
     void makeRequest(@NonNull String networkUrl, @Nullable String cacheUrl) {
@@ -110,11 +113,17 @@ public class MarketSenseStockFetcher {
         MSLog.i("Loading stock list...(cache): " + cacheUrl);
         final Cache cache = Networking.getRequestQueue(context).getCache();
         Cache.Entry entry = cache.get(cacheUrl);
-        if(entry != null && !entry.isExpired()) {
+        if(entry != null && (!mStockIsOpen || !entry.isExpired())) {
             try {
                 ArrayList<Stock> stockArrayList = StockRequest.stockParseResponse(entry.data);
                 MSLog.i("Loading stock list...(cache hit): " + new String(entry.data));
                 mMarketSenseStockNetworkListener.onStockListLoad(stockArrayList, isAutoRefresh);
+
+                if(!mStockIsOpen) {
+                    MSLog.d("We remove stock network request, " +
+                            "since stock market is close and cache is hit.");
+                    return;
+                }
             } catch (JSONException e) {
                 MSLog.e("Loading stock list...(cache failed JSONException)");
             }

@@ -122,7 +122,6 @@ public class NewsRequest extends Request<ArrayList<News>> {
                 String key = iterator.next();
                 JSONArray newsJsonArray = multipleNewsJsonObject.getJSONArray(key);
                 if (newsJsonArray != null) {
-                    MSLog.d("stock name: " + key + ", size: " + newsJsonArray.length());
                     for (int i = 0; i < newsJsonArray.length(); i++) {
                         News news = News.jsonObjectToNews(newsJsonArray.getJSONObject(i));
                         if (news != null) {

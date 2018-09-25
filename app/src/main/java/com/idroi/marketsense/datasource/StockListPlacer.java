@@ -2,6 +2,7 @@ package com.idroi.marketsense.datasource;
 
 import android.app.Activity;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.annotation.Nullable;
 
 import com.idroi.marketsense.Logging.MSLog;
@@ -61,6 +62,8 @@ public class StockListPlacer {
     private static final int REFRESH_TIME = 30 * 1000;
 
     private ClientData mClientData;
+    private HandlerThread mHandlerThread;
+    private Handler mBackgroundHandler;
 
     public StockListPlacer(Activity activity, int taskId) {
         this(activity, taskId, SORT_BY_NEWS, SORT_DOWNWARD);
@@ -75,13 +78,24 @@ public class StockListPlacer {
 
         mMarketSenseStockNetworkListener = new MarketSenseStockFetcher.MarketSenseStockNetworkListener() {
             @Override
-            public void onStockListLoad(ArrayList<Stock> stockArrayList, boolean isAutoRefresh) {
+            public void onStockListLoad(final ArrayList<Stock> stockArrayList, boolean isAutoRefresh) {
 
                 if(mActivity.get() == null) {
                     return;
                 }
 
-                updateRealTimeStockPrices(stockArrayList);
+//                updateRealTimeStockPrices(stockArrayList);
+                if(mHandlerThread != null && mBackgroundHandler != null) {
+                    mBackgroundHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Activity innerActivity = mActivity.get();
+                            if(innerActivity != null) {
+                                updateRealTimeStockPrices(innerActivity, stockArrayList);
+                            }
+                        }
+                    });
+                }
 
                 if(!isAutoRefresh && mStockArrayList == null) {
                     // first time
@@ -109,11 +123,33 @@ public class StockListPlacer {
                         MSLog.d("We first time get stock list, so we need to sort it. size: " + mStockArrayList.size());
                     }
 
-                    Comparator<Stock> comparator = genComparator(mSortedField, mSortedDirection);
-                    Collections.sort(mStockArrayList, comparator);
+//                    Comparator<Stock> comparator = genComparator(mSortedField, mSortedDirection);
+//                    Collections.sort(mStockArrayList, comparator);
+//
+//                    if (mStockListListener != null) {
+//                        mStockListListener.onStockListLoaded();
+//                    }
 
-                    if (mStockListListener != null) {
-                        mStockListListener.onStockListLoaded();
+                    if(mHandlerThread != null && mBackgroundHandler != null) {
+                        mBackgroundHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Activity innerActivity = mActivity.get();
+                                if(innerActivity != null) {
+                                    Comparator<Stock> comparator = genComparator(mSortedField, mSortedDirection);
+                                    Collections.sort(mStockArrayList, comparator);
+
+                                    innerActivity.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (mStockListListener != null) {
+                                                mStockListListener.onStockListLoaded();
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        });
                     }
                 }
             }
@@ -165,17 +201,23 @@ public class StockListPlacer {
         };
     }
 
-    private void updateRealTimeStockPrices(ArrayList<Stock> stockPrices) {
-        ClientData clientData = ClientData.getInstance(mActivity.get());
+    private void updateRealTimeStockPrices(Activity activity, ArrayList<Stock> stockPrices) {
+        final ClientData clientData = ClientData.getInstance(mActivity.get());
         if(stockPrices != null && clientData != null) {
             for (Stock stock : stockPrices) {
                 clientData.setRealTimeStockPriceHashMap(stock);
             }
             if(mTask == MAIN_ID) {
-                clientData.getUserProfile().globalBroadcast(UserProfile.NOTIFY_ID_PRICE_CHANGED);
+//                clientData.getUserProfile().globalBroadcast(UserProfile.NOTIFY_ID_PRICE_CHANGED);
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        clientData.getUserProfile().globalBroadcast(UserProfile.NOTIFY_ID_PRICE_CHANGED);
+                    }
+                });
             }
         }
-        MSLog.i("refresh real time stock price with task id: " + mTask);
+        MSLog.i("["+Thread.currentThread().getId()+"] refresh real time stock price with task id: " + mTask);
     }
 
     private boolean isRetry() {
@@ -217,6 +259,11 @@ public class StockListPlacer {
 
     private void loadStockList(MarketSenseStockFetcher stockFetcher) {
         clear();
+
+        mHandlerThread = new HandlerThread("UpdateRealPrice");
+        mHandlerThread.start();
+        mBackgroundHandler = new Handler(mHandlerThread.getLooper());
+
         mMarketSenseStockFetcher = stockFetcher;
         mMarketSenseStockFetcher.makeRequest(mNetworkUrl, mCacheUrl);
     }
@@ -244,6 +291,10 @@ public class StockListPlacer {
         if(mMarketSenseStockFetcher != null) {
             mMarketSenseStockFetcher.destroy();
             mMarketSenseStockFetcher = null;
+        }
+        if(mHandlerThread != null) {
+            mHandlerThread.quitSafely();
+            mHandlerThread = null;
         }
         mRefreshHandler.removeCallbacks(mRefreshRunnable);
     }

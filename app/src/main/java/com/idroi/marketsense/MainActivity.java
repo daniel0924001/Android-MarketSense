@@ -12,6 +12,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,7 +34,6 @@ import com.idroi.marketsense.adapter.ChoiceScreenSlidePagerAdapter;
 import com.idroi.marketsense.adapter.ProfileScreenSlidePagerAdapter;
 import com.idroi.marketsense.adapter.TrendScreenSlidePagerAdapter;
 import com.idroi.marketsense.adapter.NewsScreenSlidePagerAdapter;
-import com.idroi.marketsense.common.BottomNavigationViewHelper;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.common.FrescoHelper;
@@ -42,12 +42,10 @@ import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.UserProfile;
-import com.idroi.marketsense.datasource.MarketSenseCommentsFetcher;
-import com.idroi.marketsense.datasource.MarketSenseNewsFetcher;
-import com.idroi.marketsense.datasource.MarketSenseStockFetcher;
 import com.idroi.marketsense.fragments.MainFragment;
 import com.idroi.marketsense.util.ActionBarHelper;
 import com.idroi.marketsense.util.MarketSenseUtils;
+import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import net.lucode.hackware.magicindicator.MagicIndicator;
 import net.lucode.hackware.magicindicator.ViewPagerHelper;
@@ -78,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
     private SwipeableViewPager mViewPager;
     private MagicIndicator mMagicIndicator;
     private FloatingActionButton mFab;
-    private BottomNavigationView mBottomNavigationView;
+    private BottomNavigationViewEx mBottomNavigationView;
 
     private boolean mForceChangeBottomNavigation = false;
     private int mLastSelectedItemId = -1;
@@ -213,9 +211,7 @@ public class MainActivity extends AppCompatActivity {
         FrescoHelper.initialize(getApplicationContext());
         setContentView(R.layout.activity_main);
 
-        mBottomNavigationView = findViewById(R.id.navigation);
-        mBottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        BottomNavigationViewHelper.disableShiftMode(mBottomNavigationView);
+        setBottomNavigationView();
 
         mFab = findViewById(R.id.fab_add);
 
@@ -265,6 +261,18 @@ public class MainActivity extends AppCompatActivity {
                 mFab.setOnClickListener(null);
             }
         }
+    }
+
+    private void setBottomNavigationView() {
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        mBottomNavigationView = findViewById(R.id.navigation);
+        mBottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        mBottomNavigationView.enableAnimation(false);
+        mBottomNavigationView.enableShiftingMode(false);
+        mBottomNavigationView.enableItemShiftingMode(false);
+        mBottomNavigationView.setIconSize(30, 30);
+        mBottomNavigationView.setTextSize(12);
+        mBottomNavigationView.setIconsMarginTop((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, metrics));
     }
 
     private static final int SELF_NEWS_SLIDE_PAGER = 1;

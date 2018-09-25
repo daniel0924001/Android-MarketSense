@@ -8,6 +8,7 @@ import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.AppLifecycleHandler;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.data.UserProfile;
+import com.idroi.marketsense.util.ActionBarHelper;
 
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_NEED_TO_REOPEN;
 
@@ -47,6 +48,11 @@ public class App extends Application implements AppLifecycleHandler.LifecycleDel
         ClientData clientData = ClientData.getInstance(this);
         if(clientData != null && mHandler != null) {
             mHandler.postDelayed(mReopenRunnable, REOPEN_TIME_CONST);
+        }
+
+        ActionBarHelper actionBarHelper = ActionBarHelper.getInstance();
+        if(actionBarHelper != null) {
+            actionBarHelper.clearCurrentActionBarType();
         }
     }
 

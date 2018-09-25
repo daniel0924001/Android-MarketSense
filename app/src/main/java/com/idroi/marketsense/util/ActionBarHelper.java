@@ -10,6 +10,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.MainActivity;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.RichEditorActivity;
@@ -60,7 +61,7 @@ public class ActionBarHelper {
     }
 
     private ActionBarHelper() {
-        mCurrentActionBarType = ACTION_BAR_INITIAL;
+        clearCurrentActionBarType();
     }
 
     private boolean checkSameTypeAndChangeType(int type) {
@@ -71,6 +72,10 @@ public class ActionBarHelper {
 
     private void internalSetCurrentActionBarType(int type) {
         mCurrentActionBarType = type;
+    }
+
+    public void clearCurrentActionBarType() {
+        mCurrentActionBarType = ACTION_BAR_INITIAL;
     }
 
     private static boolean isSameTypeAndChangeType(int type) {

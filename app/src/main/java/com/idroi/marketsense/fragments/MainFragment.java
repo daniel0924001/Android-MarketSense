@@ -122,7 +122,8 @@ public class MainFragment extends Fragment {
             }
         };
 
-        UserProfile userProfile = ClientData.getInstance(getContext()).getUserProfile();
+        ClientData clientData = ClientData.getInstance(getContext());
+        UserProfile userProfile = clientData.getUserProfile();
         if(userProfile != null) {
             userProfile.addGlobalBroadcastListener(mGlobalBroadcastListener);
         }
@@ -179,6 +180,7 @@ public class MainFragment extends Fragment {
         mStockListPlacer.loadStockList(
                 StockRequest.queryStockList(getActivity(), true),
                 StockRequest.queryStockList(getActivity(), false));
+        clientData.prefetchData();
 
         mNewsRecyclerAdapter.setNewsAvailableListener(new NewsRecyclerAdapter.NewsAvailableListener() {
             @Override

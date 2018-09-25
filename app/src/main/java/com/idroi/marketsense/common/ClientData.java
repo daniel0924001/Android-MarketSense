@@ -12,6 +12,9 @@ import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.data.Knowledge;
 import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.UserProfile;
+import com.idroi.marketsense.datasource.MarketSenseCommentsFetcher;
+import com.idroi.marketsense.datasource.MarketSenseNewsFetcher;
+import com.idroi.marketsense.datasource.MarketSenseStockFetcher;
 import com.idroi.marketsense.datasource.Networking;
 import com.idroi.marketsense.request.StocksListRequest;
 import com.idroi.marketsense.request.UserEventsAndCodesRequest;
@@ -99,6 +102,12 @@ public class ClientData {
 
         updateClockInformation();
         loadAllStocksListTask(true);
+    }
+
+    public void prefetchData() {
+        MarketSenseCommentsFetcher.prefetchGeneralComments(mContext);
+//        MarketSenseNewsFetcher.prefetchNewsFirstPage(mContext);
+        MarketSenseStockFetcher.prefetchWPCTStockList(mContext);
     }
 
     public void updateClockInformation() {

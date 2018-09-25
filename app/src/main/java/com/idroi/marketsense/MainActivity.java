@@ -169,8 +169,6 @@ public class MainActivity extends AppCompatActivity {
         clientData.setScreenSizeInPixels(metrics.widthPixels, metrics.heightPixels);
         clientData.setScreenSize(width, height, metrics.density);
 
-        prefetchData();
-
         mGlobalBroadcastListener = new UserProfile.GlobalBroadcastListener() {
             @Override
             public void onGlobalBroadcast(int notifyId, Object payload) {
@@ -255,12 +253,6 @@ public class MainActivity extends AppCompatActivity {
             mCanReturn = false;
             ActionBarHelper.setActionBarForMain(this, true);
         }
-    }
-
-    private void prefetchData() {
-        MarketSenseCommentsFetcher.prefetchGeneralComments(this);
-        MarketSenseNewsFetcher.prefetchNewsFirstPage(this);
-        MarketSenseStockFetcher.prefetchWPCTStockList(this);
     }
 
     private void setFab(boolean show) {

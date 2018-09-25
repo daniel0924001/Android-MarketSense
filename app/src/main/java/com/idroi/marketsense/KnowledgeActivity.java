@@ -162,6 +162,8 @@ public class KnowledgeActivity extends AppCompatActivity {
                 if(mLoadingProgressBar != null) {
                     mLoadingProgressBar.setVisibility(View.GONE);
                 }
+                Group newsGroup = findViewById(R.id.news_group);
+                newsGroup.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -169,9 +171,8 @@ public class KnowledgeActivity extends AppCompatActivity {
                 if(mLoadingProgressBar != null) {
                     mLoadingProgressBar.setVisibility(View.GONE);
                 }
-                TextView newsTitle = findViewById(R.id.tv_news);
-                newsTitle.setVisibility(View.GONE);
-                mNewsRecyclerView.setVisibility(View.GONE);
+                Group newsGroup = findViewById(R.id.news_group);
+                newsGroup.setVisibility(View.GONE);
             }
         });
 

@@ -48,4 +48,8 @@ public enum MarketSenseError {
     public String toString() {
         return mMessage;
     }
+
+    public boolean isEqual(MarketSenseError error) {
+        return mCode == error.getCode();
+    }
 }

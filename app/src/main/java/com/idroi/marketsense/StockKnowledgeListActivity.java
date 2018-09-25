@@ -49,8 +49,8 @@ public class StockKnowledgeListActivity extends AppCompatActivity {
             }
         });
         mKnowledgeRecyclerAdapter.loadKnowledgeList(
-                KnowledgeListRequest.queryKnowledgeList(),
-                KnowledgeListRequest.queryKnowledgeList());
+                KnowledgeListRequest.queryKnowledgeList(this, true),
+                KnowledgeListRequest.queryKnowledgeList(this, false));
     }
 
     @Override

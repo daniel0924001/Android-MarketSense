@@ -91,7 +91,17 @@ public class KnowledgeFetcher {
             return;
         }
 
-        MSLog.i("Loading knowledge list...: " + networkUrl);
+        if(networkUrl == null) {
+            MSLog.e("[ERROR]: networkUrl should not be null." );
+            return;
+        }
+
+        if(cacheUrl == null) {
+            MSLog.d("cacheUrl is null, so we set networkUrl to cacheUrl");
+            cacheUrl = networkUrl;
+        }
+
+        MSLog.i("Loading knowledge list...(cache): " + cacheUrl);
         final Cache cache = Networking.getRequestQueue(context).getCache();
         Cache.Entry entry = cache.get(cacheUrl);
         if(entry != null && !entry.isExpired()) {

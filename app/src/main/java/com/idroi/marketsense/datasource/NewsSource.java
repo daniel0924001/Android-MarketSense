@@ -18,6 +18,7 @@ import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.request.NewsRequest;
 
 import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_REQUEST_NAME;
+import static com.idroi.marketsense.common.MarketSenseError.JSON_PARSED_NO_DATA;
 import static com.idroi.marketsense.fragments.NewsFragment.GENERAL_TASK_ID;
 import static com.idroi.marketsense.fragments.NewsFragment.KEYWORD_ARRAY_TASK_ID;
 import static com.idroi.marketsense.fragments.NewsFragment.KEYWORD_NAME;
@@ -133,8 +134,8 @@ public class NewsSource {
 
                 mRequestInFlight = false;
 
-                if (mCurrentRetries >= RETRY_TIME_ARRAY_MILLISECONDS.length - 1) {
-                    MSLog.w("Stopping requests after the max retry count.");
+                if (JSON_PARSED_NO_DATA.isEqual(marketSenseError) || mCurrentRetries >= RETRY_TIME_ARRAY_MILLISECONDS.length - 1) {
+                    MSLog.w("Json is null or stop requests after the max retry count.");
                     resetRetryTime();
                     mNewsSourceListener.onNewsAvailable();
                     return;

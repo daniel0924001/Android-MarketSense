@@ -1,5 +1,8 @@
 package com.idroi.marketsense.request;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -15,6 +18,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+
+import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_REQUEST_NAME;
 
 /**
  * Created by daniel.hsieh on 2018/9/19.
@@ -88,8 +93,15 @@ public class KnowledgeListRequest extends Request<ArrayList<Knowledge>> {
     public static final String API_URL_KNOWLEDGE_KEYWORD
             = "http://apiv2.infohubapp.com/v1/stock/keyword/%s";
 
-    public static String queryKnowledgeList() {
-        return API_URL_KNOWLEDGE_LIST + "?timestamp=" + System.currentTimeMillis() / 86400;
+    public static String queryKnowledgeList(Context context, boolean isNetworkUrl) {
+        if(isNetworkUrl) {
+            return API_URL_KNOWLEDGE_LIST + "?timestamp=" + System.currentTimeMillis() / (86400 * 1000);
+        } else {
+            SharedPreferences sharedPreferences =
+                    context.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE);
+            return sharedPreferences.getString(API_URL_KNOWLEDGE_LIST,
+                    API_URL_KNOWLEDGE_LIST + "?timestamp=" + System.currentTimeMillis() / (86400 * 1000));
+        }
     }
 
     public static String queryKnowledgeKeyword(String keyword) {

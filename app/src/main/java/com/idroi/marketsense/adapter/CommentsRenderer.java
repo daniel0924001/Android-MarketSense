@@ -75,14 +75,12 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
 
         setLikeAndReplyBlock(commentViewHolder, content);
 
-        if(mIsLargeBorder) {
+        if(mIsLargeBorder && commentViewHolder.newsReferencedByCommentViewHolder != null) {
             News news = content.getNews();
             if(news != null) {
-                setNewsBlock(commentViewHolder, content.getNews());
+                setNewsBlock(view.getContext(), commentViewHolder, content.getNews());
             } else {
-                if(commentViewHolder.newsBlock != null) {
-                    commentViewHolder.newsBlock.setVisibility(View.GONE);
-                }
+                commentViewHolder.newsReferencedByCommentViewHolder.mainView.setVisibility(View.GONE);
             }
         }
 
@@ -111,55 +109,14 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
         }
     }
 
-    private void setNewsBlock(CommentViewHolder commentViewHolder, final News news) {
-        if(commentViewHolder.newsBlock != null) {
-            commentViewHolder.newsBlock.setVisibility(View.VISIBLE);
-            commentViewHolder.newsBlock.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mOnNewsItemClickListener.onNewsItemClick(news);
-                }
-            });
-        }
-        MarketSenseRendererHelper.addTextView(commentViewHolder.newsTitleView, news.getTitle());
-        MarketSenseRendererHelper.addTextView(commentViewHolder.newsDateView, news.getDate());
+    private void setNewsBlock(Context context, CommentViewHolder commentViewHolder, final News news) {
+        if(commentViewHolder.newsReferencedByCommentViewHolder != null) {
+            commentViewHolder.newsReferencedByCommentViewHolder.update(context, news, mOnNewsItemClickListener);
 
-        if(commentViewHolder.newsPredictionTextView != null) {
-            if (news.isOptimistic()) {
-                commentViewHolder.newsPredictionTextView.setBackground(commentViewHolder.newsPredictionTextView.getContext().getResources().getDrawable(R.drawable.btn_oval_small_corner_red));
-                commentViewHolder.newsPredictionTextView.setVisibility(View.VISIBLE);
-            } else if (news.isPessimistic()) {
-                commentViewHolder.newsPredictionTextView.setBackground(commentViewHolder.newsPredictionTextView.getContext().getResources().getDrawable(R.drawable.btn_oval_small_corner_green));
-                commentViewHolder.newsPredictionTextView.setVisibility(View.VISIBLE);
-            } else {
-                commentViewHolder.newsPredictionTextView.setVisibility(View.GONE);
-            }
+            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) commentViewHolder.horizontalLineView.getLayoutParams();
+            params.topToBottom = commentViewHolder.newsReferencedByCommentViewHolder.mainView.getId();
+            commentViewHolder.horizontalLineView.setLayoutParams(params);
         }
-
-        switch (news.getLevel()) {
-            case 3:
-                commentViewHolder.newsPredictionTextView.setText(R.string.title_news_good3);
-                break;
-            case 2:
-                commentViewHolder.newsPredictionTextView.setText(R.string.title_news_good2);
-                break;
-            case 1:
-                commentViewHolder.newsPredictionTextView.setText(R.string.title_news_good1);
-                break;
-            case -1:
-                commentViewHolder.newsPredictionTextView.setText(R.string.title_news_bad1);
-                break;
-            case -2:
-                commentViewHolder.newsPredictionTextView.setText(R.string.title_news_bad2);
-                break;
-            case -3:
-                commentViewHolder.newsPredictionTextView.setText(R.string.title_news_bad3);
-                break;
-        }
-
-        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) commentViewHolder.horizontalLineView.getLayoutParams();
-        params.topToBottom = commentViewHolder.newsBlock.getId();
-        commentViewHolder.horizontalLineView.setLayoutParams(params);
     }
 
     public void setClickListener(View view, final Comment comment, final int position) {
@@ -203,8 +160,8 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
             public void run() {
                 ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) commentViewHolder.horizontalLineView.getLayoutParams();
                 if(show) {
-                    if(comment.getNews() != null && commentViewHolder.newsBlock != null) {
-                        params.topToBottom = commentViewHolder.newsBlock.getId();
+                    if(comment.getNews() != null && commentViewHolder.newsReferencedByCommentViewHolder != null) {
+                        params.topToBottom = commentViewHolder.newsReferencedByCommentViewHolder.mainView.getId();
                     } else {
                         params.topToBottom = commentViewHolder.readMoreView.getId();
                     }
@@ -218,8 +175,8 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
                         }
                     });
                 } else {
-                    if(comment.getNews() != null && commentViewHolder.newsBlock != null) {
-                        params.topToBottom = commentViewHolder.newsBlock.getId();
+                    if(comment.getNews() != null && commentViewHolder.newsReferencedByCommentViewHolder != null) {
+                        params.topToBottom = commentViewHolder.newsReferencedByCommentViewHolder.mainView.getId();
                     } else {
                         params.topToBottom = commentViewHolder.commentBodyView.getId();
                     }

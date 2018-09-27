@@ -36,6 +36,7 @@ import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.util.ActionBarHelper;
+import com.idroi.marketsense.viewholders.NewsReferencedByCommentViewHolder;
 
 import org.json.JSONObject;
 
@@ -116,54 +117,24 @@ public class CommentActivity extends AppCompatActivity {
     }
 
     private void setNewsBlock(final News news) {
-        ConstraintLayout newsBlock = findViewById(R.id.comment_news_block);
-        TextView newsTitleView = findViewById(R.id.comment_news_title_tv);
-        TextView dateTitleView = findViewById(R.id.comment_news_date_tv);
-        TextView predictionTextView = findViewById(R.id.comment_news_prediction);
 
-        MarketSenseRendererHelper.addTextView(newsTitleView, news.getTitle());
-        MarketSenseRendererHelper.addTextView(dateTitleView, news.getDate());
-
-        // fire text
-        if(predictionTextView != null) {
-            if (news.isOptimistic()) {
-                predictionTextView.setBackground(this.getResources().getDrawable(R.drawable.btn_oval_small_corner_red));
-                predictionTextView.setVisibility(View.VISIBLE);
-            } else if (news.isPessimistic()) {
-                predictionTextView.setBackground(this.getResources().getDrawable(R.drawable.btn_oval_small_corner_green));
-                predictionTextView.setVisibility(View.VISIBLE);
-            } else {
-                predictionTextView.setVisibility(View.GONE);
+        NewsReferencedByCommentViewHolder newsReferencedByCommentViewHolder =
+                NewsReferencedByCommentViewHolder.convertToViewHolder(findViewById(R.id.comment_news_block));
+        newsReferencedByCommentViewHolder.update(this, news, new CommentsRecyclerViewAdapter.OnNewsItemClickListener() {
+            @Override
+            public void onNewsItemClick(News news) {
+                startActivity(NewsWebViewActivity.generateNewsWebViewActivityIntent(
+                        CommentActivity.this, news));
+                overridePendingTransition(R.anim.enter, R.anim.stop);
             }
-
-            switch (news.getLevel()) {
-                case 3:
-                    predictionTextView.setText(R.string.title_news_good3);
-                    break;
-                case 2:
-                    predictionTextView.setText(R.string.title_news_good2);
-                    break;
-                case 1:
-                    predictionTextView.setText(R.string.title_news_good1);
-                    break;
-                case -1:
-                    predictionTextView.setText(R.string.title_news_bad1);
-                    break;
-                case -2:
-                    predictionTextView.setText(R.string.title_news_bad2);
-                    break;
-                case -3:
-                    predictionTextView.setText(R.string.title_news_bad3);
-                    break;
-            }
-        }
+        });
 
         View horizontalLineView = findViewById(R.id.social_horizontal_line);
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) horizontalLineView.getLayoutParams();
-        if(newsBlock != null) {
-            params.topToBottom = newsBlock.getId();
-            newsBlock.setVisibility(View.VISIBLE);
-            newsBlock.setOnClickListener(new View.OnClickListener() {
+        if(newsReferencedByCommentViewHolder.mainView != null) {
+            params.topToBottom = newsReferencedByCommentViewHolder.mainView.getId();
+            newsReferencedByCommentViewHolder.mainView.setVisibility(View.VISIBLE);
+            newsReferencedByCommentViewHolder.mainView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     startActivity(NewsWebViewActivity.generateNewsWebViewActivityIntent(

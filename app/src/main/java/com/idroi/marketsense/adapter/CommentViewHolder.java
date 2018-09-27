@@ -10,6 +10,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.idroi.marketsense.CommentTextView;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.R;
+import com.idroi.marketsense.viewholders.NewsReferencedByCommentViewHolder;
 
 /**
  * Created by daniel.hsieh on 2018/5/9.
@@ -35,10 +36,7 @@ public class CommentViewHolder {
     TextView readMoreView;
 
     // comment_list_item_large_border
-    @Nullable ConstraintLayout newsBlock;
-    @Nullable TextView newsTitleView;
-    @Nullable TextView newsDateView;
-    @Nullable TextView newsPredictionTextView;
+    @Nullable NewsReferencedByCommentViewHolder newsReferencedByCommentViewHolder;
 
     static final CommentViewHolder EMPTY_VIEW_HOLDER = new CommentViewHolder();
 
@@ -70,10 +68,11 @@ public class CommentViewHolder {
             commentViewHolder.readMoreView = view.findViewById(R.id.tv_read_more);
 
             // comment_list_item_large_border
-            commentViewHolder.newsBlock = view.findViewById(R.id.comment_news_block);
-            commentViewHolder.newsTitleView = view.findViewById(R.id.comment_news_title_tv);
-            commentViewHolder.newsDateView = view.findViewById(R.id.comment_news_date_tv);
-            commentViewHolder.newsPredictionTextView = view.findViewById(R.id.comment_news_prediction);
+            View referenceNewsView = view.findViewById(R.id.comment_news_block);
+            if(referenceNewsView != null) {
+                commentViewHolder.newsReferencedByCommentViewHolder =
+                        NewsReferencedByCommentViewHolder.convertToViewHolder(referenceNewsView);
+            }
 
             return commentViewHolder;
         } catch (ClassCastException exception) {

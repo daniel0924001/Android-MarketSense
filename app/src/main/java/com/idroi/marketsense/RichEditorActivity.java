@@ -10,7 +10,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -44,7 +43,6 @@ public class RichEditorActivity extends AppCompatActivity {
 
     RichEditor mEditor;
 //    String mEditorString;
-    View mLastPressView;
 
     public static final String EXTRA_REQ_TYPE = "extra_type";
     public static final String EXTRA_REQ_ID = "extra_id";

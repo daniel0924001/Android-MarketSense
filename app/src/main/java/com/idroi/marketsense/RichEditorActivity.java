@@ -18,8 +18,10 @@ import android.widget.Toast;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FrescoHelper;
+import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.Stock;
+import com.idroi.marketsense.viewholders.NewsReferencedByCommentViewHolder;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -48,9 +50,7 @@ public class RichEditorActivity extends AppCompatActivity {
     public static final String EXTRA_REQ_ID = "extra_id";
     public static final String EXTRA_REQ_STOCK_KEYWORDS = "extra_stock_keywords";
     public static final String EXTRA_REQ_NEWS_TITLE = "extra_news_title";
-    public static final String EXTRA_REQ_NEWS_DATE = "extra_news_date";
-    public static final String EXTRA_REQ_NEWS_PREDICTION_IMAGE_ID = "extra_news_prediction_image_id";
-    public static final String EXTRA_REQ_NEWS_PREDICTION_TEXT_ID = "extra_news_prediction_text";
+    public static final String EXTRA_REQ_NEWS_LEVEL = "extra_news_level";
     public static final String EXTRA_RES_HTML = "extra_response_html";
     public static final String EXTRA_RES_TYPE = EXTRA_REQ_TYPE;
     public static final String EXTRA_RES_ID = EXTRA_REQ_ID;
@@ -68,9 +68,7 @@ public class RichEditorActivity extends AppCompatActivity {
     private TextView mCompletedTextView;
 
     private String mNewsTitle;
-    private String mNewsSourceDate;
-    private int mNewsPredictionStringResourceId;
-    private int mNewsPredictionBackgroundDrawableResourceId;
+    private int mNewsLevel;
 
     public enum TYPE {
         NEWS("news"),
@@ -122,9 +120,7 @@ public class RichEditorActivity extends AppCompatActivity {
         mStockKeywords = intent.getStringArrayExtra(EXTRA_REQ_STOCK_KEYWORDS);
 
         mNewsTitle = intent.getStringExtra(EXTRA_REQ_NEWS_TITLE);
-        mNewsSourceDate = intent.getStringExtra(EXTRA_REQ_NEWS_DATE);
-        mNewsPredictionStringResourceId = intent.getIntExtra(EXTRA_REQ_NEWS_PREDICTION_TEXT_ID, 0);
-        mNewsPredictionBackgroundDrawableResourceId = intent.getIntExtra(EXTRA_REQ_NEWS_PREDICTION_IMAGE_ID, 0);
+        mNewsLevel = intent.getIntExtra(EXTRA_REQ_NEWS_LEVEL, 0);
     }
 
     private void leaveRichEditorActivity(boolean isSuccessful, String html, String eventId) {
@@ -182,20 +178,9 @@ public class RichEditorActivity extends AppCompatActivity {
                 }
             }
 
-            ConstraintLayout newsBlock = findViewById(R.id.comment_news_block);
-            newsBlock.setVisibility(View.VISIBLE);
-            TextView titleTextView = findViewById(R.id.comment_news_title_tv);
-            titleTextView.setText(mNewsTitle);
-            TextView dateTextView = findViewById(R.id.comment_news_date_tv);
-            dateTextView.setText(mNewsSourceDate);
-            TextView predictionTextView = findViewById(R.id.comment_news_prediction);
-            try {
-                predictionTextView.setText(mNewsPredictionStringResourceId);
-                predictionTextView.setBackground(getResources().getDrawable(mNewsPredictionBackgroundDrawableResourceId));
-            } catch (Exception e) {
-                predictionTextView.setVisibility(View.GONE);
-                predictionTextView.setVisibility(View.GONE);
-            }
+            NewsReferencedByCommentViewHolder newsReferencedByCommentViewHolder =
+                    NewsReferencedByCommentViewHolder.convertToViewHolder(findViewById(R.id.comment_news_block));
+            newsReferencedByCommentViewHolder.update(this, mNewsTitle, mStockKeywords, mNewsLevel);
 
             ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) mEditor.getLayoutParams();
             params.bottomToTop = R.id.comment_news_block;
@@ -366,46 +351,16 @@ public class RichEditorActivity extends AppCompatActivity {
     }
 
     public static Intent generateRichEditorActivityIntent(Context context, TYPE type, String id) {
-        return generateRichEditorActivityIntent(context, type, id, null, null, 0, null);
+        return generateRichEditorActivityIntent(context, type, id, null, null, 0);
     }
 
-    public static Intent generateRichEditorActivityIntent(Context context, TYPE type, String id, String[] stockKeywords, String title, int level, String date) {
+    public static Intent generateRichEditorActivityIntent(Context context, TYPE type, String id, String[] stockKeywords, String title, int level) {
         Intent intent = new Intent(context, RichEditorActivity.class);
         intent.putExtra(EXTRA_REQ_TYPE, type.getType());
         intent.putExtra(EXTRA_REQ_ID, id);
         intent.putExtra(EXTRA_REQ_STOCK_KEYWORDS, stockKeywords);
         intent.putExtra(EXTRA_REQ_NEWS_TITLE, title);
-        intent.putExtra(EXTRA_REQ_NEWS_DATE, date);
-
-        switch (level) {
-            case 3:
-                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_IMAGE_ID, R.drawable.btn_oval_small_corner_red);
-                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_TEXT_ID, R.string.title_news_good3);
-                break;
-            case 2:
-                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_IMAGE_ID, R.drawable.btn_oval_small_corner_red);
-                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_TEXT_ID, R.string.title_news_good2);
-                break;
-            case 1:
-                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_IMAGE_ID, R.drawable.btn_oval_small_corner_red);
-                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_TEXT_ID, R.string.title_news_good1);
-                break;
-            case -1:
-                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_IMAGE_ID, R.drawable.btn_oval_small_corner_green);
-                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_TEXT_ID, R.string.title_news_bad1);
-                break;
-            case -2:
-                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_IMAGE_ID, R.drawable.btn_oval_small_corner_green);
-                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_TEXT_ID, R.string.title_news_bad2);
-                break;
-            case -3:
-                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_IMAGE_ID, R.drawable.btn_oval_small_corner_green);
-                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_TEXT_ID, R.string.title_news_bad3);
-                break;
-            default:
-                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_IMAGE_ID, 0);
-                intent.putExtra(EXTRA_REQ_NEWS_PREDICTION_TEXT_ID, 0);
-        }
+        intent.putExtra(EXTRA_REQ_NEWS_LEVEL, level);
 
         return intent;
     }

@@ -17,6 +17,7 @@
         android:lineSpacingMultiplier="1.5"
         android:text="@string/knowledge_many_words"
         android:padding="12dp"
+        android:foreground="@drawable/item_foreground_with_clicked_shadow"
         android:background="@drawable/block_flat_border_gray_solid_with_radius_corner"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"

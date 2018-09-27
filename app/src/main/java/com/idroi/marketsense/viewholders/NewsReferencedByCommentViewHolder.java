@@ -87,19 +87,25 @@ public class NewsReferencedByCommentViewHolder {
         });
         MarketSenseRendererHelper.addTextView(titleTextView, news.getTitle());
 
-        String[] relatedStockName = news.getStockKeywords();
-        relatedStockNameAdapter.setRelatedStockNames(relatedStockName);
+        update(context, news.getTitle(), news.getStockKeywords(), news.getLevel());
+    }
+
+    public void update(Context context, String title, String[] relatedStockNames, int level) {
+        mainView.setVisibility(View.VISIBLE);
+        MarketSenseRendererHelper.addTextView(titleTextView, title);
+
+        relatedStockNameAdapter.setRelatedStockNames(relatedStockNames);
         if(relatedStockNameAdapter.hasRelatedStock()) {
             relatedStockRecyclerView.setVisibility(View.VISIBLE);
         } else {
             relatedStockRecyclerView.setVisibility(View.GONE);
         }
 
-        if(news.isOptimistic()) {
+        if(level > 0) {
             predictionTextView.setVisibility(View.VISIBLE);
             predictionTextView.setTextColor(context.getResources().getColor(R.color.trend_red));
             relatedStockNameAdapter.setMaxItemCount(2);
-        } else if(news.isPessimistic()) {
+        } else if(level < 0) {
             predictionTextView.setVisibility(View.VISIBLE);
             predictionTextView.setTextColor(context.getResources().getColor(R.color.trend_green));
             relatedStockNameAdapter.setMaxItemCount(2);
@@ -111,7 +117,7 @@ public class NewsReferencedByCommentViewHolder {
             relatedStockNameAdapter.setMaxItemCount(3);
         }
 
-        switch (news.getLevel()) {
+        switch (level) {
             case 3:
                 predictionTextView.setText(R.string.title_news_good3);
                 break;

@@ -25,6 +25,7 @@ import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.request.NewsRequest;
 import com.idroi.marketsense.util.ActionBarHelper;
 import com.idroi.marketsense.viewholders.KnowledgeContentItemViewHolder;
+import com.idroi.marketsense.viewholders.KnowledgeYouMayWantToKnowViewHolder;
 
 import java.util.ArrayList;
 
@@ -52,6 +53,7 @@ public class KnowledgeActivity extends AppCompatActivity {
     private KnowledgeContentItemViewHolder mDescriptionViewHolder;
     private KnowledgeContentItemViewHolder mStrategyViewHolder;
     private KnowledgeContentItemViewHolder mExampleViewHolder;
+    private KnowledgeYouMayWantToKnowViewHolder mYouMayWantToKnow;
 
     private RecyclerView mKnowledgeRecyclerView;
     @Nullable private KnowledgeRecyclerAdapter mKnowledgeRecyclerAdapter;
@@ -91,6 +93,8 @@ public class KnowledgeActivity extends AppCompatActivity {
                 .convertToViewHolder(findViewById(R.id.strategy_block));
         mExampleViewHolder = KnowledgeContentItemViewHolder
                 .convertToViewHolder(findViewById(R.id.example_block));
+        mYouMayWantToKnow = KnowledgeYouMayWantToKnowViewHolder
+                .convertToViewHolder(findViewById(R.id.you_may_want_to_know_block));
 
         KnowledgeContentItemViewHolder.update(mDescriptionViewHolder,
                 getString(R.string.knowledge_description_const), mDescription);
@@ -101,45 +105,14 @@ public class KnowledgeActivity extends AppCompatActivity {
     }
 
     private void setRelatedKnowledge() {
-        Group relatedGroup = findViewById(R.id.related_knowledge_group);
-
-        if(mRelatedKeywords != null && mRelatedKeywords.size() > 0) {
-
-            ClientData clientData = ClientData.getInstance();
-            ArrayList<Knowledge> knowledgeList = new ArrayList<>();
-            for(String keyword : mRelatedKeywords) {
-                Knowledge knowledge = clientData.getKnowledgeFromKeyword(keyword);
-
-                if(knowledge != null && !knowledge.getKeyword().equals(mTitle)) {
-                    knowledgeList.add(knowledge);
-                }
+        mYouMayWantToKnow.setRelatedKnowledge(this, mRelatedKeywords, mTitle, new KnowledgeRecyclerAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Knowledge knowledge) {
+                startActivity(KnowledgeActivity.generateKnowledgeActivityIntent(
+                        KnowledgeActivity.this, knowledge));
+                overridePendingTransition(R.anim.enter, R.anim.stop);
             }
-
-            mKnowledgeRecyclerView = findViewById(R.id.related_knowledge_recycler_view);
-            if(knowledgeList.size() > 0) {
-
-                relatedGroup.setVisibility(View.VISIBLE);
-
-                mKnowledgeRecyclerAdapter = new KnowledgeRecyclerAdapter(this);
-                mKnowledgeRecyclerView.setAdapter(mKnowledgeRecyclerAdapter);
-                mKnowledgeRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-                mKnowledgeRecyclerAdapter.setOnItemClickListener(new KnowledgeRecyclerAdapter.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(Knowledge knowledge) {
-                        startActivity(KnowledgeActivity.generateKnowledgeActivityIntent(
-                                KnowledgeActivity.this, knowledge));
-                        overridePendingTransition(R.anim.enter, R.anim.stop);
-                    }
-                });
-
-                mKnowledgeRecyclerAdapter.setKnowledgeList(knowledgeList);
-            } else {
-                relatedGroup.setVisibility(View.GONE);
-            }
-        } else {
-            relatedGroup.setVisibility(View.GONE);
-        }
+        });
     }
 
     private void setNewsBlock() {

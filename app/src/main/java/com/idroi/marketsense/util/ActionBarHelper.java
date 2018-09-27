@@ -16,6 +16,7 @@ import com.idroi.marketsense.R;
 import com.idroi.marketsense.RichEditorActivity;
 import com.idroi.marketsense.SearchAndResponseActivity;
 import com.idroi.marketsense.common.FBHelper;
+import com.idroi.marketsense.common.MarketSenseRendererHelper;
 
 import java.lang.ref.WeakReference;
 
@@ -340,9 +341,7 @@ public class ActionBarHelper {
             }
 
             TextView textView = view.findViewById(R.id.action_bar_title);
-            if(textView != null) {
-                textView.setText(actionBarTitle);
-            }
+            MarketSenseRendererHelper.addTextView(textView, actionBarTitle);
 
             actionBar.setDisplayShowHomeEnabled(false);
             actionBar.setDisplayShowTitleEnabled(false);

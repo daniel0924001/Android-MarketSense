@@ -50,7 +50,9 @@ import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.CommentAndVoteRequest;
+import com.idroi.marketsense.util.ActionBarHelper;
 import com.idroi.marketsense.util.NewsReadRecordHelper;
+import com.idroi.marketsense.viewholders.NewsWebViewTopViewHolder;
 
 import org.json.JSONObject;
 
@@ -107,13 +109,9 @@ public class NewsWebViewActivity extends AppCompatActivity {
     private int mLevel;
     private String[] mStockKeywords;
 
-    private View mImageMask;
     private ScrollView mUpperBlock;
     private NewsWebView mNewsWebViewOriginal;
     private NewsWebView mNewsWebViewMiddle;
-    private TextView mNewsWebViewMiddleTitleTextView;
-    private TextView mNewsWebViewMiddleDateTextView;
-    private SimpleDraweeView mNewsWebViewMiddleImageView;
     private CommentsRecyclerViewAdapter mCommentsRecyclerViewAdapter;
     private RecyclerView mCommentRecyclerView;
     private ProgressBar mLoadingProgressBar, mLoadingProgressBarOriginal;
@@ -306,14 +304,6 @@ public class NewsWebViewActivity extends AppCompatActivity {
             }
         });
 
-        ImageView goBackImageView = findViewById(R.id.iv_go_back);
-        goBackImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
-
         setButtonStatus();
 
         UserProfile userProfile = ClientData.getInstance(this).getUserProfile();
@@ -434,41 +424,17 @@ public class NewsWebViewActivity extends AppCompatActivity {
     }
 
     private void setActionBar() {
-        final ActionBar actionBar = getSupportActionBar();
-        if(actionBar != null) {
-            actionBar.hide();
-        }
+        ActionBarHelper.setActionBarForSimpleTitleAndBack(this, null);
     }
 
     private void initUpperBlock() {
 
-        MSLog.i("title: " + mTitle + ", source: " + mSourceDate + ", image: " + mImageUrl);
+        NewsWebViewTopViewHolder newsWebViewTopViewHolder = NewsWebViewTopViewHolder
+                .convertToViewHolder(findViewById(R.id.marketsense_webview_upper_block));
+        newsWebViewTopViewHolder.update(this, mTitle, mSourceDate, mStockKeywords, mLevel);
+
+        MSLog.i("title: " + mTitle + ", source: " + mSourceDate);
         mUpperBlock = findViewById(R.id.marketsense_webview_middle_sv);
-        mImageMask = findViewById(R.id.marketsense_webview_activity_image_mask);
-        mNewsWebViewMiddleTitleTextView = findViewById(R.id.marketsense_webview_activity_title);
-        mNewsWebViewMiddleDateTextView = findViewById(R.id.marketsense_webview_activity_source_date);
-        if(mNewsWebViewMiddleTitleTextView != null) {
-            mNewsWebViewMiddleTitleTextView.setText(mTitle);
-        }
-        if(mNewsWebViewMiddleDateTextView != null) {
-            mNewsWebViewMiddleDateTextView.setText(mSourceDate);
-        }
-        mNewsWebViewMiddleImageView = findViewById(R.id.marketsense_webview_activity_image);
-        if(mNewsWebViewMiddleImageView != null && (!mImageUrl.isEmpty() || mImageUrl.equals("None"))) {
-            FrescoImageHelper.loadImageView(mImageUrl,
-                    mNewsWebViewMiddleImageView, FrescoImageHelper.MAIN_IMAGE_RATIO);
-            mImageMask.setVisibility(View.VISIBLE);
-            mNewsWebViewMiddleTitleTextView.setTextColor(getResources().getColor(R.color.text_white));
-            mNewsWebViewMiddleDateTextView.setTextColor(getResources().getColor(R.color.text_white));
-        } else {
-            mImageMask.setVisibility(View.GONE);
-            mNewsWebViewMiddleTitleTextView.setTextColor(getResources().getColor(R.color.text_first));
-            mNewsWebViewMiddleDateTextView.setTextColor(getResources().getColor(R.color.text_first));
-            ConstraintLayout upperBlock = findViewById(R.id.marketsense_webview_upper_block);
-            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) upperBlock.getLayoutParams();
-            params.dimensionRatio = "1.55";
-            upperBlock.setLayoutParams(params);
-        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")

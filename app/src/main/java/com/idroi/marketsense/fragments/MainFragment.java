@@ -61,8 +61,6 @@ public class MainFragment extends Fragment {
     private TextView mNoDataTextView;
     private ProgressBar mLoadingProgressBar;
 
-    private StockRankingRecyclerAdapter mTechRankingRecyclerAdapter, mNewsRankingRecyclerAdapter;
-
     private StockListPlacer mStockListPlacer;
 
     private NestedScrollView mNestedScrollView;
@@ -144,35 +142,21 @@ public class MainFragment extends Fragment {
                             = mTechBlockViewHolder.mainView.getId();
                     ((ConstraintLayout.LayoutParams) secondView.getLayoutParams()).topMargin = 0;
 
-                    mTechRankingRecyclerAdapter = new StockRankingRecyclerAdapter(getActivity(),
-                            mStockListPlacer.getStocks(), StockRankingRenderer.RANKING_BY_TECH);
-                    mNewsRankingRecyclerAdapter = new StockRankingRecyclerAdapter(getActivity(),
-                            mStockListPlacer.getStocks(), StockRankingRenderer.RANKING_BY_NEWS);
-                    mTechBlockViewHolder.recyclerView.setAdapter(mTechRankingRecyclerAdapter);
-                    mNewsBlockViewHolder.recyclerView.setAdapter(mNewsRankingRecyclerAdapter);
-                    mTechBlockViewHolder.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                    mNewsBlockViewHolder.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                    mTechBlockViewHolder.recyclerView.setNestedScrollingEnabled(false);
-                    mNewsBlockViewHolder.recyclerView.setNestedScrollingEnabled(false);
-
-                    mTechRankingRecyclerAdapter.setOnItemClickListener(new StockRankingRecyclerAdapter.OnItemClickListener() {
+                    mTechBlockViewHolder.update(getActivity(), mStockListPlacer.getStocks(), StockRankingRenderer.RANKING_BY_TECH, new StockRankingRecyclerAdapter.OnItemClickListener() {
                         @Override
                         public void onItemClick(Stock stock) {
                             openStockActivity(stock);
                         }
                     });
-
-                    mNewsRankingRecyclerAdapter.setOnItemClickListener(new StockRankingRecyclerAdapter.OnItemClickListener() {
+                    mNewsBlockViewHolder.update(getActivity(), mStockListPlacer.getStocks(), StockRankingRenderer.RANKING_BY_NEWS, new StockRankingRecyclerAdapter.OnItemClickListener() {
                         @Override
                         public void onItemClick(Stock stock) {
                             openStockActivity(stock);
                         }
                     });
                 } else {
-                    mTechBlockViewHolder.recyclerView.setVisibility(View.GONE);
-                    mNewsBlockViewHolder.recyclerView.setVisibility(View.GONE);
-                    mTechBlockViewHolder.mainView.setVisibility(View.GONE);
-                    mNewsBlockViewHolder.mainView.setVisibility(View.GONE);
+                    mTechBlockViewHolder.hide();
+                    mNewsBlockViewHolder.hide();
                 }
             }
         });
@@ -327,6 +311,12 @@ public class MainFragment extends Fragment {
         }
         if(mStockListPlacer != null) {
             mStockListPlacer.clear();
+        }
+        if(mTechBlockViewHolder != null) {
+            mTechBlockViewHolder.destroy();
+        }
+        if(mNewsBlockViewHolder != null) {
+            mNewsBlockViewHolder.destroy();
         }
 
         FragmentManager fm = getFragmentManager();

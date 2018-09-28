@@ -131,4 +131,12 @@ public class StockRankingRecyclerAdapter extends RecyclerView.Adapter {
 
         return compareValue(value1, value2);
     }
+
+    public void destroy() {
+        if(mStockList != null) {
+            mStockList.clear();
+        }
+        mStockRankingRenderer.clear();
+        mOnItemClickListener = null;
+    }
 }

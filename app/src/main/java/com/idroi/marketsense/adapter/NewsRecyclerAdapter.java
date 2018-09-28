@@ -244,21 +244,23 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent) {
                     if(motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                        if (mInitLayoutType == NEWS_SINGLE_LAYOUT) {
-                            mOnItemClickListener.onItemClick(mNewsStreamPlacer.getNewsData(holder.getAdapterPosition()));
-                        } else {
-                            if (type == ITEM_TYPE.ITEM_FIRST_ROW.ordinal()) {
+                        if(mOnItemClickListener != null) {
+                            if (mInitLayoutType == NEWS_SINGLE_LAYOUT) {
                                 mOnItemClickListener.onItemClick(mNewsStreamPlacer.getNewsData(holder.getAdapterPosition()));
-                            } else if (type == ITEM_TYPE.ITEM_SECOND_ROW.ordinal()) {
-                                if (motionEvent.getX() < ClientData.getInstance().getScreenWidthPixels() - motionEvent.getX()) {
-                                    // left part
+                            } else {
+                                if (type == ITEM_TYPE.ITEM_FIRST_ROW.ordinal()) {
                                     mOnItemClickListener.onItemClick(mNewsStreamPlacer.getNewsData(holder.getAdapterPosition()));
+                                } else if (type == ITEM_TYPE.ITEM_SECOND_ROW.ordinal()) {
+                                    if (motionEvent.getX() < ClientData.getInstance().getScreenWidthPixels() - motionEvent.getX()) {
+                                        // left part
+                                        mOnItemClickListener.onItemClick(mNewsStreamPlacer.getNewsData(holder.getAdapterPosition()));
+                                    } else {
+                                        // right part
+                                        mOnItemClickListener.onItemClick(mNewsStreamPlacer.getNewsData(holder.getAdapterPosition() + 1));
+                                    }
                                 } else {
-                                    // right part
                                     mOnItemClickListener.onItemClick(mNewsStreamPlacer.getNewsData(holder.getAdapterPosition() + 1));
                                 }
-                            } else {
-                                mOnItemClickListener.onItemClick(mNewsStreamPlacer.getNewsData(holder.getAdapterPosition() + 1));
                             }
                         }
                     }
@@ -325,5 +327,9 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter {
         mNewsRenderer.clear();
         mNewsFirstRowRenderer.clear();
         mNewsStreamPlacer.clear();
+
+        mNewsAvailableListener = null;
+        mNewsExpandListener = null;
+        mOnItemClickListener = null;
     }
 }

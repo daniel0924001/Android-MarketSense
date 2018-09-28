@@ -68,7 +68,7 @@ public class KnowledgeYouMayWantToKnowViewHolder {
 
                 relatedGroup.setVisibility(View.VISIBLE);
 
-                KnowledgeRecyclerAdapter knowledgeRecyclerAdapter = new KnowledgeRecyclerAdapter(activity);
+                knowledgeRecyclerAdapter = new KnowledgeRecyclerAdapter(activity);
                 knowledgeRecyclerView.setAdapter(knowledgeRecyclerAdapter);
                 knowledgeRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
 
@@ -79,6 +79,12 @@ public class KnowledgeYouMayWantToKnowViewHolder {
             }
         } else {
             relatedGroup.setVisibility(View.GONE);
+        }
+    }
+
+    public void destroy() {
+        if(knowledgeRecyclerAdapter != null) {
+            knowledgeRecyclerAdapter.destroy();
         }
     }
 }

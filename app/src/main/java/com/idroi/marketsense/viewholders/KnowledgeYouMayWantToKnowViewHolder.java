@@ -48,6 +48,12 @@ public class KnowledgeYouMayWantToKnowViewHolder {
     }
 
     public void setRelatedKnowledge(Activity activity,
+                                    ArrayList<String> relatedKeywords,
+                                    KnowledgeRecyclerAdapter.OnItemClickListener listener) {
+        setRelatedKnowledge(activity, relatedKeywords, null, listener);
+    }
+
+    public void setRelatedKnowledge(Activity activity,
                                      ArrayList<String> relatedKeywords,
                                      String title,
                                      KnowledgeRecyclerAdapter.OnItemClickListener listener) {
@@ -59,7 +65,7 @@ public class KnowledgeYouMayWantToKnowViewHolder {
             for(String keyword : relatedKeywords) {
                 Knowledge knowledge = clientData.getKnowledgeFromKeyword(keyword);
 
-                if(knowledge != null && !knowledge.getKeyword().equals(title)) {
+                if(knowledge != null && (title == null || !knowledge.getKeyword().equals(title))) {
                     knowledgeList.add(knowledge);
                 }
             }

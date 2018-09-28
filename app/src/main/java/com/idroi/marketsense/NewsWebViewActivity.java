@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -33,31 +32,33 @@ import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter;
+import com.idroi.marketsense.adapter.KnowledgeRecyclerAdapter;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.common.FrescoHelper;
-import com.idroi.marketsense.common.FrescoImageHelper;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
 import com.idroi.marketsense.data.Event;
+import com.idroi.marketsense.data.Knowledge;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.CommentAndVoteRequest;
 import com.idroi.marketsense.util.ActionBarHelper;
 import com.idroi.marketsense.util.NewsReadRecordHelper;
+import com.idroi.marketsense.viewholders.KnowledgeYouMayWantToKnowViewHolder;
 import com.idroi.marketsense.viewholders.NewsWebViewTopViewHolder;
 
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import static com.idroi.marketsense.CommentActivity.EXTRA_COMMENT;
 import static com.idroi.marketsense.CommentActivity.EXTRA_NEED_TO_CHANGE;
@@ -91,6 +92,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
     public static final String EXTRA_VOTE_RAISE_NUM = "EXTRA_VOTE_RAISE_NUM";
     public static final String EXTRA_VOTE_FALL_NUM = "EXTRA_VOTE_FALL_NUM";
     public static final String EXTRA_STOCK_KEYWORDS = "EXTRA_STOCK_KEYWORDS";
+    public static final String EXTRA_EXPLICIT_KEYWORDS = "EXTRA_EXPLICIT_KEYWORDS";
     public static final String EXTRA_NEWS_LEVEL = "EXTRA_NEWS_LEVEL";
 
     private static final float CONST_ENABLE_ALPHA = 0.4f;
@@ -108,6 +110,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
     private int mVoteRaiseNum, mVoteFallNum;
     private int mLevel;
     private String[] mStockKeywords;
+    private ArrayList<String> mExplicitKeywords;
 
     private ScrollView mUpperBlock;
     private NewsWebView mNewsWebViewOriginal;
@@ -147,6 +150,8 @@ public class NewsWebViewActivity extends AppCompatActivity {
         }
     };
 
+    private KnowledgeYouMayWantToKnowViewHolder mYouMayWantToKnowViewHolder;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -158,6 +163,8 @@ public class NewsWebViewActivity extends AppCompatActivity {
         setActionBar();
         initUpperBlock();
         initWebView();
+
+        initYouMayWantToKnowBlock();
 
         initComments();
         initBtn();
@@ -182,10 +189,24 @@ public class NewsWebViewActivity extends AppCompatActivity {
         mImageUrl = intent.getStringExtra(EXTRA_MIDDLE_IMAGE_URL);
         mSourceDate = intent.getStringExtra(EXTRA_MIDDLE_DATE);
         mStockKeywords = intent.getStringArrayExtra(EXTRA_STOCK_KEYWORDS);
+        mExplicitKeywords = intent.getStringArrayListExtra(EXTRA_EXPLICIT_KEYWORDS);
 
         mVoteRaiseNum = intent.getIntExtra(EXTRA_VOTE_RAISE_NUM, 0);
         mVoteFallNum = intent.getIntExtra(EXTRA_VOTE_FALL_NUM, 0);
         mLevel = intent.getIntExtra(EXTRA_NEWS_LEVEL, 0);
+    }
+
+    private void initYouMayWantToKnowBlock() {
+        mYouMayWantToKnowViewHolder = KnowledgeYouMayWantToKnowViewHolder
+                .convertToViewHolder(findViewById(R.id.you_may_want_to_know_block));
+        mYouMayWantToKnowViewHolder.setRelatedKnowledge(this, mExplicitKeywords, new KnowledgeRecyclerAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Knowledge knowledge) {
+                startActivity(KnowledgeActivity.generateKnowledgeActivityIntent(
+                        NewsWebViewActivity.this, knowledge));
+                overridePendingTransition(R.anim.enter, R.anim.stop);
+            }
+        });
     }
 
     private void initComments() {
@@ -491,6 +512,10 @@ public class NewsWebViewActivity extends AppCompatActivity {
             public void onProgressChanged(WebView view, int newProgress) {
                 if(newProgress >= 80) {
                     mNewsWebViewMiddle.getSettings().setBlockNetworkImage(false);
+                    if(mLoadingProgressBar != null) {
+                        mLoadingProgressBar.setVisibility(View.GONE);
+                    }
+                    skeletonScreen.hide();
                 }
 
                 if(newProgress >= 80 && !mTryToLoadOtherWebViewFlag) {
@@ -540,12 +565,14 @@ public class NewsWebViewActivity extends AppCompatActivity {
         return generateNewsWebViewActivityIntent(context, news.getId(),
                 news.getTitle(), news.getUrlImage(), news.getDate(),
                 news.getPageLink(), news.getOriginLink(),
-                news.getVoteRaiseNum(), news.getVoteFallNum(), news.getStockKeywords(), news.getLevel());
+                news.getVoteRaiseNum(), news.getVoteFallNum(),
+                news.getStockKeywords(), news.getExplicitKeywords(), news.getLevel());
     }
 
     public static Intent generateNewsWebViewActivityIntent(
             Context context, String id, String title, String imageUrl, String sourceDate,
-            String middleUrl, String originalUrl, int voteRaiseNum, int voteFallNum, String[] stockKeywords, int level) {
+            String middleUrl, String originalUrl, int voteRaiseNum, int voteFallNum,
+            String[] stockKeywords, ArrayList<String> explicitKeywords, int level) {
         Intent intent = new Intent(context, NewsWebViewActivity.class);
         intent.putExtra(EXTRA_MIDDLE_ID, id);
         intent.putExtra(EXTRA_MIDDLE_TITLE, title);
@@ -556,6 +583,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
         intent.putExtra(EXTRA_VOTE_RAISE_NUM, voteRaiseNum);
         intent.putExtra(EXTRA_VOTE_FALL_NUM, voteFallNum);
         intent.putExtra(EXTRA_STOCK_KEYWORDS, stockKeywords);
+        intent.putExtra(EXTRA_EXPLICIT_KEYWORDS, explicitKeywords);
         intent.putExtra(EXTRA_NEWS_LEVEL, level);
         return intent;
     }

@@ -182,4 +182,30 @@ public class KnowledgeFetcher {
             mTimeoutHandler.removeCallbacks(mTimeoutRunnable);
         }
     }
+
+    public static void prefetchKnowledgeList(final Context context) {
+        final Context applicationContext = context.getApplicationContext();
+        final String networkUrl = KnowledgeListRequest.queryKnowledgeList(context, true);
+        KnowledgeListRequest knowledgeListRequest = new KnowledgeListRequest(networkUrl, new Response.Listener<ArrayList<Knowledge>>() {
+            @Override
+            public void onResponse(ArrayList<Knowledge> response) {
+                if(applicationContext != null) {
+                    SharedPreferences.Editor editor =
+                            context.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE).edit();
+                    editor.putString(KnowledgeListRequest.API_URL_KNOWLEDGE_LIST, networkUrl);
+                    SharedPreferencesCompat.apply(editor);
+                    MSLog.d("Knowledge list network query success, so we save this network url to cache: " + KnowledgeListRequest.API_URL_KNOWLEDGE_LIST + " " + networkUrl);
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                MSLog.e("Knowledge Request error: " + error.getMessage(), error);
+            }
+        });
+
+        knowledgeListRequest.setShouldCache(true);
+        Networking.getRequestQueue(context).add(knowledgeListRequest);
+    }
 }

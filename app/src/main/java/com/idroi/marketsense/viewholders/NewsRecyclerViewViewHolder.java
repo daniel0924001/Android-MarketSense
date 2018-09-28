@@ -9,7 +9,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.idroi.marketsense.KnowledgeActivity;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.NewsWebViewActivity;
 import com.idroi.marketsense.R;
@@ -101,7 +100,8 @@ public class NewsRecyclerViewViewHolder {
                         activity, news.getId(), news.getTitle(),
                         news.getUrlImage(), news.getDate(),
                         news.getPageLink(), news.getOriginLink(),
-                        news.getVoteRaiseNum(), news.getVoteFallNum(), news.getStockKeywords(), news.getLevel()));
+                        news.getVoteRaiseNum(), news.getVoteFallNum(),
+                        news.getStockKeywords(), news.getExplicitKeywords(), news.getLevel()));
                 activity.overridePendingTransition(R.anim.enter, R.anim.stop);
             }
         });

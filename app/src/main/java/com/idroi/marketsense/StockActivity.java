@@ -587,7 +587,8 @@ public class StockActivity extends AppCompatActivity {
                         StockActivity.this, news.getId(), news.getTitle(),
                         news.getUrlImage(), news.getDate(),
                         news.getPageLink(), news.getOriginLink(),
-                        news.getVoteRaiseNum(), news.getVoteFallNum(), news.getStockKeywords(), news.getLevel()));
+                        news.getVoteRaiseNum(), news.getVoteFallNum(),
+                        news.getStockKeywords(), news.getExplicitKeywords(), news.getLevel()));
                 overridePendingTransition(R.anim.enter, R.anim.stop);
             }
         });

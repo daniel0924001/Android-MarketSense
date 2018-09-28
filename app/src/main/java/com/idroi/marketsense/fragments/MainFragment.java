@@ -220,7 +220,8 @@ public class MainFragment extends Fragment {
                         getContext(), news.getId(), news.getTitle(),
                         news.getUrlImage(), news.getDate(),
                         news.getPageLink(), news.getOriginLink(),
-                        news.getVoteRaiseNum(), news.getVoteFallNum(), news.getStockKeywords(), news.getLevel()));
+                        news.getVoteRaiseNum(), news.getVoteFallNum(),
+                        news.getStockKeywords(), news.getExplicitKeywords(), news.getLevel()));
                 getActivity().overridePendingTransition(R.anim.enter, R.anim.stop);
             }
         });

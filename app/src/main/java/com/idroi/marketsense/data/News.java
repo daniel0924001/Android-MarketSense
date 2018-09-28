@@ -38,6 +38,7 @@ public class News {
     private static final String FALL = "fall";
     private static final String HIGHLIGHT_SENTENCE = "highlight_sens";
     private static final String STOCK_KEYWORDS = "stock_keywords";
+    private static final String EXPLICIT_KEYWORDS = "explicit_keywords";
 
     private String mId;
     private String mTitle;
@@ -56,6 +57,7 @@ public class News {
     @Nullable private ArrayList<HighLightSentence> mHighLightSentences;
     @Nullable private News mNextNews;
     @Nullable private String[] mStockKeywords;
+    @Nullable private ArrayList<String> mExplicitKeywords;
 
     public News() {
     }
@@ -137,6 +139,15 @@ public class News {
         }
     }
 
+    public void setExplicitKeywords(JSONArray jsonArray) {
+        if(jsonArray != null) {
+            mExplicitKeywords = new ArrayList<>();
+            for(int i = 0; i < jsonArray.length(); i++) {
+                mExplicitKeywords.add(jsonArray.optString(i));
+            }
+        }
+    }
+
     public String getId() {
         return mId;
     }
@@ -201,6 +212,10 @@ public class News {
         return mStockKeywords;
     }
 
+    public ArrayList<String> getExplicitKeywords() {
+        return mExplicitKeywords;
+    }
+
     @Nullable
     public ArrayList<HighLightSentence> getHighLightSentence() {
         return mHighLightSentences;
@@ -262,6 +277,9 @@ public class News {
                         break;
                     case STOCK_KEYWORDS:
                         news.setStockKeywords(jsonObject.optJSONArray(STOCK_KEYWORDS));
+                        break;
+                    case EXPLICIT_KEYWORDS:
+                        news.setExplicitKeywords(jsonObject.optJSONArray(EXPLICIT_KEYWORDS));
                         break;
                     default:
                         break;

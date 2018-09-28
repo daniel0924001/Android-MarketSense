@@ -33,7 +33,6 @@ public class NewsRecyclerViewViewHolder {
     public ProgressBar progressBar;
     public Group newsGroup;
 
-
     static final NewsRecyclerViewViewHolder EMPTY_VIEW_HOLDER = new NewsRecyclerViewViewHolder();
 
     private NewsRecyclerViewViewHolder() {}

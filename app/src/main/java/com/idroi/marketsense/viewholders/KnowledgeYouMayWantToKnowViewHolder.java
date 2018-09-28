@@ -7,7 +7,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.idroi.marketsense.KnowledgeActivity;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.adapter.KnowledgeRecyclerAdapter;
@@ -36,9 +35,7 @@ public class KnowledgeYouMayWantToKnowViewHolder {
         final KnowledgeYouMayWantToKnowViewHolder viewHolder = new KnowledgeYouMayWantToKnowViewHolder();
         try {
             viewHolder.relatedGroup = view.findViewById(R.id.related_knowledge_group);
-
             viewHolder.knowledgeRecyclerView = view.findViewById(R.id.related_knowledge_recycler_view);
-
 
             return viewHolder;
         } catch (ClassCastException exception) {

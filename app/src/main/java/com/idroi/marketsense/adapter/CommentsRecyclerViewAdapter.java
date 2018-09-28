@@ -215,5 +215,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
         mReplyRenderer.clear();
         mCommentsPlacer.clear();
         mCommentsAvailableListener = null;
+        mOnItemClickListener = null;
+        mOnNewsItemClickListener = null;
     }
 }

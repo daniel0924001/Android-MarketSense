@@ -10,8 +10,6 @@ import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,9 +46,9 @@ import com.idroi.marketsense.data.Knowledge;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
-import com.idroi.marketsense.request.CommentAndVoteRequest;
 import com.idroi.marketsense.util.ActionBarHelper;
 import com.idroi.marketsense.util.NewsReadRecordHelper;
+import com.idroi.marketsense.viewholders.CommentRecyclerViewViewHolder;
 import com.idroi.marketsense.viewholders.KnowledgeYouMayWantToKnowViewHolder;
 import com.idroi.marketsense.viewholders.NewsWebViewTopViewHolder;
 
@@ -115,8 +113,6 @@ public class NewsWebViewActivity extends AppCompatActivity {
     private ScrollView mUpperBlock;
     private NewsWebView mNewsWebViewOriginal;
     private NewsWebView mNewsWebViewMiddle;
-    private CommentsRecyclerViewAdapter mCommentsRecyclerViewAdapter;
-    private RecyclerView mCommentRecyclerView;
     private ProgressBar mLoadingProgressBar, mLoadingProgressBarOriginal;
 
     private ConstraintLayout mVoteUpBlock, mVoteDownBlock;
@@ -150,6 +146,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
         }
     };
 
+    private CommentRecyclerViewViewHolder mCommentRecyclerViewViewHolder;
     private KnowledgeYouMayWantToKnowViewHolder mYouMayWantToKnowViewHolder;
 
     @Override
@@ -163,9 +160,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
         setActionBar();
         initUpperBlock();
         initWebView();
-
         initYouMayWantToKnowBlock();
-
         initComments();
         initBtn();
     }
@@ -210,9 +205,9 @@ public class NewsWebViewActivity extends AppCompatActivity {
     }
 
     private void initComments() {
-        mCommentRecyclerView = findViewById(R.id.marketsense_webview_comment_rv);
-
-        mCommentsRecyclerViewAdapter = new CommentsRecyclerViewAdapter(this, new CommentsRecyclerViewAdapter.OnItemClickListener() {
+        mCommentRecyclerViewViewHolder = CommentRecyclerViewViewHolder
+                .convertToViewHolder(findViewById(R.id.target_comment_block));
+        mCommentRecyclerViewViewHolder.init(this, mId, new CommentsRecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void onSayLikeItemClick(Comment comment, int position) {
                 if(FBHelper.checkFBLogin()) {
@@ -220,7 +215,7 @@ public class NewsWebViewActivity extends AppCompatActivity {
                     comment.increaseLike();
                     comment.setLike(true);
                     PostEvent.sendLike(NewsWebViewActivity.this, comment.getCommentId());
-                    mCommentsRecyclerViewAdapter.notifyItemChanged(position, ADAPTER_CHANGE_LIKE_ONLY);
+                    mCommentRecyclerViewViewHolder.mCommentsRecyclerViewAdapter.notifyItemChanged(position, ADAPTER_CHANGE_LIKE_ONLY);
                 } else {
                     mTempComment = comment;
                     mTempPosition = position;
@@ -235,36 +230,19 @@ public class NewsWebViewActivity extends AppCompatActivity {
                         NewsWebViewActivity.this, comment, position), sReplyEditorRequestCode);
                 overridePendingTransition(R.anim.enter, R.anim.stop);
             }
-        });
-        mCommentRecyclerView.setAdapter(mCommentsRecyclerViewAdapter);
-
-        mCommentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mCommentsRecyclerViewAdapter.setCommentsAvailableListener(new CommentsRecyclerViewAdapter.CommentsAvailableListener() {
+        }, new CommentsRecyclerViewAdapter.CommentsAvailableListener() {
             @Override
             public void onCommentsAvailable(CommentAndVote commentAndVote) {
                 if(commentAndVote != null) {
                     if (commentAndVote.getCommentSize() > 0) {
-                        showCommentBlock();
+                        mCommentRecyclerViewViewHolder.showCommentBlock(NewsWebViewActivity.this);
                     }
                     mVoteRaiseNum = commentAndVote.getRaiseNumber();
                     mVoteFallNum = commentAndVote.getFallNumber();
                     setButtonStatus();
-                    MSLog.d("raise number: " + commentAndVote.getRaiseNumber());
-                    MSLog.d("fall number: " + commentAndVote.getFallNumber());
                 }
             }
         });
-        mCommentsRecyclerViewAdapter.loadCommentsList(CommentAndVoteRequest.querySingleNewsUrl(mId, CommentAndVoteRequest.TASK.NEWS_COMMENT));
-    }
-
-    private void showCommentBlock() {
-        findViewById(R.id.marketsense_webview_no_comment_iv).setVisibility(View.GONE);
-        findViewById(R.id.marketsense_webview_no_comment_tv).setVisibility(View.GONE);
-        mCommentRecyclerView.setVisibility(View.VISIBLE);
-
-        TextView commentTitle = findViewById(R.id.comment_title);
-        int size = mCommentsRecyclerViewAdapter.getItemCount();
-        commentTitle.setText(String.format(getString(R.string.title_comment_format), size));
     }
 
     private void initBtn() {
@@ -338,14 +316,14 @@ public class NewsWebViewActivity extends AppCompatActivity {
                                 sEditorRequestCode);
                         overridePendingTransition(R.anim.enter, R.anim.stop);
                     } else if(mLastClickAction == LAST_CLICK_IS_LIKE) {
-                        mCommentsRecyclerViewAdapter.updateCommentsLike();
+                        mCommentRecyclerViewViewHolder.mCommentsRecyclerViewAdapter.updateCommentsLike();
                         MSLog.d("is like: " + mTempComment.isLiked());
                         if(!mTempComment.isLiked()) {
                             MSLog.d("say like at position: " + mTempPosition);
                             mTempComment.increaseLike();
                             mTempComment.setLike(true);
                             PostEvent.sendLike(NewsWebViewActivity.this, mTempComment.getCommentId());
-                            mCommentsRecyclerViewAdapter.notifyItemChanged(mTempPosition, ADAPTER_CHANGE_LIKE_ONLY);
+                            mCommentRecyclerViewViewHolder.mCommentsRecyclerViewAdapter.notifyItemChanged(mTempPosition, ADAPTER_CHANGE_LIKE_ONLY);
                         }
                     } else if(mLastClickAction == LAST_CLICK_IS_VOTE_UP) {
                         MSLog.d("click good in news: " + mId);
@@ -424,8 +402,8 @@ public class NewsWebViewActivity extends AppCompatActivity {
                 Comment newComment = new Comment();
                 newComment.setCommentId(eventId);
                 newComment.setCommentHtml(html);
-                mCommentsRecyclerViewAdapter.addOneComment(newComment);
-                showCommentBlock();
+                mCommentRecyclerViewViewHolder.mCommentsRecyclerViewAdapter.addOneComment(newComment);
+                mCommentRecyclerViewViewHolder.showCommentBlock(this);
 
                 MSLog.d(String.format("user send a comment on (%s, %s, %s): %s", type, id, eventId, html));
             }
@@ -436,8 +414,8 @@ public class NewsWebViewActivity extends AppCompatActivity {
                 if (serializable != null && serializable instanceof Comment && position != -1) {
                     MSLog.d("comment with position " + position + " is needed to change");
                     Comment comment = (Comment) serializable;
-                    mCommentsRecyclerViewAdapter.cloneSocialContent(position, comment);
-                    mCommentsRecyclerViewAdapter.notifyItemChanged(position, ADAPTER_CHANGE_LIKE_ONLY);
+                    mCommentRecyclerViewViewHolder.mCommentsRecyclerViewAdapter.cloneSocialContent(position, comment);
+                    mCommentRecyclerViewViewHolder.mCommentsRecyclerViewAdapter.notifyItemChanged(position, ADAPTER_CHANGE_LIKE_ONLY);
                 }
             }
         }
@@ -449,7 +427,6 @@ public class NewsWebViewActivity extends AppCompatActivity {
     }
 
     private void initUpperBlock() {
-
         NewsWebViewTopViewHolder newsWebViewTopViewHolder = NewsWebViewTopViewHolder
                 .convertToViewHolder(findViewById(R.id.marketsense_webview_upper_block));
         newsWebViewTopViewHolder.update(this, mTitle, mSourceDate, mStockKeywords, mLevel);
@@ -461,12 +438,12 @@ public class NewsWebViewActivity extends AppCompatActivity {
     @SuppressLint("SetJavaScriptEnabled")
     private void initWebView() {
 
-        mNewsWebViewOriginal = (NewsWebView) findViewById(R.id.news_webview_original);
+        mNewsWebViewOriginal = findViewById(R.id.news_webview_original);
         mNewsWebViewOriginal.setVerticalScrollBarEnabled(true);
         mNewsWebViewOriginal.setHorizontalFadingEdgeEnabled(false);
         mNewsWebViewOriginal.getSettings().setBlockNetworkImage(true);
 
-        mNewsWebViewMiddle = (NewsWebView) findViewById(R.id.news_webview_middle);
+        mNewsWebViewMiddle = findViewById(R.id.news_webview_middle);
         mNewsWebViewMiddle.setVerticalScrollBarEnabled(true);
         mNewsWebViewMiddle.setHorizontalFadingEdgeEnabled(false);
         mNewsWebViewMiddle.getSettings().setAppCachePath(getApplicationContext().getCacheDir().getAbsolutePath());
@@ -602,9 +579,9 @@ public class NewsWebViewActivity extends AppCompatActivity {
             mNewsWebViewOriginal.destroy();
             mNewsWebViewOriginal = null;
         }
-        if(mCommentsRecyclerViewAdapter != null) {
-            mCommentsRecyclerViewAdapter.destroy();
-            mCommentsRecyclerViewAdapter = null;
+        if(mCommentRecyclerViewViewHolder != null) {
+            mCommentRecyclerViewViewHolder.destroy();
+            mCommentRecyclerViewViewHolder = null;
         }
         UserProfile userProfile = ClientData.getInstance(this).getUserProfile();
         userProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);

@@ -40,7 +40,6 @@
         android:id="@+id/news_prediction"
         android:layout_width="wrap_content"
         android:layout_height="24dp"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:textColor="@color/trend_red"
         android:fontFamily="sans-serif"
@@ -52,7 +51,7 @@
         android:paddingBottom="3dp"
         android:gravity="center"
         android:background="@drawable/block_flat_border_gray_solid_with_radius_corner"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@id/news_date"
         app:layout_constraintTop_toBottomOf="@id/news_date" />
 
     <android.support.v7.widget.RecyclerView

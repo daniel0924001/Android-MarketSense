@@ -103,66 +103,14 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/you_may_want_to_know_block"/>
 
-            <android.support.constraint.ConstraintLayout
+            <include
+                android:id="@+id/target_comment_block"
+                layout="@layout/layout_target_comment_block"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/social_horizontal_line">
-
-                <TextView
-                    android:id="@+id/comment_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/title_comment"
-                    android:textSize="16sp"
-                    android:textColor="@color/text_first"
-                    android:textStyle="bold"
-                    android:fontFamily="sans-serif"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginStart="15dp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"/>
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/marketsense_webview_comment_rv"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
-                    android:visibility="gone"
-                    android:layout_marginTop="20dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/comment_title" />
-
-                <ImageView
-                    android:id="@+id/marketsense_webview_no_comment_iv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="73dp"
-                    android:contentDescription="@string/title_no_comment"
-                    android:src="@mipmap/ic_nocomment"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/comment_title" />
-
-                <TextView
-                    android:id="@+id/marketsense_webview_no_comment_tv"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:layout_marginBottom="56dp"
-                    android:fontFamily="sans-serif"
-                    android:gravity="center"
-                    android:text="@string/title_no_comment"
-                    android:textColor="@color/text_third"
-                    android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/marketsense_webview_no_comment_iv"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-
-            </android.support.constraint.ConstraintLayout>
+                app:layout_constraintTop_toBottomOf="@id/social_horizontal_line" />
 
         </android.support.constraint.ConstraintLayout>
     </ScrollView>

@@ -20,7 +20,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <com.idroi.marketsense.SwipeableViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+    <com.idroi.marketsense.SwipeableViewPager
         android:id="@+id/pager"
         android:layout_width="0dp"
         android:layout_height="0dp"

@@ -24,33 +24,21 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <android.support.constraint.ConstraintLayout
-                android:id="@+id/top_banner"
-                android:layout_width="0dp"
+            <include
+                android:id="@+id/top_banner_block"
+                layout="@layout/layout_top_banner"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageView
-                    android:id="@+id/top_banner_1"
-                    android:layout_width="0dp"
-                    android:layout_height="159dp"
-                    android:src="@mipmap/img_banner_top10"
-                    android:contentDescription="@string/main_page_card_sub_title"
-                    android:scaleType="centerCrop"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
-
-            </android.support.constraint.ConstraintLayout>
+                app:layout_constraintTop_toTopOf="parent"/>
 
             <include
                 android:id="@+id/tech_block"
                 layout="@layout/layout_ranking_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/top_banner"/>
+                app:layout_constraintTop_toBottomOf="@id/top_banner_block"/>
 
             <include
                 android:id="@+id/news_block"

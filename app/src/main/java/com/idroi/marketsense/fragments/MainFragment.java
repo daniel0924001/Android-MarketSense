@@ -1,12 +1,17 @@
 package com.idroi.marketsense.fragments;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,14 +20,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.idroi.marketsense.NewsWebViewActivity;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.StockActivity;
+import com.idroi.marketsense.StockKnowledgeListActivity;
 import com.idroi.marketsense.adapter.NewsRecyclerAdapter;
 import com.idroi.marketsense.adapter.StockRankingRecyclerAdapter;
 import com.idroi.marketsense.adapter.StockRankingRenderer;
+import com.idroi.marketsense.adapter.TopBannerPagerAdapter;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.Logging.MSLog;
@@ -71,6 +79,12 @@ public class MainFragment extends Fragment {
 
     private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
 
+    private ViewPager.OnPageChangeListener mOnPageChangeListener;
+    private ViewPager mViewPager;
+    private Runnable mSwipeRunnable;
+    private Handler mSwipeHandler;
+    private final int REFRESH_TIME = 6000;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -101,7 +115,7 @@ public class MainFragment extends Fragment {
                         view.findViewById(R.id.news_block),
                         R.string.main_page_news_ranking);
 
-        initTopBanner(view);
+        initTopBanner(view.findViewById(R.id.top_banner_block));
 
         return view;
     }
@@ -235,26 +249,88 @@ public class MainFragment extends Fragment {
         bundle.putInt(StockListFragment.TASK_NAME, StockListFragment.TASK.WPCT.getTaskId());
         mStockListFragment.setArguments(bundle);
 
-        ImageView card1 = view.findViewById(R.id.top_banner_1);
-        card1.setOnClickListener(new View.OnClickListener() {
+        final RadioGroup radioGroup = view.findViewById(R.id.radio_group);
+        mOnPageChangeListener = new ViewPager.OnPageChangeListener() {
             @Override
-            public void onClick(View view) {
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-                FragmentManager fm = getFragmentManager();
-                if(fm != null) {
-                    FragmentTransaction transaction = fm.beginTransaction();
+            }
 
-                    transaction.replace(R.id.fragment_container, mStockListFragment);
-                    transaction.addToBackStack(null);
-
-                    // Commit the transaction
-                    transaction.commit();
-                }
-                if(mOnActionBarChangeListener != null) {
-                    mOnActionBarChangeListener.onActionBarChange(getResources().getString(R.string.main_page_card_sub_title), true);
+            @Override
+            public void onPageSelected(int position) {
+                switch (position) {
+                    case 0:
+                        radioGroup.check(R.id.radio_button_1);
+                        break;
+                    case 1:
+                        radioGroup.check(R.id.radio_button_2);
+                        break;
                 }
             }
-        });
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        };
+
+        mViewPager = view.findViewById(R.id.top_banner);
+        final LayoutInflater mInflater = LayoutInflater.from(getContext());
+
+        View view1 = mInflater.inflate(R.layout.layout_top_banner_image_view_top_10, null);
+        View view2 = mInflater.inflate(R.layout.layout_top_banner_image_view_knowledge, null);
+
+        ArrayList<View> viewArrayList = new ArrayList<>();
+        viewArrayList.add(view1);
+        viewArrayList.add(view2);
+
+        mViewPager.setAdapter(new TopBannerPagerAdapter(viewArrayList, new TopBannerPagerAdapter.TopBannerClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Activity activity = getActivity();
+                if(activity == null) {
+                    return;
+                }
+
+                switch (position) {
+                    case 0:
+                        FragmentManager fm = getFragmentManager();
+                        if(fm != null) {
+                            FragmentTransaction transaction = fm.beginTransaction();
+
+                            transaction.replace(R.id.fragment_container, mStockListFragment);
+                            transaction.addToBackStack(null);
+
+                            // Commit the transaction
+                            transaction.commit();
+                        }
+                        if(mOnActionBarChangeListener != null) {
+                            mOnActionBarChangeListener.onActionBarChange(getResources().getString(R.string.main_page_card_sub_title), true);
+                        }
+                        break;
+                    case 1:
+                        Intent intent = new Intent(activity, StockKnowledgeListActivity.class);
+                        startActivity(intent);
+                        activity.overridePendingTransition(R.anim.enter, R.anim.stop);
+                        break;
+                }
+            }
+        }));
+        mViewPager.addOnPageChangeListener(mOnPageChangeListener);
+        mViewPager.setCurrentItem(0);
+
+        mSwipeHandler = new Handler();
+        mSwipeRunnable = new Runnable() {
+            @Override
+            public void run() {
+                PagerAdapter pagerAdapter = mViewPager.getAdapter();
+                if(pagerAdapter != null) {
+                    int position = (mViewPager.getCurrentItem() + 1) % pagerAdapter.getCount();
+                    mViewPager.setCurrentItem(position);
+                }
+                mSwipeHandler.postDelayed(mSwipeRunnable, REFRESH_TIME);
+            }
+        };
     }
 
     private void openStockActivity(Stock stock) {
@@ -306,6 +382,10 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        if(mViewPager != null) {
+            mViewPager.removeOnPageChangeListener(mOnPageChangeListener);
+        }
+
         if(mNewsRecyclerAdapter != null) {
             mNewsRecyclerAdapter.destroy();
         }

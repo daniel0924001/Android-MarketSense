@@ -24,8 +24,10 @@
     <string name="title_profile_account">我的帳戶</string>
     <string name="title_market_trend">行情</string>
 
-    <string name="main_page_tech_ranking">技術面預測排行</string>
+    <string name="main_page_tech_ranking">技術面排行</string>
+    <string name="main_page_tech_trend">技術風向</string>
     <string name="main_page_news_ranking">新聞面排行</string>
+    <string name="main_page_news_trend">新聞風向</string>
     <string name="main_page_news">最新消息</string>
     <string name="main_page_card_sub_title">十大焦點個股</string>
     <string name="main_stock_name_is_too_long">股票名稱真的很長</string>

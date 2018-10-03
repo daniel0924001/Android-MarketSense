@@ -14,9 +14,11 @@ import com.idroi.marketsense.R;
 public class StockRankingViewHolder {
 
     TextView nameView;
-    TextView priceView;
+    TextView codeView;
 
-    ImageView priceImageView;
+    TextView priceView;
+    TextView diffView;
+
     ImageView predictionImageView;
 
     static final StockRankingViewHolder EMPTY_VIEW_HOLDER = new StockRankingViewHolder();
@@ -26,9 +28,10 @@ public class StockRankingViewHolder {
     static StockRankingViewHolder convertToViewHolder(final View view) {
         final StockRankingViewHolder stockRankingViewHolder = new StockRankingViewHolder();
         try {
-            stockRankingViewHolder.nameView = view.findViewById(R.id.ranking_stock_title);
+            stockRankingViewHolder.nameView = view.findViewById(R.id.ranking_stock_name);
+            stockRankingViewHolder.codeView = view.findViewById(R.id.ranking_stock_code);
             stockRankingViewHolder.priceView = view.findViewById(R.id.ranking_stock_price);
-            stockRankingViewHolder.priceImageView = view.findViewById(R.id.ranking_stock_price_iv);
+            stockRankingViewHolder.diffView = view.findViewById(R.id.ranking_stock_diff);
             stockRankingViewHolder.predictionImageView = view.findViewById(R.id.ranking_stock_iv);
             return stockRankingViewHolder;
         } catch (ClassCastException exception) {

@@ -109,11 +109,13 @@ public class MainFragment extends Fragment {
         mTechBlockViewHolder =
                 RankingListViewHolder.convertToViewHolder(
                         view.findViewById(R.id.tech_block),
-                        R.string.main_page_tech_ranking);
+                        R.string.main_page_tech_ranking,
+                        R.string.main_page_tech_trend);
         mNewsBlockViewHolder =
                 RankingListViewHolder.convertToViewHolder(
                         view.findViewById(R.id.news_block),
-                        R.string.main_page_news_ranking);
+                        R.string.main_page_news_ranking,
+                        R.string.main_page_news_trend);
 
         initTopBanner(view.findViewById(R.id.top_banner_block));
 
@@ -331,6 +333,7 @@ public class MainFragment extends Fragment {
                 mSwipeHandler.postDelayed(mSwipeRunnable, REFRESH_TIME);
             }
         };
+        mSwipeHandler.postDelayed(mSwipeRunnable, REFRESH_TIME);
     }
 
     private void openStockActivity(Stock stock) {

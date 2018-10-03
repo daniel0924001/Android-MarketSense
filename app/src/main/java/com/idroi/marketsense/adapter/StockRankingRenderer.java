@@ -47,18 +47,19 @@ public class StockRankingRenderer implements MarketSenseRenderer<Stock> {
         }
 
         MarketSenseRendererHelper.addTextView(stockRankingViewHolder.nameView, content.getName());
+        MarketSenseRendererHelper.addTextView(stockRankingViewHolder.codeView, content.getCode());
         MarketSenseRendererHelper.addTextView(stockRankingViewHolder.priceView, content.getPrice());
+        MarketSenseRendererHelper.addTextView(stockRankingViewHolder.diffView, content.getDiffPercentage());
         setColor(view.getContext(), stockRankingViewHolder, content);
-        setRankingIcon(stockRankingViewHolder.priceImageView,
-                stockRankingViewHolder.predictionImageView, content);
+        setRankingIcon(stockRankingViewHolder.predictionImageView, content);
     }
 
     private void setColor(Context context, StockRankingViewHolder stockRankingViewHolder, Stock content) {
         int colorResourceId = context.getResources().getColor(content.getDiffColorResourceId());
-        stockRankingViewHolder.priceView.setTextColor(colorResourceId);
+        stockRankingViewHolder.diffView.setTextColor(colorResourceId);
     }
 
-    private void setRankingIcon(ImageView priceImageView, ImageView predictImageView, Stock stock) {
+    private void setRankingIcon(ImageView predictImageView, Stock stock) {
         int direction = Stock.TREND_UP;
         switch (mRankType) {
             case RANKING_BY_TECH:
@@ -73,12 +74,6 @@ public class StockRankingRenderer implements MarketSenseRenderer<Stock> {
             predictImageView.setImageResource(R.mipmap.ic_direction_down);
         } else {
             predictImageView.setImageResource(R.mipmap.ic_direction_up);
-        }
-
-        if(stock.getDiffDirection() == Stock.TREND_UP) {
-            priceImageView.setImageResource(R.mipmap.ic_trend_arrow_up);
-        } else {
-            priceImageView.setImageResource(R.mipmap.ic_trend_arrow_down);
         }
     }
 

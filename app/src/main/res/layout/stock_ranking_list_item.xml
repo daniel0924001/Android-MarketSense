@@ -3,23 +3,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
+    android:layout_height="56dp"
     android:clickable="true"
     android:focusable="true"
+    android:background="@drawable/border_on_bottom_layout"
     android:foreground="@drawable/item_foreground_with_clicked_shadow">
 
-    <View
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:background="@color/white_two"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
     <TextView
-        android:id="@+id/ranking_stock_title"
+        android:id="@+id/ranking_stock_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="16sp"
@@ -28,7 +19,22 @@
         android:textColor="@color/text_first"
         android:text="@string/main_stock_name_is_too_long"
         android:layout_marginStart="16dp"
+        app:layout_constraintVertical_chainStyle="packed"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/ranking_stock_code"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/ranking_stock_code"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="13sp"
+        android:fontFamily="sans-serif"
+        android:textStyle="normal"
+        android:textColor="@color/text_second"
+        android:text="@string/main_stock_name_is_too_long"
+        android:layout_marginStart="16dp"
+        app:layout_constraintTop_toBottomOf="@id/ranking_stock_name"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
 
@@ -37,38 +43,36 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.517"/>
-
-    <ImageView
-        android:id="@+id/ranking_stock_price_iv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/ic_trend_arrow_up"
-        android:contentDescription="@string/title_company_predict_fluctuation"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@id/guideline_1"/>
+        app:layout_constraintGuide_percent="0.69"/>
 
     <TextView
         android:id="@+id/ranking_stock_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif"
+        android:textStyle="normal"
+        android:textColor="@color/text_first"
+        android:text="@string/title_company_price"
+        android:layout_marginStart="8dp"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/ranking_stock_diff"
+        app:layout_constraintEnd_toStartOf="@id/guideline_1"/>
+
+    <TextView
+        android:id="@+id/ranking_stock_diff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
         android:fontFamily="sans-serif"
         android:textStyle="normal"
         android:textColor="@color/trend_red"
         android:text="@string/title_company_price"
         android:layout_marginStart="8dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ranking_stock_price"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/ranking_stock_price_iv"/>
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline_2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.87"/>
+        app:layout_constraintEnd_toStartOf="@id/guideline_1"/>
 
     <ImageView
         android:id="@+id/ranking_stock_iv"
@@ -79,6 +83,6 @@
         android:layout_marginEnd="16dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@id/guideline_2"/>
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>

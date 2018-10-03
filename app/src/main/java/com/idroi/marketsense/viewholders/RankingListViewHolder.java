@@ -33,7 +33,9 @@ public class RankingListViewHolder {
 
     }
 
-    public static RankingListViewHolder convertToViewHolder(final View view, int titleStringId) {
+    public static RankingListViewHolder convertToViewHolder(final View view,
+                                                            int titleStringId,
+                                                            int trendStringId) {
         final RankingListViewHolder rankingListViewHolder = new RankingListViewHolder();
         try {
             rankingListViewHolder.mainView = view;
@@ -42,6 +44,9 @@ public class RankingListViewHolder {
 
             TextView titleTextView = view.findViewById(R.id.ranking_title);
             titleTextView.setText(titleStringId);
+
+            TextView trendTextView = view.findViewById(R.id.company_trend);
+            trendTextView.setText(trendStringId);
 
             return rankingListViewHolder;
         } catch (ClassCastException exception) {

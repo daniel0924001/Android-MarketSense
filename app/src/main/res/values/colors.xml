@@ -51,6 +51,8 @@
 
     <!-- color guideline -->
     <color name="trend_red">#ff6358</color>
+    <color name="trend_red_second">#b3ff6358</color>
+    <color name="trend_red_third">#7fff6358</color>
     <color name="trend_green">#00cf7a</color>
     <color name="tag_yellow">#ffbb00</color>
     <color name="stock_blue">#5680f7</color>

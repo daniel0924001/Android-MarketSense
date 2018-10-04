@@ -39,6 +39,7 @@ public class ClientData {
     private Context mContext;
     private ArrayList<Stock> mAllStocksListInfo;
     private HashMap<String, Stock> mRealTimePricesHashMap;
+    private HashMap<Integer, ArrayList<Stock>> mSortedRealTimePrices;
     private HashMap<String, Knowledge> mKnowledgeHashMap;
 
     private int mScreenWidth, mScreenHeight;
@@ -100,6 +101,7 @@ public class ClientData {
         mUserProfile = new UserProfile(context, true);
         mRealTimePricesHashMap = new HashMap<>();
         mKnowledgeHashMap = new HashMap<>();
+        mSortedRealTimePrices = new HashMap<>();
 
         updateClockInformation();
         loadAllStocksListTask(true);
@@ -200,6 +202,22 @@ public class ClientData {
 
     public int getScreenHeightPixels() {
         return mScreenHeightPixels;
+    }
+
+    public ArrayList<Stock> getStockPrices() {
+        if(mRealTimePricesHashMap != null) {
+            return new ArrayList<Stock>(mRealTimePricesHashMap.values());
+        } else {
+            return null;
+        }
+    }
+
+    public void setSortedRealTimePrices(int key, ArrayList<Stock> stocks) {
+        mSortedRealTimePrices.put(key, new ArrayList<Stock>(stocks));
+    }
+
+    public ArrayList<Stock> getSortedRealTimePrices(int key) {
+        return mSortedRealTimePrices.get(key);
     }
 
     public Stock getPriceFromCode(String code) {

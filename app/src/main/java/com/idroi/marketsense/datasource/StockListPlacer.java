@@ -16,7 +16,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Locale;
 
 import static com.idroi.marketsense.fragments.StockListFragment.MAIN_ID;
 import static com.idroi.marketsense.fragments.StockListFragment.SELF_CHOICES_ID;
@@ -42,6 +41,10 @@ public class StockListPlacer {
         void onStockListLoaded();
     }
 
+    public interface LoadingPageListener {
+        void onLoadingPageVisible();
+    }
+
     private static final int RETRY_TIME_CONST = 2;
     private int mCurrentRetries = 0;
 
@@ -49,6 +52,7 @@ public class StockListPlacer {
 
     private MarketSenseStockFetcher.MarketSenseStockNetworkListener mMarketSenseStockNetworkListener;
     private StockListListener mStockListListener;
+    private LoadingPageListener mLoadingPageListener;
 
     private WeakReference<Activity> mActivity;
     private MarketSenseStockFetcher mMarketSenseStockFetcher;
@@ -242,6 +246,10 @@ public class StockListPlacer {
         mStockListListener = listener;
     }
 
+    public void setLoadingPageListener(LoadingPageListener listener) {
+        mLoadingPageListener = listener;
+    }
+
     public void loadStockList(String networkUrl, String cacheUrl) {
         loadStockList(networkUrl, cacheUrl, null);
     }
@@ -254,7 +262,8 @@ public class StockListPlacer {
 
         mNetworkUrl = networkUrl;
         mCacheUrl = cacheUrl;
-        loadStockList(new MarketSenseStockFetcher(activity, mMarketSenseStockNetworkListener, mode));
+        loadStockList(new MarketSenseStockFetcher(activity,
+                mMarketSenseStockNetworkListener, mLoadingPageListener, mode));
     }
 
     private void loadStockList(MarketSenseStockFetcher stockFetcher) {

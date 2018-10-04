@@ -1,7 +1,6 @@
 package com.idroi.marketsense.viewholders;
 
 import android.app.Activity;
-import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,7 +8,6 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.idroi.marketsense.Logging.MSLog;
@@ -26,7 +24,6 @@ import java.util.ArrayList;
 public class RankingListViewHolder {
 
     public View mainView;
-    public ProgressBar progressBar;
 
     public ImageView foldImageView;
     public TextView trendTextView;
@@ -36,7 +33,6 @@ public class RankingListViewHolder {
 
     public ConstraintLayout foldGroup;
     public int shrinkHeight;
-    public boolean open = true;
 
     static final RankingListViewHolder EMPTY_VIEW_HOLDER = new RankingListViewHolder();
 
@@ -50,7 +46,6 @@ public class RankingListViewHolder {
         final RankingListViewHolder rankingListViewHolder = new RankingListViewHolder();
         try {
             rankingListViewHolder.mainView = view;
-            rankingListViewHolder.progressBar = view.findViewById(R.id.loading_progress_bar);
             rankingListViewHolder.recyclerView = view.findViewById(R.id.stock_list);
 
             rankingListViewHolder.foldGroup = view.findViewById(R.id.fold_group);
@@ -88,7 +83,7 @@ public class RankingListViewHolder {
                             }
                         };
 
-                        a.setDuration(800);
+                        a.setDuration(300);
                         a.setFillAfter(true);
                         rankingListViewHolder.foldGroup.startAnimation(a);
                     } else {
@@ -108,7 +103,7 @@ public class RankingListViewHolder {
                             }
                         };
 
-                        a.setDuration(800);
+                        a.setDuration(300);
                         a.setFillAfter(true);
                         a.setAnimationListener(new Animation.AnimationListener() {
                             @Override
@@ -145,12 +140,15 @@ public class RankingListViewHolder {
     public void update(Activity activity,
                        ArrayList<Stock> stockArrayList,
                        int rankingType,
-                       StockRankingRecyclerAdapter.OnItemClickListener listener) {
-        stockRankingRecyclerAdapter = new StockRankingRecyclerAdapter(activity, stockArrayList, rankingType);
+                       StockRankingRecyclerAdapter.OnItemClickListener listener,
+                       boolean needToSort) {
+        stockRankingRecyclerAdapter = new StockRankingRecyclerAdapter(activity);
+        stockRankingRecyclerAdapter.setStockList(stockArrayList, rankingType, needToSort);
+        stockRankingRecyclerAdapter.setOnItemClickListener(listener);
+
         recyclerView.setAdapter(stockRankingRecyclerAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(activity));
         recyclerView.setNestedScrollingEnabled(false);
-        stockRankingRecyclerAdapter.setOnItemClickListener(listener);
     }
 
     public void hide() {

@@ -54,15 +54,18 @@ public class MarketSenseStockFetcher {
 
     private WeakReference<Context> mContext;
     private MarketSenseStockNetworkListener mMarketSenseStockNetworkListener;
+    private StockListPlacer.LoadingPageListener mLoadingPageListener;
     private StockRequest mStockRequest;
     private String mMode;
     private boolean mStockIsOpen;
 
     MarketSenseStockFetcher(Context context,
                             MarketSenseStockNetworkListener marketSenseStockNetworkListener,
+                            StockListPlacer.LoadingPageListener loadingPageListener,
                             @Nullable String mode) {
         mContext = new WeakReference<Context>(context);
         mMarketSenseStockNetworkListener = marketSenseStockNetworkListener;
+        mLoadingPageListener = loadingPageListener;
         mTimeoutHandler = new Handler();
         mTimeoutRunnable = new Runnable() {
             @Override
@@ -110,25 +113,35 @@ public class MarketSenseStockFetcher {
             cacheUrl = networkUrl;
         }
 
-        MSLog.i("Loading stock list...(cache): " + cacheUrl);
-        final Cache cache = Networking.getRequestQueue(context).getCache();
-        Cache.Entry entry = cache.get(cacheUrl);
-        if(entry != null && (!mStockIsOpen || !entry.isExpired())) {
-            try {
-                ArrayList<Stock> stockArrayList = StockRequest.stockParseResponse(entry.data);
-                MSLog.i("Loading stock list...(cache hit): " + new String(entry.data));
-                mMarketSenseStockNetworkListener.onStockListLoad(stockArrayList, isAutoRefresh);
-
-                if(!mStockIsOpen) {
-                    MSLog.d("We remove stock network request, " +
-                            "since stock market is close and cache is hit.");
-                    return;
-                }
-            } catch (JSONException e) {
-                MSLog.e("Loading stock list...(cache failed JSONException)");
-            }
+        ArrayList<Stock> inMemoryStockPrice = ClientData.getInstance().getStockPrices();
+        if(inMemoryStockPrice != null && inMemoryStockPrice.size() > 0) {
+            MSLog.i("Loading stock list in memory...");
+            mMarketSenseStockNetworkListener.onStockListLoad(inMemoryStockPrice, isAutoRefresh);
         } else {
-            MSLog.i("Loading stock list...(cache miss or expired)");
+            if(mLoadingPageListener != null) {
+                mLoadingPageListener.onLoadingPageVisible();
+            }
+
+            MSLog.i("Loading stock list...(cache): " + cacheUrl);
+            final Cache cache = Networking.getRequestQueue(context).getCache();
+            Cache.Entry entry = cache.get(cacheUrl);
+            if (entry != null && (!mStockIsOpen || !entry.isExpired())) {
+                try {
+                    ArrayList<Stock> stockArrayList = StockRequest.stockParseResponse(entry.data);
+                    MSLog.i("Loading stock list...(cache hit): " + new String(entry.data));
+                    mMarketSenseStockNetworkListener.onStockListLoad(stockArrayList, isAutoRefresh);
+
+                    if (!mStockIsOpen) {
+                        MSLog.d("We remove stock network request, " +
+                                "since stock market is close and cache is hit.");
+                        return;
+                    }
+                } catch (JSONException e) {
+                    MSLog.e("Loading stock list...(cache failed JSONException)");
+                }
+            } else {
+                MSLog.i("Loading stock list...(cache miss or expired)");
+            }
         }
 
         mStockRequest = new StockRequest(Request.Method.GET, networkUrl, null, new Response.Listener<ArrayList<Stock>>() {

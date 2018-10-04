@@ -1,12 +1,13 @@
 package com.idroi.marketsense.adapter;
 
-import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.data.Stock;
 
 import java.util.ArrayList;
@@ -34,14 +35,36 @@ public class StockRankingRecyclerAdapter extends RecyclerView.Adapter {
 
     private OnItemClickListener mOnItemClickListener;
 
-    public StockRankingRecyclerAdapter(final Context context, ArrayList<Stock> stockArrayList, int rankType) {
+    public StockRankingRecyclerAdapter(final Context context) {
         mContext = context;
+        mItemCount = 5;
+    }
+
+    public void setStockList(ArrayList<Stock> stockArrayList, final int rankType, boolean needToSort) {
         mRankType = rankType;
         mStockList = new ArrayList<>(stockArrayList);
         mStockRankingRenderer = new StockRankingRenderer(rankType);
-        mItemCount = 5;
 
-        Collections.sort(mStockList, genComparator());
+        if(needToSort) {
+            Collections.sort(mStockList, genComparator());
+            ClientData.getInstance().setSortedRealTimePrices(rankType, mStockList);
+        } else {
+            if(ClientData.getInstance().isWorkDayAndStockMarketIsOpen()) {
+                HandlerThread handlerThread = new HandlerThread("UpdateSortedRealPrice");
+                handlerThread.start();
+                Handler backgroundHandler = new Handler(handlerThread.getLooper());
+                backgroundHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        ArrayList<Stock> stocks = ClientData.getInstance().getStockPrices();
+                        if (stocks != null) {
+                            Collections.sort(stocks, genComparator());
+                            ClientData.getInstance().setSortedRealTimePrices(rankType, stocks);
+                        }
+                    }
+                });
+            }
+        }
     }
 
     public void setItemCount(int itemCount) {

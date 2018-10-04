@@ -39,6 +39,7 @@ import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.datasource.StockListPlacer;
 import com.idroi.marketsense.request.NewsRequest;
 import com.idroi.marketsense.request.StockRequest;
+import com.idroi.marketsense.viewholders.LoadingDotsPageViewHolder;
 import com.idroi.marketsense.viewholders.RankingListViewHolder;
 
 import java.util.ArrayList;
@@ -76,6 +77,7 @@ public class MainFragment extends Fragment {
     private OnActionBarChangeListener mOnActionBarChangeListener;
 
     private RankingListViewHolder mTechBlockViewHolder, mNewsBlockViewHolder;
+    private LoadingDotsPageViewHolder mLoadingDotsPageViewHolder;
 
     private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
 
@@ -106,6 +108,8 @@ public class MainFragment extends Fragment {
 
         mNestedScrollView = view.findViewById(R.id.body_scroll_view);
 
+        mLoadingDotsPageViewHolder = LoadingDotsPageViewHolder
+                .convertToViewHolder(view.findViewById(R.id.loading_dots_page));
         mTechBlockViewHolder =
                 RankingListViewHolder.convertToViewHolder(
                         view.findViewById(R.id.tech_block),
@@ -142,44 +146,61 @@ public class MainFragment extends Fragment {
             userProfile.addGlobalBroadcastListener(mGlobalBroadcastListener);
         }
 
-        mStockListPlacer = new StockListPlacer(getActivity(), NORMAL_ID);
-        mStockListPlacer.setStockListListener(new StockListPlacer.StockListListener() {
-            @Override
-            public void onStockListLoaded() {
-                if(mTechBlockViewHolder != null) {
-                    mTechBlockViewHolder.progressBar.setVisibility(View.GONE);
-                }
-                if(mNewsBlockViewHolder != null) {
-                    mNewsBlockViewHolder.progressBar.setVisibility(View.GONE);
-                }
-                if(mStockListPlacer.getStocks() != null) {
-                    View secondView = mNewsBlockViewHolder.mainView;
-                    ((ConstraintLayout.LayoutParams) secondView.getLayoutParams()).topToBottom
-                            = mTechBlockViewHolder.mainView.getId();
-                    ((ConstraintLayout.LayoutParams) secondView.getLayoutParams()).topMargin = 0;
+        ArrayList<Stock> techSortedStocks = clientData.getSortedRealTimePrices(StockRankingRenderer.RANKING_BY_TECH);
+        ArrayList<Stock> newsSortedStocks = clientData.getSortedRealTimePrices(StockRankingRenderer.RANKING_BY_NEWS);
 
-                    mTechBlockViewHolder.update(getActivity(), mStockListPlacer.getStocks(), StockRankingRenderer.RANKING_BY_TECH, new StockRankingRecyclerAdapter.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(Stock stock) {
-                            openStockActivity(stock);
-                        }
-                    });
-                    mNewsBlockViewHolder.update(getActivity(), mStockListPlacer.getStocks(), StockRankingRenderer.RANKING_BY_NEWS, new StockRankingRecyclerAdapter.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(Stock stock) {
-                            openStockActivity(stock);
-                        }
-                    });
-                } else {
-                    mTechBlockViewHolder.hide();
-                    mNewsBlockViewHolder.hide();
+        if(techSortedStocks != null && techSortedStocks.size() > 0 && newsSortedStocks != null && newsSortedStocks.size() > 0) {
+            MSLog.d("sorted stocks are in memory");
+            mTechBlockViewHolder.update(getActivity(), techSortedStocks, StockRankingRenderer.RANKING_BY_TECH, new StockRankingRecyclerAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(Stock stock) {
+                    openStockActivity(stock);
                 }
-            }
-        });
+            }, false);
+            mNewsBlockViewHolder.update(getActivity(), newsSortedStocks, StockRankingRenderer.RANKING_BY_NEWS, new StockRankingRecyclerAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(Stock stock) {
+                    openStockActivity(stock);
+                }
+            }, false);
+        } else {
+            MSLog.d("sorted stocks are not in memory");
+            mStockListPlacer = new StockListPlacer(getActivity(), NORMAL_ID);
+            mStockListPlacer.setStockListListener(new StockListPlacer.StockListListener() {
+                @Override
+                public void onStockListLoaded() {
+                    mLoadingDotsPageViewHolder.stopAndGone();
 
-        mStockListPlacer.loadStockList(
-                StockRequest.queryStockList(getActivity(), true),
-                StockRequest.queryStockList(getActivity(), false));
+                    if(mStockListPlacer.getStocks() != null) {
+                        mTechBlockViewHolder.update(getActivity(), mStockListPlacer.getStocks(), StockRankingRenderer.RANKING_BY_TECH, new StockRankingRecyclerAdapter.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(Stock stock) {
+                                openStockActivity(stock);
+                            }
+                        }, true);
+                        mNewsBlockViewHolder.update(getActivity(), mStockListPlacer.getStocks(), StockRankingRenderer.RANKING_BY_NEWS, new StockRankingRecyclerAdapter.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(Stock stock) {
+                                openStockActivity(stock);
+                            }
+                        }, true);
+                    } else {
+                        mTechBlockViewHolder.hide();
+                        mNewsBlockViewHolder.hide();
+                    }
+                }
+            });
+
+            mStockListPlacer.setLoadingPageListener(new StockListPlacer.LoadingPageListener() {
+                @Override
+                public void onLoadingPageVisible() {
+                    mLoadingDotsPageViewHolder.start(getActivity());
+                }
+            });
+            mStockListPlacer.loadStockList(
+                    StockRequest.queryStockList(getActivity(), true),
+                    StockRequest.queryStockList(getActivity(), false));
+        }
         clientData.prefetchData();
 
         mNewsRecyclerAdapter.setNewsAvailableListener(new NewsRecyclerAdapter.NewsAvailableListener() {
@@ -400,6 +421,9 @@ public class MainFragment extends Fragment {
         }
         if(mNewsBlockViewHolder != null) {
             mNewsBlockViewHolder.destroy();
+        }
+        if(mLoadingDotsPageViewHolder != null) {
+            mLoadingDotsPageViewHolder.stopAndGone();
         }
 
         FragmentManager fm = getFragmentManager();

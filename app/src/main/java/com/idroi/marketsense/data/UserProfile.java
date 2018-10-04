@@ -520,12 +520,17 @@ public class UserProfile implements Serializable {
 
         MSLog.i("[user login]: is login on going: " + mLoginOnGoing);
         if(!mLoginOnGoing) {
-            mLoginOnGoing = true;
-            MSLog.i("[user login]: start to login");
             final SharedPreferences sharedPreferences =
                     context.getSharedPreferences(USER_PROFILE_SHARE_PREFERENCE, Context.MODE_PRIVATE);
             mUserId = sharedPreferences.getString(SHARE_PREF_ID_KEY, null);
             mUserType = sharedPreferences.getString(SHARE_PREF_USER_TYPE, null);
+
+            if(mUserId == null || mUserId.isEmpty()) {
+                return;
+            }
+
+            MSLog.i("[user login]: start to login");
+            mLoginOnGoing = true;
             getFavoriteStocksAndEvents(context, mUserId);
             String password = UserProfile.generatePassword(mUserId, mUserType);
             PostEvent.sendLogin(context, mUserId, password, mUserEmail, new PostEvent.PostEventListener() {

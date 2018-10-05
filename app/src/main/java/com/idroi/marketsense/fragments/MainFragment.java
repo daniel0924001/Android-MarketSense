@@ -40,6 +40,7 @@ import com.idroi.marketsense.datasource.StockListPlacer;
 import com.idroi.marketsense.request.NewsRequest;
 import com.idroi.marketsense.request.StockRequest;
 import com.idroi.marketsense.viewholders.LoadingDotsPageViewHolder;
+import com.idroi.marketsense.viewholders.RankingListSingleColumnViewHolder;
 import com.idroi.marketsense.viewholders.RankingListViewHolder;
 
 import java.util.ArrayList;
@@ -77,6 +78,7 @@ public class MainFragment extends Fragment {
     private OnActionBarChangeListener mOnActionBarChangeListener;
 
     private RankingListViewHolder mTechBlockViewHolder, mNewsBlockViewHolder;
+    private RankingListSingleColumnViewHolder mDiffBlockViewHolder;
     private LoadingDotsPageViewHolder mLoadingDotsPageViewHolder;
 
     private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
@@ -120,6 +122,10 @@ public class MainFragment extends Fragment {
                         view.findViewById(R.id.news_block),
                         R.string.main_page_news_ranking,
                         R.string.main_page_news_trend);
+        mDiffBlockViewHolder =
+                RankingListSingleColumnViewHolder.convertToViewHolder(
+                        view.findViewById(R.id.diff_block),
+                        R.string.main_page_diff_ranking);
 
         initTopBanner(view.findViewById(R.id.top_banner_block));
 
@@ -146,18 +152,25 @@ public class MainFragment extends Fragment {
             userProfile.addGlobalBroadcastListener(mGlobalBroadcastListener);
         }
 
-        ArrayList<Stock> techSortedStocks = clientData.getSortedRealTimePrices(StockRankingRenderer.RANKING_BY_TECH);
-        ArrayList<Stock> newsSortedStocks = clientData.getSortedRealTimePrices(StockRankingRenderer.RANKING_BY_NEWS);
+        ArrayList<Stock> techSortedStocks = clientData.getSortedRealTimePrices(ClientData.RANKING_BY_TECH);
+        ArrayList<Stock> newsSortedStocks = clientData.getSortedRealTimePrices(ClientData.RANKING_BY_NEWS);
+        ArrayList<Stock> diffSortedStocks = clientData.getSortedRealTimePrices(ClientData.RANKING_BY_DIFF);
 
-        if(techSortedStocks != null && techSortedStocks.size() > 0 && newsSortedStocks != null && newsSortedStocks.size() > 0) {
+        if(techSortedStocks != null && techSortedStocks.size() > 0 && newsSortedStocks != null && newsSortedStocks.size() > 0 && diffSortedStocks != null && diffSortedStocks.size() > 0) {
             MSLog.d("sorted stocks are in memory");
-            mTechBlockViewHolder.update(getActivity(), techSortedStocks, StockRankingRenderer.RANKING_BY_TECH, new StockRankingRecyclerAdapter.OnItemClickListener() {
+            mTechBlockViewHolder.update(getActivity(), techSortedStocks, ClientData.RANKING_BY_TECH, new StockRankingRecyclerAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(Stock stock) {
                     openStockActivity(stock);
                 }
             }, false);
-            mNewsBlockViewHolder.update(getActivity(), newsSortedStocks, StockRankingRenderer.RANKING_BY_NEWS, new StockRankingRecyclerAdapter.OnItemClickListener() {
+            mNewsBlockViewHolder.update(getActivity(), newsSortedStocks, ClientData.RANKING_BY_NEWS, new StockRankingRecyclerAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(Stock stock) {
+                    openStockActivity(stock);
+                }
+            }, false);
+            mDiffBlockViewHolder.update(getActivity(), diffSortedStocks, ClientData.RANKING_BY_DIFF, new StockRankingRecyclerAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(Stock stock) {
                     openStockActivity(stock);
@@ -172,13 +185,19 @@ public class MainFragment extends Fragment {
                     mLoadingDotsPageViewHolder.stopAndGone();
 
                     if(mStockListPlacer.getStocks() != null) {
-                        mTechBlockViewHolder.update(getActivity(), mStockListPlacer.getStocks(), StockRankingRenderer.RANKING_BY_TECH, new StockRankingRecyclerAdapter.OnItemClickListener() {
+                        mTechBlockViewHolder.update(getActivity(), mStockListPlacer.getStocks(), ClientData.RANKING_BY_TECH, new StockRankingRecyclerAdapter.OnItemClickListener() {
                             @Override
                             public void onItemClick(Stock stock) {
                                 openStockActivity(stock);
                             }
                         }, true);
-                        mNewsBlockViewHolder.update(getActivity(), mStockListPlacer.getStocks(), StockRankingRenderer.RANKING_BY_NEWS, new StockRankingRecyclerAdapter.OnItemClickListener() {
+                        mNewsBlockViewHolder.update(getActivity(), mStockListPlacer.getStocks(), ClientData.RANKING_BY_NEWS, new StockRankingRecyclerAdapter.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(Stock stock) {
+                                openStockActivity(stock);
+                            }
+                        }, true);
+                        mDiffBlockViewHolder.update(getActivity(), mStockListPlacer.getStocks(), ClientData.RANKING_BY_DIFF, new StockRankingRecyclerAdapter.OnItemClickListener() {
                             @Override
                             public void onItemClick(Stock stock) {
                                 openStockActivity(stock);
@@ -187,6 +206,7 @@ public class MainFragment extends Fragment {
                     } else {
                         mTechBlockViewHolder.hide();
                         mNewsBlockViewHolder.hide();
+                        mDiffBlockViewHolder.hide();
                     }
                 }
             });
@@ -374,6 +394,7 @@ public class MainFragment extends Fragment {
             mNoDataTextView.setText(R.string.ops_something_wrong);
             mNoDataImageView.setImageResource(R.drawable.baseline_sentiment_dissatisfied_24px);
         } else {
+            mNewsRecyclerView.setVisibility(View.VISIBLE);
             mNoDataRefreshLayout.setVisibility(View.GONE);
         }
     }
@@ -421,6 +442,9 @@ public class MainFragment extends Fragment {
         }
         if(mNewsBlockViewHolder != null) {
             mNewsBlockViewHolder.destroy();
+        }
+        if(mDiffBlockViewHolder != null) {
+            mDiffBlockViewHolder.destroy();
         }
         if(mLoadingDotsPageViewHolder != null) {
             mLoadingDotsPageViewHolder.stopAndGone();

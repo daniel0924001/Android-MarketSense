@@ -14,9 +14,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import static com.idroi.marketsense.adapter.StockRankingRenderer.RANKING_BY_NEWS;
-import static com.idroi.marketsense.adapter.StockRankingRenderer.RANKING_BY_TECH;
-
 /**
  * Created by daniel.hsieh on 2018/7/28.
  */
@@ -29,25 +26,26 @@ public class StockRankingRecyclerAdapter extends RecyclerView.Adapter {
 
     private Context mContext;
     private ArrayList<Stock> mStockList;
-    private StockRankingRenderer mStockRankingRenderer;
+    private MarketSenseRenderer<Stock> mStockRenderer;
     private int mItemCount;
     private int mRankType;
 
     private OnItemClickListener mOnItemClickListener;
 
-    public StockRankingRecyclerAdapter(final Context context) {
+    public StockRankingRecyclerAdapter(final Context context, MarketSenseRenderer<Stock> renderer, final int rankType) {
         mContext = context;
+        mStockRenderer = renderer;
         mItemCount = 5;
+        mRankType = rankType;
     }
 
-    public void setStockList(ArrayList<Stock> stockArrayList, final int rankType, boolean needToSort) {
-        mRankType = rankType;
+    public void setStockList(ArrayList<Stock> stockArrayList, boolean needToSort) {
+
         mStockList = new ArrayList<>(stockArrayList);
-        mStockRankingRenderer = new StockRankingRenderer(rankType);
 
         if(needToSort) {
             Collections.sort(mStockList, genComparator());
-            ClientData.getInstance().setSortedRealTimePrices(rankType, mStockList);
+            ClientData.getInstance().setSortedRealTimePrices(mRankType, mStockList);
         } else {
             if(ClientData.getInstance().isWorkDayAndStockMarketIsOpen()) {
                 HandlerThread handlerThread = new HandlerThread("UpdateSortedRealPrice");
@@ -59,7 +57,7 @@ public class StockRankingRecyclerAdapter extends RecyclerView.Adapter {
                         ArrayList<Stock> stocks = ClientData.getInstance().getStockPrices();
                         if (stocks != null) {
                             Collections.sort(stocks, genComparator());
-                            ClientData.getInstance().setSortedRealTimePrices(rankType, stocks);
+                            ClientData.getInstance().setSortedRealTimePrices(mRankType, stocks);
                         }
                     }
                 });
@@ -77,14 +75,14 @@ public class StockRankingRecyclerAdapter extends RecyclerView.Adapter {
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new MarketSenseViewHolder(mStockRankingRenderer.createView(mContext, parent));
+        return new MarketSenseViewHolder(mStockRenderer.createView(mContext, parent));
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         final Stock stock = mStockList.get(position);
         if(stock != null) {
-            mStockRankingRenderer.renderView(holder.itemView, stock);
+            mStockRenderer.renderView(holder.itemView, stock);
         }
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,10 +108,12 @@ public class StockRankingRecyclerAdapter extends RecyclerView.Adapter {
             @Override
             public int compare(Stock stock1, Stock stock2) {
                 switch (mRankType) {
-                    case RANKING_BY_TECH:
-                        return compareValue(stock2, stock1, RANKING_BY_TECH);
-                    case RANKING_BY_NEWS:
-                        return compareValue(stock2, stock1, RANKING_BY_NEWS);
+                    case ClientData.RANKING_BY_TECH:
+                        return compareValue(stock2, stock1, ClientData.RANKING_BY_TECH);
+                    case ClientData.RANKING_BY_NEWS:
+                        return compareValue(stock2, stock1, ClientData.RANKING_BY_NEWS);
+                    case ClientData.RANKING_BY_DIFF:
+                        return compareValueWithoutHot(stock2, stock1, ClientData.RANKING_BY_DIFF);
                     default:
                         return 0;
                 }
@@ -138,13 +138,13 @@ public class StockRankingRecyclerAdapter extends RecyclerView.Adapter {
         value1 = (stock1.getYesterdayVolume() > 1500) ? 10 : -10;
         value2 = (stock2.getYesterdayVolume() > 1500) ? 10 : -10;
 
-        if(type == RANKING_BY_TECH) {
+        if(type == ClientData.RANKING_BY_TECH) {
             value1 += (stock1.getDiffDirection() == stock1.getPredictTechDirection()) ? 20 : -20;
             value2 += (stock2.getDiffDirection() == stock2.getPredictTechDirection()) ? 20 : -20;
 
             value1 += Math.abs(stock1.getPredictionTechScore());
             value2 += Math.abs(stock2.getPredictionTechScore());
-        } else if(type == RANKING_BY_NEWS) {
+        } else if(type == ClientData.RANKING_BY_NEWS) {
             value1 += (stock1.getDiffDirection() == stock1.getConfidenceDirection()) ? 20 : -20;
             value2 += (stock2.getDiffDirection() == stock2.getConfidenceDirection()) ? 20 : -20;
 
@@ -155,11 +155,22 @@ public class StockRankingRecyclerAdapter extends RecyclerView.Adapter {
         return compareValue(value1, value2);
     }
 
+    private int compareValueWithoutHot(Stock stock1, Stock stock2, int type) {
+        float value1 = 0, value2 = 0;
+
+        if(type == ClientData.RANKING_BY_DIFF) {
+            value1 += stock1.getDiffPercentageDouble();
+            value2 += stock2.getDiffPercentageDouble();
+        }
+
+        return compareValue(value1, value2);
+    }
+
     public void destroy() {
         if(mStockList != null) {
             mStockList.clear();
         }
-        mStockRankingRenderer.clear();
+        mStockRenderer.clear();
         mOnItemClickListener = null;
     }
 }

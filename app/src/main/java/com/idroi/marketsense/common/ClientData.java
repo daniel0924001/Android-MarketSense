@@ -212,6 +212,10 @@ public class ClientData {
         }
     }
 
+    public static final int RANKING_BY_TECH = 1;
+    public static final int RANKING_BY_NEWS = 2;
+    public static final int RANKING_BY_DIFF = 3;
+
     public void setSortedRealTimePrices(int key, ArrayList<Stock> stocks) {
         mSortedRealTimePrices.put(key, new ArrayList<Stock>(stocks));
     }

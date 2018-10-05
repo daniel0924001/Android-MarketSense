@@ -13,7 +13,7 @@ import android.widget.TextView;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.adapter.StockRankingRecyclerAdapter;
-import com.idroi.marketsense.adapter.StockRankingRenderer;
+import com.idroi.marketsense.adapter.StockRankingRendererSingleColumn;
 import com.idroi.marketsense.data.Stock;
 
 import java.util.ArrayList;
@@ -22,12 +22,12 @@ import java.util.ArrayList;
  * Created by daniel.hsieh on 2018/8/2.
  */
 
-public class RankingListViewHolder {
+public class RankingListSingleColumnViewHolder {
 
     public View mainView;
 
+    public TextView valueTextView;
     public ImageView foldImageView;
-    public TextView trendTextView;
     public RecyclerView recyclerView;
     public StockRankingRecyclerAdapter stockRankingRecyclerAdapter;
     public View bottomDividor;
@@ -35,16 +35,15 @@ public class RankingListViewHolder {
     public ConstraintLayout foldGroup;
     public int shrinkHeight;
 
-    static final RankingListViewHolder EMPTY_VIEW_HOLDER = new RankingListViewHolder();
+    static final RankingListSingleColumnViewHolder EMPTY_VIEW_HOLDER = new RankingListSingleColumnViewHolder();
 
-    private RankingListViewHolder() {
+    private RankingListSingleColumnViewHolder() {
 
     }
 
-    public static RankingListViewHolder convertToViewHolder(final View view,
-                                                            int titleStringId,
-                                                            int trendStringId) {
-        final RankingListViewHolder rankingListViewHolder = new RankingListViewHolder();
+    public static RankingListSingleColumnViewHolder convertToViewHolder(final View view,
+                                                                        int titleStringId) {
+        final RankingListSingleColumnViewHolder rankingListViewHolder = new RankingListSingleColumnViewHolder();
         try {
             rankingListViewHolder.mainView = view;
             rankingListViewHolder.recyclerView = view.findViewById(R.id.stock_list);
@@ -55,6 +54,7 @@ public class RankingListViewHolder {
             rankingListViewHolder.bottomDividor = view.findViewById(R.id.bottom_divider);
             rankingListViewHolder.foldImageView = view.findViewById(R.id.iv_fold);
 
+            rankingListViewHolder.valueTextView = view.findViewById(R.id.company_value);
             TextView titleTextView = view.findViewById(R.id.ranking_title);
             titleTextView.setText(titleStringId);
             titleTextView.setOnClickListener(new View.OnClickListener() {
@@ -63,7 +63,9 @@ public class RankingListViewHolder {
 
                     if(rankingListViewHolder.foldGroup.getVisibility() == View.VISIBLE) {
                         rankingListViewHolder.foldImageView.setImageResource(R.mipmap.ic_fold);
-                        rankingListViewHolder.shrinkHeight = rankingListViewHolder.recyclerView.getHeight() + rankingListViewHolder.trendTextView.getHeight() + rankingListViewHolder.bottomDividor.getHeight();
+                        rankingListViewHolder.shrinkHeight = rankingListViewHolder.recyclerView.getHeight()
+                                + rankingListViewHolder.valueTextView.getHeight()
+                                + rankingListViewHolder.bottomDividor.getHeight();
                         Animation a = new Animation()
                         {
                             @Override
@@ -128,9 +130,6 @@ public class RankingListViewHolder {
                 }
             });
 
-            rankingListViewHolder.trendTextView = view.findViewById(R.id.company_trend);
-            rankingListViewHolder.trendTextView.setText(trendStringId);
-
             return rankingListViewHolder;
         } catch (ClassCastException exception) {
             MSLog.e(exception.toString());
@@ -143,7 +142,7 @@ public class RankingListViewHolder {
                        int rankingType,
                        StockRankingRecyclerAdapter.OnItemClickListener listener,
                        boolean needToSort) {
-        stockRankingRecyclerAdapter = new StockRankingRecyclerAdapter(activity, new StockRankingRenderer(rankingType), rankingType);
+        stockRankingRecyclerAdapter = new StockRankingRecyclerAdapter(activity, new StockRankingRendererSingleColumn(), rankingType);
         stockRankingRecyclerAdapter.setStockList(stockArrayList, needToSort);
         stockRankingRecyclerAdapter.setOnItemClickListener(listener);
 

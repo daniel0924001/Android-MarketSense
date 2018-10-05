@@ -260,6 +260,10 @@ public class DateUtils {
     public static Date MAX_DATE = new Date(Long.MAX_VALUE);
 
     /* stock transaction related methods part */
+    public static boolean isWorkDay() {
+        return isWorkDay(Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei")).getTime());
+    }
+
     private static boolean isWorkDay(Date now) {
         if(now == null) {
             throw new IllegalArgumentException("The dates must not be null");
@@ -267,7 +271,18 @@ public class DateUtils {
         Calendar c = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei"));
         c.setTime(now);
         int day = c.get(Calendar.DAY_OF_WEEK);
-        return !(day == Calendar.SUNDAY || day == Calendar.SATURDAY);
+        return !(day == Calendar.SUNDAY || day == Calendar.SATURDAY || isHoliday(now));
+    }
+
+    private static boolean isHoliday(Date now) {
+        Calendar c = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei"));
+        c.setTime(now);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        if (month == Calendar.SEPTEMBER && day == 24) return true;
+        if (month == Calendar.OCTOBER && day == 10) return true;
+        if (month == Calendar.DECEMBER && day == 31) return true;
+        return false;
     }
 
     private static Date getTodaySpecificTime(Date now, int hour, int minute) {
@@ -283,11 +298,31 @@ public class DateUtils {
         return c.getTime();
     }
 
+    private static Date getTodayStockOpenTime(Date now) {
+        if(now == null) {
+            return null;
+        }
+        return getTodaySpecificTime(now, 9, 0);
+    }
+
     private static Date getTodayStockClosedTime(Date now) {
         if(now == null) {
             return null;
         }
         return getTodaySpecificTime(now, 13, 30);
+    }
+
+    public static boolean isWorkDayBeforeStockMarketOpen() {
+        Date now = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei")).getTime();
+        Date open = getTodayStockOpenTime(now);
+        return isWorkDay(now) && now.before(open);
+    }
+
+    public static boolean isWorkDayAndStockMarketOpen() {
+        Date now = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei")).getTime();
+        Date open = getTodayStockOpenTime(now);
+        Date close = getTodayStockClosedTime(now);
+        return isWorkDay(now) && now.after(open) && now.before(close);
     }
 
     public static boolean isWorkDayBeforeStockClosed() {
@@ -303,10 +338,34 @@ public class DateUtils {
         return isWorkDay(now) && now.after(close) && now.before(disclosureEnd);
     }
 
+    public static boolean isWorkDayAfterAnswerDisclosure() {
+        Date now = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei")).getTime();
+        Date disclosureEnd = getTodaySpecificTime(now, 15, 0);
+        return isWorkDay(now) && now.after(disclosureEnd);
+    }
+
     public static boolean doesUseTodayPredictionValue() {
         Date now = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei")).getTime();
         Date start = getTodaySpecificTime(now, 8, 10);
         Date end = getTodaySpecificTime(now, 15, 0);
-        return now.after(start) && now.before(end);
+        return isWorkDay(now) & now.after(start) && now.before(end);
+    }
+
+    public static Calendar getTheWorkDayLessButClosestToToday(int offset) {
+        Calendar result = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei"));
+        result.add(Calendar.DAY_OF_YEAR, offset);
+        while(!isWorkDay(result.getTime())) {
+            result.add(Calendar.DAY_OF_YEAR, -1);
+        }
+        return result;
+    }
+
+    public static Calendar getTheWorkDayLaterButClosestToTomorrow() {
+        Calendar result = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei"));
+        result.add(Calendar.DAY_OF_YEAR, 1);
+        while(!isWorkDay(result.getTime())) {
+            result.add(Calendar.DAY_OF_YEAR, 1);
+        }
+        return result;
     }
 }

@@ -9,15 +9,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.idroi.marketsense.CommentTextView;
 import com.idroi.marketsense.Logging.MSLog;
-import com.idroi.marketsense.NewsWebView;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.common.FrescoImageHelper;
 import com.idroi.marketsense.common.MarketSenseRendererHelper;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.News;
 
-import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
@@ -72,23 +71,16 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
                     commentViewHolder.avatarView, FrescoImageHelper.ICON_IMAGE_RATIO);
         }
 
-        // chinese characters can not be decoded.
-        // https://blog.csdn.net/top_code/article/details/9163597
-        // we have a /assets/img.css file.
-        String htmlData = "<link rel=\"stylesheet\" type=\"text/css\" href=\"img.css\" />" + content.getCommentHtml();
-        commentViewHolder.commentBodyView.
-                loadDataWithBaseURL("file:///android_asset/", htmlData, "text/html", "UTF-8", null);
+        MarketSenseRendererHelper.addHtmlToTextView(commentViewHolder.commentBodyView, content.getCommentHtml());
 
         setLikeAndReplyBlock(commentViewHolder, content);
 
-        if(mIsLargeBorder) {
+        if(mIsLargeBorder && commentViewHolder.newsReferencedByCommentViewHolder != null) {
             News news = content.getNews();
             if(news != null) {
-                setNewsBlock(commentViewHolder, content.getNews());
+                setNewsBlock(view.getContext(), commentViewHolder, content.getNews());
             } else {
-                if(commentViewHolder.newsBlock != null) {
-                    commentViewHolder.newsBlock.setVisibility(View.GONE);
-                }
+                commentViewHolder.newsReferencedByCommentViewHolder.mainView.setVisibility(View.GONE);
             }
         }
 
@@ -117,70 +109,14 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
         }
     }
 
-    private void setNewsBlock(CommentViewHolder commentViewHolder, final News news) {
-        if(commentViewHolder.newsBlock != null) {
-            commentViewHolder.newsBlock.setVisibility(View.VISIBLE);
-            commentViewHolder.newsBlock.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mOnNewsItemClickListener.onNewsItemClick(news);
-                }
-            });
-        }
-        MarketSenseRendererHelper.addTextView(commentViewHolder.newsTitleView, news.getTitle());
-        MarketSenseRendererHelper.addTextView(commentViewHolder.newsDateView, news.getDate());
+    private void setNewsBlock(Context context, CommentViewHolder commentViewHolder, final News news) {
+        if(commentViewHolder.newsReferencedByCommentViewHolder != null) {
+            commentViewHolder.newsReferencedByCommentViewHolder.update(context, news, mOnNewsItemClickListener);
 
-        // fire text
-        if(commentViewHolder.fireTextView != null) {
-            if (news.isOptimistic()) {
-                commentViewHolder.fireTextView.setTextColor(
-                        commentViewHolder.fireTextView.getContext().getResources().getColor(R.color.colorTrendUp));
-                commentViewHolder.fireTextView.setVisibility(View.VISIBLE);
-            } else if (news.isPessimistic()) {
-                commentViewHolder.fireTextView.setTextColor(
-                        commentViewHolder.fireTextView.getContext().getResources().getColor(R.color.colorTrendDown));
-                commentViewHolder.fireTextView.setVisibility(View.VISIBLE);
-            } else {
-                commentViewHolder.fireTextView.setVisibility(View.GONE);
-            }
+            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) commentViewHolder.horizontalLineView.getLayoutParams();
+            params.topToBottom = commentViewHolder.newsReferencedByCommentViewHolder.mainView.getId();
+            commentViewHolder.horizontalLineView.setLayoutParams(params);
         }
-
-        // fire image
-        if(commentViewHolder.fireImageView != null) {
-            commentViewHolder.fireImageView.setVisibility(View.VISIBLE);
-            switch (news.getLevel()) {
-                case 3:
-                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_up3);
-                    commentViewHolder.fireTextView.setText(R.string.title_news_good3);
-                    break;
-                case 2:
-                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_up2);
-                    commentViewHolder.fireTextView.setText(R.string.title_news_good2);
-                    break;
-                case 1:
-                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_up1);
-                    commentViewHolder.fireTextView.setText(R.string.title_news_good1);
-                    break;
-                case -1:
-                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_down1);
-                    commentViewHolder.fireTextView.setText(R.string.title_news_bad1);
-                    break;
-                case -2:
-                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_down2);
-                    commentViewHolder.fireTextView.setText(R.string.title_news_bad2);
-                    break;
-                case -3:
-                    commentViewHolder.fireImageView.setImageResource(R.mipmap.ic_news_down3);
-                    commentViewHolder.fireTextView.setText(R.string.title_news_bad3);
-                    break;
-                default:
-                    commentViewHolder.fireImageView.setVisibility(View.GONE);
-            }
-        }
-
-        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) commentViewHolder.horizontalLineView.getLayoutParams();
-        params.topToBottom = commentViewHolder.newsBlock.getId();
-        commentViewHolder.horizontalLineView.setLayoutParams(params);
     }
 
     public void setClickListener(View view, final Comment comment, final int position) {
@@ -206,7 +142,7 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
                 });
             }
 
-            commentViewHolder.commentBodyView.setOnReachMaxHeightListener(new NewsWebView.OnReachMaxHeightListener() {
+            commentViewHolder.commentBodyView.setOnReachMaxHeightListener(new CommentTextView.OnReachMaxHeightListener() {
                 @Override
                 public void onReachMaxHeight() {
                     setReadMoreTextView(commentViewHolder, true, comment, position);
@@ -224,8 +160,8 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
             public void run() {
                 ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) commentViewHolder.horizontalLineView.getLayoutParams();
                 if(show) {
-                    if(comment.getNews() != null && commentViewHolder.newsBlock != null) {
-                        params.topToBottom = commentViewHolder.newsBlock.getId();
+                    if(comment.getNews() != null && commentViewHolder.newsReferencedByCommentViewHolder != null) {
+                        params.topToBottom = commentViewHolder.newsReferencedByCommentViewHolder.mainView.getId();
                     } else {
                         params.topToBottom = commentViewHolder.readMoreView.getId();
                     }
@@ -239,8 +175,8 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
                         }
                     });
                 } else {
-                    if(comment.getNews() != null && commentViewHolder.newsBlock != null) {
-                        params.topToBottom = commentViewHolder.newsBlock.getId();
+                    if(comment.getNews() != null && commentViewHolder.newsReferencedByCommentViewHolder != null) {
+                        params.topToBottom = commentViewHolder.newsReferencedByCommentViewHolder.mainView.getId();
                     } else {
                         params.topToBottom = commentViewHolder.commentBodyView.getId();
                     }
@@ -260,10 +196,6 @@ public class CommentsRenderer implements MarketSenseRenderer<Comment> {
 
     @Override
     public void clear() {
-        for(Map.Entry<View, CommentViewHolder> entry : mViewHolderMap.entrySet()) {
-            CommentViewHolder commentViewHolder = entry.getValue();
-            commentViewHolder.commentBodyView.destroy();
-        }
         mViewHolderMap.clear();
     }
 }

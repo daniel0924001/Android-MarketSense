@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <corners android:radius="4dip" />
-    <gradient android:startColor="@color/background_predict_up_top"
-        android:endColor="@color/background_predict_up_bottom"
-        android:angle="90" />
+    <corners android:radius="2dip" />
+    <solid android:color="@color/trend_red" />
 </shape>

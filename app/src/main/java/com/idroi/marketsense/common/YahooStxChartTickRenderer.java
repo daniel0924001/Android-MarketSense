@@ -95,7 +95,9 @@ public class YahooStxChartTickRenderer {
         }
 
         LineDataSet lineDataSet = new LineDataSet(yPrices, null);
-        lineDataSet.setColor(context.getResources().getColor(R.color.color_price_line));
+        lineDataSet.setColor(context.getResources().getColor(R.color.stock_blue));
+        lineDataSet.setDrawFilled(true);
+        lineDataSet.setFillColor(context.getResources().getColor(R.color.stock_blue));
         lineDataSet.setDrawValues(false);
         lineDataSet.setDrawCircles(false);
         lineDataSet.setDrawCircleHole(false);
@@ -124,7 +126,7 @@ public class YahooStxChartTickRenderer {
                 context.getResources().getString(R.string.title_company_name_code_format),
                 mName, mCode));
         description.setTextSize(16);
-        description.setTextColor(context.getResources().getColor(R.color.marketsense_text_black));
+        description.setTextColor(context.getResources().getColor(R.color.text_first));
         description.setEnabled(false);
 
         Description description1 = mVolumeBarChart.getDescription();
@@ -135,7 +137,7 @@ public class YahooStxChartTickRenderer {
 
         XAxis xAxis = mPriceLineChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setTextColor(context.getResources().getColor(R.color.marketsense_text_black));
+        xAxis.setTextColor(context.getResources().getColor(R.color.text_second));
         xAxis.setTextSize(10f);
         xAxis.setDrawAxisLine(false);
         xAxis.setDrawGridLines(true);
@@ -148,7 +150,7 @@ public class YahooStxChartTickRenderer {
 
         XAxis xAxisVolume = mVolumeBarChart.getXAxis();
         xAxisVolume.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxisVolume.setTextColor(context.getResources().getColor(R.color.marketsense_text_black));
+        xAxisVolume.setTextColor(context.getResources().getColor(R.color.text_second));
         xAxisVolume.setTextSize(10f);
         xAxisVolume.setDrawAxisLine(false);
         xAxisVolume.setDrawGridLines(true);
@@ -162,7 +164,7 @@ public class YahooStxChartTickRenderer {
     private void setYAxis(Context context) {
 
         YAxis yRightAxis = mPriceLineChart.getAxisRight();
-        yRightAxis.setTextColor(context.getResources().getColor(R.color.marketsense_text_black));
+        yRightAxis.setTextColor(context.getResources().getColor(R.color.text_second));
         yRightAxis.setTextSize(10f);
         yRightAxis.setDrawAxisLine(false);
         yRightAxis.setDrawGridLines(true);
@@ -175,13 +177,13 @@ public class YahooStxChartTickRenderer {
         yRightAxis.setYOffset(-7);
 
         LimitLine limitLine = new LimitLine(mStockTradeData.getYesterdayPrice());
-        limitLine.setLineColor(context.getResources().getColor(R.color.marketsense_text_gray));
+        limitLine.setLineColor(context.getResources().getColor(R.color.text_second));
         limitLine.setLineWidth(0.8f);
         yRightAxis.addLimitLine(limitLine);
         yRightAxis.setDrawLimitLinesBehindData(true);
 
         YAxis yRightAxisVolume = mVolumeBarChart.getAxisRight();
-        yRightAxisVolume.setTextColor(context.getResources().getColor(R.color.colorTrendUp));
+        yRightAxisVolume.setTextColor(context.getResources().getColor(R.color.trend_red));
         yRightAxisVolume.setTextSize(10f);
         yRightAxisVolume.setDrawAxisLine(false);
         yRightAxisVolume.setDrawGridLines(true);
@@ -233,7 +235,7 @@ public class YahooStxChartTickRenderer {
     }
 
     private void renderStockChartDataFailed(Context context) {
-        mPriceLineChart.setNoDataText(context.getResources().getString(R.string.no_data));
+        mPriceLineChart.setNoDataText(context.getResources().getString(R.string.no_transaction_date));
         Typeface typeface = Typeface.create("sans-serif", Typeface.NORMAL);
         mPriceLineChart.setNoDataTextTypeface(typeface);
         Paint paint = mPriceLineChart.getPaint(Chart.PAINT_INFO);

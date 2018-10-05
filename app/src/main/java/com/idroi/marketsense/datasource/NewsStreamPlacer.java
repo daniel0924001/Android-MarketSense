@@ -102,6 +102,17 @@ public class NewsStreamPlacer {
         return mNewsArrayList.get(position);
     }
 
+    public int getNewsPosition(News news) {
+        if(mNewsArrayList != null) {
+            for (int i = 0; i < mNewsArrayList.size(); i++) {
+                if(mNewsArrayList.get(i).equals(news)) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
     public int getNewsTotalCount() {
         return mNewsSource.getNewsTotalCount();
     }

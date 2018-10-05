@@ -8,7 +8,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
 import com.idroi.marketsense.Logging.MSLog;
-import com.idroi.marketsense.NewsWebView;
 import com.idroi.marketsense.common.SharedPreferencesCompat;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
@@ -216,5 +215,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter {
         mReplyRenderer.clear();
         mCommentsPlacer.clear();
         mCommentsAvailableListener = null;
+        mOnItemClickListener = null;
+        mOnNewsItemClickListener = null;
     }
 }

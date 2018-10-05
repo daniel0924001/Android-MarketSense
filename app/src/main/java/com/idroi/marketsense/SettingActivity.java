@@ -1,9 +1,7 @@
 package com.idroi.marketsense;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,7 +30,6 @@ import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.common.FrescoHelper;
 import com.idroi.marketsense.common.MarketSenseRendererHelper;
-import com.idroi.marketsense.common.SharedPreferencesCompat;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.datasource.SettingSource;
@@ -40,38 +37,14 @@ import com.idroi.marketsense.datasource.SettingSource;
 import org.json.JSONObject;
 
 import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
-import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_USER_SETTING;
 import static com.idroi.marketsense.common.Constants.SHARE_APP_INSTALL_LINK;
-import static com.idroi.marketsense.common.Constants.USER_SETTING_NOTIFICATION_KEY;
-import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 
 /**
  * Created by daniel.hsieh on 2018/4/27.
  */
 
+@Deprecated
 public class SettingActivity extends AppCompatActivity {
-
-//    private int[] mStringIds = {
-//            R.string.preference_notification, // fake
-//            R.string.preference_notification,
-//            R.string.preference_share,
-//            R.string.preference_feedback,
-//            R.string.preference_star,
-//            R.string.preference_privacy_statement,
-//            R.string.preference_term_of_service,
-//            R.string.preference_disclaimer
-//    };
-//
-//    private Integer[] mDrawableIds = {
-//            R.drawable.setting_notification, // fake
-//            R.drawable.setting_notification,
-//            R.drawable.setting_share,
-//            R.drawable.setting_feedback,
-//            R.drawable.setting_star,
-//            R.drawable.setting_about,
-//            R.drawable.setting_about,
-//            R.drawable.setting_about,
-//    };
 
     private AlertDialog mLoginAlertDialog, mStarAlertDialog;
     private CallbackManager mFBCallbackManager;
@@ -84,7 +57,7 @@ public class SettingActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FrescoHelper.initialize(getApplicationContext());
-        setContentView(R.layout.activity_setting);
+        setContentView(R.layout.fragment_profile);
 
         setListView();
         setActionBar();
@@ -198,7 +171,7 @@ public class SettingActivity extends AppCompatActivity {
             button.setText(R.string.logout);
         } else {
             imageView.setImageResource(R.drawable.ic_account_circle_gray_24px);
-            textView.setText(getResources().getString(R.string.hello));
+            textView.setText(getResources().getString(R.string.first_line_state_not_login));
             button.setText(R.string.login);
         }
     }
@@ -222,38 +195,38 @@ public class SettingActivity extends AppCompatActivity {
     }
 
     private void setListView() {
-        mListView = (ListView) findViewById(R.id.setting_listview);
+        mListView = findViewById(R.id.setting_listview);
         mSettingSource = new SettingSource(this);
 
-        mSettingAdapter = new SettingAdapter(this, mSettingSource);
-        mSettingAdapter.setSettingOnClickListener(new SettingAdapter.SettingOnClickListener() {
-            @Override
-            public void onLoginBtnClick() {
-                if(FBHelper.checkFBLogin()) {
-                    MSLog.d("perform logout");
-                    LoginManager.getInstance().logOut();
-                    internalRefreshFBUi(null, null);
-
-                    UserProfile userProfile = ClientData.getInstance(SettingActivity.this).getUserProfile();
-                    userProfile.saveFavoriteStocksAndEvents(SettingActivity.this);
-                    userProfile.clearUserProfile();
-                    userProfile.globalBroadcast(NOTIFY_ID_FAVORITE_LIST);
-                } else {
-                    MSLog.d("perform login");
-                    showLoginAlertDialog();
-                }
-            }
-
-            @Override
-            public void onSwitchClick(boolean isChecked) {
-                MSLog.d("user set notification to: " + isChecked);
-                SharedPreferences.Editor editor =
-                        SettingActivity.this.getSharedPreferences(SHARED_PREFERENCE_USER_SETTING, Context.MODE_PRIVATE).edit();
-                editor.putBoolean(USER_SETTING_NOTIFICATION_KEY, isChecked);
-                SharedPreferencesCompat.apply(editor);
-            }
-        });
-        mListView.setAdapter(mSettingAdapter);
+        mSettingAdapter = new SettingAdapter(this, mSettingSource, null);
+//        mSettingAdapter.setSettingOnClickListener(new SettingAdapter.SettingOnClickListener() {
+//            @Override
+//            public void onLoginBtnClick() {
+//                if(FBHelper.checkFBLogin()) {
+//                    MSLog.d("perform logout");
+//                    LoginManager.getInstance().logOut();
+//                    internalRefreshFBUi(null, null);
+//
+//                    UserProfile userProfile = ClientData.getInstance(SettingActivity.this).getUserProfile();
+//                    userProfile.saveFavoriteStocksAndEvents(SettingActivity.this);
+//                    userProfile.clearUserProfile();
+//                    userProfile.globalBroadcast(NOTIFY_ID_FAVORITE_LIST);
+//                } else {
+//                    MSLog.d("perform login");
+//                    showLoginAlertDialog();
+//                }
+//            }
+//
+//            @Override
+//            public void onSwitchClick(boolean isChecked) {
+//                MSLog.d("user set notification to: " + isChecked);
+//                SharedPreferences.Editor editor =
+//                        SettingActivity.this.getSharedPreferences(SHARED_PREFERENCE_USER_SETTING, Context.MODE_PRIVATE).edit();
+//                editor.putBoolean(USER_SETTING_NOTIFICATION_KEY, isChecked);
+//                SharedPreferencesCompat.apply(editor);
+//            }
+//        });
+//        mListView.setAdapter(mSettingAdapter);
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -392,7 +365,7 @@ public class SettingActivity extends AppCompatActivity {
 
             SimpleDraweeView imageView = view.findViewById(R.id.action_bar_avatar);
             if(imageView != null) {
-                imageView.setImageResource(R.drawable.ic_keyboard_backspace_white_24px);
+                imageView.setImageResource(R.mipmap.ic_arrow_left);
                 imageView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

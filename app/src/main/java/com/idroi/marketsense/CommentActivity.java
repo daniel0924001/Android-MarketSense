@@ -35,6 +35,8 @@ import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.UserProfile;
+import com.idroi.marketsense.util.ActionBarHelper;
+import com.idroi.marketsense.viewholders.NewsReferencedByCommentViewHolder;
 
 import org.json.JSONObject;
 
@@ -92,40 +94,7 @@ public class CommentActivity extends AppCompatActivity {
     }
 
     private void setActionBar() {
-        final ActionBar actionBar = getSupportActionBar();
-
-        if(actionBar != null) {
-            actionBar.setElevation(0);
-            View view = LayoutInflater.from(actionBar.getThemedContext())
-                    .inflate(R.layout.main_action_bar, null);
-
-            SimpleDraweeView imageView = view.findViewById(R.id.action_bar_avatar);
-            if(imageView != null) {
-                imageView.setImageResource(R.drawable.ic_keyboard_backspace_white_24px);
-                imageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        onBackPressed();
-                    }
-                });
-            }
-
-            TextView textview = view.findViewById(R.id.action_bar_name);
-            if(textview != null) {
-                textview.setText(getString(R.string.activity_comment));
-            }
-
-            ImageView additionFunction = view.findViewById(R.id.action_bar_notification);
-            additionFunction.setVisibility(View.GONE);
-
-            actionBar.setDisplayShowHomeEnabled(false);
-            actionBar.setDisplayShowTitleEnabled(false);
-            actionBar.setCustomView(view,
-                    new ActionBar.LayoutParams(
-                            ActionBar.LayoutParams.MATCH_PARENT,
-                            ActionBar.LayoutParams.MATCH_PARENT));
-            actionBar.setDisplayShowCustomEnabled(true);
-        }
+        ActionBarHelper.setActionBarForSimpleTitleAndBack(this, getString(R.string.activity_comment));
     }
 
     private void setUpperBlock() {
@@ -138,12 +107,8 @@ public class CommentActivity extends AppCompatActivity {
             FrescoImageHelper.loadImageView("http://monster.infohubapp.com/monsters/ic_mon_01_y.png",
                     (SimpleDraweeView) findViewById(R.id.comment_avatar_image_iv), FrescoImageHelper.ICON_IMAGE_RATIO);
         }
-        NewsWebView commentBody = findViewById(R.id.comment_body);
-        commentBody.getSettings().setLoadWithOverviewMode(false);
-        commentBody.getSettings().setUseWideViewPort(false);
-        commentBody.getSettings().setJavaScriptEnabled(false);
-        String htmlData = "<link rel=\"stylesheet\" type=\"text/css\" href=\"img.css\" />" + mComment.getCommentHtml();
-        commentBody.loadDataWithBaseURL("file:///android_asset/", htmlData, "text/html", "UTF-8", null);
+        CommentTextView commentBody = findViewById(R.id.comment_body);
+        MarketSenseRendererHelper.addHtmlToTextView(commentBody, mComment.getCommentHtml());
 
         News news = mComment.getNews();
         if(news != null) {
@@ -152,69 +117,24 @@ public class CommentActivity extends AppCompatActivity {
     }
 
     private void setNewsBlock(final News news) {
-        ConstraintLayout newsBlock = findViewById(R.id.comment_news_block);
-        TextView newsTitleView = findViewById(R.id.comment_news_title_tv);
-        TextView dateTitleView = findViewById(R.id.comment_news_date_tv);
-        TextView fireTextView = findViewById(R.id.comment_news_fire_tv);
-        ImageView fireImageView = findViewById(R.id.comment_news_fire_iv);
 
-        MarketSenseRendererHelper.addTextView(newsTitleView, news.getTitle());
-        MarketSenseRendererHelper.addTextView(dateTitleView, news.getDate());
-
-        // fire text
-        if(fireTextView != null) {
-            if (news.isOptimistic()) {
-                fireTextView.setTextColor(
-                        fireTextView.getContext().getResources().getColor(R.color.colorTrendUp));
-                fireTextView.setVisibility(View.VISIBLE);
-            } else if (news.isPessimistic()) {
-                fireTextView.setTextColor(
-                        fireTextView.getContext().getResources().getColor(R.color.colorTrendDown));
-                fireTextView.setVisibility(View.VISIBLE);
-            } else {
-                fireTextView.setVisibility(View.GONE);
+        NewsReferencedByCommentViewHolder newsReferencedByCommentViewHolder =
+                NewsReferencedByCommentViewHolder.convertToViewHolder(findViewById(R.id.comment_news_block));
+        newsReferencedByCommentViewHolder.update(this, news, new CommentsRecyclerViewAdapter.OnNewsItemClickListener() {
+            @Override
+            public void onNewsItemClick(News news) {
+                startActivity(NewsWebViewActivity.generateNewsWebViewActivityIntent(
+                        CommentActivity.this, news));
+                overridePendingTransition(R.anim.enter, R.anim.stop);
             }
-        }
-
-        // fire image
-        if(fireImageView != null && fireTextView != null) {
-            fireImageView.setVisibility(View.VISIBLE);
-            switch (news.getLevel()) {
-                case 3:
-                    fireImageView.setImageResource(R.mipmap.ic_news_up3);
-                    fireTextView.setText(R.string.title_news_good3);
-                    break;
-                case 2:
-                    fireImageView.setImageResource(R.mipmap.ic_news_up2);
-                    fireTextView.setText(R.string.title_news_good2);
-                    break;
-                case 1:
-                    fireImageView.setImageResource(R.mipmap.ic_news_up1);
-                    fireTextView.setText(R.string.title_news_good1);
-                    break;
-                case -1:
-                    fireImageView.setImageResource(R.mipmap.ic_news_down1);
-                    fireTextView.setText(R.string.title_news_bad1);
-                    break;
-                case -2:
-                    fireImageView.setImageResource(R.mipmap.ic_news_down2);
-                    fireTextView.setText(R.string.title_news_bad2);
-                    break;
-                case -3:
-                    fireImageView.setImageResource(R.mipmap.ic_news_down3);
-                    fireTextView.setText(R.string.title_news_bad3);
-                    break;
-                default:
-                    fireImageView.setVisibility(View.GONE);
-            }
-        }
+        });
 
         View horizontalLineView = findViewById(R.id.social_horizontal_line);
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) horizontalLineView.getLayoutParams();
-        if(newsBlock != null) {
-            params.topToBottom = newsBlock.getId();
-            newsBlock.setVisibility(View.VISIBLE);
-            newsBlock.setOnClickListener(new View.OnClickListener() {
+        if(newsReferencedByCommentViewHolder.mainView != null) {
+            params.topToBottom = newsReferencedByCommentViewHolder.mainView.getId();
+            newsReferencedByCommentViewHolder.mainView.setVisibility(View.VISIBLE);
+            newsReferencedByCommentViewHolder.mainView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     startActivity(NewsWebViewActivity.generateNewsWebViewActivityIntent(

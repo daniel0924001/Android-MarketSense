@@ -9,6 +9,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.common.MarketSenseNetworkError;
 import com.idroi.marketsense.data.Stock;
@@ -55,6 +56,12 @@ public class StockRequest extends Request<ArrayList<Stock>> {
             ArrayList<Stock> stockArrayList = stockParseResponse(response.data);
             if(stockArrayList != null && stockArrayList.size() != 0) {
                 MSLog.i("Stock Request success: " + new String(response.data));
+
+                ClientData clientData = ClientData.getInstance();
+                if(clientData != null) {
+                    clientData.updateClockInformation();
+                }
+
                 return Response.success(stockArrayList, HttpHeaderParser.parseCacheHeaders(response));
             } else {
                 return Response.error(new MarketSenseNetworkError(MarketSenseError.JSON_PARSED_NO_DATA));
@@ -109,17 +116,17 @@ public class StockRequest extends Request<ArrayList<Stock>> {
         } else {
             SharedPreferences sharedPreferences =
                     context.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE);
-            return sharedPreferences.getString(url, url + "?timestamp=" + System.currentTimeMillis() / (30 * 1000));
+            return sharedPreferences.getString(url, null);
         }
     }
 
     public static String queryStockList(Context context, boolean isNetworkUrl) {
-        if(isNetworkUrl) {
+        if(isNetworkUrl && ClientData.getInstance().isWorkDayAndStockMarketIsOpen()) {
             return API_URL + "?timestamp=" + System.currentTimeMillis() / (STOCK_REQUEST_SOFT_TTL);
         } else {
             SharedPreferences sharedPreferences =
                     context.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE);
-            return sharedPreferences.getString(API_URL, API_URL + "?timestamp=" + System.currentTimeMillis() / (30 * 1000));
+            return sharedPreferences.getString(API_URL, API_URL + "?timestamp=" + System.currentTimeMillis() / (STOCK_REQUEST_SOFT_TTL));
         }
     }
 }

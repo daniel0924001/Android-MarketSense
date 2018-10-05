@@ -16,7 +16,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -323,15 +322,14 @@ public class PostEvent {
                         }
                     }){
 
-
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    HashMap<String, String> headers = new HashMap<String, String>();
-                    headers.put("Content-Type", "application/json");
-                    if(mUserToken != null && !mUserToken.isEmpty()) {
-                        headers.put("User-Token", mUserToken);
-                    }
-                    return headers;
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        HashMap<String, String> headers = new HashMap<String, String>();
+                        headers.put("Content-Type", "application/json");
+                        if(mUserToken != null && !mUserToken.isEmpty()) {
+                            headers.put("User-Token", mUserToken);
+                        }
+                        return headers;
                 }
             };
             jsonObjectRequest.setShouldCache(false);
@@ -348,6 +346,8 @@ public class PostEvent {
                 jsonObject.optString(RESPONSE_RESULT).equals(RESPONSE_DUPLICATE_REGISTER)) {
             // {"status":false,"result":"You have registered before!"}
             sendLogin(null, mUserId, mUserPassword, mUserEmail, mListener);
+        } else {
+            MSLog.e("error in processRegister: " + jsonObject);
         }
     }
 
@@ -361,10 +361,15 @@ public class PostEvent {
                 ClientData clientData = ClientData.getInstance();
                 clientData.setUserToken(token);
                 clientData.loadPreference();
+            } else {
+                isSuccessful = false;
             }
         }
 
         if(mListener != null) {
+            if(!isSuccessful) {
+                ClientData.getInstance().getUserProfile().clearUserProfile();
+            }
             mListener.onResponse(isSuccessful, null);
         }
     }

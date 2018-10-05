@@ -130,7 +130,7 @@ public class MarketSenseNewsFetcher {
             for(String cacheUrl : cacheUrls) {
                 MSLog.i("Loading news...(cache): " + cacheUrl);
                 Cache.Entry entry = cache.get(cacheUrl);
-                if (entry != null) {
+                if (entry != null && !entry.isExpired()) {
                     try {
 
                         if (cacheUrl.contains(PARAM_KEYWORD_ARRAY)) {
@@ -152,7 +152,7 @@ public class MarketSenseNewsFetcher {
                         break;
                     }
                 } else {
-                    MSLog.i("Loading news...(cache miss)");
+                    MSLog.i("Loading news...(cache miss or expired)");
                     break;
                 }
             }

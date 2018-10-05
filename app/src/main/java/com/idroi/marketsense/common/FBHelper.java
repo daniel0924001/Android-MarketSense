@@ -31,6 +31,17 @@ public class FBHelper {
         return accessToken != null && !accessToken.isExpired();
     }
 
+    public static boolean isExpired() {
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if(accessToken != null) {
+            MSLog.d("check accessToken is expired: " + accessToken.isExpired());
+            return accessToken.isExpired();
+        } else {
+            MSLog.d("check accessToken is expired: null");
+            return false;
+        }
+    }
+
     public static void getFBUserProfile(final Context context,
                                         final FBHelperListener listener) {
         if(!FBHelper.checkFBLogin()) {

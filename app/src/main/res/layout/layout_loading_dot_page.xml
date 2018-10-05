@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/background">
+
+    <View
+        android:id="@+id/first_dot"
+        android:layout_width="6dp"
+        android:layout_height="6dp"
+        android:background="@drawable/top_banner_selector_red_first"
+        android:layout_marginTop="40dp"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/second_dot" />
+
+    <View
+        android:id="@+id/second_dot"
+        android:layout_width="6dp"
+        android:layout_height="6dp"
+        android:background="@drawable/top_banner_selector_red_second"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/first_dot"
+        app:layout_constraintEnd_toStartOf="@id/third_dot"/>
+
+    <View
+        android:id="@+id/third_dot"
+        android:layout_width="6dp"
+        android:layout_height="6dp"
+        android:background="@drawable/top_banner_selector_red_third"
+        android:layout_marginTop="40dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/second_dot"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</android.support.constraint.ConstraintLayout>

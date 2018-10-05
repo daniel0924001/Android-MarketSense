@@ -22,7 +22,7 @@
         android:layout_marginTop="20dp"
         android:textSize="28sp"
         android:text="@string/no_notification"
-        android:textColor="@color/marketsense_text_light_gray"
+        android:textColor="@color/text_third"
         android:fontFamily="sans-serif"
         app:layout_constraintTop_toBottomOf="@id/no_notification_iv"
         app:layout_constraintLeft_toLeftOf="parent"

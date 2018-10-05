@@ -23,21 +23,16 @@ import java.util.WeakHashMap;
 public class StockListRenderer implements MarketSenseRenderer<Stock>{
 
     @NonNull private final WeakHashMap<View, StockViewHolder> mViewHolderMap;
-    private final int[] mBarRedResourceId, mBarGreenResourceId, mAttitudeRedResourceId, mAttitudeGreenResourceId;
 
     StockListRenderer() {
         mViewHolderMap = new WeakHashMap<>();
-        mBarRedResourceId = new int[] {R.mipmap.ic_bar1_overview_red, R.mipmap.ic_bar2_overview_red, R.mipmap.ic_bar3_overview_red};
-        mBarGreenResourceId = new int[] {R.mipmap.ic_bar1_overview_green, R.mipmap.ic_bar2_overview_green, R.mipmap.ic_bar3_overview_green};
-        mAttitudeRedResourceId = new int[] {R.string.title_level_up_high, R.string.title_level_up_high, R.string.title_level_up_highest};
-        mAttitudeGreenResourceId = new int[] {R.string.title_level_down_high, R.string.title_level_down_high, R.string.title_level_down_highest};
     }
 
     @Override
     public View createView(@NonNull Context context, @Nullable ViewGroup parent) {
         return LayoutInflater
                 .from(context)
-                .inflate(R.layout.stock_list_item, parent, false);
+                .inflate(R.layout.stock_list_item_v2, parent, false);
     }
 
     @Override
@@ -49,6 +44,19 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
         }
         update(view.getContext(), stockViewHolder, content);
         setViewVisibility(stockViewHolder, View.VISIBLE);
+    }
+
+    public void updateRightPartOnly(final View view, final Stock stock) {
+        final StockViewHolder stockViewHolder = mViewHolderMap.get(view);
+        if(stockViewHolder == null) {
+            MSLog.e("stockViewHolder is null in updatePriceOnly");
+            return;
+        }
+
+        stock.renderTomorrowBlock(view.getContext(),
+                stockViewHolder.stockPredictionBlockViewHolder.tomorrowBlock,
+                stockViewHolder.stockPredictionBlockViewHolder.tomorrowTitleTextView,
+                stockViewHolder.stockPredictionBlockViewHolder.tomorrowStatusTextView);
     }
 
     public void updatePriceOnly(final View view, final Stock stock) {
@@ -80,10 +88,10 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
 
     private void animationForPriceChange(final TextView textView, final Stock stock, boolean goUp) {
         if(goUp) {
-            textView.setBackgroundColor(textView.getContext().getResources().getColor(R.color.colorTrendUp));
+            textView.setBackgroundColor(textView.getContext().getResources().getColor(R.color.trend_red));
             textView.setTextColor(textView.getContext().getResources().getColor(R.color.text_white));
         } else {
-            textView.setBackgroundColor(textView.getResources().getColor(R.color.colorTrendDown));
+            textView.setBackgroundColor(textView.getResources().getColor(R.color.trend_green));
             textView.setTextColor(textView.getResources().getColor(R.color.text_white));
         }
         new Handler().postDelayed(new Runnable() {
@@ -103,55 +111,34 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
         MarketSenseRendererHelper.addTextView(stockViewHolder.priceView, content.getPrice());
         MarketSenseRendererHelper.addTextView(stockViewHolder.diffView, content.getDiffPercentage());
 
-        int techLevel = content.getPredictTechLevel();
-        int newsLevel = content.getPredictNewsLevel();
-        int foundationLevel = content.getPredictFoundationLevel();
+        content.renderDiffColor(context, stockViewHolder.diffView);
+        content.renderDiffIcon(stockViewHolder.priceImageView);
 
-        if(content.getPredictFoundationDirection() == Stock.TREND_UP) {
-            stockViewHolder.predictFundamentalImageView.setImageResource(mBarRedResourceId[foundationLevel]);
-            stockViewHolder.predictFundamentalAttitude.setText(mAttitudeRedResourceId[foundationLevel]);
-        } else if(content.getPredictFoundationDirection() == Stock.TREND_DOWN) {
-            stockViewHolder.predictFundamentalImageView.setImageResource(mBarGreenResourceId[foundationLevel]);
-            stockViewHolder.predictFundamentalAttitude.setText(mAttitudeGreenResourceId[foundationLevel]);
-        } else {
-            stockViewHolder.predictFundamentalImageView.setImageResource(R.mipmap.ic_bar0_overview_none);
-            stockViewHolder.predictFundamentalAttitude.setText(R.string.title_level_flat);
-        }
+        Stock.renderTitleAndStars(context, content.getPredictTechDirection(),
+                content.getPredictTechLevel(),
+                stockViewHolder.stockPredictionBlockViewHolder.techBlockView,
+                stockViewHolder.stockPredictionBlockViewHolder.techTitleTextView,
+                stockViewHolder.stockPredictionBlockViewHolder.techUnavailableTextView,
+                stockViewHolder.stockPredictionBlockViewHolder.techImageViews);
 
-        if(content.getPredictTechDirection() == Stock.TREND_UP) {
-            stockViewHolder.predictTechImageView.setImageResource(mBarRedResourceId[techLevel]);
-            stockViewHolder.predictTechAttitude.setText(mAttitudeRedResourceId[techLevel]);
-        } else if(content.getPredictTechDirection() == Stock.TREND_DOWN) {
-            stockViewHolder.predictTechImageView.setImageResource(mBarGreenResourceId[techLevel]);
-            stockViewHolder.predictTechAttitude.setText(mAttitudeGreenResourceId[techLevel]);
-        } else {
-            stockViewHolder.predictTechImageView.setImageResource(R.mipmap.ic_bar0_overview_none);
-            stockViewHolder.predictTechAttitude.setText(R.string.title_level_flat);
-        }
+        Stock.renderTitleAndStars(context, content.getConfidenceDirection(),
+                content.getPredictNewsLevel(),
+                stockViewHolder.stockPredictionBlockViewHolder.newsBlockView,
+                stockViewHolder.stockPredictionBlockViewHolder.newsTitleTextView,
+                stockViewHolder.stockPredictionBlockViewHolder.newsUnavailableTextView,
+                stockViewHolder.stockPredictionBlockViewHolder.newsImageViews);
 
-        if(content.getConfidenceDirection() == Stock.TREND_UP) {
-            stockViewHolder.predictNewsImageView.setImageResource(mBarRedResourceId[newsLevel]);
-            stockViewHolder.predictNewsAttitude.setText(mAttitudeRedResourceId[newsLevel]);
-        } else if(content.getConfidenceDirection() == Stock.TREND_DOWN) {
-            stockViewHolder.predictNewsImageView.setImageResource(mBarGreenResourceId[newsLevel]);
-            stockViewHolder.predictNewsAttitude.setText(mAttitudeGreenResourceId[newsLevel]);
-        } else {
-            stockViewHolder.predictNewsImageView.setImageResource(R.mipmap.ic_bar0_overview_none);
-            stockViewHolder.predictNewsAttitude.setText(R.string.title_level_flat);
-        }
+        content.renderIsHit(context, stockViewHolder.hitView);
 
-        setColor(context, stockViewHolder, content);
+        content.renderTodayBlock(context,
+                stockViewHolder.stockPredictionBlockViewHolder.todayBlock,
+                stockViewHolder.stockPredictionBlockViewHolder.todayTitleTextView,
+                stockViewHolder.stockPredictionBlockViewHolder.todayStatusTextView);
 
-        content.setRightPredictionBlock(context,
-                stockViewHolder.rightBlock,
-                stockViewHolder.rightTitle,
-                stockViewHolder.rightValue,
-                stockViewHolder.hitImageView);
-    }
-
-    private void setColor(Context context, StockViewHolder stockViewHolder, Stock content) {
-        int colorResourceId = context.getResources().getColor(content.getDiffColorResourceId());
-        stockViewHolder.diffView.setTextColor(colorResourceId);
+        content.renderTomorrowBlock(context,
+                stockViewHolder.stockPredictionBlockViewHolder.tomorrowBlock,
+                stockViewHolder.stockPredictionBlockViewHolder.tomorrowTitleTextView,
+                stockViewHolder.stockPredictionBlockViewHolder.tomorrowStatusTextView);
     }
 
     private void setViewVisibility(final StockViewHolder stockViewHolder, final int visibility) {

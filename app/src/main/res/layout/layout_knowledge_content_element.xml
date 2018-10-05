@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <View
+        android:id="@+id/highlight_red_vertical_bar"
+        android:layout_width="2dp"
+        android:layout_height="12dp"
+        android:background="@drawable/title_left_part_vertical_line"
+        android:layout_marginEnd="5dp"
+        app:layout_constraintTop_toTopOf="@id/knowledge_description_title"
+        app:layout_constraintBottom_toBottomOf="@id/knowledge_description_title"
+        app:layout_constraintEnd_toStartOf="@id/knowledge_description_title"/>
+
+    <TextView
+        android:id="@+id/knowledge_description_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="22dp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textColor="@color/text_first"
+        android:textSize="13sp"
+        android:fontFamily="sans-serif"
+        android:text="@string/knowledge_title"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/knowledge_description_content"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="24dp"
+        android:textColor="@color/text_first"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif"
+        android:lineSpacingMultiplier="1.5"
+        android:text="@string/knowledge_many_words"
+        android:padding="12dp"
+        android:background="@drawable/block_flat_border_gray_solid_with_radius_corner"
+        app:layout_constraintTop_toBottomOf="@id/highlight_red_vertical_bar"
+        app:layout_constraintStart_toStartOf="@id/highlight_red_vertical_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</android.support.constraint.ConstraintLayout>

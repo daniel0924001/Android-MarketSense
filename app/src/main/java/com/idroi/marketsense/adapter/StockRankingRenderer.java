@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.idroi.marketsense.R;
+import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.MarketSenseRendererHelper;
 import com.idroi.marketsense.data.Stock;
 
@@ -20,13 +21,10 @@ import java.util.WeakHashMap;
 
 public class StockRankingRenderer implements MarketSenseRenderer<Stock> {
 
-    public static final int RANKING_BY_TECH = 1;
-    public static final int RANKING_BY_NEWS = 2;
-
     private final WeakHashMap<View, StockRankingViewHolder> mViewHolderMap;
     private int mRankType;
 
-    StockRankingRenderer(int rankType) {
+    public StockRankingRenderer(int rankType) {
         mViewHolderMap = new WeakHashMap<>();
         mRankType = rankType;
     }
@@ -47,31 +45,33 @@ public class StockRankingRenderer implements MarketSenseRenderer<Stock> {
         }
 
         MarketSenseRendererHelper.addTextView(stockRankingViewHolder.nameView, content.getName());
+        MarketSenseRendererHelper.addTextView(stockRankingViewHolder.codeView, content.getCode());
         MarketSenseRendererHelper.addTextView(stockRankingViewHolder.priceView, content.getPrice());
+        MarketSenseRendererHelper.addTextView(stockRankingViewHolder.diffView, content.getDiffPercentage());
         setColor(view.getContext(), stockRankingViewHolder, content);
         setRankingIcon(stockRankingViewHolder.predictionImageView, content);
     }
 
     private void setColor(Context context, StockRankingViewHolder stockRankingViewHolder, Stock content) {
         int colorResourceId = context.getResources().getColor(content.getDiffColorResourceId());
-        stockRankingViewHolder.priceView.setTextColor(colorResourceId);
+        stockRankingViewHolder.diffView.setTextColor(colorResourceId);
     }
 
-    private void setRankingIcon(ImageView imageView, Stock stock) {
+    private void setRankingIcon(ImageView predictImageView, Stock stock) {
         int direction = Stock.TREND_UP;
         switch (mRankType) {
-            case RANKING_BY_TECH:
+            case ClientData.RANKING_BY_TECH:
                 direction = stock.getPredictTechDirection();
                 break;
-            case RANKING_BY_NEWS:
+            case ClientData.RANKING_BY_NEWS:
                 direction = stock.getConfidenceDirection();
                 break;
         }
 
         if(direction == Stock.TREND_DOWN) {
-            imageView.setImageResource(R.mipmap.ic_direction_down);
+            predictImageView.setImageResource(R.mipmap.ic_direction_down);
         } else {
-            imageView.setImageResource(R.mipmap.ic_direction_up);
+            predictImageView.setImageResource(R.mipmap.ic_direction_up);
         }
     }
 

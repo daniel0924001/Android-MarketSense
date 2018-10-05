@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/action_bar_background_with_border"
+    android:layout_width="match_parent"
+    android:layout_height="56dp">
+
+    <Button
+        android:id="@+id/btn_trend"
+        android:layout_width="91dp"
+        android:layout_height="29dp"
+        android:background="@drawable/btn_oval_left_selected"
+        android:textSize="14sp"
+        android:text="@string/title_market_trend"
+        android:textColor="@color/text_white"
+        android:stateListAnimator="@null"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btn_news"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_news"
+        android:layout_width="91dp"
+        android:layout_height="29dp"
+        android:background="@drawable/btn_oval_right_not_selected"
+        android:textSize="14sp"
+        android:text="@string/title_news_tab"
+        android:textColor="@color/text_first"
+        android:stateListAnimator="@null"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/btn_trend"/>
+
+    <ImageButton
+        android:id="@+id/action_bar_search"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@mipmap/ic_search"
+        android:background="@null"
+        android:contentDescription="@string/title_search_cancel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</android.support.constraint.ConstraintLayout>

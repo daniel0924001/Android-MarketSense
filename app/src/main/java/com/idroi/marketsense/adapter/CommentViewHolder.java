@@ -7,9 +7,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.idroi.marketsense.CommentTextView;
 import com.idroi.marketsense.Logging.MSLog;
-import com.idroi.marketsense.NewsWebView;
 import com.idroi.marketsense.R;
+import com.idroi.marketsense.viewholders.NewsReferencedByCommentViewHolder;
 
 /**
  * Created by daniel.hsieh on 2018/5/9.
@@ -23,7 +24,7 @@ public class CommentViewHolder {
     SimpleDraweeView avatarView;
     TextView userNameView;
     TextView createTimeView;
-    NewsWebView commentBodyView;
+    CommentTextView commentBodyView;
 
     ConstraintLayout replyBlock;
     ConstraintLayout likeBlock;
@@ -35,11 +36,7 @@ public class CommentViewHolder {
     TextView readMoreView;
 
     // comment_list_item_large_border
-    @Nullable ConstraintLayout newsBlock;
-    @Nullable TextView newsTitleView;
-    @Nullable TextView newsDateView;
-    @Nullable TextView fireTextView;
-    @Nullable ImageView fireImageView;
+    @Nullable NewsReferencedByCommentViewHolder newsReferencedByCommentViewHolder;
 
     static final CommentViewHolder EMPTY_VIEW_HOLDER = new CommentViewHolder();
 
@@ -59,11 +56,7 @@ public class CommentViewHolder {
             // https://stackoverflow.com/questions/1973565/how-to-resize-a-android-webview-after-adding-data-in-it
             // https://capdroid.wordpress.com/2014/08/07/resizing-webview-to-match-the-content-size/
             commentViewHolder.commentBodyView = view.findViewById(R.id.comment_body);
-            commentViewHolder.commentBodyView.getSettings().setLoadWithOverviewMode(false);
-            commentViewHolder.commentBodyView.getSettings().setUseWideViewPort(false);
-            commentViewHolder.commentBodyView.getSettings().setJavaScriptEnabled(false);
-            float density = view.getContext().getResources().getDisplayMetrics().density;
-            commentViewHolder.commentBodyView.setMaxHeight((int)(MAX_COMMENT_HEIGHT * density));
+            commentViewHolder.commentBodyView.setMaxLineCount(5);
 
             commentViewHolder.replyBlock = view.findViewById(R.id.social_reply_block);
             commentViewHolder.likeBlock = view.findViewById(R.id.social_like_block);
@@ -75,11 +68,11 @@ public class CommentViewHolder {
             commentViewHolder.readMoreView = view.findViewById(R.id.tv_read_more);
 
             // comment_list_item_large_border
-            commentViewHolder.newsBlock = view.findViewById(R.id.comment_news_block);
-            commentViewHolder.newsTitleView = view.findViewById(R.id.comment_news_title_tv);
-            commentViewHolder.newsDateView = view.findViewById(R.id.comment_news_date_tv);
-            commentViewHolder.fireTextView = view.findViewById(R.id.comment_news_fire_tv);
-            commentViewHolder.fireImageView = view.findViewById(R.id.comment_news_fire_iv);
+            View referenceNewsView = view.findViewById(R.id.comment_news_block);
+            if(referenceNewsView != null) {
+                commentViewHolder.newsReferencedByCommentViewHolder =
+                        NewsReferencedByCommentViewHolder.convertToViewHolder(referenceNewsView);
+            }
 
             return commentViewHolder;
         } catch (ClassCastException exception) {

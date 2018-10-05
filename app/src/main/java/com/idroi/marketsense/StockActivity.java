@@ -6,9 +6,8 @@ import android.content.Intent;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.constraint.Guideline;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -19,9 +18,9 @@ import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.webkit.WebChromeClient;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -31,7 +30,6 @@ import android.widget.Toast;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
@@ -49,7 +47,6 @@ import com.idroi.marketsense.common.MarketSenseError;
 import com.idroi.marketsense.common.YahooStxChartCrawler;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.CommentAndVote;
-import com.idroi.marketsense.data.Event;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.Stock;
@@ -60,14 +57,22 @@ import com.idroi.marketsense.request.NewsRequest;
 import com.idroi.marketsense.request.CommentAndVoteRequest;
 import com.idroi.marketsense.request.StockChartDataRequest;
 import com.idroi.marketsense.util.MarketSenseUtils;
+import com.idroi.marketsense.viewholders.ChartPeriodSelectorViewHolder;
+import com.idroi.marketsense.viewholders.ChartTaTopItemsViewHolder;
+import com.idroi.marketsense.viewholders.ChartTickBottomItemsViewHolder;
+import com.idroi.marketsense.viewholders.ChartTickTopItemsViewHolder;
+import com.idroi.marketsense.viewholders.FiveBestPriceViewHolder;
+import com.idroi.marketsense.viewholders.PredictForDifferentPeriodViewHolder;
+import com.idroi.marketsense.viewholders.StockActivityActionBarViewHolder;
+import com.idroi.marketsense.viewholders.StockActivityBottomContent;
+import com.idroi.marketsense.viewholders.StockActivityRealPriceBlockViewHolder;
+import com.idroi.marketsense.viewholders.StockPredictionBlockViewHolder;
 
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import static com.idroi.marketsense.CommentActivity.EXTRA_COMMENT;
 import static com.idroi.marketsense.CommentActivity.EXTRA_NEED_TO_CHANGE;
@@ -81,8 +86,8 @@ import static com.idroi.marketsense.RichEditorActivity.sReplyEditorRequestCode;
 import static com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter.ADAPTER_CHANGE_LIKE_ONLY;
 import static com.idroi.marketsense.adapter.NewsRecyclerAdapter.NEWS_SINGLE_LAYOUT;
 import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
-import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_EVENT_LIST;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_NEWS_READ_RECORD_LIST;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_USER_HAS_LOGIN;
 import static com.idroi.marketsense.fragments.NewsFragment.KEYWORD_NAME;
 import static com.idroi.marketsense.fragments.NewsFragment.KEYWORD_TASK_ID;
@@ -107,52 +112,70 @@ public class StockActivity extends AppCompatActivity {
     public final static int CLICK_VOTE_UP_BEFORE_LOGIN = 5;
     public final static int CLICK_VOTE_DOWN_BEFORE_LOGIN = 6;
 
-    private static final float CONST_ENABLE_ALPHA = 1.0f;
-    private static final float CONST_DISABLE_ALPHA = 0.7f;
-
     private YahooStxChartCrawler mYahooStxChartCrawler;
-    private ProgressBar mLoadingProgressBar, mLoadingProgressBarMore;
-    private boolean mIsMoreLoadFinished = false;
+    private ProgressBar mLoadingProgressBar;
     private String mStockName;
     private String mCode;
     private String mPrice, mDiffNum, mDiffPercentage;
-    private ConstraintLayout mCommentBlock, mNewsBlock;
-    private ConstraintLayout mVoteTopBlock, mBottomFixedBlock;
-
-    private NewsWebView mStockAIWebView;
-    private boolean mIsStockAIOpen = false;
-    private boolean mIsStockAILoading = false;
-
-    private Button mButtonRaise, mButtonFall;
-    private TextView mResultTextView;
 
     private CallbackManager mFBCallbackManager;
     private UserProfile mUserProfile;
     private boolean mIsFavorite;
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private TextView mSelectedChartTextView, mChartType1M;
+    private TextView mSelectedChartTextView;
 
     private RecyclerView mCommentRecyclerView;
     private CommentsRecyclerViewAdapter mCommentsRecyclerViewAdapter;
     private RecyclerView mNewsRecyclerView;
     private NewsRecyclerAdapter mNewsRecyclerAdapter;
 
-    private int mVoteRaiseNum, mVoteFallNum;
-
     private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
     private int mLastClickedButton;
     private AlertDialog mLoginAlertDialog, mStarAlertDialog;
     private LoginButton mFBLoginBtn;
-    private ImageView mAddFavorite;
-    private ConstraintLayout mSelectorComment, mSelectorNews;
     private NestedScrollView mNestedScrollView;
 
+    private View mMoreAlertView;
     private RecyclerView mCriticalStatisticsRecyclerView;
     private CriticalStatisticsAdapter mCriticalStatisticsAdapter;
 
     private Comment mTempComment;
     private int mTempPosition;
+
+    private LineChart mLineChart;
+    private BarChart mBarChart;
+    private CandleStickChart mCandleStickChart;
+
+    private StockActivityActionBarViewHolder mStockActivityActionBarViewHolder;
+    private StockActivityRealPriceBlockViewHolder mStockActivityRealPriceBlockViewHolder;
+    private StockPredictionBlockViewHolder mStockPredictionBlockViewHolder;
+    private ChartPeriodSelectorViewHolder mChartPeriodSelectorViewHolder;
+    private ChartTickTopItemsViewHolder mChartTickTopItemsViewHolder;
+    private ChartTaTopItemsViewHolder mChartTaTopItemsViewHolder;
+    private ChartTickBottomItemsViewHolder mChartTickBottomItemsViewHolder;
+    private FiveBestPriceViewHolder mBestPriceRowViewHolder;
+    private PredictForDifferentPeriodViewHolder mPredictForDifferentPeriodViewHolder;
+    private StockActivityBottomContent mStockActivityBottomContent;
+
+    private View.OnLayoutChangeListener mOnLayoutChangeListener;
+    private int mRealTimeContainerShrinkHeight = Integer.MAX_VALUE;
+    private int mSelectorTop = Integer.MAX_VALUE;
+    private boolean mIsSelectorFixed = false;
+
+    private AlertDialog mMoreAlertDialog;
+
+    private boolean mIsTopShrink = false;
+
+    private Handler mHandler = new Handler();
+    private Runnable mExpandRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if(mNewsRecyclerAdapter != null) {
+                mNewsRecyclerAdapter.expand(7);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -164,28 +187,50 @@ public class StockActivity extends AppCompatActivity {
 
         initFBLogin();
         setInformation();
+        initViewHolders();
         setActionBar();
         initCriticalStatistics();
+        initStockPredictionBlock();
         initStockChart();
         setSelector();
-        initStockAIWebView();
         initSocialButtons();
+    }
+
+    private void initViewHolders() {
+        mStockActivityRealPriceBlockViewHolder =
+                StockActivityRealPriceBlockViewHolder
+                        .convertToViewHolder(findViewById(R.id.top_real_price_block));
+        mStockPredictionBlockViewHolder =
+                StockPredictionBlockViewHolder
+                        .convertToViewHolder(findViewById(R.id.stock_prediction_block));
+        mChartPeriodSelectorViewHolder =
+                ChartPeriodSelectorViewHolder
+                        .convertToViewHolder(findViewById(R.id.stock_period_block));
+        mChartTickTopItemsViewHolder =
+                ChartTickTopItemsViewHolder
+                        .convertToViewHolder(findViewById(R.id.stock_chart_tick_top_block));
+        mChartTaTopItemsViewHolder =
+                ChartTaTopItemsViewHolder
+                        .convertToViewHolder(findViewById(R.id.stock_chart_ta_top_block));
+        mChartTickBottomItemsViewHolder =
+                ChartTickBottomItemsViewHolder
+                        .convertToViewHolder(findViewById(R.id.stock_chart_tick_bottom_block));
+        mBestPriceRowViewHolder =
+                FiveBestPriceViewHolder
+                        .convertToViewHolder(findViewById(R.id.five_best_price));
+        mPredictForDifferentPeriodViewHolder =
+                PredictForDifferentPeriodViewHolder
+                        .convertToViewHolder(findViewById(R.id.predict_for_different_period));
+        mStockActivityBottomContent =
+                StockActivityBottomContent
+                        .convertToViewHolder(findViewById(R.id.stock_activity_bottom_selector));
     }
 
     @Override
     public void onBackPressed() {
-        if(mIsStockAIOpen) {
-            mStockAIWebView.setVisibility(View.GONE);
-            mBottomFixedBlock.setVisibility(View.VISIBLE);
-            if(mLoadingProgressBarMore != null) {
-                mLoadingProgressBarMore.setVisibility(View.GONE);
-            }
-            mIsStockAIOpen = false;
-        } else {
-            super.onBackPressed();
-            mUserProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
-            overridePendingTransition(R.anim.stop, R.anim.right_to_left);
-        }
+        super.onBackPressed();
+        mUserProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
+        overridePendingTransition(R.anim.stop, R.anim.right_to_left);
     }
 
     @Override
@@ -193,8 +238,9 @@ public class StockActivity extends AppCompatActivity {
         mNewsRecyclerAdapter.destroy();
         mCommentsRecyclerViewAdapter.destroy();
         mUserProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
-        mStockAIWebView.destroy();
         mYahooStxChartCrawler.destroy();
+        mHandler.removeCallbacks(mExpandRunnable);
+        mStockActivityRealPriceBlockViewHolder.mainView.removeOnLayoutChangeListener(mOnLayoutChangeListener);
         super.onDestroy();
     }
 
@@ -211,128 +257,20 @@ public class StockActivity extends AppCompatActivity {
             mStarAlertDialog.dismiss();
             mStarAlertDialog = null;
         }
-    }
 
-    private void doVoteAction(boolean isGood) {
-        Toast.makeText(this, R.string.title_welcome_tomorrow, Toast.LENGTH_SHORT).show();
-        if(isGood) {
-            PostEvent.sendStockVote(this, mCode, PostEvent.EventVars.VOTE_RAISE, 1);
-            mVoteRaiseNum += 1;
-        } else {
-            PostEvent.sendStockVote(this, mCode, PostEvent.EventVars.VOTE_FALL, 1);
-            mVoteFallNum += 1;
+        if(mMoreAlertDialog != null) {
+            mMoreAlertDialog.dismiss();
+            mMoreAlertDialog = null;
         }
-        setVoteButtons();
-    }
-
-    private void setVoteButtons() {
-        MSLog.d("canVoteAgain: " + mCode + ", " + mUserProfile.canVoteAgain(mCode));
-        if(!mUserProfile.canVoteAgain(mCode)) {
-            mVoteTopBlock.setVisibility(View.GONE);
-            mResultTextView.setVisibility(View.VISIBLE);
-
-            Event event = mUserProfile.getRecentVoteForStockEvent(mCode);
-            if(event.getEventType().equals(PostEvent.EventVars.VOTE_RAISE.getEventVar())) {
-                MarketSenseUtils.setHtmlColorText(mResultTextView, getString(R.string.title_you_look_good));
-            } else {
-                MarketSenseUtils.setHtmlColorText(mResultTextView, getString(R.string.title_you_look_bad));
-            }
-
-            showVoteResult();
-        } else {
-            mVoteTopBlock.setVisibility(View.VISIBLE);
-            mResultTextView.setVisibility(View.INVISIBLE);
-            mButtonRaise.setEnabled(true);
-            mButtonFall.setEnabled(true);
-            mButtonRaise.setAlpha(CONST_ENABLE_ALPHA);
-            mButtonFall.setAlpha(CONST_ENABLE_ALPHA);
-        }
-    }
-
-    private void showVoteResult() {
-        setVoteResult();
-
-        ConstraintLayout emptyLayout = findViewById(R.id.vote_result_empty_block);
-        ConstraintLayout resultLayout = findViewById(R.id.vote_result_block);
-
-        emptyLayout.setVisibility(View.GONE);
-        resultLayout.setVisibility(View.VISIBLE);
-
-        ConstraintLayout.LayoutParams paramsComment = (ConstraintLayout.LayoutParams) mSelectorComment.getLayoutParams();
-        paramsComment.topToBottom = R.id.vote_result_block;
-        mSelectorComment.setLayoutParams(paramsComment);
-
-        ConstraintLayout.LayoutParams paramsNews = (ConstraintLayout.LayoutParams) mSelectorNews.getLayoutParams();
-        paramsNews.topToBottom = R.id.vote_result_block;
-        mSelectorNews.setLayoutParams(paramsNews);
-    }
-
-    private void initStockAIWebView() {
-        mStockAIWebView = findViewById(R.id.more_webview);
-        mStockAIWebView.setVerticalScrollBarEnabled(true);
-        mStockAIWebView.setHorizontalScrollBarEnabled(false);
-        mStockAIWebView.getSettings().setAppCachePath(getApplicationContext().getCacheDir().getAbsolutePath());
-        mStockAIWebView.getSettings().setAllowFileAccess(true);
-        mStockAIWebView.getSettings().setAppCacheEnabled(true);
-        mStockAIWebView.getSettings().setBlockNetworkImage(true);
-        mStockAIWebView.setWebViewClient(new WebViewClient() {
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                MSLog.d("load stock ai page: " + url + " finished.");
-                mIsMoreLoadFinished = true;
-                if(mLoadingProgressBarMore != null) {
-                    mLoadingProgressBarMore.setVisibility(View.GONE);
-                }
-                super.onPageFinished(view, url);
-            }
-        });
-        mStockAIWebView.setWebChromeClient(new WebChromeClient() {
-            @Override
-            public void onProgressChanged(WebView view, int newProgress) {
-                if(newProgress > 90) {
-                    mStockAIWebView.getSettings().setBlockNetworkImage(false);
-                }
-                super.onProgressChanged(view, newProgress);
-            }
-        });
     }
 
     private void initSocialButtons() {
-        mVoteTopBlock = findViewById(R.id.the_most_top_block);
-        mBottomFixedBlock = findViewById(R.id.the_most_bottom_block);
-        mButtonRaise = findViewById(R.id.vote_up_btn);
-        mButtonFall = findViewById(R.id.vote_down_btn);
-        mResultTextView = findViewById(R.id.vote_result_btn);
 
-        setVoteButtons();
-
-        Button buttonGoUp = findViewById(R.id.btn_go_up);
+        ImageView buttonGoUp = findViewById(R.id.btn_go_up);
         buttonGoUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mNestedScrollView.scrollTo(0, 0);
-            }
-        });
-
-        mButtonRaise.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(FBHelper.checkFBLogin()) {
-                    doVoteAction(true);
-                } else {
-                    showLoginAlertDialog(CLICK_VOTE_UP_BEFORE_LOGIN);
-                }
-            }
-        });
-
-        mButtonFall.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(FBHelper.checkFBLogin()) {
-                    doVoteAction(false);
-                } else {
-                    showLoginAlertDialog(CLICK_VOTE_DOWN_BEFORE_LOGIN);
-                }
             }
         });
 
@@ -372,12 +310,6 @@ public class StockActivity extends AppCompatActivity {
             @Override
             public void onGlobalBroadcast(int notifyId, Object payload) {
                 if(notifyId == NOTIFY_USER_HAS_LOGIN && FBHelper.checkFBLogin()) {
-                    mVoteTopBlock.setVisibility(View.VISIBLE);
-                    mButtonRaise.setClickable(false);
-                    mButtonFall.setClickable(false);
-                    mButtonRaise.setAlpha(CONST_DISABLE_ALPHA);
-                    mButtonFall.setAlpha(CONST_DISABLE_ALPHA);
-
                     switch (mLastClickedButton) {
                         case CLICK_COMMENT_BEFORE_LOGIN:
                             startActivityForResult(RichEditorActivity.generateRichEditorActivityIntent(
@@ -386,7 +318,7 @@ public class StockActivity extends AppCompatActivity {
                             overridePendingTransition(R.anim.enter, R.anim.stop);
                             return;
                         case CLICK_STAR_BEFORE_LOGIN:
-                            changeFavorite(mAddFavorite);
+                            changeFavorite(mStockActivityActionBarViewHolder.favoriteImageView);
                             break;
                         case CLICK_LIKE_BEFORE_LOGIN:
                             mCommentsRecyclerViewAdapter.updateCommentsLike();
@@ -399,26 +331,16 @@ public class StockActivity extends AppCompatActivity {
                                 mCommentsRecyclerViewAdapter.notifyItemChanged(mTempPosition, ADAPTER_CHANGE_LIKE_ONLY);
                             }
                     }
-                } else if(notifyId == NOTIFY_ID_EVENT_LIST) {
-                    if(mLastClickedButton == CLICK_VOTE_UP_BEFORE_LOGIN || mLastClickedButton == CLICK_VOTE_DOWN_BEFORE_LOGIN) {
-                        if(!mUserProfile.canVoteAgain(mCode)) {
-                            Toast.makeText(StockActivity.this, R.string.title_welcome_but_you_have_voted, Toast.LENGTH_SHORT).show();
-                            setVoteButtons();
-                        } else if(mLastClickedButton == CLICK_VOTE_UP_BEFORE_LOGIN) {
-                            doVoteAction(true);
-                        } else if(mLastClickedButton == CLICK_VOTE_DOWN_BEFORE_LOGIN) {
-                            doVoteAction(false);
-                        }
-                    } else {
-                        setVoteButtons();
-                    }
                 } else if(notifyId == NOTIFY_ID_FAVORITE_LIST) {
                     mIsFavorite = mUserProfile.isFavoriteStock(mCode);
                     if(mIsFavorite) {
-                        mAddFavorite.setImageResource(R.drawable.ic_star_yellow_24px);
+                        mStockActivityActionBarViewHolder.favoriteImageView.setImageResource(R.mipmap.ic_fav_on);
                     } else {
-                        mAddFavorite.setImageResource(R.drawable.ic_star_border_white_24px);
+                        mStockActivityActionBarViewHolder.favoriteImageView.setImageResource(R.mipmap.ic_fav_off);
                     }
+                } else if(notifyId == NOTIFY_ID_NEWS_READ_RECORD_LIST) {
+                    MSLog.d("update user's read news records");
+                    mNewsRecyclerAdapter.notifyItemRangeChanged(0, mNewsRecyclerAdapter.getItemCount());
                 }
             }
         };
@@ -455,17 +377,25 @@ public class StockActivity extends AppCompatActivity {
     }
 
     private void initSelector() {
-        mCommentBlock = findViewById(R.id.marketsense_stock_comment);
-        mNewsBlock = findViewById(R.id.marketsense_stock_news);
-        mSelectorComment = findViewById(R.id.selector_comment_block);
-        mSelectorNews = findViewById(R.id.selector_news_block);
-        mSelectorComment.setOnClickListener(new View.OnClickListener() {
+        mStockActivityBottomContent.stockActivityBottomSelector.commentSelector.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 chooseBottomBlock(0);
             }
         });
-        mSelectorNews.setOnClickListener(new View.OnClickListener() {
+        mStockActivityBottomContent.stockActivityBottomSelector.newsSelector.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chooseBottomBlock(1);
+            }
+        });
+        mStockActivityRealPriceBlockViewHolder.stockActivityBottomSelector.commentSelector.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chooseBottomBlock(0);
+            }
+        });
+        mStockActivityRealPriceBlockViewHolder.stockActivityBottomSelector.newsSelector.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 chooseBottomBlock(1);
@@ -473,20 +403,50 @@ public class StockActivity extends AppCompatActivity {
         });
 
         mNestedScrollView = findViewById(R.id.body_scroll_view);
-        final ConstraintLayout voteInformationBlock = findViewById(R.id.stock_people_vote_information);
-        final ConstraintLayout newsInformationBlock = findViewById(R.id.stock_news_vote_information);
-        voteInformationBlock.setOnClickListener(new View.OnClickListener() {
+
+        mOnLayoutChangeListener = new View.OnLayoutChangeListener() {
             @Override
-            public void onClick(View view) {
-                chooseBottomBlock(0);
-                slideToView(mSelectorComment);
+            public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
+                int height = view.getHeight();
+                if(height != 0) {
+                    if(height < mRealTimeContainerShrinkHeight) {
+                        mRealTimeContainerShrinkHeight = view.getHeight();
+
+                        Point childOffset = new Point();
+                        MarketSenseUtils.getDeepChildOffset(mNestedScrollView,
+                                mStockActivityBottomContent.stockActivityBottomSelector.newsSelector.getParent(),
+                                mStockActivityBottomContent.stockActivityBottomSelector.newsSelector,
+                                childOffset);
+                        mSelectorTop = childOffset.y - mRealTimeContainerShrinkHeight;
+                    }
+                }
             }
-        });
-        newsInformationBlock.setOnClickListener(new View.OnClickListener() {
+        };
+
+        mStockActivityRealPriceBlockViewHolder.mainView.addOnLayoutChangeListener(mOnLayoutChangeListener);
+
+        mNestedScrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
             @Override
-            public void onClick(View view) {
-                chooseBottomBlock(1);
-                slideToView(mSelectorNews);
+            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                if(!mIsTopShrink && scrollY > 50) {
+                    mIsTopShrink = true;
+                    mStockActivityRealPriceBlockViewHolder.shrink();
+                }
+
+                if(mIsTopShrink && scrollY < 100) {
+                    mIsTopShrink = false;
+                    mStockActivityRealPriceBlockViewHolder.expand();
+                }
+
+                if(!mIsSelectorFixed && scrollY >= mSelectorTop) {
+                    mStockActivityRealPriceBlockViewHolder.showSelector();
+                    mIsSelectorFixed = true;
+                }
+
+                if(mIsSelectorFixed && scrollY < mSelectorTop) {
+                    mStockActivityRealPriceBlockViewHolder.hideSelector();
+                    mIsSelectorFixed = false;
+                }
             }
         });
     }
@@ -498,9 +458,7 @@ public class StockActivity extends AppCompatActivity {
                 final DisplayMetrics metrics = getResources().getDisplayMetrics();
                 Point childOffset = new Point();
                 MarketSenseUtils.getDeepChildOffset(mNestedScrollView, child.getParent(), child, childOffset);
-                if(mUserProfile.canVoteAgain(mCode)) {
-                    childOffset.y = childOffset.y - (int)(56 * metrics.density);
-                }
+                childOffset.y = childOffset.y - (int)(mStockActivityRealPriceBlockViewHolder.mainView.getHeight() * metrics.density);
                 mNestedScrollView.scrollTo(0, childOffset.y);
             }
         });
@@ -509,28 +467,64 @@ public class StockActivity extends AppCompatActivity {
     private void chooseBottomBlock(int position) {
         switch (position) {
             case 0:
-                mCommentBlock.setVisibility(View.VISIBLE);
-                mNewsBlock.setVisibility(View.GONE);
-                mSelectorComment.setBackground(getDrawable(R.drawable.border_selector_selected));
-                mSelectorNews.setBackground(getDrawable(R.drawable.border_selector));
+                mStockActivityBottomContent.setSelected(this,
+                        mStockActivityBottomContent.stockActivityBottomSelector.commentSelector,
+                        mStockActivityBottomContent.commentBlock);
                 break;
             case 1:
-                mCommentBlock.setVisibility(View.GONE);
-                mNewsBlock.setVisibility(View.VISIBLE);
-                mSelectorComment.setBackground(getDrawable(R.drawable.border_selector));
-                mSelectorNews.setBackground(getDrawable(R.drawable.border_selector_selected));
+                mStockActivityBottomContent.setSelected(this,
+                        mStockActivityBottomContent.stockActivityBottomSelector.newsSelector,
+                        mStockActivityBottomContent.newsBlock);
                 break;
         }
     }
 
-
     private void initCriticalStatistics() {
-        mCriticalStatisticsRecyclerView = findViewById(R.id.critical_statistics_list_view);
+        mMoreAlertView = LayoutInflater.from(this)
+                .inflate(R.layout.alertdialog_stock_more, null);
+        ImageView cancelImageView = mMoreAlertView.findViewById(R.id.cancel_button);
+        cancelImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dismissMoreAlertDialog();
+            }
+        });
+        mCriticalStatisticsRecyclerView = mMoreAlertView.findViewById(R.id.critical_statistics_list_view);
+
         mCriticalStatisticsAdapter = new CriticalStatisticsAdapter(this);
         mCriticalStatisticsRecyclerView.setAdapter(mCriticalStatisticsAdapter);
         mCriticalStatisticsRecyclerView.setNestedScrollingEnabled(false);
         mCriticalStatisticsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mCriticalStatisticsAdapter.loadCriticalStatistics(CriticalStatisticsRequest.getUrlStockCriticalStatistics(mCode));
+        mCriticalStatisticsAdapter.loadCriticalStatistics(
+                        CriticalStatisticsRequest.getUrlStockCriticalStatistics(mCode));
+    }
+
+    private void showMoreAlertDialog() {
+        dismissMoreAlertDialog();
+
+        if(mMoreAlertView != null) {
+            ViewGroup viewGroup = ((ViewGroup) mMoreAlertView.getParent());
+            if (viewGroup != null) {
+                viewGroup.removeView(mMoreAlertView);
+            }
+        }
+
+        mMoreAlertDialog = new AlertDialog.Builder(this)
+                .setView(mMoreAlertView)
+                .create();
+        mMoreAlertDialog.show();
+        Window window = mMoreAlertDialog.getWindow();
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        if(window != null) {
+            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, (int) (520 * metrics.density));
+        }
+    }
+
+    private void dismissMoreAlertDialog() {
+        if(mMoreAlertDialog != null) {
+            mMoreAlertDialog.dismiss();
+            mMoreAlertDialog = null;
+        }
     }
 
     private void initNews() {
@@ -556,7 +550,7 @@ public class StockActivity extends AppCompatActivity {
                 int totalItemCount = layoutManager.getItemCount();
                 int pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
                 if (pastVisibleItems + visibleItemCount >= totalItemCount) {
-                    mNewsRecyclerAdapter.expand(7);
+                    mHandler.post(mExpandRunnable);
                 }
             }
         });
@@ -588,23 +582,19 @@ public class StockActivity extends AppCompatActivity {
         mNewsRecyclerAdapter.setOnItemClickListener(new NewsRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(News news) {
+                mNewsRecyclerAdapter.notifyNewsIsClicked(news);
                 startActivity(NewsWebViewActivity.generateNewsWebViewActivityIntent(
                         StockActivity.this, news.getId(), news.getTitle(),
                         news.getUrlImage(), news.getDate(),
                         news.getPageLink(), news.getOriginLink(),
-                        news.getVoteRaiseNum(), news.getVoteFallNum(), news.getStockKeywords(), news.getLevel()));
+                        news.getVoteRaiseNum(), news.getVoteFallNum(),
+                        news.getStockKeywords(), news.getExplicitKeywords(), news.getLevel()));
                 overridePendingTransition(R.anim.enter, R.anim.stop);
             }
         });
     }
 
     private void setNewsForEmptyData(boolean isEmpty) {
-
-        TextView newsJoin = findViewById(R.id.news_join);
-        String format = getResources().getString(R.string.title_news_join);
-        newsJoin.setText(String.format(format, mNewsRecyclerAdapter.getNewsTotalCount()));
-        newsJoin.setVisibility(View.VISIBLE);
-
         ImageView noDataImageView = findViewById(R.id.no_news_iv);
         TextView noDataTextView = findViewById(R.id.no_news_tv);
         if(isEmpty) {
@@ -658,11 +648,8 @@ public class StockActivity extends AppCompatActivity {
                     if (commentAndVote.getCommentSize() > 0) {
                         showCommentBlock();
                     }
-                    mVoteRaiseNum = commentAndVote.getRaiseNumber();
-                    mVoteFallNum = commentAndVote.getFallNumber();
                     MSLog.d("update stock raise vote number: " + commentAndVote.getRaiseNumber());
                     MSLog.d("update stock fall vote number: " + commentAndVote.getFallNumber());
-                    setSocialInformation(commentAndVote);
                 }
             }
         });
@@ -676,147 +663,80 @@ public class StockActivity extends AppCompatActivity {
         mCommentRecyclerView.setVisibility(View.VISIBLE);
     }
 
-    private void setSocialInformation(CommentAndVote commentAndVote) {
-        TextView peopleJoin = findViewById(R.id.people_join);
-        String format = getResources().getString(R.string.title_people_join);
-        peopleJoin.setText(String.format(format, commentAndVote.getCommentSize()));
-        peopleJoin.setVisibility(View.VISIBLE);
+    private void initStockPredictionBlock() {
+        ClientData clientData = ClientData.getInstance(this);
+        Stock stock = clientData.getPriceFromCode(mCode);
 
-        TextView peopleScore = findViewById(R.id.people_score);
-        TextView peopleMaxScore = findViewById(R.id.people_score_max_const);
-        TextView newsScore = findViewById(R.id.news_score);
-        TextView newsMaxScore = findViewById(R.id.news_score_max_const);
-        TextView peopleAttitude = findViewById(R.id.people_attitude);
-        TextView newsAttitude = findViewById(R.id.news_attitude);
+        if(stock != null) {
+            Stock.renderTitleAndStars(this, stock.getPredictTechDirection(),
+                    stock.getPredictTechLevel(),
+                    mStockPredictionBlockViewHolder.techBlockView,
+                    mStockPredictionBlockViewHolder.techTitleTextView,
+                    mStockPredictionBlockViewHolder.techUnavailableTextView,
+                    mStockPredictionBlockViewHolder.techImageViews);
 
-        commentAndVote.setVotingText(peopleScore, peopleMaxScore);
-        commentAndVote.setPredictionText(newsScore, newsMaxScore);
-        peopleAttitude.setText(commentAndVote.getVotingAttitude(this));
-        newsAttitude.setText(commentAndVote.getPredictionAttitude(this));
+            Stock.renderTitleAndStars(this, stock.getConfidenceDirection(),
+                    stock.getPredictNewsLevel(),
+                    mStockPredictionBlockViewHolder.newsBlockView,
+                    mStockPredictionBlockViewHolder.newsTitleTextView,
+                    mStockPredictionBlockViewHolder.newsUnavailableTextView,
+                    mStockPredictionBlockViewHolder.newsImageViews);
 
-        ImageView peopleImageView = findViewById(R.id.people_score_iv);
-        ImageView newsImageView = findViewById(R.id.news_score_iv);
-        commentAndVote.setVotingIcon(this, peopleImageView);
-        commentAndVote.setPredictionIcon(this, newsImageView);
-        setVoteResult();
-    }
 
-    private void setVoteResult() {
-        DecimalFormat decimalFormat = new DecimalFormat("#,###,###");
+            stock.renderTodayBlock(this,
+                    mStockPredictionBlockViewHolder.todayBlock,
+                    mStockPredictionBlockViewHolder.todayTitleTextView,
+                    mStockPredictionBlockViewHolder.todayStatusTextView);
 
-        TextView totalPeopleTextView = findViewById(R.id.vote_result_people_number);
-        String totalNumberString =
-                decimalFormat.format(mVoteRaiseNum + mVoteFallNum) +
-                        getResources().getString(R.string.title_vote_people_number);
-        totalPeopleTextView.setText(totalNumberString);
-        TextView goodPeopleTextView = findViewById(R.id.vote_result_vote_good_number);
-        TextView badPeopleTextView = findViewById(R.id.vote_result_vote_bad_number);
-        goodPeopleTextView.setText(decimalFormat.format(mVoteRaiseNum));
-        badPeopleTextView.setText(decimalFormat.format(mVoteFallNum));
+            stock.renderTomorrowBlock(this,
+                    mStockPredictionBlockViewHolder.tomorrowBlock,
+                    mStockPredictionBlockViewHolder.tomorrowTitleTextView,
+                    mStockPredictionBlockViewHolder.tomorrowStatusTextView);
 
-        Guideline guideLine = findViewById(R.id.vote_percentage_guideline);
-        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) guideLine.getLayoutParams();
-        float goodPercentage = (float) mVoteRaiseNum / (mVoteRaiseNum + mVoteFallNum);
-        params.guidePercent = goodPercentage;
-        guideLine.setLayoutParams(params);
-
-        DecimalFormat percentFormat = new DecimalFormat("#%");
-        TextView goodPercentageTextView = findViewById(R.id.vote_look_good_percentage);
-        TextView badPercentageTextView = findViewById(R.id.vote_look_bad_percentage);
-        goodPercentageTextView.setText(percentFormat.format(goodPercentage));
-        badPercentageTextView.setText(percentFormat.format(1 - goodPercentage));
-    }
-
-    private void setPriceBlock(float price, float diffNum, float diffPercentage) {
-        String diffNumberString = null;
-        String diffPercentageString = null;
-        if(diffPercentage > 0) {
-            diffNumberString = String.format(Locale.US, "+%s", diffNum);
-            diffPercentageString = String.format(Locale.US, "+%.2f%%", diffPercentage);
-        } else {
-            diffNumberString = String.format(Locale.US, "%s", diffNum);
-            diffPercentageString = String.format(Locale.US, "%.2f%%", diffPercentage);
-        }
-        setPriceBlock(String.valueOf(price), diffNumberString, diffPercentageString);
-    }
-
-    private void setPriceBlock(String price, String diffNum, String diffPercentage) {
-        TextView priceTextView = findViewById(R.id.stock_price_tv);
-        TextView diffTextView = findViewById(R.id.stock_diff_tv);
-        String format = getResources().getString(R.string.title_diff_format);
-
-        priceTextView.setText(price);
-        diffTextView.setText(String.format(format, diffNum, diffPercentage));
-
-        try {
-            float diffPercentageFloat = Float.valueOf(diffNum);
-            if(diffPercentageFloat > 0) {
-                priceTextView.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_red_s, 0, 0, 0);
-                diffTextView.setTextColor(getResources().getColor(R.color.colorTrendUp));
-            } else if(diffPercentageFloat < 0) {
-                priceTextView.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_green_s, 0, 0, 0);
-                diffTextView.setTextColor(getResources().getColor(R.color.colorTrendDown));
-            } else {
-                priceTextView.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_none, 0, 0, 0);
-                diffTextView.setTextColor(getResources().getColor(R.color.colorTrendFlat));
-            }
-        } catch (NumberFormatException e) {
-            diffTextView.setTextColor(getResources().getColor(R.color.colorTrendFlat));
-            MSLog.e("NumberFormatException: " + mDiffNum);
+            PredictForDifferentPeriodViewHolder.update(mPredictForDifferentPeriodViewHolder,
+                    stock.getTomorrowPredictionDiffDirection(),
+                    stock.get5DPredictionDirection(),
+                    stock.get20DPredictionDirection());
         }
     }
 
     private void initStockChart() {
 
         mLoadingProgressBar = findViewById(R.id.loading_progress_bar_1);
-        mLoadingProgressBarMore = findViewById(R.id.loading_progress_bar_2);
         mSwipeRefreshLayout = findViewById(R.id.swipe_to_refresh);
 
-        setPriceBlock(mPrice, mDiffNum, mDiffPercentage);
+        updatePrice(mPrice, mDiffNum, mDiffPercentage, null);
 
-        Button moreButton = findViewById(R.id.more_information_btn);
-        moreButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mStockAIWebView.setVisibility(View.VISIBLE);
-                mBottomFixedBlock.setVisibility(View.GONE);
-                mIsStockAIOpen = true;
-                if(mLoadingProgressBarMore != null && !mIsMoreLoadFinished) {
-                    mLoadingProgressBarMore.setVisibility(View.VISIBLE);
-                }
-                if(!mIsStockAILoading) {
-                    String stockAIUrl = String.format(Locale.US, "https://stock-ai.com/tw-Dly-8-%s.php", mCode);
-                    MSLog.d("load stock ai page: " + stockAIUrl);
-                    mStockAIWebView.loadUrl(stockAIUrl);
-                }
-            }
-        });
-
-        LineChart lineChart = findViewById(R.id.stock_chart_price);
-        BarChart barChart = findViewById(R.id.stock_chart_volume);
-        CandleStickChart candleStickChart = findViewById(R.id.stock_candle_chart_price);
+        mLineChart = findViewById(R.id.stock_chart_price);
+        mBarChart = findViewById(R.id.stock_chart_volume);
+        mCandleStickChart = findViewById(R.id.stock_candle_chart_price);
         mYahooStxChartCrawler =
-                new YahooStxChartCrawler(this, mStockName, mCode, lineChart, barChart, candleStickChart);
+                new YahooStxChartCrawler(this, mStockName, mCode, mLineChart, mBarChart, mCandleStickChart);
 
         mYahooStxChartCrawler.setInformationTextView(
-                (TextView) findViewById(R.id.stock_price_tv),
-                (TextView) findViewById(R.id.stock_diff_tv),
-                (TextView) findViewById(R.id.stock_price_open),
-                (TextView) findViewById(R.id.stock_price_high),
-                (TextView) findViewById(R.id.stock_price_low),
-                (TextView) findViewById(R.id.stock_price_yesterday_close),
-                (TextView) findViewById(R.id.stock_date_tv),
-                (TextView) findViewById(R.id.stock_volume_tv));
+                mChartTaTopItemsViewHolder,
+                mChartTickBottomItemsViewHolder);
         mYahooStxChartCrawler.setYahooStxChartListener(new YahooStxChartCrawler.YahooStxChartListener() {
             @Override
             public void onStxChartDataLoad() {
                 mYahooStxChartCrawler.renderStockChartData();
                 StockTradeData stockTradeData = mYahooStxChartCrawler.getStockTradeData();
                 if(stockTradeData != null) {
-                    setPriceBlock(stockTradeData.getRealPrice(),
+                    updatePrice(stockTradeData.getRealPrice(),
                             stockTradeData.getDiffPrice(),
-                            stockTradeData.getDiffPercentage());
+                            stockTradeData.getDiffPercentage(),
+                            stockTradeData.getTickTotalVolume());
+                    if(stockTradeData.getFiveBestPrice() != null) {
+                        updateFiveBestPrice(stockTradeData.getFiveBestPrice(), stockTradeData.getYesterdayPrice());
+                    }
                 }
+
+                if(mSelectedChartTextView == mChartPeriodSelectorViewHolder.chartType1M) {
+                    showTickBlock();
+                } else {
+                    showTaBlock();
+                }
+
                 mSwipeRefreshLayout.setRefreshing(false);
                 if(mLoadingProgressBar != null) {
                     mLoadingProgressBar.setVisibility(View.GONE);
@@ -834,48 +754,42 @@ public class StockActivity extends AppCompatActivity {
         });
         mYahooStxChartCrawler.loadStockChartData();
 
-        mChartType1M = findViewById(R.id.chart_type_1m);
-        final TextView chartTypeD = findViewById(R.id.chart_type_d);
-        final TextView chartTypeW = findViewById(R.id.chart_type_w);
-        final TextView chartTypeM = findViewById(R.id.chart_type_m);
-        mChartType1M.setTextColor(getResources().getColor(R.color.color_price_line));
-
-        mChartType1M.setOnClickListener(new View.OnClickListener() {
+        mChartPeriodSelectorViewHolder.chartType1M.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changeChartSelectorUI(mChartType1M, chartTypeD, chartTypeW, chartTypeM);
+                changeChartSelectorUI(mChartPeriodSelectorViewHolder.chartType1M);
                 mYahooStxChartCrawler.loadStockChartData();
             }
         });
 
-        chartTypeD.setOnClickListener(new View.OnClickListener() {
+        mChartPeriodSelectorViewHolder.chartTypeD.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changeChartSelectorUI(chartTypeD, mChartType1M, chartTypeW, chartTypeM);
+                changeChartSelectorUI(mChartPeriodSelectorViewHolder.chartTypeD);
                 mYahooStxChartCrawler.loadTaStockChartData(StockChartDataRequest.TA_TYPE_DAY);
             }
         });
 
-        chartTypeW.setOnClickListener(new View.OnClickListener() {
+        mChartPeriodSelectorViewHolder.chartTypeW.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changeChartSelectorUI(chartTypeW, chartTypeD, mChartType1M, chartTypeM);
+                changeChartSelectorUI(mChartPeriodSelectorViewHolder.chartTypeW);
                 mYahooStxChartCrawler.loadTaStockChartData(StockChartDataRequest.TA_TYPE_WEEK);
             }
         });
 
-        chartTypeM.setOnClickListener(new View.OnClickListener() {
+        mChartPeriodSelectorViewHolder.chartTypeM.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changeChartSelectorUI(chartTypeM, chartTypeD, chartTypeW, mChartType1M);
+                changeChartSelectorUI(mChartPeriodSelectorViewHolder.chartTypeM);
                 mYahooStxChartCrawler.loadTaStockChartData(StockChartDataRequest.TA_TYPE_MONTH);
             }
         });
 
         final DisplayMetrics metrics = getResources().getDisplayMetrics();
-        int start = (int) (74 * metrics.density);
-        int end = (int) (94 * metrics.density);
-        mSelectedChartTextView = mChartType1M;
+        int start = (int) (100 * metrics.density);
+        int end = (int) (130 * metrics.density);
+        mSelectedChartTextView = mChartPeriodSelectorViewHolder.chartType1M;
         mSwipeRefreshLayout.setProgressViewOffset(false, start, end);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -887,20 +801,44 @@ public class StockActivity extends AppCompatActivity {
         });
     }
 
-    private void changeChartSelectorUI(TextView selected, TextView ... others) {
-        for (TextView other : others) {
-            other.setTextColor(getResources().getColor(R.color.text_gray));
-        }
-        selected.setTextColor(getResources().getColor(R.color.color_price_line));
+    private void updatePrice(String price, String diffNum, String diffPercentage, String volume) {
+        StockActivityRealPriceBlockViewHolder.update(this, mStockActivityRealPriceBlockViewHolder, price, diffNum, diffPercentage);
+        StockActivityActionBarViewHolder.update(this, mStockActivityActionBarViewHolder, diffNum);
+        ChartTickTopItemsViewHolder.update(this, mChartTickTopItemsViewHolder, volume);
+    }
+
+    private void updatePrice(float price, float diffNum , float diffPercentage, String volume) {
+        StockActivityRealPriceBlockViewHolder.update(this, mStockActivityRealPriceBlockViewHolder, price, diffNum, diffPercentage);
+        StockActivityActionBarViewHolder.update(this, mStockActivityActionBarViewHolder, diffNum);
+        ChartTickTopItemsViewHolder.update(this, mChartTickTopItemsViewHolder, volume);
+    }
+
+    private void updateFiveBestPrice(StockTradeData.BestPriceRow[] bestPriceRows, float yesterdayPrice) {
+        FiveBestPriceViewHolder.update(mBestPriceRowViewHolder, bestPriceRows, yesterdayPrice);
+    }
+
+    private void changeChartSelectorUI(TextView selected) {
+        mChartPeriodSelectorViewHolder.setSelected(this, selected);
         mSelectedChartTextView = selected;
-        if(mSelectedChartTextView == mChartType1M) {
-            mSwipeRefreshLayout.setEnabled(true);
-        } else {
-            mSwipeRefreshLayout.setEnabled(false);
-        }
         if(mLoadingProgressBar != null) {
             mLoadingProgressBar.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void showTickBlock() {
+        mSwipeRefreshLayout.setEnabled(true);
+        mChartTickTopItemsViewHolder.mainView.setVisibility(View.VISIBLE);
+        mChartTaTopItemsViewHolder.mainView.setVisibility(View.GONE);
+
+        mChartTickBottomItemsViewHolder.showSecondRow();
+    }
+
+    private void showTaBlock() {
+        mSwipeRefreshLayout.setEnabled(false);
+        mChartTickTopItemsViewHolder.mainView.setVisibility(View.GONE);
+        mChartTaTopItemsViewHolder.mainView.setVisibility(View.VISIBLE);
+
+        mChartTickBottomItemsViewHolder.hideSecondRow();
     }
 
     private void setInformation() {
@@ -908,8 +846,6 @@ public class StockActivity extends AppCompatActivity {
             MSLog.d("set information in normal stock list click");
             mStockName = getIntent().getStringExtra(Intent.EXTRA_TITLE);
             mCode = getIntent().getStringExtra(EXTRA_CODE);
-            mVoteRaiseNum = getIntent().getIntExtra(EXTRA_RAISE_NUM, 0);
-            mVoteFallNum = getIntent().getIntExtra(EXTRA_FALL_NUM, 0);
 
             mIsFavorite = mUserProfile.isFavoriteStock(mCode);
 
@@ -935,8 +871,6 @@ public class StockActivity extends AppCompatActivity {
 
                 mStockName = stock.getName();
                 mCode = stock.getCode();
-                mVoteRaiseNum = stock.getRaiseNum();
-                mVoteFallNum = stock.getFallNum();
 
                 mIsFavorite = mUserProfile.isFavoriteStock(mCode);
 
@@ -953,44 +887,42 @@ public class StockActivity extends AppCompatActivity {
         if(actionBar != null) {
             actionBar.setElevation(0);
             View view = LayoutInflater.from(actionBar.getThemedContext())
-                    .inflate(R.layout.main_action_bar, null);
+                    .inflate(R.layout.action_bar_stock_activity, null);
 
-            SimpleDraweeView imageView = view.findViewById(R.id.action_bar_avatar);
-            if(imageView != null) {
-                imageView.setImageResource(R.drawable.ic_keyboard_backspace_white_24px);
-                imageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        onBackPressed();
-                    }
-                });
-            }
+            mStockActivityActionBarViewHolder = StockActivityActionBarViewHolder.convertToViewHolder(view, actionBar);
 
-            TextView textView = view.findViewById(R.id.action_bar_name);
-            if(textView != null) {
-                String title = mStockName + " " + mCode;
-                textView.setText(title);
-            }
-
-            mAddFavorite = view.findViewById(R.id.action_bar_notification);
-            if(mAddFavorite != null) {
-                mAddFavorite.setVisibility(View.VISIBLE);
-                if(mIsFavorite) {
-                    mAddFavorite.setImageResource(R.drawable.ic_star_yellow_24px);
-                } else {
-                    mAddFavorite.setImageResource(R.drawable.ic_star_border_white_24px);
+            mStockActivityActionBarViewHolder.backImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onBackPressed();
                 }
-                mAddFavorite.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if(FBHelper.checkFBLogin()) {
-                            changeFavorite(mAddFavorite);
-                        } else {
-                            showLoginAlertDialog(CLICK_STAR_BEFORE_LOGIN);
-                        }
-                    }
-                });
+            });
+
+            String format = getResources().getString(R.string.title_company_name_code_format_no_decoration);
+            mStockActivityActionBarViewHolder.titleTextView.setText(String.format(format, mStockName, mCode));
+
+            mStockActivityActionBarViewHolder.favoriteImageView.setVisibility(View.VISIBLE);
+            if(mIsFavorite) {
+                mStockActivityActionBarViewHolder.favoriteImageView.setImageResource(R.mipmap.ic_fav_on);
+            } else {
+                mStockActivityActionBarViewHolder.favoriteImageView.setImageResource(R.mipmap.ic_fav_off);
             }
+            mStockActivityActionBarViewHolder.favoriteImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(FBHelper.checkFBLogin()) {
+                        changeFavorite(mStockActivityActionBarViewHolder.favoriteImageView);
+                    } else {
+                        showLoginAlertDialog(CLICK_STAR_BEFORE_LOGIN);
+                    }
+                }
+            });
+            mStockActivityActionBarViewHolder.moreImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    showMoreAlertDialog();
+                }
+            });
 
             actionBar.setDisplayShowHomeEnabled(false);
             actionBar.setDisplayShowTitleEnabled(false);
@@ -1008,13 +940,13 @@ public class StockActivity extends AppCompatActivity {
             PostEvent.sendFavoriteStocksDelete(this, mCode);
             String format = getResources().getString(R.string.title_delete_complete);
             Toast.makeText(this, String.format(format, mStockName, mCode), Toast.LENGTH_SHORT).show();
-            imageView.setImageResource(R.drawable.ic_star_border_white_24px);
+            imageView.setImageResource(R.mipmap.ic_fav_off);
         } else {
             mUserProfile.addFavoriteStock(mCode);
             PostEvent.sendFavoriteStocksAdd(this, mCode);
             String format = getResources().getString(R.string.title_add_complete);
             Toast.makeText(this, String.format(format, mStockName, mCode), Toast.LENGTH_SHORT).show();
-            imageView.setImageResource(R.drawable.ic_star_yellow_24px);
+            imageView.setImageResource(R.mipmap.ic_fav_on);
 
             if(mUserProfile.canShowStarDialog(this)) {
                 showStarAlertDialog();
@@ -1104,7 +1036,7 @@ public class StockActivity extends AppCompatActivity {
                 showCommentBlock();
 
                 chooseBottomBlock(0);
-                slideToView(mSelectorComment);
+                slideToView(mStockActivityBottomContent.stockActivityBottomSelector.commentSelector);
 
                 MSLog.d(String.format("user send a comment on (%s, %s, %s): %s", type, id, eventId, html));
             }

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.idroi.marketsense.NewsWebView xmlns:android="http://schemas.android.com/apk/res/android"
+    <com.idroi.marketsense.NewsWebView
         android:id="@+id/marketsense_webview"
         android:layout_width="0dp"
         android:layout_height="0dp"

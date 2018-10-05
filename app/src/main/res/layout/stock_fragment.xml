@@ -26,8 +26,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/stock_chart">
+                app:layout_constraintStart_toStartOf="parent">
 
                 <include
                     android:id="@+id/action_title"
@@ -46,7 +45,7 @@
                         android:layout_marginStart="20dp"
                         android:maxLines="1"
                         android:ellipsize="end"
-                        android:textColor="@color/colorTrendUp"
+                        android:textColor="@color/trend_red"
                         android:textSize="18sp"
                         android:fontFamily="sans-serif"
                         android:textStyle="bold"
@@ -81,7 +80,7 @@
                         android:layout_marginStart="25dp"
                         android:maxLines="1"
                         android:ellipsize="end"
-                        android:textColor="@color/colorTrendDown"
+                        android:textColor="@color/trend_green"
                         android:textSize="18sp"
                         android:fontFamily="sans-serif"
                         android:textStyle="bold"
@@ -118,7 +117,7 @@
                         android:layout_marginStart="25dp"
                         android:maxLines="1"
                         android:ellipsize="end"
-                        android:textColor="@color/marketsense_text_black"
+                        android:textColor="@color/text_first"
                         android:textSize="18sp"
                         android:fontFamily="sans-serif"
                         android:textStyle="bold"
@@ -192,7 +191,7 @@
                     android:fontFamily="sans-serif"
                     android:gravity="center"
                     android:text="@string/title_no_comment"
-                    android:textColor="@color/marketsense_text_gray"
+                    android:textColor="@color/text_third"
                     android:textSize="20sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"

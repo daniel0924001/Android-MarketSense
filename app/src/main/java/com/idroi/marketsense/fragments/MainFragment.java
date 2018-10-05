@@ -1,12 +1,17 @@
 package com.idroi.marketsense.fragments;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,26 +20,35 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.idroi.marketsense.NewsWebViewActivity;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.StockActivity;
+import com.idroi.marketsense.StockKnowledgeListActivity;
 import com.idroi.marketsense.adapter.NewsRecyclerAdapter;
 import com.idroi.marketsense.adapter.StockRankingRecyclerAdapter;
 import com.idroi.marketsense.adapter.StockRankingRenderer;
+import com.idroi.marketsense.adapter.TopBannerPagerAdapter;
+import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.data.Stock;
+import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.datasource.StockListPlacer;
 import com.idroi.marketsense.request.NewsRequest;
 import com.idroi.marketsense.request.StockRequest;
+import com.idroi.marketsense.viewholders.LoadingDotsPageViewHolder;
+import com.idroi.marketsense.viewholders.RankingListSingleColumnViewHolder;
+import com.idroi.marketsense.viewholders.RankingListViewHolder;
 
 import java.util.ArrayList;
 
 import static com.idroi.marketsense.adapter.NewsRecyclerAdapter.NEWS_SINGLE_LAYOUT;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_NEWS_READ_RECORD_LIST;
 import static com.idroi.marketsense.fragments.NewsFragment.GENERAL_TASK_ID;
-import static com.idroi.marketsense.fragments.StockListFragment.WPCT_ID;
+import static com.idroi.marketsense.fragments.StockListFragment.NORMAL_ID;
 import static com.idroi.marketsense.request.NewsRequest.PARAM_GTS;
 import static com.idroi.marketsense.request.NewsRequest.PARAM_LEVEL;
 import static com.idroi.marketsense.request.NewsRequest.PARAM_STATUS;
@@ -55,16 +69,25 @@ public class MainFragment extends Fragment {
     private ConstraintLayout mNoDataRefreshLayout;
     private ImageView mNoDataImageView;
     private TextView mNoDataTextView;
-    private ProgressBar mLoadingProgressBar, mLoadingProgressBarRankingPeople, mLoadingProgressBarRankingNews;
-
-    private RecyclerView mTechRankingRecyclerView, mNewsRankingRecyclerView;
-    private StockRankingRecyclerAdapter mTechRankingRecyclerAdapter, mNewsRankingRecyclerAdapter;
+    private ProgressBar mLoadingProgressBar;
 
     private StockListPlacer mStockListPlacer;
 
     private NestedScrollView mNestedScrollView;
     private Fragment mStockListFragment;
     private OnActionBarChangeListener mOnActionBarChangeListener;
+
+    private RankingListViewHolder mTechBlockViewHolder, mNewsBlockViewHolder;
+    private RankingListSingleColumnViewHolder mDiffBlockViewHolder;
+    private LoadingDotsPageViewHolder mLoadingDotsPageViewHolder;
+
+    private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
+
+    private ViewPager.OnPageChangeListener mOnPageChangeListener;
+    private ViewPager mViewPager;
+    private Runnable mSwipeRunnable;
+    private Handler mSwipeHandler;
+    private final int REFRESH_TIME = 6000;
 
     @Nullable
     @Override
@@ -83,16 +106,28 @@ public class MainFragment extends Fragment {
         mNewsRecyclerView.setAdapter(mNewsRecyclerAdapter);
         mNewsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        mLoadingProgressBar = view.findViewById(R.id.loading_progress_bar);
-        mLoadingProgressBarRankingNews = view.findViewById(R.id.loading_progress_bar_rank_news);
-        mLoadingProgressBarRankingPeople = view.findViewById(R.id.loading_progress_bar_rank_people);
-
-        mTechRankingRecyclerView = view.findViewById(R.id.list_ranking_tech);
-        mNewsRankingRecyclerView = view.findViewById(R.id.list_ranking_news);
+        mLoadingProgressBar = view.findViewById(R.id.news_list_progress_bar);
 
         mNestedScrollView = view.findViewById(R.id.body_scroll_view);
 
-        initTopBanner(view);
+        mLoadingDotsPageViewHolder = LoadingDotsPageViewHolder
+                .convertToViewHolder(view.findViewById(R.id.loading_dots_page));
+        mTechBlockViewHolder =
+                RankingListViewHolder.convertToViewHolder(
+                        view.findViewById(R.id.tech_block),
+                        R.string.main_page_tech_ranking,
+                        R.string.main_page_tech_trend);
+        mNewsBlockViewHolder =
+                RankingListViewHolder.convertToViewHolder(
+                        view.findViewById(R.id.news_block),
+                        R.string.main_page_news_ranking,
+                        R.string.main_page_news_trend);
+        mDiffBlockViewHolder =
+                RankingListSingleColumnViewHolder.convertToViewHolder(
+                        view.findViewById(R.id.diff_block),
+                        R.string.main_page_diff_ranking);
+
+        initTopBanner(view.findViewById(R.id.top_banner_block));
 
         return view;
     }
@@ -101,66 +136,95 @@ public class MainFragment extends Fragment {
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mStockListPlacer = new StockListPlacer(getActivity(), WPCT_ID);
-        mStockListPlacer.setStockListListener(new StockListPlacer.StockListListener() {
+        mGlobalBroadcastListener = new UserProfile.GlobalBroadcastListener() {
             @Override
-            public void onStockListLoaded() {
-                if(mLoadingProgressBarRankingNews != null) {
-                    mLoadingProgressBarRankingNews.setVisibility(View.GONE);
-                }
-                if(mLoadingProgressBarRankingPeople != null) {
-                    mLoadingProgressBarRankingPeople.setVisibility(View.GONE);
-                }
-                if(mStockListPlacer.getStocks() != null) {
-                    TextView secondTitle = view.findViewById(R.id.tv_news_ranking);
-                    ((ConstraintLayout.LayoutParams) secondTitle.getLayoutParams()).topToBottom = R.id.list_ranking_tech;
-                    ((ConstraintLayout.LayoutParams) secondTitle.getLayoutParams()).topMargin = 0;
-                    TextView thirdTitle = view.findViewById(R.id.tv_news);
-                    ((ConstraintLayout.LayoutParams) thirdTitle.getLayoutParams()).topToBottom = R.id.list_ranking_news;
-                    ((ConstraintLayout.LayoutParams) thirdTitle.getLayoutParams()).topMargin = 0;
-
-                    mTechRankingRecyclerAdapter = new StockRankingRecyclerAdapter(getActivity(),
-                            mStockListPlacer.getStocks(), StockRankingRenderer.RANKING_BY_TECH);
-                    mNewsRankingRecyclerAdapter = new StockRankingRecyclerAdapter(getActivity(),
-                            mStockListPlacer.getStocks(), StockRankingRenderer.RANKING_BY_NEWS);
-                    mTechRankingRecyclerView.setAdapter(mTechRankingRecyclerAdapter);
-                    mNewsRankingRecyclerView.setAdapter(mNewsRankingRecyclerAdapter);
-                    mTechRankingRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                    mNewsRankingRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                    mTechRankingRecyclerView.setNestedScrollingEnabled(false);
-                    mNewsRankingRecyclerView.setNestedScrollingEnabled(false);
-
-                    mTechRankingRecyclerAdapter.setOnItemClickListener(new StockRankingRecyclerAdapter.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(Stock stock) {
-                            openStockActivity(stock);
-                        }
-                    });
-
-                    mNewsRankingRecyclerAdapter.setOnItemClickListener(new StockRankingRecyclerAdapter.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(Stock stock) {
-                            openStockActivity(stock);
-                        }
-                    });
-                } else {
-                    mTechRankingRecyclerView.setVisibility(View.GONE);
-                    mNewsRankingRecyclerView.setVisibility(View.GONE);
-                    view.findViewById(R.id.tv_news_ranking).setVisibility(View.GONE);
-                    view.findViewById(R.id.tv_news_ranking_subtitle).setVisibility(View.GONE);
-                    view.findViewById(R.id.tv_news_ranking_subtitle_price).setVisibility(View.GONE);
-                    view.findViewById(R.id.tv_news_ranking_subtitle_predict).setVisibility(View.GONE);
-                    view.findViewById(R.id.tv_tech_ranking).setVisibility(View.GONE);
-                    view.findViewById(R.id.tv_tech_ranking_subtitle).setVisibility(View.GONE);
-                    view.findViewById(R.id.tv_tech_ranking_subtitle_price).setVisibility(View.GONE);
-                    view.findViewById(R.id.tv_tech_ranking_subtitle_predict).setVisibility(View.GONE);
+            public void onGlobalBroadcast(int notifyId, Object payload) {
+                if(notifyId == NOTIFY_ID_NEWS_READ_RECORD_LIST) {
+                    MSLog.d("update user's read news records");
+                    mNewsRecyclerAdapter.notifyItemRangeChanged(0, mNewsRecyclerAdapter.getItemCount());
                 }
             }
-        });
+        };
 
-        mStockListPlacer.loadStockList(
-                StockRequest.queryStockList(getActivity(), true),
-                StockRequest.queryStockList(getActivity(), false));
+        ClientData clientData = ClientData.getInstance(getContext());
+        UserProfile userProfile = clientData.getUserProfile();
+        if(userProfile != null) {
+            userProfile.addGlobalBroadcastListener(mGlobalBroadcastListener);
+        }
+
+        ArrayList<Stock> techSortedStocks = clientData.getSortedRealTimePrices(ClientData.RANKING_BY_TECH);
+        ArrayList<Stock> newsSortedStocks = clientData.getSortedRealTimePrices(ClientData.RANKING_BY_NEWS);
+        ArrayList<Stock> diffSortedStocks = clientData.getSortedRealTimePrices(ClientData.RANKING_BY_DIFF);
+
+        mNewsBlockViewHolder.close();
+        mDiffBlockViewHolder.close();
+
+        if(techSortedStocks != null && techSortedStocks.size() > 0 && newsSortedStocks != null && newsSortedStocks.size() > 0 && diffSortedStocks != null && diffSortedStocks.size() > 0) {
+            MSLog.d("sorted stocks are in memory");
+            mTechBlockViewHolder.update(getActivity(), techSortedStocks, ClientData.RANKING_BY_TECH, new StockRankingRecyclerAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(Stock stock) {
+                    openStockActivity(stock);
+                }
+            }, false);
+            mNewsBlockViewHolder.update(getActivity(), newsSortedStocks, ClientData.RANKING_BY_NEWS, new StockRankingRecyclerAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(Stock stock) {
+                    openStockActivity(stock);
+                }
+            }, false);
+            mDiffBlockViewHolder.update(getActivity(), diffSortedStocks, ClientData.RANKING_BY_DIFF, new StockRankingRecyclerAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(Stock stock) {
+                    openStockActivity(stock);
+                }
+            }, false);
+        } else {
+            MSLog.d("sorted stocks are not in memory");
+            mStockListPlacer = new StockListPlacer(getActivity(), NORMAL_ID);
+            mStockListPlacer.setStockListListener(new StockListPlacer.StockListListener() {
+                @Override
+                public void onStockListLoaded() {
+                    mLoadingDotsPageViewHolder.stopAndGone();
+
+                    if(mStockListPlacer.getStocks() != null) {
+                        mTechBlockViewHolder.update(getActivity(), mStockListPlacer.getStocks(), ClientData.RANKING_BY_TECH, new StockRankingRecyclerAdapter.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(Stock stock) {
+                                openStockActivity(stock);
+                            }
+                        }, true);
+                        mNewsBlockViewHolder.update(getActivity(), mStockListPlacer.getStocks(), ClientData.RANKING_BY_NEWS, new StockRankingRecyclerAdapter.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(Stock stock) {
+                                openStockActivity(stock);
+                            }
+                        }, true);
+                        mDiffBlockViewHolder.update(getActivity(), mStockListPlacer.getStocks(), ClientData.RANKING_BY_DIFF, new StockRankingRecyclerAdapter.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(Stock stock) {
+                                openStockActivity(stock);
+                            }
+                        }, true);
+                    } else {
+                        mTechBlockViewHolder.hide();
+                        mNewsBlockViewHolder.hide();
+                        mDiffBlockViewHolder.hide();
+                    }
+                }
+            });
+
+            mStockListPlacer.setLoadingPageListener(new StockListPlacer.LoadingPageListener() {
+                @Override
+                public void onLoadingPageVisible() {
+                    mLoadingDotsPageViewHolder.start(getActivity());
+                }
+            });
+            mStockListPlacer.loadStockList(
+                    StockRequest.queryStockList(getActivity(), true),
+                    StockRequest.queryStockList(getActivity(), false));
+        }
+        clientData.prefetchData();
 
         mNewsRecyclerAdapter.setNewsAvailableListener(new NewsRecyclerAdapter.NewsAvailableListener() {
             @Override
@@ -195,11 +259,13 @@ public class MainFragment extends Fragment {
         mNewsRecyclerAdapter.setOnItemClickListener(new NewsRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(News news) {
+                mNewsRecyclerAdapter.notifyNewsIsClicked(news);
                 startActivity(NewsWebViewActivity.generateNewsWebViewActivityIntent(
                         getContext(), news.getId(), news.getTitle(),
                         news.getUrlImage(), news.getDate(),
                         news.getPageLink(), news.getOriginLink(),
-                        news.getVoteRaiseNum(), news.getVoteFallNum(), news.getStockKeywords(), news.getLevel()));
+                        news.getVoteRaiseNum(), news.getVoteFallNum(),
+                        news.getStockKeywords(), news.getExplicitKeywords(), news.getLevel()));
                 getActivity().overridePendingTransition(R.anim.enter, R.anim.stop);
             }
         });
@@ -229,26 +295,89 @@ public class MainFragment extends Fragment {
         bundle.putInt(StockListFragment.TASK_NAME, StockListFragment.TASK.WPCT.getTaskId());
         mStockListFragment.setArguments(bundle);
 
-        ConstraintLayout card1 = view.findViewById(R.id.top_banner_1);
-        card1.setOnClickListener(new View.OnClickListener() {
+        final RadioGroup radioGroup = view.findViewById(R.id.radio_group);
+        mOnPageChangeListener = new ViewPager.OnPageChangeListener() {
             @Override
-            public void onClick(View view) {
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-                FragmentManager fm = getFragmentManager();
-                if(fm != null) {
-                    FragmentTransaction transaction = fm.beginTransaction();
+            }
 
-                    transaction.replace(R.id.fragment_container, mStockListFragment);
-                    transaction.addToBackStack(null);
-
-                    // Commit the transaction
-                    transaction.commit();
-                }
-                if(mOnActionBarChangeListener != null) {
-                    mOnActionBarChangeListener.onActionBarChange(getResources().getString(R.string.main_page_card_sub_title), true);
+            @Override
+            public void onPageSelected(int position) {
+                switch (position) {
+                    case 0:
+                        radioGroup.check(R.id.radio_button_1);
+                        break;
+                    case 1:
+                        radioGroup.check(R.id.radio_button_2);
+                        break;
                 }
             }
-        });
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        };
+
+        mViewPager = view.findViewById(R.id.top_banner);
+        final LayoutInflater mInflater = LayoutInflater.from(getContext());
+
+        View view1 = mInflater.inflate(R.layout.layout_top_banner_image_view_top_10, null);
+        View view2 = mInflater.inflate(R.layout.layout_top_banner_image_view_knowledge, null);
+
+        ArrayList<View> viewArrayList = new ArrayList<>();
+        viewArrayList.add(view1);
+        viewArrayList.add(view2);
+
+        mViewPager.setAdapter(new TopBannerPagerAdapter(viewArrayList, new TopBannerPagerAdapter.TopBannerClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Activity activity = getActivity();
+                if(activity == null) {
+                    return;
+                }
+
+                switch (position) {
+                    case 0:
+                        FragmentManager fm = getFragmentManager();
+                        if(fm != null) {
+                            FragmentTransaction transaction = fm.beginTransaction();
+
+                            transaction.replace(R.id.fragment_container, mStockListFragment);
+                            transaction.addToBackStack(null);
+
+                            // Commit the transaction
+                            transaction.commit();
+                        }
+                        if(mOnActionBarChangeListener != null) {
+                            mOnActionBarChangeListener.onActionBarChange(getResources().getString(R.string.main_page_card_sub_title), true);
+                        }
+                        break;
+                    case 1:
+                        Intent intent = new Intent(activity, StockKnowledgeListActivity.class);
+                        startActivity(intent);
+                        activity.overridePendingTransition(R.anim.enter, R.anim.stop);
+                        break;
+                }
+            }
+        }));
+        mViewPager.addOnPageChangeListener(mOnPageChangeListener);
+        mViewPager.setCurrentItem(0);
+
+        mSwipeHandler = new Handler();
+        mSwipeRunnable = new Runnable() {
+            @Override
+            public void run() {
+                PagerAdapter pagerAdapter = mViewPager.getAdapter();
+                if(pagerAdapter != null) {
+                    int position = (mViewPager.getCurrentItem() + 1) % pagerAdapter.getCount();
+                    mViewPager.setCurrentItem(position);
+                }
+                mSwipeHandler.postDelayed(mSwipeRunnable, REFRESH_TIME);
+            }
+        };
+        mSwipeHandler.postDelayed(mSwipeRunnable, REFRESH_TIME);
     }
 
     private void openStockActivity(Stock stock) {
@@ -268,6 +397,7 @@ public class MainFragment extends Fragment {
             mNoDataTextView.setText(R.string.ops_something_wrong);
             mNoDataImageView.setImageResource(R.drawable.baseline_sentiment_dissatisfied_24px);
         } else {
+            mNewsRecyclerView.setVisibility(View.VISIBLE);
             mNoDataRefreshLayout.setVisibility(View.GONE);
         }
     }
@@ -298,15 +428,29 @@ public class MainFragment extends Fragment {
         return results;
     }
 
-
-
     @Override
     public void onDestroyView() {
+        if(mViewPager != null) {
+            mViewPager.removeOnPageChangeListener(mOnPageChangeListener);
+        }
+
         if(mNewsRecyclerAdapter != null) {
             mNewsRecyclerAdapter.destroy();
         }
         if(mStockListPlacer != null) {
             mStockListPlacer.clear();
+        }
+        if(mTechBlockViewHolder != null) {
+            mTechBlockViewHolder.destroy();
+        }
+        if(mNewsBlockViewHolder != null) {
+            mNewsBlockViewHolder.destroy();
+        }
+        if(mDiffBlockViewHolder != null) {
+            mDiffBlockViewHolder.destroy();
+        }
+        if(mLoadingDotsPageViewHolder != null) {
+            mLoadingDotsPageViewHolder.stopAndGone();
         }
 
         FragmentManager fm = getFragmentManager();
@@ -319,6 +463,11 @@ public class MainFragment extends Fragment {
 
         if(mOnActionBarChangeListener != null) {
             mOnActionBarChangeListener.onActionBarChange(getResources().getString(R.string.app_name), false);
+        }
+
+        UserProfile userProfile = ClientData.getInstance(getContext()).getUserProfile();
+        if(userProfile != null) {
+            userProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
         }
 
         super.onDestroyView();

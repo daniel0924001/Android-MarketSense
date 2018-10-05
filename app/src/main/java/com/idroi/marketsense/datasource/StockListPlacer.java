@@ -2,6 +2,7 @@ package com.idroi.marketsense.datasource;
 
 import android.app.Activity;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.annotation.Nullable;
 
 import com.idroi.marketsense.Logging.MSLog;
@@ -15,10 +16,10 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Locale;
 
 import static com.idroi.marketsense.fragments.StockListFragment.MAIN_ID;
 import static com.idroi.marketsense.fragments.StockListFragment.SELF_CHOICES_ID;
+import static com.idroi.marketsense.fragments.StockListFragment.WPCT_ID;
 
 /**
  * Created by daniel.hsieh on 2018/4/23.
@@ -40,6 +41,10 @@ public class StockListPlacer {
         void onStockListLoaded();
     }
 
+    public interface LoadingPageListener {
+        void onLoadingPageVisible();
+    }
+
     private static final int RETRY_TIME_CONST = 2;
     private int mCurrentRetries = 0;
 
@@ -47,6 +52,7 @@ public class StockListPlacer {
 
     private MarketSenseStockFetcher.MarketSenseStockNetworkListener mMarketSenseStockNetworkListener;
     private StockListListener mStockListListener;
+    private LoadingPageListener mLoadingPageListener;
 
     private WeakReference<Activity> mActivity;
     private MarketSenseStockFetcher mMarketSenseStockFetcher;
@@ -59,6 +65,10 @@ public class StockListPlacer {
     private Runnable mRefreshRunnable;
     private static final int REFRESH_TIME = 30 * 1000;
 
+    private ClientData mClientData;
+    private HandlerThread mHandlerThread;
+    private Handler mBackgroundHandler;
+
     public StockListPlacer(Activity activity, int taskId) {
         this(activity, taskId, SORT_BY_NEWS, SORT_DOWNWARD);
     }
@@ -68,20 +78,35 @@ public class StockListPlacer {
         mSortedField = field;
         mSortedDirection = direction;
         mRefreshHandler = new Handler();
+        mClientData = ClientData.getInstance(activity);
 
         mMarketSenseStockNetworkListener = new MarketSenseStockFetcher.MarketSenseStockNetworkListener() {
             @Override
-            public void onStockListLoad(ArrayList<Stock> stockArrayList, boolean isAutoRefresh) {
+            public void onStockListLoad(final ArrayList<Stock> stockArrayList, boolean isAutoRefresh) {
 
                 if(mActivity.get() == null) {
                     return;
                 }
 
-                updateRealTimeStockPrices(stockArrayList);
+//                updateRealTimeStockPrices(stockArrayList);
+                if(mHandlerThread != null && mBackgroundHandler != null) {
+                    mBackgroundHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Activity innerActivity = mActivity.get();
+                            if(innerActivity != null) {
+                                updateRealTimeStockPrices(innerActivity, stockArrayList);
+                            }
+                        }
+                    });
+                }
 
                 if(!isAutoRefresh && mStockArrayList == null) {
                     // first time
-                    mRefreshHandler.postDelayed(mRefreshRunnable, REFRESH_TIME);
+
+                    if(mClientData.isWorkDayAndStockMarketIsOpen()) {
+                        mRefreshHandler.postDelayed(mRefreshRunnable, REFRESH_TIME);
+                    }
 
                     if (mTask == SELF_CHOICES_ID) {
 
@@ -102,14 +127,34 @@ public class StockListPlacer {
                         MSLog.d("We first time get stock list, so we need to sort it. size: " + mStockArrayList.size());
                     }
 
-                    Comparator<Stock> comparator = genComparator(mSortedField, mSortedDirection);
-                    Collections.sort(mStockArrayList, comparator);
+//                    Comparator<Stock> comparator = genComparator(mSortedField, mSortedDirection);
+//                    Collections.sort(mStockArrayList, comparator);
+//
+//                    if (mStockListListener != null) {
+//                        mStockListListener.onStockListLoaded();
+//                    }
 
-                    if (mStockListListener != null) {
-                        mStockListListener.onStockListLoaded();
+                    if(mHandlerThread != null && mBackgroundHandler != null) {
+                        mBackgroundHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Activity innerActivity = mActivity.get();
+                                if(innerActivity != null) {
+                                    Comparator<Stock> comparator = genComparator(mSortedField, mSortedDirection);
+                                    Collections.sort(mStockArrayList, comparator);
+
+                                    innerActivity.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (mStockListListener != null) {
+                                                mStockListListener.onStockListLoaded();
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        });
                     }
-
-//                    showPredictionAccuracy();
                 }
             }
 
@@ -122,7 +167,9 @@ public class StockListPlacer {
 
                 increaseRetryTime();
                 if(isRetry()) {
-                    mMarketSenseStockFetcher.makeRequest(mNetworkUrl, mCacheUrl);
+                    if(mMarketSenseStockFetcher != null) {
+                        mMarketSenseStockFetcher.makeRequest(mNetworkUrl, mCacheUrl);
+                    }
                 } else {
                     if(mStockListListener != null) {
                         mStockListListener.onStockListLoaded();
@@ -144,7 +191,11 @@ public class StockListPlacer {
                         return;
                     }
 
-                    mNetworkUrl = StockRequest.queryStockList(activity, true);
+                    if(mTask == WPCT_ID) {
+                        mNetworkUrl = StockRequest.queryStockListWithMode(activity, true, StockRequest.MODE_WPCT);
+                    } else {
+                        mNetworkUrl = StockRequest.queryStockList(activity, true);
+                    }
                     mMarketSenseStockFetcher.makeRequest(mNetworkUrl, null, true);
 
                     MSLog.d("schedule refresh stock price in " + REFRESH_TIME + " millisecond.");
@@ -154,17 +205,23 @@ public class StockListPlacer {
         };
     }
 
-    private void updateRealTimeStockPrices(ArrayList<Stock> stockPrices) {
-        ClientData clientData = ClientData.getInstance(mActivity.get());
+    private void updateRealTimeStockPrices(Activity activity, ArrayList<Stock> stockPrices) {
+        final ClientData clientData = ClientData.getInstance(mActivity.get());
         if(stockPrices != null && clientData != null) {
             for (Stock stock : stockPrices) {
                 clientData.setRealTimeStockPriceHashMap(stock);
             }
             if(mTask == MAIN_ID) {
-                clientData.getUserProfile().globalBroadcast(UserProfile.NOTIFY_ID_PRICE_CHANGED);
+//                clientData.getUserProfile().globalBroadcast(UserProfile.NOTIFY_ID_PRICE_CHANGED);
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        clientData.getUserProfile().globalBroadcast(UserProfile.NOTIFY_ID_PRICE_CHANGED);
+                    }
+                });
             }
         }
-        MSLog.i("refresh real time stock price with task id: " + mTask);
+        MSLog.i("["+Thread.currentThread().getId()+"] refresh real time stock price with task id: " + mTask);
     }
 
     private boolean isRetry() {
@@ -189,6 +246,10 @@ public class StockListPlacer {
         mStockListListener = listener;
     }
 
+    public void setLoadingPageListener(LoadingPageListener listener) {
+        mLoadingPageListener = listener;
+    }
+
     public void loadStockList(String networkUrl, String cacheUrl) {
         loadStockList(networkUrl, cacheUrl, null);
     }
@@ -201,11 +262,17 @@ public class StockListPlacer {
 
         mNetworkUrl = networkUrl;
         mCacheUrl = cacheUrl;
-        loadStockList(new MarketSenseStockFetcher(activity, mMarketSenseStockNetworkListener, mode));
+        loadStockList(new MarketSenseStockFetcher(activity,
+                mMarketSenseStockNetworkListener, mLoadingPageListener, mode));
     }
 
     private void loadStockList(MarketSenseStockFetcher stockFetcher) {
         clear();
+
+        mHandlerThread = new HandlerThread("UpdateRealPrice");
+        mHandlerThread.start();
+        mBackgroundHandler = new Handler(mHandlerThread.getLooper());
+
         mMarketSenseStockFetcher = stockFetcher;
         mMarketSenseStockFetcher.makeRequest(mNetworkUrl, mCacheUrl);
     }
@@ -233,6 +300,10 @@ public class StockListPlacer {
         if(mMarketSenseStockFetcher != null) {
             mMarketSenseStockFetcher.destroy();
             mMarketSenseStockFetcher = null;
+        }
+        if(mHandlerThread != null) {
+            mHandlerThread.quitSafely();
+            mHandlerThread = null;
         }
         mRefreshHandler.removeCallbacks(mRefreshRunnable);
     }
@@ -307,43 +378,6 @@ public class StockListPlacer {
             return 0;
         } else {
             return -1;
-        }
-    }
-
-    private void showPredictionAccuracy() {
-        if(mStockArrayList != null) {
-            int count_with_zero = 0;
-            int count = 0;
-            int count_without_zero = 0;
-            int total_without_zero = 0;
-            double earn_simple = 0;
-            double earn_weighted = 0;
-            for (Stock stock : mStockArrayList) {
-                if (stock.isHitPredictionDirection(true)) {
-                    count_with_zero++;
-                }
-                if (stock.isHitPredictionDirection(false)) {
-                    count++;
-                }
-                if (!(stock.getDiffDirection() == Stock.TREND_FLAT)) {
-                    total_without_zero++;
-                    if(stock.isHitPredictionDirection(false)) {
-                        count_without_zero++;
-                    }
-                    earn_simple += stock.getEarnInPrediction(true);
-                    earn_weighted += stock.getEarnInPrediction(false);
-                }
-            }
-            String format = "hit %d in total %d, accuracy: %.2f";
-            String format2 = "invest money on prediction list %d -> %.2f";
-            // real diff equaling to zero is always true
-            MSLog.e(String.format(Locale.US, format, count_with_zero, mStockArrayList.size(), (float) count_with_zero / mStockArrayList.size() * 100));
-            // you have to prediction 0 when the real diff is 0
-            MSLog.e(String.format(Locale.US, format, count, mStockArrayList.size(), (float) count / mStockArrayList.size() * 100));
-            // we exclude the real diff equaling to 0 situation
-            MSLog.e(String.format(Locale.US, format, count_without_zero, total_without_zero, (float) count_without_zero / total_without_zero * 100));
-            MSLog.e(String.format(Locale.US, format2, total_without_zero, earn_simple));
-            MSLog.e(String.format(Locale.US, format2, total_without_zero, earn_weighted));
         }
     }
 }

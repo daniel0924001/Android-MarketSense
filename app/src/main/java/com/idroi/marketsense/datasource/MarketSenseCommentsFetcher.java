@@ -103,7 +103,7 @@ public class MarketSenseCommentsFetcher {
             if(cacheUrl != null) {
                 Cache.Entry entry = cache.get(cacheUrl);
                 MSLog.i("Loading comments...(cache): " + cacheKey + ", " + cacheUrl);
-                if (entry != null) {
+                if (entry != null && !entry.isExpired()) {
                     try {
                         CommentAndVote commentAndVote = CommentAndVoteRequest.commentsParseResponse(entry.data);
                         MSLog.i("Loading comments...(cache hit): " + new String(entry.data));
@@ -113,7 +113,7 @@ public class MarketSenseCommentsFetcher {
                         MSLog.e("Loading comments...(cache failed JSONException)");
                     }
                 } else {
-                    MSLog.i("Loading comments...(cache miss)");
+                    MSLog.i("Loading comments...(cache miss or expired)");
                 }
             }
         }

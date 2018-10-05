@@ -53,19 +53,19 @@ public class NewsSecondRowRenderer implements MarketSenseRenderer<News> {
 
         if(content.getImportant()) {
             if(content.isOptimistic()) {
-                newsViewHolder.leftDateView.setBackgroundColor(context.getResources().getColor(R.color.colorTrendUp));
+                newsViewHolder.leftDateView.setBackgroundColor(context.getResources().getColor(R.color.trend_red));
                 newsViewHolder.leftAlarmImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_notifications_red_24px));
-                newsViewHolder.leftDateView.setBackgroundColor(context.getResources().getColor(R.color.colorTrendUp));
+                newsViewHolder.leftDateView.setBackgroundColor(context.getResources().getColor(R.color.trend_red));
             } else {
-                newsViewHolder.leftDateView.setBackgroundColor(context.getResources().getColor(R.color.colorTrendDown));
+                newsViewHolder.leftDateView.setBackgroundColor(context.getResources().getColor(R.color.trend_green));
                 newsViewHolder.leftAlarmImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_notifications_green_24px));
-                newsViewHolder.leftDateView.setBackgroundColor(context.getResources().getColor(R.color.colorTrendDown));
+                newsViewHolder.leftDateView.setBackgroundColor(context.getResources().getColor(R.color.trend_green));
             }
             newsViewHolder.leftDateView.setTextColor(context.getResources().getColor(R.color.marketsense_text_white));
             newsViewHolder.leftAlarmImageView.setVisibility(View.VISIBLE);
         } else {
             newsViewHolder.leftDateView.setBackgroundColor(context.getResources().getColor(R.color.marketsense_text_white));
-            newsViewHolder.leftDateView.setTextColor(context.getResources().getColor(R.color.marketsense_text_gray));
+            newsViewHolder.leftDateView.setTextColor(context.getResources().getColor(R.color.text_third));
             newsViewHolder.leftAlarmImageView.setVisibility(View.GONE);
         }
         if(!TextUtils.isEmpty(content.getUrlImage())) {
@@ -83,19 +83,19 @@ public class NewsSecondRowRenderer implements MarketSenseRenderer<News> {
 
         if(nextContent.getImportant()) {
             if(nextContent.isOptimistic()) {
-                newsViewHolder.rightDateView.setBackgroundColor(context.getResources().getColor(R.color.colorTrendUp));
+                newsViewHolder.rightDateView.setBackgroundColor(context.getResources().getColor(R.color.trend_red));
                 newsViewHolder.rightAlarmImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_notifications_red_24px));
-                newsViewHolder.rightDateView.setBackgroundColor(context.getResources().getColor(R.color.colorTrendUp));
+                newsViewHolder.rightDateView.setBackgroundColor(context.getResources().getColor(R.color.trend_red));
             } else {
-                newsViewHolder.rightDateView.setBackgroundColor(context.getResources().getColor(R.color.colorTrendDown));
+                newsViewHolder.rightDateView.setBackgroundColor(context.getResources().getColor(R.color.trend_green));
                 newsViewHolder.rightAlarmImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_notifications_green_24px));
-                newsViewHolder.rightDateView.setBackgroundColor(context.getResources().getColor(R.color.colorTrendDown));
+                newsViewHolder.rightDateView.setBackgroundColor(context.getResources().getColor(R.color.trend_green));
             }
             newsViewHolder.rightDateView.setTextColor(context.getResources().getColor(R.color.marketsense_text_white));
             newsViewHolder.rightAlarmImageView.setVisibility(View.VISIBLE);
         } else {
             newsViewHolder.rightDateView.setBackgroundColor(context.getResources().getColor(R.color.marketsense_text_white));
-            newsViewHolder.rightDateView.setTextColor(context.getResources().getColor(R.color.marketsense_text_gray));
+            newsViewHolder.rightDateView.setTextColor(context.getResources().getColor(R.color.text_third));
             newsViewHolder.rightAlarmImageView.setVisibility(View.GONE);
         }
         if(!TextUtils.isEmpty(nextContent.getUrlImage())) {

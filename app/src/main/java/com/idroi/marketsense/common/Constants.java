@@ -11,6 +11,7 @@ public class Constants {
     public static final String SHARED_PREFERENCE_REQUEST_NAME = "com.idroi.marketsense.request";
     public static final String SHARED_PREFERENCE_USER_SETTING = "com.idroi.marketsense.user_setting";
     public static final String SHARED_PREFERENCE_LAST_STAR_TIMESTAMP = "com.idroi.marketsense.last_star_timestamp";
+    public static final String SHARED_PREFERENCE_NEWS_BROWSE_HISTORY = "com.idroi.marketsense.news_browse_history";
 
     public static final String USER_SETTING_NOTIFICATION_KEY = "com.idroi.marketsense.user_setting.notification";
 

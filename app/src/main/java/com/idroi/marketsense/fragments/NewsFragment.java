@@ -29,6 +29,7 @@ import java.util.ArrayList;
 
 import static com.idroi.marketsense.adapter.NewsRecyclerAdapter.NEWS_SINGLE_LAYOUT;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_NEWS_READ_RECORD_LIST;
 import static com.idroi.marketsense.request.NewsRequest.PARAM_GTS;
 import static com.idroi.marketsense.request.NewsRequest.PARAM_LEVEL;
 import static com.idroi.marketsense.request.NewsRequest.PARAM_STATUS;
@@ -70,6 +71,7 @@ public class NewsFragment extends Fragment {
 
     private int mTaskId;
     private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
+    private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener2;
 
     private ConstraintLayout mNoDataRefreshLayout;
 
@@ -199,11 +201,13 @@ public class NewsFragment extends Fragment {
         mNewsRecyclerAdapter.setOnItemClickListener(new NewsRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(News news) {
+                mNewsRecyclerAdapter.notifyNewsIsClicked(news);
                 startActivity(NewsWebViewActivity.generateNewsWebViewActivityIntent(
                         getContext(), news.getId(), news.getTitle(),
                         news.getUrlImage(), news.getDate(),
                         news.getPageLink(), news.getOriginLink(),
-                        news.getVoteRaiseNum(), news.getVoteFallNum(), news.getStockKeywords(), news.getLevel()));
+                        news.getVoteRaiseNum(), news.getVoteFallNum(),
+                        news.getStockKeywords(), news.getExplicitKeywords(), news.getLevel()));
                 getActivity().overridePendingTransition(R.anim.enter, R.anim.stop);
             }
         });
@@ -227,6 +231,21 @@ public class NewsFragment extends Fragment {
                 setVisibilityForEmptyData(false);
             }
         });
+
+        mGlobalBroadcastListener2 = new UserProfile.GlobalBroadcastListener() {
+            @Override
+            public void onGlobalBroadcast(int notifyId, Object payload) {
+                if(notifyId == NOTIFY_ID_NEWS_READ_RECORD_LIST) {
+                    MSLog.d("update user's read news records");
+                    mNewsRecyclerAdapter.notifyItemRangeChanged(0, mNewsRecyclerAdapter.getItemCount());
+                }
+            }
+        };
+
+        UserProfile userProfile = ClientData.getInstance(getContext()).getUserProfile();
+        if(userProfile != null) {
+            userProfile.addGlobalBroadcastListener(mGlobalBroadcastListener2);
+        }
     }
 
     public ArrayList<String> generateURL(boolean isNetworkUrl) {
@@ -278,10 +297,11 @@ public class NewsFragment extends Fragment {
     public void onDestroyView() {
         MSLog.i("Exit NewsFragment");
         mNewsRecyclerAdapter.destroy();
+        UserProfile userProfile = ClientData.getInstance(getContext()).getUserProfile();
         if(mTaskId == KEYWORD_ARRAY_TASK_ID) {
-            ClientData.getInstance().getUserProfile()
-                    .deleteGlobalBroadcastListener(mGlobalBroadcastListener);
+            userProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
         }
+        userProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener2);
         super.onDestroyView();
     }
 

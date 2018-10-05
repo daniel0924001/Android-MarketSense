@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/selector_news_block"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif"
+        android:textStyle="normal"
+        android:textColor="@color/text_first"
+        android:text="@string/title_news_tab"
+        android:gravity="center"
+        android:background="@drawable/border_selector_selected"
+        android:foreground="@drawable/item_foreground_with_clicked_shadow"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/selector_comment_block" />
+
+    <TextView
+        android:id="@+id/selector_comment_block"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif"
+        android:textStyle="normal"
+        android:textColor="@color/text_second"
+        android:text="@string/title_comment"
+        android:gravity="center"
+        android:background="@drawable/border_selector"
+        android:foreground="@drawable/item_foreground_with_clicked_shadow"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/selector_news_block"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</android.support.constraint.ConstraintLayout>

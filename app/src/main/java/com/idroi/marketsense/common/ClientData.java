@@ -9,8 +9,13 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.idroi.marketsense.Logging.MSLog;
+import com.idroi.marketsense.data.Knowledge;
 import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.UserProfile;
+import com.idroi.marketsense.datasource.KnowledgeFetcher;
+import com.idroi.marketsense.datasource.MarketSenseCommentsFetcher;
+import com.idroi.marketsense.datasource.MarketSenseNewsFetcher;
+import com.idroi.marketsense.datasource.MarketSenseStockFetcher;
 import com.idroi.marketsense.datasource.Networking;
 import com.idroi.marketsense.request.StocksListRequest;
 import com.idroi.marketsense.request.UserEventsAndCodesRequest;
@@ -19,6 +24,7 @@ import com.idroi.marketsense.util.DateUtils;
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,9 +39,12 @@ public class ClientData {
     private Context mContext;
     private ArrayList<Stock> mAllStocksListInfo;
     private HashMap<String, Stock> mRealTimePricesHashMap;
+    private HashMap<Integer, ArrayList<Stock>> mSortedRealTimePrices;
+    private HashMap<String, Knowledge> mKnowledgeHashMap;
 
     private int mScreenWidth, mScreenHeight;
     private int mScreenWidthPixels, mScreenHeightPixels;
+    private float mScreenDensity;
     @NonNull private UserProfile mUserProfile;
     private String mUserToken;
 
@@ -43,9 +52,14 @@ public class ClientData {
     private int mLoadPreferenceRetryCounter = DEFAULT_RETRY_TIME;
     private int mLoadAllStockListRetryCounter = DEFAULT_RETRY_TIME;
 
+    private boolean mIsWorkDayBeforeStockOpen;
+    private boolean mIsWorkDayAndStockMarketIsOpen;
     private boolean mIsWorkDayBeforeStockClosed;
     private boolean mIsWorkDayAfterStockClosedBeforeAnswerDisclosure;
-    private boolean mDoesUseTodayPredictionValue;;
+    private boolean mIsWorkDayAfterAnswerDisclosure;
+    private boolean mDoesUseTodayPredictionValue;
+    private boolean mIsWorkDay;
+    private Calendar mWorkDay, mWorkDayMinusOne, mWorkDayPlusOne;
 
     /**
      * Returns the singleton ClientMetadata object, using the context to obtain data if necessary.
@@ -86,15 +100,43 @@ public class ClientData {
         mContext = context.getApplicationContext();
         mUserProfile = new UserProfile(context, true);
         mRealTimePricesHashMap = new HashMap<>();
+        mKnowledgeHashMap = new HashMap<>();
+        mSortedRealTimePrices = new HashMap<>();
 
         updateClockInformation();
         loadAllStocksListTask(true);
     }
 
+    public void prefetchData() {
+        MarketSenseCommentsFetcher.prefetchGeneralComments(mContext);
+//        MarketSenseNewsFetcher.prefetchNewsFirstPage(mContext);
+        MarketSenseStockFetcher.prefetchWPCTStockList(mContext);
+        KnowledgeFetcher.prefetchKnowledgeList(mContext);
+    }
+
     public void updateClockInformation() {
+        mIsWorkDayBeforeStockOpen = DateUtils.isWorkDayBeforeStockMarketOpen();
+        mIsWorkDayAndStockMarketIsOpen = DateUtils.isWorkDayAndStockMarketOpen();
         mIsWorkDayBeforeStockClosed = DateUtils.isWorkDayBeforeStockClosed();
         mIsWorkDayAfterStockClosedBeforeAnswerDisclosure = DateUtils.isWorkDayAfterStockClosedAndBeforeAnswerDisclosure();
+        mIsWorkDayAfterAnswerDisclosure = DateUtils.isWorkDayAfterAnswerDisclosure();
         mDoesUseTodayPredictionValue = DateUtils.doesUseTodayPredictionValue();
+        mIsWorkDay = DateUtils.isWorkDay();
+        mWorkDay = DateUtils.getTheWorkDayLessButClosestToToday(0);
+        mWorkDayMinusOne = DateUtils.getTheWorkDayLessButClosestToToday(-1);
+        mWorkDayPlusOne = DateUtils.getTheWorkDayLaterButClosestToTomorrow();
+    }
+
+    public Calendar getWorkDay() {
+        return mWorkDay;
+    }
+
+    public Calendar getWorkDayMinusOne() {
+        return mWorkDayMinusOne;
+    }
+
+    public Calendar getWorkDayPlusOne() {
+        return mWorkDayPlusOne;
     }
 
     public void setScreenSizeInPixels(int widthPixels, int heightPixels) {
@@ -102,9 +144,14 @@ public class ClientData {
         mScreenHeightPixels = heightPixels;
     }
 
-    public void setScreenSize(int width, int height) {
+    public void setScreenSize(int width, int height, float density) {
         mScreenWidth = width;
         mScreenHeight = height;
+        mScreenDensity = density;
+    }
+
+    public float getScreenDensity() {
+        return mScreenDensity;
     }
 
     private void setAllStocksListInfo(ArrayList<Stock> stocksListInfo) {
@@ -119,6 +166,14 @@ public class ClientData {
 
     public void setRealTimeStockPriceHashMap(Stock stock) {
         mRealTimePricesHashMap.put(stock.getCode(), stock);
+    }
+
+    public void setKnowledgeHashMap(Knowledge knowledge) {
+        mKnowledgeHashMap.put(knowledge.getKeyword(), knowledge);
+    }
+
+    public Knowledge getKnowledgeFromKeyword(String keyword) {
+        return mKnowledgeHashMap.get(keyword);
     }
 
     public void setUserToken(String token) {
@@ -147,6 +202,26 @@ public class ClientData {
 
     public int getScreenHeightPixels() {
         return mScreenHeightPixels;
+    }
+
+    public ArrayList<Stock> getStockPrices() {
+        if(mRealTimePricesHashMap != null) {
+            return new ArrayList<Stock>(mRealTimePricesHashMap.values());
+        } else {
+            return null;
+        }
+    }
+
+    public static final int RANKING_BY_TECH = 1;
+    public static final int RANKING_BY_NEWS = 2;
+    public static final int RANKING_BY_DIFF = 3;
+
+    public void setSortedRealTimePrices(int key, ArrayList<Stock> stocks) {
+        mSortedRealTimePrices.put(key, new ArrayList<Stock>(stocks));
+    }
+
+    public ArrayList<Stock> getSortedRealTimePrices(int key) {
+        return mSortedRealTimePrices.get(key);
     }
 
     public Stock getPriceFromCode(String code) {
@@ -200,12 +275,28 @@ public class ClientData {
         return (name != null) && (code != null);
     }
 
+    public boolean isWorkDay() {
+        return mIsWorkDay;
+    }
+
+    public boolean isWorkDayBeforeStockOpen() {
+        return mIsWorkDayBeforeStockOpen;
+    }
+
+    public boolean isWorkDayAndStockMarketIsOpen() {
+        return mIsWorkDayAndStockMarketIsOpen;
+    }
+
     public boolean isWorkDayBeforeStockClosed() {
         return mIsWorkDayBeforeStockClosed;
     }
 
     public boolean isWorkDayAfterStockClosedBeforeAnswerDisclosure() {
         return mIsWorkDayAfterStockClosedBeforeAnswerDisclosure;
+    }
+
+    public boolean isWorkDayAfterAnswerDisclosure() {
+        return mIsWorkDayAfterAnswerDisclosure;
     }
 
     public boolean doesUseTodayPredictionValue() {
@@ -220,7 +311,7 @@ public class ClientData {
             MSLog.i("Loading all stocks list...(cache): " + url);
             Cache cache = Networking.getRequestQueue(mContext).getCache();
             Cache.Entry entry = cache.get(url);
-            if (entry != null) {
+            if (entry != null && !entry.isExpired()) {
                 try {
                     ArrayList<Stock> stockArrayList = StocksListRequest.stockParseResponse(entry.data);
                     MSLog.i("Loading all stock list...(cache hit): " + new String(entry.data));
@@ -229,7 +320,7 @@ public class ClientData {
                     MSLog.e("Loading all stocks list...(cache failed JSONException)");
                 }
             } else {
-                MSLog.i("Loading all stocks list...(cache miss)");
+                MSLog.i("Loading all stocks list...(cache miss or expired)");
             }
         }
 

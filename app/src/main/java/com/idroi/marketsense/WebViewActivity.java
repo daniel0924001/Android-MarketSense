@@ -12,6 +12,7 @@ import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ethanhua.skeleton.Skeleton;
@@ -19,6 +20,7 @@ import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.FrescoHelper;
+import com.idroi.marketsense.util.ActionBarHelper;
 
 /**
  * Created by daniel.hsieh on 2018/5/28.
@@ -46,18 +48,6 @@ public class WebViewActivity extends AppCompatActivity {
         initWebView();
     }
 
-    private void processWebView() {
-//        switch (mId) {
-//            case R.string.preference_feedback:
-//                new Handler().postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                    }
-//                }, 3000);
-//                break;
-//        }
-    }
-
     private void initWebView() {
         mWebView = findViewById(R.id.marketsense_webview);
         mWebView.setVerticalScrollBarEnabled(true);
@@ -74,7 +64,6 @@ public class WebViewActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 skeletonScreen.hide();
-                processWebView();
                 super.onPageFinished(view, url);
             }
         });
@@ -97,37 +86,7 @@ public class WebViewActivity extends AppCompatActivity {
     }
 
     private void setActionBar() {
-        final ActionBar actionBar = getSupportActionBar();
-
-        if(actionBar != null) {
-            actionBar.setElevation(0);
-            View view = LayoutInflater.from(actionBar.getThemedContext())
-                    .inflate(R.layout.main_action_bar, null);
-
-            SimpleDraweeView imageView = view.findViewById(R.id.action_bar_avatar);
-            if(imageView != null) {
-                imageView.setImageResource(R.drawable.ic_keyboard_backspace_white_24px);
-                imageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        onBackPressed();
-                    }
-                });
-            }
-
-            TextView textView = view.findViewById(R.id.action_bar_name);
-            if(textView != null) {
-                textView.setText(mActionBarTitle);
-            }
-
-            actionBar.setDisplayShowHomeEnabled(false);
-            actionBar.setDisplayShowTitleEnabled(false);
-            actionBar.setCustomView(view,
-                    new ActionBar.LayoutParams(
-                            ActionBar.LayoutParams.MATCH_PARENT,
-                            ActionBar.LayoutParams.MATCH_PARENT));
-            actionBar.setDisplayShowCustomEnabled(true);
-        }
+        ActionBarHelper.setActionBarForSimpleTitleAndBack(this, mActionBarTitle);
     }
 
     @Override

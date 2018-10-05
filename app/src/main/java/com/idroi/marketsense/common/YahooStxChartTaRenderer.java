@@ -77,6 +77,7 @@ public class YahooStxChartTaRenderer {
             setXAxis(context);
             setYAxis(context);
             setTouchMarker(context);
+            refreshTextView(context, stockTradeData.getLastStockTaData(0));
 
             mCandleStickChart.invalidate();
             mVolumeBarChart.invalidate();
@@ -111,11 +112,11 @@ public class YahooStxChartTaRenderer {
             volume.setData(stockTaData);
 
             if(closePrice > openPrice) {
-                colorsArray.add(resources.getColor(R.color.colorTrendUp));
+                colorsArray.add(resources.getColor(R.color.trend_red));
             } else if(closePrice < openPrice) {
-                colorsArray.add(resources.getColor(R.color.colorTrendDown));
+                colorsArray.add(resources.getColor(R.color.trend_green));
             } else {
-                colorsArray.add(resources.getColor(R.color.colorTrendFlatGray));
+                colorsArray.add(resources.getColor(R.color.draw_grey));
             }
         }
         CandleDataSet candleDataSet = new CandleDataSet(entries, null);
@@ -124,11 +125,11 @@ public class YahooStxChartTaRenderer {
         candleDataSet.setColor(Color.rgb(80, 80, 80));
         candleDataSet.setShadowColor(Color.DKGRAY);
         candleDataSet.setShadowWidth(0.7f);
-        candleDataSet.setDecreasingColor(resources.getColor(R.color.colorTrendDown));
+        candleDataSet.setDecreasingColor(resources.getColor(R.color.trend_green));
         candleDataSet.setDecreasingPaintStyle(Paint.Style.FILL);
-        candleDataSet.setIncreasingColor(resources.getColor(R.color.colorTrendUp));
+        candleDataSet.setIncreasingColor(resources.getColor(R.color.trend_red));
         candleDataSet.setIncreasingPaintStyle(Paint.Style.FILL);
-        candleDataSet.setNeutralColor(resources.getColor(R.color.colorTrendFlat));
+        candleDataSet.setNeutralColor(resources.getColor(R.color.draw_grey));
         CandleData data = new CandleData(candleDataSet);
 
         mCandleStickChart.setData(data);
@@ -152,7 +153,7 @@ public class YahooStxChartTaRenderer {
                 context.getResources().getString(R.string.title_company_name_code_format),
                 mName, mCode));
         description.setTextSize(16);
-        description.setTextColor(context.getResources().getColor(R.color.marketsense_text_black));
+        description.setTextColor(context.getResources().getColor(R.color.text_first));
         description.setEnabled(false);
 
         Description description1 = mVolumeBarChart.getDescription();
@@ -165,7 +166,7 @@ public class YahooStxChartTaRenderer {
 
         XAxis xAxis = mCandleStickChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setTextColor(context.getResources().getColor(R.color.marketsense_text_black));
+        xAxis.setTextColor(context.getResources().getColor(R.color.text_second));
         xAxis.setTextSize(10f);
         xAxis.setDrawAxisLine(false);
         xAxis.setDrawGridLines(true);
@@ -178,7 +179,7 @@ public class YahooStxChartTaRenderer {
 
         XAxis xAxisVolume = mVolumeBarChart.getXAxis();
         xAxisVolume.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxisVolume.setTextColor(context.getResources().getColor(R.color.marketsense_text_black));
+        xAxisVolume.setTextColor(context.getResources().getColor(R.color.text_second));
         xAxisVolume.setTextSize(10f);
         xAxisVolume.setDrawAxisLine(false);
         xAxisVolume.setDrawGridLines(true);
@@ -192,7 +193,7 @@ public class YahooStxChartTaRenderer {
     private void setYAxis(Context context) {
 
         YAxis yRightAxis = mCandleStickChart.getAxisRight();
-        yRightAxis.setTextColor(context.getResources().getColor(R.color.marketsense_text_black));
+        yRightAxis.setTextColor(context.getResources().getColor(R.color.text_second));
         yRightAxis.setTextSize(10f);
         yRightAxis.setDrawAxisLine(false);
         yRightAxis.setDrawGridLines(true);
@@ -205,7 +206,7 @@ public class YahooStxChartTaRenderer {
         yRightAxis.setYOffset(-7);
 
         YAxis yRightAxisVolume = mVolumeBarChart.getAxisRight();
-        yRightAxisVolume.setTextColor(context.getResources().getColor(R.color.colorTrendUp));
+        yRightAxisVolume.setTextColor(context.getResources().getColor(R.color.trend_red));
         yRightAxisVolume.setTextSize(10f);
         yRightAxisVolume.setDrawAxisLine(false);
         yRightAxisVolume.setDrawGridLines(true);
@@ -274,38 +275,39 @@ public class YahooStxChartTaRenderer {
         MarketSenseRendererHelper.addTextView(mPriceTextView, String.valueOf(todayClose));
         MarketSenseRendererHelper.addTextView(mDateTextView, StockTradeData.getTaTradeDate(stockTaData.getTime().toString()));
         MarketSenseRendererHelper.addTextView(mVolumeTextView, StockVolumeFormatter.getFormattedValue(stockTaData.getVolume()));
-        MarketSenseRendererHelper.addTextView(mOpenTextView, String.valueOf(stockTaData.getOpen()));
-        MarketSenseRendererHelper.addTextView(mHighTextView, String.valueOf(stockTaData.getShadowHigh()));
-        MarketSenseRendererHelper.addTextView(mLowTextView, String.valueOf(stockTaData.getShadowLow()));
+        MarketSenseRendererHelper.addTextViewWithColor(mOpenTextView, String.valueOf(stockTaData.getOpen()), R.color.text_first);
+        MarketSenseRendererHelper.addTextViewWithColor(mHighTextView, String.valueOf(stockTaData.getShadowHigh()), R.color.text_first);
+        MarketSenseRendererHelper.addTextViewWithColor(mLowTextView, String.valueOf(stockTaData.getShadowLow()), R.color.text_first);
 
         try {
             int index = ta.indexOf(stockTaData);
             StockTaData stockTaDataYesterday = (StockTaData) ta.get(index - 1);
             float yesterdayClose = stockTaDataYesterday.getClose();
-            MarketSenseRendererHelper.addTextView(mYesterdayCloseTextView, String.valueOf(yesterdayClose));
+            MarketSenseRendererHelper.addTextViewWithColor(mYesterdayCloseTextView, String.valueOf(yesterdayClose), R.color.text_first);
 
             float diffNumber = todayClose - yesterdayClose;
             float diffPercentage = (diffNumber / yesterdayClose) * 100;
             String format = context.getResources().getString(R.string.title_diff_format);
             if(diffNumber > 0) {
-                mPriceTextView.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_red_s, 0, 0, 0);
-                mDiffTextView.setTextColor(context.getResources().getColor(R.color.colorTrendUp));
-                mDiffTextView.setText(String.format(format, String.format(Locale.US,"+%.2f", diffNumber), String.format(Locale.US, "+%.2f%%", diffPercentage)));
+                MarketSenseRendererHelper.addTextViewWithIcon(
+                        mDiffTextView,
+                        String.format(format, String.format(Locale.US,"+%.2f", diffNumber), String.format(Locale.US, "+%.2f%%", diffPercentage)),
+                        R.mipmap.ic_trend_arrow_up);
             } else if(diffNumber < 0) {
-                mPriceTextView.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_green_s, 0, 0, 0);
-                mDiffTextView.setTextColor(context.getResources().getColor(R.color.colorTrendDown));
-                mDiffTextView.setText(String.format(format, String.format(Locale.US,"%.2f", diffNumber), String.format(Locale.US, "%.2f%%", diffPercentage)));
+                MarketSenseRendererHelper.addTextViewWithIcon(
+                        mDiffTextView,
+                        String.format(format, String.format(Locale.US,"%.2f", diffNumber), String.format(Locale.US, "%.2f%%", diffPercentage)),
+                        R.mipmap.ic_trend_arrow_down);
             } else {
-                mPriceTextView.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_none, 0, 0, 0);
-                mDiffTextView.setTextColor(context.getResources().getColor(R.color.colorTrendFlat));
-                mDiffTextView.setText(String.format(format, String.format(Locale.US,"%.2f", diffNumber), String.format(Locale.US, "%.2f%%", diffPercentage)));
+                MarketSenseRendererHelper.addTextViewWithIcon(
+                        mDiffTextView,
+                        String.format(format, String.format(Locale.US,"%.2f", diffNumber), String.format(Locale.US, "%.2f%%", diffPercentage)),
+                        R.mipmap.ic_trend_arrow_draw_white);
             }
 
             mDiffTextView.setVisibility(View.VISIBLE);
         } catch (Exception e) {
             MarketSenseRendererHelper.addTextView(mYesterdayCloseTextView, String.valueOf("--"));
-
-            mPriceTextView.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_arrow_none, 0, 0, 0);
             mDiffTextView.setVisibility(View.INVISIBLE);
         }
     }

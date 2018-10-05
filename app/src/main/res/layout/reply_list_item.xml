@@ -6,7 +6,7 @@
     android:layout_marginBottom="1dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/news_layout_border">
+    android:background="@drawable/border_on_bottom_layout">
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/comment_avatar_image_iv"
@@ -26,7 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginStart="8dp"
-        android:textColor="@color/marketsense_text_black"
+        android:textColor="@color/text_first"
         android:textSize="14sp"
         android:fontFamily="sans-serif"
         android:textStyle="bold"
@@ -39,7 +39,7 @@
         android:id="@+id/comment_create_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/marketsense_text_gray"
+        android:textColor="@color/text_third"
         android:textSize="12sp"
         android:fontFamily="sans-serif"
         android:text="@string/title_comment_create_time"
@@ -47,15 +47,20 @@
         app:layout_constraintTop_toBottomOf="@id/comment_user_name"
         app:layout_constraintStart_toStartOf="@id/comment_user_name" />
 
-    <com.idroi.marketsense.NewsWebView
+    <com.idroi.marketsense.CommentTextView
         android:id="@+id/comment_body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textColor="@color/text_first"
+        android:textColorLink="@color/stock_blue"
+        android:textColorHighlight="@color/stock_blue"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif"
         android:layout_marginTop="8dp"
         android:layout_marginStart="64dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintTop_toBottomOf="@id/comment_avatar_image_iv"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintTop_toBottomOf="@id/comment_create_time"
         app:layout_constraintBottom_toBottomOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

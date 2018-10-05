@@ -10,18 +10,18 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FrescoHelper;
+import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.Stock;
+import com.idroi.marketsense.viewholders.NewsReferencedByCommentViewHolder;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -45,16 +45,12 @@ public class RichEditorActivity extends AppCompatActivity {
 
     RichEditor mEditor;
 //    String mEditorString;
-    View mLastPressView;
 
     public static final String EXTRA_REQ_TYPE = "extra_type";
     public static final String EXTRA_REQ_ID = "extra_id";
     public static final String EXTRA_REQ_STOCK_KEYWORDS = "extra_stock_keywords";
     public static final String EXTRA_REQ_NEWS_TITLE = "extra_news_title";
-    public static final String EXTRA_REQ_NEWS_DATE = "extra_news_date";
-    public static final String EXTRA_REQ_NEWS_FIRE_IMAGE_ID = "extra_news_fire_image_id";
-    public static final String EXTRA_REQ_NEWS_FIRE_TEXT_ID = "extra_news_fire_text";
-    public static final String EXTRA_REQ_NEWS_FIRE_TEXT_COLOR_ID = "extra_news_fire_text_color";
+    public static final String EXTRA_REQ_NEWS_LEVEL = "extra_news_level";
     public static final String EXTRA_RES_HTML = "extra_response_html";
     public static final String EXTRA_RES_TYPE = EXTRA_REQ_TYPE;
     public static final String EXTRA_RES_ID = EXTRA_REQ_ID;
@@ -72,10 +68,7 @@ public class RichEditorActivity extends AppCompatActivity {
     private TextView mCompletedTextView;
 
     private String mNewsTitle;
-    private String mNewsSourceDate;
-    private int mNewsFireStringResourceId;
-    private int mNewsFireImageResourceId;
-    private int mNewsFireColorStringResourceId;
+    private int mNewsLevel;
 
     public enum TYPE {
         NEWS("news"),
@@ -127,14 +120,10 @@ public class RichEditorActivity extends AppCompatActivity {
         mStockKeywords = intent.getStringArrayExtra(EXTRA_REQ_STOCK_KEYWORDS);
 
         mNewsTitle = intent.getStringExtra(EXTRA_REQ_NEWS_TITLE);
-        mNewsSourceDate = intent.getStringExtra(EXTRA_REQ_NEWS_DATE);
-        mNewsFireStringResourceId = intent.getIntExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, 0);
-        mNewsFireImageResourceId = intent.getIntExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, 0);
-        mNewsFireColorStringResourceId = intent.getIntExtra(EXTRA_REQ_NEWS_FIRE_TEXT_COLOR_ID, 0);
+        mNewsLevel = intent.getIntExtra(EXTRA_REQ_NEWS_LEVEL, 0);
     }
 
     private void leaveRichEditorActivity(boolean isSuccessful, String html, String eventId) {
-        mCompletedTextView.setClickable(true);
         if(isSuccessful) {
             Intent intent = new Intent();
             intent.putExtra(EXTRA_RES_HTML, html);
@@ -147,6 +136,7 @@ public class RichEditorActivity extends AppCompatActivity {
             finish();
             overridePendingTransition(R.anim.stop, R.anim.right_to_left);
         } else {
+            mCompletedTextView.setClickable(true);
             Toast.makeText(this, R.string.send_comment_fail, Toast.LENGTH_SHORT).show();
         }
     }
@@ -156,7 +146,7 @@ public class RichEditorActivity extends AppCompatActivity {
         mEditor.loadCSS("file:///android_asset/img.css");
         mEditor.setEditorHeight(200);
         mEditor.setEditorFontSize(22);
-        mEditor.setEditorFontColor(getResources().getColor(R.color.marketsense_text_black));
+        mEditor.setEditorFontColor(getResources().getColor(R.color.text_first));
         //mEditor.setEditorBackgroundColor(Color.BLUE);
         //mEditor.setBackgroundColor(Color.BLUE);
         //mEditor.setBackgroundResource(R.drawable.bg);
@@ -188,22 +178,9 @@ public class RichEditorActivity extends AppCompatActivity {
                 }
             }
 
-            ConstraintLayout newsBlock = findViewById(R.id.comment_news_block);
-            newsBlock.setVisibility(View.VISIBLE);
-            TextView titleTextView = findViewById(R.id.comment_news_title_tv);
-            titleTextView.setText(mNewsTitle);
-            TextView dateTextView = findViewById(R.id.comment_news_date_tv);
-            dateTextView.setText(mNewsSourceDate);
-            TextView fireTextView = findViewById(R.id.comment_news_fire_tv);
-            ImageView fireImageView = findViewById(R.id.comment_news_fire_iv);
-            try {
-                fireTextView.setText(mNewsFireStringResourceId);
-                fireTextView.setTextColor(getResources().getColor(mNewsFireColorStringResourceId));
-                fireImageView.setImageResource(mNewsFireImageResourceId);
-            } catch (Exception e) {
-                fireTextView.setVisibility(View.GONE);
-                fireImageView.setVisibility(View.GONE);
-            }
+            NewsReferencedByCommentViewHolder newsReferencedByCommentViewHolder =
+                    NewsReferencedByCommentViewHolder.convertToViewHolder(findViewById(R.id.comment_news_block));
+            newsReferencedByCommentViewHolder.update(this, mNewsTitle, mStockKeywords, mNewsLevel);
 
             ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) mEditor.getLayoutParams();
             params.bottomToTop = R.id.comment_news_block;
@@ -216,12 +193,13 @@ public class RichEditorActivity extends AppCompatActivity {
 
         if(actionBar != null) {
             actionBar.setElevation(0);
+            actionBar.setBackgroundDrawable(
+                    getDrawable(R.drawable.action_bar_background_with_border));
             View view = LayoutInflater.from(actionBar.getThemedContext())
                     .inflate(R.layout.action_bar_right_text, null);
 
-            SimpleDraweeView imageView = view.findViewById(R.id.action_bar_avatar);
+            ImageView imageView = view.findViewById(R.id.action_bar_back);
             if(imageView != null) {
-                imageView.setImageResource(R.mipmap.ic_close_white);
                 imageView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -230,7 +208,7 @@ public class RichEditorActivity extends AppCompatActivity {
                 });
             }
 
-            TextView titleTextView = view.findViewById(R.id.action_bar_name);
+            TextView titleTextView = view.findViewById(R.id.action_bar_title);
             if(titleTextView != null) {
                 if(mType.equals(TYPE.REPLY.getType())) {
                     titleTextView.setText(getResources().getText(R.string.reply_comment));
@@ -239,7 +217,7 @@ public class RichEditorActivity extends AppCompatActivity {
                 }
             }
 
-            mCompletedTextView = view.findViewById(R.id.action_bar_right_text);
+            mCompletedTextView = view.findViewById(R.id.action_bar_complete);
             if(mCompletedTextView != null) {
                 mCompletedTextView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -373,354 +351,17 @@ public class RichEditorActivity extends AppCompatActivity {
     }
 
     public static Intent generateRichEditorActivityIntent(Context context, TYPE type, String id) {
-        return generateRichEditorActivityIntent(context, type, id, null, null, 0, null);
+        return generateRichEditorActivityIntent(context, type, id, null, null, 0);
     }
 
-    public static Intent generateRichEditorActivityIntent(Context context, TYPE type, String id, String[] stockKeywords, String title, int level, String date) {
+    public static Intent generateRichEditorActivityIntent(Context context, TYPE type, String id, String[] stockKeywords, String title, int level) {
         Intent intent = new Intent(context, RichEditorActivity.class);
         intent.putExtra(EXTRA_REQ_TYPE, type.getType());
         intent.putExtra(EXTRA_REQ_ID, id);
         intent.putExtra(EXTRA_REQ_STOCK_KEYWORDS, stockKeywords);
         intent.putExtra(EXTRA_REQ_NEWS_TITLE, title);
-        intent.putExtra(EXTRA_REQ_NEWS_DATE, date);
-
-        switch (level) {
-            case 3:
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_news_up3);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_good3);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_COLOR_ID, R.color.colorTrendUp);
-                break;
-            case 2:
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_news_up2);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_good2);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_COLOR_ID, R.color.colorTrendUp);
-                break;
-            case 1:
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_news_up1);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_good1);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_COLOR_ID, R.color.colorTrendUp);
-                break;
-            case -1:
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_news_down1);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_bad1);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_COLOR_ID, R.color.colorTrendDown);
-                break;
-            case -2:
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_news_down2);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_bad2);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_COLOR_ID, R.color.colorTrendDown);
-                break;
-            case -3:
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, R.mipmap.ic_news_down3);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, R.string.title_news_bad3);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_COLOR_ID, R.color.colorTrendDown);
-                break;
-            default:
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_IMAGE_ID, 0);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_ID, 0);
-                intent.putExtra(EXTRA_REQ_NEWS_FIRE_TEXT_COLOR_ID, 0);
-        }
+        intent.putExtra(EXTRA_REQ_NEWS_LEVEL, level);
 
         return intent;
-    }
-
-    // Useless
-    private void changeBtnBackgroundColor(View view) {
-        if(mLastPressView != view) {
-            if(mLastPressView != null) {
-                mLastPressView.setBackgroundColor(
-                        getResources().getColor(R.color.marketsense_rich_edit_black_background));
-            }
-            view.setBackgroundColor(
-                    getResources().getColor(R.color.colorTrendUp));
-            mLastPressView = view;
-        } else {
-            view.setBackgroundColor(
-                    getResources().getColor(R.color.marketsense_rich_edit_black_background));
-            mLastPressView = null;
-        }
-    }
-
-    private boolean changeBtnBackgroundColorImmediately(View view, MotionEvent motionEvent) {
-        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-            // Pressed
-            if(mLastPressView != null) {
-                mLastPressView.setBackgroundColor(
-                        getResources().getColor(R.color.marketsense_rich_edit_black_background));
-            }
-            view.setBackgroundColor(
-                    getResources().getColor(R.color.colorTrendUp));
-            mLastPressView = view;
-            view.performClick();
-        } else if (motionEvent.getAction() == MotionEvent.ACTION_UP ||
-                motionEvent.getAction() == MotionEvent.ACTION_CANCEL) {
-            // Released
-            view.setBackgroundColor(
-                    getResources().getColor(R.color.marketsense_rich_edit_black_background));
-        }
-
-        return false;
-    }
-
-    private void initEditorPanel() {
-        // TODO: maybe one day we will open these functions
-//        findViewById(R.id.action_undo).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.undo();
-//            }
-//        });
-//        findViewById(R.id.action_undo).setOnTouchListener(new View.OnTouchListener() {
-//            @SuppressLint("ClickableViewAccessibility")
-//            @Override
-//            public boolean onTouch(View view, MotionEvent motionEvent) {
-//                return changeBtnBackgroundColorImmediately(view, motionEvent);
-//            }
-//        });
-//
-//        findViewById(R.id.action_redo).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.redo();
-//            }
-//        });
-//        findViewById(R.id.action_redo).setOnTouchListener(new View.OnTouchListener() {
-//            @SuppressLint("ClickableViewAccessibility")
-//            @Override
-//            public boolean onTouch(View view, MotionEvent motionEvent) {
-//                return changeBtnBackgroundColorImmediately(view, motionEvent);
-//            }
-//        });
-//
-//        findViewById(R.id.action_bold).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.setBold();
-//                changeBtnBackgroundColor(v);
-//            }
-//        });
-//
-//        findViewById(R.id.action_italic).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.setItalic();
-//                changeBtnBackgroundColor(v);
-//            }
-//        });
-//
-//        findViewById(R.id.action_subscript).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.setSubscript();
-//                changeBtnBackgroundColor(v);
-//            }
-//        });
-//
-//        findViewById(R.id.action_superscript).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.setSuperscript();
-//                changeBtnBackgroundColor(v);
-//            }
-//        });
-//
-//        findViewById(R.id.action_strikethrough).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.setStrikeThrough();
-//                changeBtnBackgroundColor(v);
-//            }
-//        });
-//
-//        findViewById(R.id.action_underline).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.setUnderline();
-//                changeBtnBackgroundColor(v);
-//            }
-//        });
-//
-//        findViewById(R.id.action_heading1).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.setHeading(1);
-//                changeBtnBackgroundColor(v);
-//            }
-//        });
-//
-//        findViewById(R.id.action_heading2).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.setHeading(2);
-//                changeBtnBackgroundColor(v);
-//            }
-//        });
-//
-//        findViewById(R.id.action_heading3).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.setHeading(3);
-//                changeBtnBackgroundColor(v);
-//            }
-//        });
-//
-//        findViewById(R.id.action_heading4).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.setHeading(4);
-//                changeBtnBackgroundColor(v);
-//            }
-//        });
-//
-//        findViewById(R.id.action_heading5).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.setHeading(5);
-//                changeBtnBackgroundColor(v);
-//            }
-//        });
-//
-//        findViewById(R.id.action_heading6).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.setHeading(6);
-//                changeBtnBackgroundColor(v);
-//            }
-//        });
-//
-//        findViewById(R.id.action_txt_color).setOnClickListener(new View.OnClickListener() {
-//            private boolean isChanged;
-//
-//            @Override public void onClick(View view) {
-//                mEditor.setTextColor(isChanged ?
-//                        getResources().getColor(R.color.marketsense_text_black) :
-//                        getResources().getColor(R.color.marketsense_text_red));
-//                view.setBackgroundColor(isChanged ?
-//                        getResources().getColor(R.color.marketsense_rich_edit_black_background) :
-//                        getResources().getColor(R.color.colorTrendUp));
-//                isChanged = !isChanged;
-//            }
-//        });
-//
-//        findViewById(R.id.action_bg_color).setOnClickListener(new View.OnClickListener() {
-//            private boolean isChanged;
-//
-//            @Override public void onClick(View view) {
-//                mEditor.setTextBackgroundColor(isChanged ?
-//                        getResources().getColor(R.color.marketsense_trans) :
-//                        Color.YELLOW);
-//                view.setBackgroundColor(isChanged ?
-//                        getResources().getColor(R.color.marketsense_rich_edit_black_background) :
-//                        getResources().getColor(R.color.colorTrendUp));
-//                isChanged = !isChanged;
-//            }
-//        });
-//
-//        findViewById(R.id.action_indent).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.setIndent();
-//                changeBtnBackgroundColor(v);
-//            }
-//        });
-//
-//        findViewById(R.id.action_outdent).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.setOutdent();
-//                changeBtnBackgroundColor(v);
-//            }
-//        });
-//
-//        findViewById(R.id.action_align_left).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.setAlignLeft();
-//                changeBtnBackgroundColor(v);
-//            }
-//        });
-//
-//        findViewById(R.id.action_align_center).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.setAlignCenter();
-//                changeBtnBackgroundColor(v);
-//            }
-//        });
-//
-//        findViewById(R.id.action_align_right).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.setAlignRight();
-//                changeBtnBackgroundColor(v);
-//            }
-//        });
-//
-//        findViewById(R.id.action_blockquote).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.setBlockquote();
-//                changeBtnBackgroundColor(v);
-//            }
-//        });
-//
-//        findViewById(R.id.action_insert_image).setOnTouchListener(new View.OnTouchListener() {
-//            @SuppressLint("ClickableViewAccessibility")
-//            @Override
-//            public boolean onTouch(View view, MotionEvent motionEvent) {
-//                if(motionEvent.getAction() == MotionEvent.ACTION_UP) {
-//                    mEditor.focusEditor();
-//                    final View alertView = LayoutInflater.from(RichEditorActivity.this)
-//                            .inflate(R.layout.alertdialog_single_input, null);
-//                    if (mImageAlertDialog != null) {
-//                        mImageAlertDialog.dismiss();
-//                        mImageAlertDialog = null;
-//                    }
-//                    final EditText editText = alertView.findViewById(R.id.alert_dialog_input);
-//                    editText.setText(HTTP);
-//                    mImageAlertDialog = new AlertDialog.Builder(RichEditorActivity.this)
-//                            .setTitle(R.string.insert_image_url)
-//                            .setView(alertView)
-//                            .setPositiveButton(R.string.insert_ok, new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialogInterface, int i) {
-//                                    mEditor.insertImage(editText.getText().toString(),
-//                                            getResources().getString(R.string.image_alt));
-//                                    mImageAlertDialog.dismiss();
-//                                }
-//                            }).setNegativeButton(R.string.insert_cancel, new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialogInterface, int i) {
-//                                    mImageAlertDialog.dismiss();
-//                                }
-//                            }).show();
-//                }
-//                return changeBtnBackgroundColorImmediately(view, motionEvent);
-//            }
-//        });
-//
-//        findViewById(R.id.action_insert_link).setOnTouchListener(new View.OnTouchListener() {
-//            @SuppressLint("ClickableViewAccessibility")
-//            @Override
-//            public boolean onTouch(View view, MotionEvent motionEvent) {
-//                if(motionEvent.getAction() == MotionEvent.ACTION_UP) {
-//                    mEditor.focusEditor();
-//                    final View alertView = LayoutInflater.from(RichEditorActivity.this)
-//                            .inflate(R.layout.alertdialog_two_inputs, null);
-//                    if (mUrlAlertDialog != null) {
-//                        mUrlAlertDialog.dismiss();
-//                        mUrlAlertDialog = null;
-//                    }
-//                    final EditText editTextUrl = alertView.findViewById(R.id.alert_dialog_input_2);
-//                    editTextUrl.setText(HTTP);
-//                    mUrlAlertDialog = new AlertDialog.Builder(RichEditorActivity.this)
-//                            .setTitle(R.string.insert_hyperlink)
-//                            .setView(alertView)
-//                            .setPositiveButton(R.string.insert_ok, new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialogInterface, int i) {
-//                                    EditText editTextTitle = alertView.findViewById(R.id.alert_dialog_input_1);
-//                                    mEditor.insertLink(
-//                                            editTextUrl.getText().toString(),
-//                                            editTextTitle.getText().toString());
-//                                    mUrlAlertDialog.dismiss();
-//                                }
-//                            }).setNegativeButton(R.string.insert_cancel, new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialogInterface, int i) {
-//                                    mUrlAlertDialog.dismiss();
-//                                }
-//                            }).show();
-//                }
-//                return changeBtnBackgroundColorImmediately(view, motionEvent);
-//            }
-//        });
-//
-//        findViewById(R.id.action_insert_checkbox).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.insertTodo();
-//                changeBtnBackgroundColor(v);
-//            }
-//        });
     }
 }

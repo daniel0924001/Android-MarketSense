@@ -22,9 +22,43 @@ public class StockTradeData {
     private float mRealPrice, mDiffPrice, mDiffPercentage;
 
     private float mTaHighPrice, mTaLowPrice;
+    private float mBuyPrice, mSellPrice;
+    private int mYesterdayVolume;
+    private float mTradeMoney;
 
     private String mTradeDay;
     private int mTotalVolume;
+    private BestPriceRow[] mBestPriceRow;
+
+    public static class BestPriceRow {
+        private float mBuyPrice;
+        private float mSellPrice;
+        private int mBuyVolume;
+        private int mSellVolume;
+
+        public BestPriceRow(float buyPrice, int buyVolume, float sellPrice, int sellVolume) {
+            mBuyPrice = buyPrice;
+            mBuyVolume = buyVolume;
+            mSellPrice = sellPrice;
+            mSellVolume = sellVolume;
+        }
+
+        public float getBuyPrice() {
+            return mBuyPrice;
+        }
+
+        public float getSellPrice() {
+            return mSellPrice;
+        }
+
+        public int getBuyVolume() {
+            return mBuyVolume;
+        }
+
+        public int getSellVolume() {
+            return mSellVolume;
+        }
+    }
 
     public StockTradeData(String type) {
         mType = type;
@@ -196,5 +230,53 @@ public class StockTradeData {
 
     public String getTickTotalVolume() {
         return StockVolumeFormatter.getFormattedValue(mTotalVolume);
+    }
+
+    public void setTickBuyPrice(float buyPrice) {
+        mBuyPrice = buyPrice;
+    }
+
+    public float getTickBuyPrice() {
+        return mBuyPrice;
+    }
+
+    public void setTickSellPrice(float sellPrice) {
+        mSellPrice = sellPrice;
+    }
+
+    public float getTickSellPrice() {
+        return mSellPrice;
+    }
+
+    public void setYesterdayVolume(float yesterdayVolume) {
+        mYesterdayVolume = (int) yesterdayVolume;
+    }
+
+    public int getYesterdayVolume() {
+        return mYesterdayVolume;
+    }
+
+    public void setTradeMoney(float tradeMoney) {
+        mTradeMoney = tradeMoney / 100000;
+    }
+
+    public float getTradeMoney() {
+        return mTradeMoney;
+    }
+
+    public void setFiveBestPrice(int index, float buyPrice, float sellPrice, int buyVolume, int sellVolume) {
+        if(mBestPriceRow == null) {
+            mBestPriceRow = new BestPriceRow[5];
+        }
+
+        if(index < 0 || index >= 5) {
+            return;
+        }
+
+        mBestPriceRow[index] = new BestPriceRow(buyPrice, buyVolume, sellPrice, sellVolume);
+    }
+
+    public BestPriceRow[] getFiveBestPrice() {
+        return mBestPriceRow;
     }
 }

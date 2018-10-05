@@ -2,15 +2,12 @@ package com.idroi.marketsense;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,11 +24,13 @@ import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FrescoHelper;
 import com.idroi.marketsense.data.News;
 import com.idroi.marketsense.data.Stock;
+import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.request.NewsRequest;
 
 import java.util.ArrayList;
 
 import static com.idroi.marketsense.adapter.NewsRecyclerAdapter.NEWS_SINGLE_LAYOUT;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_NEWS_READ_RECORD_LIST;
 import static com.idroi.marketsense.fragments.NewsFragment.KEYWORD_TASK_ID;
 
 /**
@@ -56,6 +55,8 @@ public class SearchAndResponseActivity extends AppCompatActivity {
     private String mQueryString;
     private int mSearchType;
 
+    private UserProfile.GlobalBroadcastListener mGlobalBroadcastListener;
+
     private  ArrayList<Stock> mAllStocks = ClientData.getInstance(this).getAllStocksListInfo();
 
     @Override
@@ -64,10 +65,24 @@ public class SearchAndResponseActivity extends AppCompatActivity {
         FrescoHelper.initialize(getApplicationContext());
         setContentView(R.layout.activity_search);
 
-        ClientData.getInstance(this);
+        UserProfile userProfile = ClientData.getInstance(this).getUserProfile();
         setInformation();
         setResultsLayout();
         setActionBar();
+
+        mGlobalBroadcastListener = new UserProfile.GlobalBroadcastListener() {
+            @Override
+            public void onGlobalBroadcast(int notifyId, Object payload) {
+                if(notifyId == NOTIFY_ID_NEWS_READ_RECORD_LIST) {
+                    MSLog.d("update user's read news records");
+                    mNewsRecyclerAdapter.notifyItemRangeChanged(0, mNewsRecyclerAdapter.getItemCount());
+                }
+            }
+        };
+
+        if(userProfile != null) {
+            userProfile.addGlobalBroadcastListener(mGlobalBroadcastListener);
+        }
     }
 
     private void setActionBar() {
@@ -75,7 +90,7 @@ public class SearchAndResponseActivity extends AppCompatActivity {
 
         if(actionBar != null) {
             actionBar.setElevation(0);
-            actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.text_white)));
+            actionBar.setBackgroundDrawable(getDrawable(R.drawable.action_bar_background_with_border));
             View view = LayoutInflater.from(actionBar.getThemedContext())
                     .inflate(R.layout.action_bar_search, null);
 
@@ -126,11 +141,13 @@ public class SearchAndResponseActivity extends AppCompatActivity {
         mNewsRecyclerAdapter.setOnItemClickListener(new NewsRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(News news) {
+                mNewsRecyclerAdapter.notifyNewsIsClicked(news);
                 startActivity(NewsWebViewActivity.generateNewsWebViewActivityIntent(
                         SearchAndResponseActivity.this, news.getId(), news.getTitle(),
                         news.getUrlImage(), news.getDate(),
                         news.getPageLink(), news.getOriginLink(),
-                        news.getVoteRaiseNum(), news.getVoteFallNum(), news.getStockKeywords(), news.getLevel()));
+                        news.getVoteRaiseNum(), news.getVoteFallNum(),
+                        news.getStockKeywords(), news.getExplicitKeywords(), news.getLevel()));
                 overridePendingTransition(R.anim.enter, R.anim.stop);
             }
         });
@@ -292,6 +309,10 @@ public class SearchAndResponseActivity extends AppCompatActivity {
     protected void onDestroy() {
         if(mNewsRecyclerAdapter != null) {
             mNewsRecyclerAdapter.destroy();
+        }
+        UserProfile userProfile = ClientData.getInstance(this).getUserProfile();
+        if(userProfile != null) {
+            userProfile.deleteGlobalBroadcastListener(mGlobalBroadcastListener);
         }
         super.onDestroy();
     }

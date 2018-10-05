@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/chart_type_1m"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif"
+        android:textStyle="normal"
+        android:textColor="@color/text_first"
+        android:text="@string/title_chart_type_1m"
+        android:gravity="center"
+        android:background="@drawable/border_selector_selected"
+        android:foreground="@drawable/item_foreground_with_clicked_shadow"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/chart_type_d" />
+
+    <TextView
+        android:id="@+id/chart_type_d"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif"
+        android:textStyle="normal"
+        android:textColor="@color/text_third"
+        android:text="@string/title_chart_type_d"
+        android:gravity="center"
+        android:background="@drawable/border_selector"
+        android:foreground="@drawable/item_foreground_with_clicked_shadow"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/chart_type_1m"
+        app:layout_constraintEnd_toStartOf="@id/chart_type_w" />
+
+    <TextView
+        android:id="@+id/chart_type_w"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif"
+        android:textStyle="normal"
+        android:textColor="@color/text_third"
+        android:text="@string/title_chart_type_w"
+        android:gravity="center"
+        android:background="@drawable/border_selector"
+        android:foreground="@drawable/item_foreground_with_clicked_shadow"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/chart_type_d"
+        app:layout_constraintEnd_toStartOf="@id/chart_type_m"/>
+
+    <TextView
+        android:id="@+id/chart_type_m"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif"
+        android:textStyle="normal"
+        android:textColor="@color/text_third"
+        android:text="@string/title_chart_type_m"
+        android:gravity="center"
+        android:background="@drawable/border_selector"
+        android:foreground="@drawable/item_foreground_with_clicked_shadow"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/chart_type_w"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</android.support.constraint.ConstraintLayout>

@@ -14,6 +14,7 @@ import com.idroi.marketsense.common.ClientData;
 
 import org.json.JSONObject;
 
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.Locale;
 
@@ -22,6 +23,8 @@ import java.util.Locale;
  */
 
 public class Stock {
+
+    private static boolean sDisclosureState;
 
     private static final String CODE = "code";
     private static final String NAME = "name";
@@ -35,6 +38,9 @@ public class Stock {
     private static final String FALL = "fall";
     private static final String TODAY_DIFF_PRED = "today_diff_predict";
     private static final String NEXT_DIFF_PRED = "next_diff_predict";
+    private static final String NEXT_5D_DIFF_PRED = "next_5d_diff_predict";
+    private static final String NEXT_20D_DIFF_PRED = "next_20d_diff_predict";
+    private static final String YESTERDAY_VOLUME = "y_vol";
 
     public static final int LEVEL_HIGHEST = 2;
     public static final int LEVEL_HIGH = 1;
@@ -52,6 +58,7 @@ public class Stock {
 
     private int mDiffDirection = 3;
     private double mPrice, mDiffNumber, mDiffPercentage;
+    private int mYesterdayVolume;
 
     private double mConfidence = 75;
     private int mConfidenceDirection;
@@ -64,7 +71,11 @@ public class Stock {
 
     private int mTodayPredictionDiffDirection, mTomorrowPredictionDiffDirection, mPredictionDiffDirection;
     private double mTodayPredictionDiffPercentage, mTomorrowPredictionDiffPercentage, mPredictionDiffPercentage;
-    private double mPredictionError;
+    private double mPredictionError, mPredictionErrorWhenClosed;
+
+    private int m5DPredictionDirection, m20DPredictionDirection;
+
+    private boolean mIsUpOrDownStop;
 
     public Stock() {
 
@@ -102,6 +113,31 @@ public class Stock {
             mDiffDirection = Stock.TREND_FLAT;
         } else {
             mDiffDirection = Stock.TREND_DOWN;
+        }
+    }
+
+    public void checkIsStop(double yesterdayPrice, double price) {
+        double maxThreshold = yesterdayPrice * 1.1;
+        double minThreshold = yesterdayPrice * 0.9;
+        double step = 0;
+        if(yesterdayPrice < 10) {
+            step = 0.01;
+        } else if(yesterdayPrice < 50) {
+            step = 0.05;
+        } else if(yesterdayPrice < 100) {
+            step = 0.1;
+        } else if(yesterdayPrice < 500) {
+            step = 0.5;
+        } else if(yesterdayPrice < 1000) {
+            step = 1;
+        } else {
+            step = 5;
+        }
+
+        if(price + step >= maxThreshold || price - step <= minThreshold) {
+            mIsUpOrDownStop = true;
+        } else {
+            mIsUpOrDownStop = false;
         }
     }
 
@@ -201,6 +237,34 @@ public class Stock {
         }
     }
 
+    public void set5DPrediction(double prediction) {
+        if(prediction > 0) {
+            m5DPredictionDirection = TREND_UP;
+        } else if(prediction == 0) {
+            m5DPredictionDirection = TREND_FLAT;
+        } else {
+            m5DPredictionDirection = TREND_DOWN;
+        }
+    }
+
+    public void set20DPrediction(double prediction) {
+        if(prediction > 0) {
+            m20DPredictionDirection = TREND_UP;
+        } else if(prediction == 0) {
+            m20DPredictionDirection = TREND_FLAT;
+        } else {
+            m20DPredictionDirection = TREND_DOWN;
+        }
+    }
+
+    public void setYesterdayVolume(int yesterdayVolume) {
+        mYesterdayVolume = yesterdayVolume;
+    }
+
+    public int getYesterdayVolume() {
+        return mYesterdayVolume;
+    }
+
     public String getName() {
         return mName;
     }
@@ -216,13 +280,13 @@ public class Stock {
     public int getDiffColorResourceId() {
         switch (mDiffDirection) {
             case TREND_UP:
-                return R.color.colorTrendUp;
+                return R.color.trend_red;
             case TREND_FLAT:
-                return R.color.colorTrendFlat;
+                return R.color.draw_grey;
             case TREND_DOWN:
-                return R.color.colorTrendDown;
+                return R.color.trend_green;
             default:
-                return R.color.colorTrendFlat;
+                return R.color.draw_grey;
         }
     }
 
@@ -274,6 +338,18 @@ public class Stock {
 
     public int getFallNum() {
         return mFallNum;
+    }
+
+    public int getTomorrowPredictionDiffDirection() {
+        return mTomorrowPredictionDiffDirection;
+    }
+
+    public int get5DPredictionDirection() {
+        return m5DPredictionDirection;
+    }
+
+    public int get20DPredictionDirection() {
+        return m20DPredictionDirection;
     }
 
     public int getPredictNewsLevel() {
@@ -362,11 +438,25 @@ public class Stock {
         }
         error += Math.abs(mTodayPredictionDiffDirection * mTodayPredictionDiffPercentage - mDiffDirection * mDiffPercentage);
         mPredictionError = -error;
+
+        if(isHitPredictionDirection(false)) {
+            mPredictionErrorWhenClosed = 10 + mPredictionDiffDirection * mPredictionDiffPercentage;
+        } else {
+            mPredictionErrorWhenClosed = mPredictionDiffDirection * mPredictionDiffPercentage;
+        }
     }
 
     public boolean isHitPredictionDirection(boolean isCountZero) {
         return (isCountZero && mDiffDirection == TREND_FLAT)
                 || mTodayPredictionDiffDirection == mDiffDirection;
+    }
+
+    public static void initializeRightPartValue() {
+        sDisclosureState = false;
+    }
+
+    public static void changeRightPartValue() {
+        sDisclosureState = !sDisclosureState;
     }
 
     public double getEarnInPrediction(boolean simple) {
@@ -388,63 +478,236 @@ public class Stock {
 
     public double getPredictionSortScore() {
         ClientData clientData = ClientData.getInstance();
-        if(clientData.isWorkDayBeforeStockClosed() ||
-                clientData.isWorkDayAfterStockClosedBeforeAnswerDisclosure()) {
+        if(clientData.isWorkDayAndStockMarketIsOpen() || clientData.isWorkDayAfterStockClosedBeforeAnswerDisclosure()) {
             return mPredictionError;
         } else {
-            if(isHitPredictionDirection(false)) {
-                return 10 + mPredictionDiffDirection * mPredictionDiffPercentage;
-            } else {
-                return mPredictionDiffDirection * mPredictionDiffPercentage;
+            return mPredictionErrorWhenClosed;
+        }
+    }
+
+    public void renderDiffColor(Context context, TextView textView) {
+        if(mIsUpOrDownStop) {
+            textView.setTextColor(context.getResources().getColor(R.color.white));
+            switch (mDiffDirection) {
+                case TREND_UP:
+                    textView.setBackgroundColor(context.getResources().getColor(R.color.trend_red));
+                    break;
+                case TREND_DOWN:
+                    textView.setBackgroundColor(context.getResources().getColor(R.color.trend_green));
+                    break;
+            }
+        } else {
+            textView.setBackgroundColor(context.getResources().getColor(R.color.white));
+            switch (mDiffDirection) {
+                case TREND_UP:
+                    textView.setTextColor(context.getResources().getColor(R.color.trend_red));
+                    break;
+                case TREND_FLAT:
+                    textView.setTextColor(context.getResources().getColor(R.color.draw_grey));
+                    break;
+                case TREND_DOWN:
+                    textView.setTextColor(context.getResources().getColor(R.color.trend_green));
+                    break;
+                default:
+                    textView.setTextColor(context.getResources().getColor(R.color.draw_grey));
+                    break;
             }
         }
     }
 
-    public void setRightPredictionBlock(Context context,
-                                        ConstraintLayout predictionBlock,
-                                        TextView titleTextView,
-                                        TextView valueTextView,
-                                        ImageView isHitImageView) {
-        Resources resources = context.getResources();
-        ClientData clientData = ClientData.getInstance(context);
-        isHitImageView.setVisibility(View.GONE);
-        if(clientData.isWorkDayBeforeStockClosed()) {
-            titleTextView.setText(resources.getString(R.string.title_predict_today));
-        } else if(clientData.isWorkDayAfterStockClosedBeforeAnswerDisclosure()) {
-            titleTextView.setText(resources.getString(R.string.title_predict_today_answer_disclosure));
-            if(isHitPredictionDirection(false)) {
-                isHitImageView.setVisibility(View.VISIBLE);
-            }
-        } else {
-            titleTextView.setText(resources.getString(R.string.title_predict_tomorrow));
-            if(isHitPredictionDirection(false)) {
-                isHitImageView.setVisibility(View.VISIBLE);
-            }
-        }
-
-        valueTextView.setTextColor(resources.getColor(R.color.text_white));
-        titleTextView.setTextColor(resources.getColor(R.color.text_white));
-        switch (mPredictionDiffDirection) {
+    public void renderDiffIcon(ImageView imageView) {
+        switch (mDiffDirection) {
             case TREND_UP:
-                predictionBlock.setBackground(resources.getDrawable(R.drawable.block_predict_up_background));
-                valueTextView.setText(String.format(Locale.US, "+%.2f%%", mPredictionDiffPercentage));
+                imageView.setVisibility(View.VISIBLE);
+                imageView.setImageResource(R.mipmap.ic_trend_arrow_up);
                 break;
             case TREND_FLAT:
-                predictionBlock.setBackgroundColor(resources.getColor(R.color.card_gray_background));
-                valueTextView.setText(String.format(Locale.US, "%.2f%%", mPredictionDiffPercentage));
-                valueTextView.setTextColor(resources.getColor(R.color.text_dark_gray));
-                titleTextView.setTextColor(resources.getColor(R.color.text_dark_gray));
+                imageView.setVisibility(View.INVISIBLE);
                 break;
             case TREND_DOWN:
-                predictionBlock.setBackground(resources.getDrawable(R.drawable.block_predict_down_background));
-                valueTextView.setText(String.format(Locale.US, "-%.2f%%", mPredictionDiffPercentage));
+                imageView.setVisibility(View.VISIBLE);
+                imageView.setImageResource(R.mipmap.ic_trend_arrow_down);
                 break;
             default:
-                predictionBlock.setBackgroundColor(resources.getColor(R.color.card_gray_background));
-                valueTextView.setText(String.format(Locale.US, "%.2f%%", mPredictionDiffPercentage));
-                valueTextView.setTextColor(resources.getColor(R.color.text_dark_gray));
-                titleTextView.setTextColor(resources.getColor(R.color.text_dark_gray));
+                imageView.setVisibility(View.INVISIBLE);
                 break;
+        }
+    }
+
+    public static void renderTitleAndStars(Context context, int direction, int level,
+                                           ConstraintLayout blockView,
+                                           TextView titleTextView,
+                                           TextView unavailableTextView,
+                                           ImageView[] imageViews) {
+        Resources resources = context.getResources();
+        if(direction == TREND_FLAT) {
+            titleTextView.setVisibility(View.GONE);
+            unavailableTextView.setVisibility(View.VISIBLE);
+            for(ImageView imageView : imageViews) {
+                imageView.setVisibility(View.INVISIBLE);
+            }
+        } else {
+            titleTextView.setVisibility(View.VISIBLE);
+            unavailableTextView.setVisibility(View.GONE);
+            int iconResourceId;
+            if(direction == TREND_UP) {
+                iconResourceId = R.mipmap.ic_trend_arrow_up;
+            } else {
+                iconResourceId = R.mipmap.ic_trend_arrow_down;
+            }
+            for(int i = 0; i <= level; i++) {
+                imageViews[i].setVisibility(View.VISIBLE);
+                imageViews[i].setImageResource(iconResourceId);
+            }
+            for(int i = level + 1; i < 3; i++) {
+                imageViews[i].setVisibility(View.INVISIBLE);
+            }
+        }
+    }
+
+    public void renderIsHit(Context context, TextView hitTextView) {
+        Resources resources = context.getResources();
+        ClientData clientData = ClientData.getInstance();
+
+        if(isHitPredictionDirection(false) && !clientData.isWorkDayAndStockMarketIsOpen()) {
+            hitTextView.setVisibility(View.VISIBLE);
+            if (mTodayPredictionDiffDirection == TREND_UP) {
+                hitTextView.setBackground(resources.getDrawable(R.drawable.block_red_border_with_radius_corner));
+                hitTextView.setTextColor(resources.getColor(R.color.trend_red));
+            } else if (mTodayPredictionDiffDirection == TREND_DOWN) {
+                hitTextView.setBackground(resources.getDrawable(R.drawable.block_green_border_with_radius_corner));
+                hitTextView.setTextColor(resources.getColor(R.color.trend_green));
+            } else {
+                hitTextView.setBackground(resources.getDrawable(R.drawable.block_flat_border_with_radius_corner));
+                hitTextView.setTextColor(resources.getColor(R.color.draw_grey));
+            }
+        } else {
+            hitTextView.setVisibility(View.GONE);
+        }
+    }
+
+    public void renderTodayBlock(Context context,
+                                 ConstraintLayout blockView,
+                                 TextView titleTextView,
+                                 TextView statusTextView) {
+        Resources resources = context.getResources();
+        ClientData clientData = ClientData.getInstance();
+
+        String todayFormat = resources.getString(R.string.title_month_day_close_predict);
+        if(clientData.isWorkDay()) {
+            if(clientData.isWorkDayBeforeStockOpen()) {
+                // D - 1
+                Calendar c = clientData.getWorkDayMinusOne();
+                titleTextView.setText(String.format(todayFormat,
+                        c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH)));
+            } else {
+                // D
+                Calendar c = clientData.getWorkDay();
+                titleTextView.setText(String.format(todayFormat,
+                        c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH)));
+            }
+        } else {
+            // D - n
+            Calendar c = clientData.getWorkDay();
+            titleTextView.setText(String.format(todayFormat,
+                    c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH)));
+        }
+
+        if(isHitPredictionDirection(false)) {
+            titleTextView.setTextColor(resources.getColor(R.color.white));
+            statusTextView.setTextColor(resources.getColor(R.color.white));
+            if (mTodayPredictionDiffDirection == TREND_UP) {
+                blockView.setBackground(resources.getDrawable(R.drawable.block_predict_up_background));
+                statusTextView.setText(String.format(Locale.US, "+%.2f%%", mTodayPredictionDiffPercentage));
+            } else if (mTodayPredictionDiffDirection == TREND_DOWN) {
+                blockView.setBackground(resources.getDrawable(R.drawable.block_predict_down_background));
+                statusTextView.setText(String.format(Locale.US, "-%.2f%%", mTodayPredictionDiffPercentage));
+            } else {
+                blockView.setBackground(resources.getDrawable(R.drawable.block_predict_flat_background));
+                statusTextView.setText(String.format(Locale.US, "%.2f%%", mTodayPredictionDiffPercentage));
+            }
+        } else {
+            blockView.setBackground(resources.getDrawable(R.drawable.block_predict_unavailable));
+            titleTextView.setTextColor(resources.getColor(R.color.pinkish_grey_four));
+            statusTextView.setTextColor(resources.getColor(R.color.warm_grey_four));
+            if (mTodayPredictionDiffDirection == TREND_UP) {
+                statusTextView.setText(String.format(Locale.US, "+%.2f%%", mTodayPredictionDiffPercentage));
+            } else if (mTodayPredictionDiffDirection == TREND_DOWN) {
+                statusTextView.setText(String.format(Locale.US, "-%.2f%%", mTodayPredictionDiffPercentage));
+            } else {
+                statusTextView.setText(String.format(Locale.US, "%.2f%%", mTodayPredictionDiffPercentage));
+            }
+        }
+    }
+
+    public void renderTomorrowBlock(Context context,
+                                    ConstraintLayout blockView,
+                                    TextView titleTextView,
+                                    TextView statusTextView) {
+
+        Resources resources = context.getResources();
+        ClientData clientData = ClientData.getInstance();
+
+        String todayFormat = resources.getString(R.string.title_month_day_close_predict);
+        if(clientData.isWorkDay()) {
+            if(clientData.isWorkDayBeforeStockOpen()) {
+                // D
+                Calendar c = clientData.getWorkDay();
+                titleTextView.setText(String.format(todayFormat,
+                        c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH)));
+                titleTextView.setTextColor(resources.getColor(R.color.white));
+                statusTextView.setTextColor(resources.getColor(R.color.white));
+                if (mTomorrowPredictionDiffDirection == TREND_UP) {
+                    blockView.setBackground(resources.getDrawable(R.drawable.block_predict_up_background));
+                    statusTextView.setText(String.format(Locale.US, "+%.2f%%", mTomorrowPredictionDiffPercentage));
+                } else if (mTomorrowPredictionDiffDirection == TREND_DOWN) {
+                    blockView.setBackground(resources.getDrawable(R.drawable.block_predict_down_background));
+                    statusTextView.setText(String.format(Locale.US, "-%.2f%%", mTomorrowPredictionDiffPercentage));
+                } else {
+                    blockView.setBackground(resources.getDrawable(R.drawable.block_predict_flat_background));
+                    statusTextView.setText(String.format(Locale.US, "%.2f%%", mTomorrowPredictionDiffPercentage));
+                }
+            } else {
+                // D + 1
+                Calendar c = clientData.getWorkDayPlusOne();
+                titleTextView.setText(String.format(todayFormat,
+                        c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH)));
+                if(clientData.isWorkDayAndStockMarketIsOpen() || clientData.isWorkDayAfterStockClosedBeforeAnswerDisclosure()) {
+                    statusTextView.setText(R.string.title_disclosure_at_1500);
+                    titleTextView.setTextColor(resources.getColor(R.color.pinkish_grey_four));
+                    statusTextView.setTextColor(resources.getColor(R.color.warm_grey_four));
+                } else {
+                    titleTextView.setTextColor(resources.getColor(R.color.white));
+                    statusTextView.setTextColor(resources.getColor(R.color.white));
+                    if (mTomorrowPredictionDiffDirection == TREND_UP) {
+                        blockView.setBackground(resources.getDrawable(R.drawable.block_predict_up_background));
+                        statusTextView.setText(String.format(Locale.US, "+%.2f%%", mTomorrowPredictionDiffPercentage));
+                    } else if (mTomorrowPredictionDiffDirection == TREND_DOWN) {
+                        blockView.setBackground(resources.getDrawable(R.drawable.block_predict_down_background));
+                        statusTextView.setText(String.format(Locale.US, "-%.2f%%", mTomorrowPredictionDiffPercentage));
+                    } else {
+                        blockView.setBackground(resources.getDrawable(R.drawable.block_predict_flat_background));
+                        statusTextView.setText(String.format(Locale.US, "%.2f%%", mTomorrowPredictionDiffPercentage));
+                    }
+                }
+            }
+        } else {
+            // D + n
+            Calendar c = clientData.getWorkDayPlusOne();
+            titleTextView.setText(String.format(todayFormat,
+                    c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH)));
+            titleTextView.setTextColor(resources.getColor(R.color.white));
+            statusTextView.setTextColor(resources.getColor(R.color.white));
+            if (mTomorrowPredictionDiffDirection == TREND_UP) {
+                blockView.setBackground(resources.getDrawable(R.drawable.block_predict_up_background));
+                statusTextView.setText(String.format(Locale.US, "+%.2f%%", mTomorrowPredictionDiffPercentage));
+            } else if (mTomorrowPredictionDiffDirection == TREND_DOWN) {
+                blockView.setBackground(resources.getDrawable(R.drawable.block_predict_down_background));
+                statusTextView.setText(String.format(Locale.US, "-%.2f%%", mTomorrowPredictionDiffPercentage));
+            } else {
+                blockView.setBackground(resources.getDrawable(R.drawable.block_predict_flat_background));
+                statusTextView.setText(String.format(Locale.US, "%.2f%%", mTomorrowPredictionDiffPercentage));
+            }
         }
     }
 
@@ -494,6 +757,7 @@ public class Stock {
                         stock.setDiffNumber(diff);
                         stock.setDiffPercentage(diffPercentage);
                         stock.setDiffDirection(diff);
+                        stock.checkIsStop(yesterdayPrice, price);
                         break;
                     case RAISE:
                         stock.setRaiseNum(jsonObject.optInt(RAISE));
@@ -506,6 +770,15 @@ public class Stock {
                         break;
                     case NEXT_DIFF_PRED:
                         stock.setTomorrowPrediction(jsonObject.optDouble(NEXT_DIFF_PRED));
+                        break;
+                    case YESTERDAY_VOLUME:
+                        stock.setYesterdayVolume(jsonObject.optInt(YESTERDAY_VOLUME));
+                        break;
+                    case NEXT_5D_DIFF_PRED:
+                        stock.set5DPrediction(jsonObject.optDouble(NEXT_5D_DIFF_PRED));
+                        break;
+                    case NEXT_20D_DIFF_PRED:
+                        stock.set20DPrediction(jsonObject.optDouble(NEXT_20D_DIFF_PRED));
                         break;
                     default:
                         break;

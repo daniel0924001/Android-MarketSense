@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@mipmap/ic_time_12x12"
+        android:contentDescription="@string/title_last_refresh_time"
+        android:layout_marginEnd="6dp"
+        app:layout_constraintTop_toTopOf="@id/chart_ta_trade_date"
+        app:layout_constraintBottom_toBottomOf="@id/chart_ta_trade_date"
+        app:layout_constraintEnd_toStartOf="@id/chart_ta_trade_date"
+        />
+
+    <TextView
+        android:id="@+id/chart_ta_trade_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="@color/text_second"
+        android:fontFamily="sans-serif"
+        android:text="@string/title_chart_ta_trade_date"
+        android:layout_marginStart="32dp"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/stock_trade_close_price_const"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:textSize="12sp"
+        android:fontFamily="sans-serif"
+        android:textColor="@color/text_second"
+        android:text="@string/title_close_priced"
+        android:background="@drawable/btn_oval_small_corner_gray"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp"
+        android:paddingTop="1dp"
+        android:paddingBottom="1dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="22dp"
+        app:layout_constraintTop_toBottomOf="@id/chart_ta_trade_date"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/stock_trade_close_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:fontFamily="sans-serif"
+        android:textSize="12sp"
+        android:textColor="@color/text_first"
+        android:text="@string/title_unavailable_price"
+        android:layout_marginStart="6dp"
+        app:layout_constraintTop_toTopOf="@id/stock_trade_close_price_const"
+        app:layout_constraintBottom_toBottomOf="@id/stock_trade_close_price_const"
+        app:layout_constraintStart_toEndOf="@id/stock_trade_close_price_const"/>
+
+    <android.support.constraint.Guideline
+        android:id="@+id/stock_trade_diff_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5"/>
+
+    <TextView
+        android:id="@+id/stock_trade_diff_const"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:textSize="12sp"
+        android:fontFamily="sans-serif"
+        android:textColor="@color/text_second"
+        android:text="@string/title_diff"
+        android:background="@drawable/btn_oval_small_corner_gray"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp"
+        android:paddingTop="1dp"
+        android:paddingBottom="1dp"
+        android:layout_marginTop="22dp"
+        app:layout_constraintTop_toBottomOf="@id/chart_ta_trade_date"
+        app:layout_constraintStart_toStartOf="@id/stock_trade_diff_guideline"/>
+
+    <TextView
+        android:id="@+id/stock_trade_diff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:fontFamily="sans-serif"
+        android:textSize="12sp"
+        android:textColor="@color/text_first"
+        android:text="@string/title_unavailable_score_double"
+        android:layout_marginStart="6dp"
+        app:layout_constraintTop_toTopOf="@id/stock_trade_diff_const"
+        app:layout_constraintBottom_toBottomOf="@id/stock_trade_diff_const"
+        app:layout_constraintStart_toEndOf="@id/stock_trade_diff_const"/>
+
+    <TextView
+        android:id="@+id/stock_trade_volume_const"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:textSize="12sp"
+        android:fontFamily="sans-serif"
+        android:textColor="@color/text_second"
+        android:text="@string/title_trade_volume"
+        android:background="@drawable/btn_oval_small_corner_gray"
+        android:paddingStart="8dp"
+        android:paddingEnd="7dp"
+        android:paddingTop="1dp"
+        android:paddingBottom="1dp"
+        app:layout_constraintStart_toStartOf="@id/stock_trade_diff_guideline"/>
+
+    <TextView
+        android:id="@+id/stock_trade_volume"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:fontFamily="sans-serif"
+        android:textSize="12sp"
+        android:textColor="@color/text_first"
+        android:text="@string/title_unavailable_volume"
+        android:layout_marginStart="6dp"
+        app:layout_constraintTop_toTopOf="@id/stock_trade_volume_const"
+        app:layout_constraintBottom_toBottomOf="@id/stock_trade_volume_const"
+        app:layout_constraintStart_toEndOf="@id/stock_trade_volume_const"/>
+
+</android.support.constraint.ConstraintLayout>

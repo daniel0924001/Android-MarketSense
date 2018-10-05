@@ -17,7 +17,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Created by daniel.hsieh on 2018/5/21.
@@ -38,6 +41,10 @@ public class StockChartDataRequest extends Request<StockTradeData> {
     private static final String PARAM_REAL_PRICE = "125";
     private static final String PARAM_DIFF_PRICE = "184";
     private static final String PARAM_DIFF_PERCENTAGE = "185";
+    private static final String PARAM_YESTERDAY_VOLUME = "128";
+    private static final String PARAM_AVERAGE_PRICE = "471";
+    private static final String PARAM_BUY_PRICE = "101";
+    private static final String PARAM_SELL_PRICE = "102";
     private static final String PARAM_TRADE_DAY = "TradeDay";
     private static final String PARAM_T = "t";
     private static final String PARAM_P = "p";
@@ -46,6 +53,30 @@ public class StockChartDataRequest extends Request<StockTradeData> {
     private static final String PARAM_L = "l";
     private static final String PARAM_O = "o";
     private static final String PARAM_C = "c";
+
+    private static final String BEST_PRICE_1_BUY_PRICE = "101";
+    private static final String BEST_PRICE_2_BUY_PRICE = "103";
+    private static final String BEST_PRICE_3_BUY_PRICE = "105";
+    private static final String BEST_PRICE_4_BUY_PRICE = "107";
+    private static final String BEST_PRICE_5_BUY_PRICE = "109";
+
+    private static final String BEST_PRICE_1_SELL_PRICE = "102";
+    private static final String BEST_PRICE_2_SELL_PRICE = "104";
+    private static final String BEST_PRICE_3_SELL_PRICE = "106";
+    private static final String BEST_PRICE_4_SELL_PRICE = "108";
+    private static final String BEST_PRICE_5_SELL_PRICE = "110";
+
+    private static final String BEST_PRICE_1_BUY_VOLUME = "113";
+    private static final String BEST_PRICE_2_BUY_VOLUME = "115";
+    private static final String BEST_PRICE_3_BUY_VOLUME = "117";
+    private static final String BEST_PRICE_4_BUY_VOLUME = "119";
+    private static final String BEST_PRICE_5_BUY_VOLUME = "121";
+
+    private static final String BEST_PRICE_1_SELL_VOLUME = "114";
+    private static final String BEST_PRICE_2_SELL_VOLUME = "116";
+    private static final String BEST_PRICE_3_SELL_VOLUME = "118";
+    private static final String BEST_PRICE_4_SELL_VOLUME = "120";
+    private static final String BEST_PRICE_5_SELL_VOLUME = "122";
 
     private final Response.Listener<StockTradeData> mListener;
 
@@ -149,6 +180,23 @@ public class StockChartDataRequest extends Request<StockTradeData> {
                     MSLog.e("Exception in setTickData: " + e);
                 }
             }
+
+            // append no transaction data
+            try {
+                Calendar now = Calendar.getInstance(TimeZone.getTimeZone("Asia/Taipei"));
+                int hour = now.get(Calendar.HOUR_OF_DAY);
+                int minute = now.get(Calendar.MINUTE);
+                int appendNumber = (hour - 9) * 60 + minute;
+                JSONObject lastTick = tickArray.getJSONObject(tickArray.length() - 1);
+                for (int i = tickArray.length(); i < Math.min(appendNumber, 270); i++) {
+                    StockTickData stockTickData
+                            = new StockTickData((long)0, lastTick.getDouble(PARAM_P), 0, i);
+                    stockTickDataArrayList.add(stockTickData);
+                }
+            } catch (Exception exception) {
+                MSLog.e("Exception in append no transaction data: " + exception);
+            }
+
             stockTradeData.setStockTransactionData(stockTickDataArrayList);
         }
     }
@@ -157,16 +205,20 @@ public class StockChartDataRequest extends Request<StockTradeData> {
         JSONObject data = jsonResponse.optJSONObject(PARAM_MEM);
         if(data != null) {
             try {
-                float yesterdayPrice = (float) data.getDouble(PARAM_YESTERDAY);
-                float openPrice = (float) data.getDouble(PARAM_OPEN);
-                float highPrice = (float) data.getDouble(PARAM_HIGH);
-                float lowPrice = (float) data.getDouble(PARAM_LOW);
-                float minPrice = (float) data.getDouble(PARAM_MIN_PRICE);
-                float maxPrice = (float) data.getDouble(PARAM_MAX_PRICE);
+                float yesterdayPrice = (float) data.optDouble(PARAM_YESTERDAY);
+                float openPrice = (float) data.optDouble(PARAM_OPEN);
+                float highPrice = (float) data.optDouble(PARAM_HIGH);
+                float lowPrice = (float) data.optDouble(PARAM_LOW);
+                float minPrice = (float) data.optDouble(PARAM_MIN_PRICE);
+                float maxPrice = (float) data.optDouble(PARAM_MAX_PRICE);
                 float todayTotalVolume = (float) data.optDouble(PARAM_TODAY_TOTAL_VOLUME);
-                float realPrice = (float) data.getDouble(PARAM_REAL_PRICE);
-                float diffPrice = (float) data.getDouble(PARAM_DIFF_PRICE);
-                float diffPercentage = (float) data.getDouble(PARAM_DIFF_PERCENTAGE);
+                float realPrice = (float) data.optDouble(PARAM_REAL_PRICE);
+                float diffPrice = (float) data.optDouble(PARAM_DIFF_PRICE);
+                float diffPercentage = (float) data.optDouble(PARAM_DIFF_PERCENTAGE);
+                float buyPrice = (float) data.optDouble(PARAM_BUY_PRICE);
+                float sellPrice = (float) data.optDouble(PARAM_SELL_PRICE);
+                float yesterdayVolume = (float) data.optDouble(PARAM_YESTERDAY_VOLUME);
+                float money = (float) data.optDouble(PARAM_AVERAGE_PRICE) * todayTotalVolume;
                 stockTradeData.setOpenPrice(openPrice);
                 stockTradeData.setHighPrice(highPrice);
                 stockTradeData.setLowPrice(lowPrice);
@@ -177,6 +229,37 @@ public class StockChartDataRequest extends Request<StockTradeData> {
                 stockTradeData.setDiffPrice(diffPrice);
                 stockTradeData.setDiffPercentage(diffPercentage);
                 stockTradeData.setTickTotalVolume(todayTotalVolume);
+                stockTradeData.setTickBuyPrice(buyPrice);
+                stockTradeData.setTickSellPrice(sellPrice);
+                stockTradeData.setTradeMoney(money);
+                stockTradeData.setYesterdayVolume(yesterdayVolume);
+
+                // five prices
+                stockTradeData.setFiveBestPrice(0,
+                        (float) data.optDouble(BEST_PRICE_1_BUY_PRICE),
+                        (float) data.optDouble(BEST_PRICE_1_SELL_PRICE),
+                        (int) data.optDouble(BEST_PRICE_1_BUY_VOLUME),
+                        (int) data.optDouble(BEST_PRICE_1_SELL_VOLUME));
+                stockTradeData.setFiveBestPrice(1,
+                        (float) data.optDouble(BEST_PRICE_2_BUY_PRICE),
+                        (float) data.optDouble(BEST_PRICE_2_SELL_PRICE),
+                        (int) data.optDouble(BEST_PRICE_2_BUY_VOLUME),
+                        (int) data.optDouble(BEST_PRICE_2_SELL_VOLUME));
+                stockTradeData.setFiveBestPrice(2,
+                        (float) data.optDouble(BEST_PRICE_3_BUY_PRICE),
+                        (float) data.optDouble(BEST_PRICE_3_SELL_PRICE),
+                        (int) data.optDouble(BEST_PRICE_3_BUY_VOLUME),
+                        (int) data.optDouble(BEST_PRICE_3_SELL_VOLUME));
+                stockTradeData.setFiveBestPrice(3,
+                        (float) data.optDouble(BEST_PRICE_4_BUY_PRICE),
+                        (float) data.optDouble(BEST_PRICE_4_SELL_PRICE),
+                        (int) data.optDouble(BEST_PRICE_4_BUY_VOLUME),
+                        (int) data.optDouble(BEST_PRICE_4_SELL_VOLUME));
+                stockTradeData.setFiveBestPrice(4,
+                        (float) data.optDouble(BEST_PRICE_5_BUY_PRICE),
+                        (float) data.optDouble(BEST_PRICE_5_SELL_PRICE),
+                        (int) data.optDouble(BEST_PRICE_5_BUY_VOLUME),
+                        (int) data.optDouble(BEST_PRICE_5_SELL_VOLUME));
 
                 if(data.has(PARAM_TRADE_DAY)) {
                     stockTradeData.setTickTradeDate(data.optString(PARAM_TRADE_DAY));

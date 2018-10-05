@@ -11,8 +11,8 @@ import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.common.SharedPreferencesCompat;
 import com.idroi.marketsense.notification.NotificationHelper;
 import com.idroi.marketsense.util.DateUtils;
+import com.idroi.marketsense.util.NewsReadRecordHelper;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,12 +23,11 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.TimeZone;
 
 import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_LAST_STAR_TIMESTAMP;
 import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_USER_SETTING;
@@ -50,12 +49,17 @@ public class UserProfile implements Serializable {
     public static final int NOTIFY_ID_MAIN_ACTIVITY_FUNCTION_CLICK = 9;
     public static final int NOTIFY_USER_HAS_LOGIN = 4;
     public static final int NOTIFY_ID_EVENT_LIST = 5;
+    public static final int NOTIFY_ID_NEWS_READ_RECORD_LIST = 14;
     public static final int NOTIFY_USER_LOGIN_FAILED = 6;
 
     public static final int NOTIFY_ID_FUNCTION_SEARCH_COMMENT = 9;
     public static final int NOTIFY_ID_FUNCTION_INSERT_COMMENT = 10;
 
     public static final int NOTIFY_ID_PRICE_CHANGED = 11;
+    public static final int NOTIFY_ID_NEED_TO_APK_UPDATED = 12;
+    public static final int NOTIFY_ID_RIGHT_PART_CHANGE = 13;
+
+    public static final int NOTIFY_ID_NEED_TO_REOPEN = 15;
 
     public interface GlobalBroadcastListener {
         void onGlobalBroadcast(int notifyId, Object payload);
@@ -96,8 +100,14 @@ public class UserProfile implements Serializable {
 
     private ArrayList<GlobalBroadcastListener> mGlobalBroadcastListeners;
 
+    private static final int RETRY_TIME_CONST = 2;
+    private int mCurrentRetries = 0;
+
     @Nullable private ArrayList<String> mFavoriteStocks;
     @Nullable private transient ArrayList<Event> mEventsArrayList;
+
+    @Nullable private ArrayList<NewsReadRecord> mNewsReadRecordsArrayList;
+    @Nullable private HashMap<String, NewsReadRecord> mNewsReadRecordsMap;
 
     private UserProfile() {
         this(null, false);
@@ -118,6 +128,9 @@ public class UserProfile implements Serializable {
 
             if(FBHelper.checkFBLogin()) {
                 tryToLoginAndInitUserData(context);
+            } else {
+                MSLog.w("we failed to login and initialize user data " +
+                        "since user has not logged in facebook, is expired: " + FBHelper.isExpired());
             }
         }
     }
@@ -181,12 +194,26 @@ public class UserProfile implements Serializable {
         return mUserName;
     }
 
-//    public String getUserToken() {
-//        return mUserToken;
-//    }
-
     public String getUserAvatarLink() {
         return mUserAvatarLink;
+    }
+
+    public ArrayList<NewsReadRecord> getNewsReadRecords() {
+        return mNewsReadRecordsArrayList;
+    }
+
+    private boolean isRetry() {
+        return mCurrentRetries <= RETRY_TIME_CONST;
+    }
+
+    private void increaseRetryTime() {
+        if(mCurrentRetries <= RETRY_TIME_CONST) {
+            mCurrentRetries++;
+        }
+    }
+
+    private void resetRetryTime() {
+        mCurrentRetries = 0;
     }
 
     /* favorite stock list */
@@ -382,6 +409,17 @@ public class UserProfile implements Serializable {
         clearEvents();
         MSLog.d("clear favorite stocks...");
         clearFavoriteStock();
+        clearNewsReadRecords();
+    }
+
+    public void clearNewsReadRecords() {
+        if(mNewsReadRecordsMap != null) {
+            mNewsReadRecordsMap.clear();
+        }
+        if(mNewsReadRecordsArrayList != null) {
+            mNewsReadRecordsArrayList.clear();
+        }
+        globalBroadcast(NOTIFY_ID_NEWS_READ_RECORD_LIST);
     }
 
     public void saveFavoriteStocksAndEvents(Context context) {
@@ -401,6 +439,21 @@ public class UserProfile implements Serializable {
 
     public void setIsInitFavoriteStocksAndEvents(boolean isInit) {
         mIsInitFavoriteStocksAndEvents = isInit;
+    }
+
+    public void addNewsReadRecord(String newsId) {
+        MSLog.d("addNewsReadRecord newsId: " + newsId);
+        NewsReadRecord newsReadRecord = new NewsReadRecord(newsId);
+        if(mNewsReadRecordsMap != null) {
+            mNewsReadRecordsMap.put(newsId, newsReadRecord);
+        }
+        if(mNewsReadRecordsArrayList != null) {
+            mNewsReadRecordsArrayList.add(newsReadRecord);
+        }
+    }
+
+    public boolean hasReadThisNews(String newsId) {
+        return mNewsReadRecordsMap != null && mNewsReadRecordsMap.containsKey(newsId);
     }
 
     public void getFavoriteStocksAndEvents(Context context, String userId) {
@@ -436,6 +489,11 @@ public class UserProfile implements Serializable {
                     MSLog.e("JSONException in getFavoriteStocksAndEvents: " + e.toString());
                 }
             }
+
+            // news read records
+            mNewsReadRecordsMap = NewsReadRecordHelper.readFromInternalStorage(context, userId);
+            mNewsReadRecordsArrayList = new ArrayList<>(mNewsReadRecordsMap.values());
+            globalBroadcast(NOTIFY_ID_NEWS_READ_RECORD_LIST);
         }
     }
 
@@ -460,13 +518,19 @@ public class UserProfile implements Serializable {
             return;
         }
 
+        MSLog.i("[user login]: is login on going: " + mLoginOnGoing);
         if(!mLoginOnGoing) {
-            mLoginOnGoing = true;
-            MSLog.i("[user login]: start to login");
             final SharedPreferences sharedPreferences =
                     context.getSharedPreferences(USER_PROFILE_SHARE_PREFERENCE, Context.MODE_PRIVATE);
             mUserId = sharedPreferences.getString(SHARE_PREF_ID_KEY, null);
             mUserType = sharedPreferences.getString(SHARE_PREF_USER_TYPE, null);
+
+            if(mUserId == null || mUserId.isEmpty()) {
+                return;
+            }
+
+            MSLog.i("[user login]: start to login");
+            mLoginOnGoing = true;
             getFavoriteStocksAndEvents(context, mUserId);
             String password = UserProfile.generatePassword(mUserId, mUserType);
             PostEvent.sendLogin(context, mUserId, password, mUserEmail, new PostEvent.PostEventListener() {
@@ -477,6 +541,7 @@ public class UserProfile implements Serializable {
                     mHasLogin = isSuccessful;
 
                     if (mHasLogin) {
+                        resetRetryTime();
                         mUserName = sharedPreferences.getString(SHARE_PREF_NAME_KEY,
                                 context.getResources().getString(R.string.default_user_name));
                         mUserEmail = sharedPreferences.getString(SHARE_PREF_EMAIL_KEY, null);
@@ -486,7 +551,12 @@ public class UserProfile implements Serializable {
                                 mUserId, mUserName, mUserEmail, mUserAvatarLink));
                         globalBroadcast(NOTIFY_USER_HAS_LOGIN);
                     } else {
-                        globalBroadcast(NOTIFY_USER_LOGIN_FAILED);
+                        increaseRetryTime();
+                        if(isRetry()) {
+                            tryToLoginAndInitUserData(context);
+                        } else {
+                            globalBroadcast(NOTIFY_USER_LOGIN_FAILED);
+                        }
                     }
                 }
             });

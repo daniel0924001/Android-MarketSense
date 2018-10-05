@@ -30,7 +30,7 @@ public class RankingListSingleColumnViewHolder {
     public ImageView foldImageView;
     public RecyclerView recyclerView;
     public StockRankingRecyclerAdapter stockRankingRecyclerAdapter;
-    public View bottomDividor;
+    public View bottomDivisor;
 
     public ConstraintLayout foldGroup;
     public int shrinkHeight;
@@ -51,7 +51,7 @@ public class RankingListSingleColumnViewHolder {
             rankingListViewHolder.foldGroup = view.findViewById(R.id.fold_group);
             rankingListViewHolder.foldGroup.setZ(-100);
 
-            rankingListViewHolder.bottomDividor = view.findViewById(R.id.bottom_divider);
+            rankingListViewHolder.bottomDivisor = view.findViewById(R.id.bottom_divider);
             rankingListViewHolder.foldImageView = view.findViewById(R.id.iv_fold);
 
             rankingListViewHolder.valueTextView = view.findViewById(R.id.company_value);
@@ -65,7 +65,7 @@ public class RankingListSingleColumnViewHolder {
                         rankingListViewHolder.foldImageView.setImageResource(R.mipmap.ic_fold);
                         rankingListViewHolder.shrinkHeight = rankingListViewHolder.recyclerView.getHeight()
                                 + rankingListViewHolder.valueTextView.getHeight()
-                                + rankingListViewHolder.bottomDividor.getHeight();
+                                + rankingListViewHolder.bottomDivisor.getHeight();
                         Animation a = new Animation()
                         {
                             @Override

@@ -60,72 +60,10 @@ public class RankingListSingleColumnViewHolder {
             titleTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
                     if(rankingListViewHolder.foldGroup.getVisibility() == View.VISIBLE) {
-                        rankingListViewHolder.foldImageView.setImageResource(R.mipmap.ic_fold);
-                        rankingListViewHolder.shrinkHeight = rankingListViewHolder.recyclerView.getHeight()
-                                + rankingListViewHolder.valueTextView.getHeight()
-                                + rankingListViewHolder.bottomDivisor.getHeight();
-                        Animation a = new Animation()
-                        {
-                            @Override
-                            protected void applyTransformation(float interpolatedTime, Transformation t) {
-                                rankingListViewHolder.foldGroup.setAlpha(1 - interpolatedTime);
-                                if(interpolatedTime == 1){
-                                    rankingListViewHolder.foldGroup.setVisibility(View.GONE);
-                                    rankingListViewHolder.foldGroup.clearAnimation();
-                                }else{
-                                    rankingListViewHolder.foldGroup.getLayoutParams().height = rankingListViewHolder.shrinkHeight - (int)(rankingListViewHolder.shrinkHeight * interpolatedTime);
-                                    rankingListViewHolder.foldGroup.requestLayout();
-                                }
-                            }
-
-                            @Override
-                            public boolean willChangeBounds() {
-                                return true;
-                            }
-                        };
-
-                        a.setDuration(300);
-                        a.setFillAfter(true);
-                        rankingListViewHolder.foldGroup.startAnimation(a);
+                        rankingListViewHolder.close();
                     } else {
-                        rankingListViewHolder.foldImageView.setImageResource(R.mipmap.ic_unfold);
-                        final Animation a = new Animation()
-                        {
-                            @Override
-                            protected void applyTransformation(float interpolatedTime, Transformation t) {
-                                rankingListViewHolder.foldGroup.setAlpha(interpolatedTime);
-                                rankingListViewHolder.foldGroup.getLayoutParams().height = (int)(rankingListViewHolder.shrinkHeight * interpolatedTime);
-                                rankingListViewHolder.foldGroup.requestLayout();
-                            }
-
-                            @Override
-                            public boolean willChangeBounds() {
-                                return true;
-                            }
-                        };
-
-                        a.setDuration(300);
-                        a.setFillAfter(true);
-                        a.setAnimationListener(new Animation.AnimationListener() {
-                            @Override
-                            public void onAnimationStart(Animation animation) {
-                                rankingListViewHolder.foldGroup.setVisibility(View.VISIBLE);
-                                rankingListViewHolder.foldGroup.getLayoutParams().height = 1;
-                            }
-
-                            @Override
-                            public void onAnimationEnd(Animation animation) {
-
-                            }
-
-                            @Override
-                            public void onAnimationRepeat(Animation animation) {
-
-                            }
-                        });
-                        rankingListViewHolder.foldGroup.startAnimation(a);
+                        rankingListViewHolder.open();
                     }
                 }
             });
@@ -160,5 +98,72 @@ public class RankingListSingleColumnViewHolder {
         if(stockRankingRecyclerAdapter != null) {
             stockRankingRecyclerAdapter.destroy();
         }
+    }
+
+    public void close() {
+        foldImageView.setImageResource(R.mipmap.ic_fold);
+        shrinkHeight = recyclerView.getHeight() + valueTextView.getHeight() + bottomDivisor.getHeight();
+        Animation a = new Animation()
+        {
+            @Override
+            protected void applyTransformation(float interpolatedTime, Transformation t) {
+                foldGroup.setAlpha(1 - interpolatedTime);
+                if(interpolatedTime == 1){
+                    foldGroup.setVisibility(View.GONE);
+                    foldGroup.clearAnimation();
+                }else{
+                    foldGroup.getLayoutParams().height = shrinkHeight - (int)(shrinkHeight * interpolatedTime);
+                    foldGroup.requestLayout();
+                }
+            }
+
+            @Override
+            public boolean willChangeBounds() {
+                return true;
+            }
+        };
+
+        a.setDuration(300);
+        a.setFillAfter(true);
+        foldGroup.startAnimation(a);
+    }
+
+    public void open() {
+        foldImageView.setImageResource(R.mipmap.ic_unfold);
+        final Animation a = new Animation()
+        {
+            @Override
+            protected void applyTransformation(float interpolatedTime, Transformation t) {
+                foldGroup.setAlpha(interpolatedTime);
+                foldGroup.getLayoutParams().height = (int)(shrinkHeight * interpolatedTime);
+                foldGroup.requestLayout();
+            }
+
+            @Override
+            public boolean willChangeBounds() {
+                return true;
+            }
+        };
+
+        a.setDuration(300);
+        a.setFillAfter(true);
+        a.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                foldGroup.setVisibility(View.VISIBLE);
+                foldGroup.getLayoutParams().height = 1;
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        foldGroup.startAnimation(a);
     }
 }

@@ -156,6 +156,9 @@ public class MainFragment extends Fragment {
         ArrayList<Stock> newsSortedStocks = clientData.getSortedRealTimePrices(ClientData.RANKING_BY_NEWS);
         ArrayList<Stock> diffSortedStocks = clientData.getSortedRealTimePrices(ClientData.RANKING_BY_DIFF);
 
+        mNewsBlockViewHolder.close();
+        mDiffBlockViewHolder.close();
+
         if(techSortedStocks != null && techSortedStocks.size() > 0 && newsSortedStocks != null && newsSortedStocks.size() > 0 && diffSortedStocks != null && diffSortedStocks.size() > 0) {
             MSLog.d("sorted stocks are in memory");
             mTechBlockViewHolder.update(getActivity(), techSortedStocks, ClientData.RANKING_BY_TECH, new StockRankingRecyclerAdapter.OnItemClickListener() {

@@ -109,6 +109,7 @@ public class RankingListSingleColumnViewHolder {
             protected void applyTransformation(float interpolatedTime, Transformation t) {
                 foldGroup.setAlpha(1 - interpolatedTime);
                 if(interpolatedTime == 1){
+                    foldGroup.getLayoutParams().height = 0;
                     foldGroup.setVisibility(View.GONE);
                     foldGroup.clearAnimation();
                 }else{
@@ -147,23 +148,7 @@ public class RankingListSingleColumnViewHolder {
 
         a.setDuration(300);
         a.setFillAfter(true);
-        a.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-                foldGroup.setVisibility(View.VISIBLE);
-                foldGroup.getLayoutParams().height = 1;
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
         foldGroup.startAnimation(a);
+        foldGroup.setVisibility(View.VISIBLE);
     }
 }

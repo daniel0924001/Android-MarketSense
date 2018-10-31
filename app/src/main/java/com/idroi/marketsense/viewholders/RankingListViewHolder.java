@@ -30,7 +30,7 @@ public class RankingListViewHolder {
     public TextView trendTextView;
     public RecyclerView recyclerView;
     public StockRankingRecyclerAdapter stockRankingRecyclerAdapter;
-    public View bottomDividor;
+    public View bottomDivider;
 
     public ConstraintLayout foldGroup;
     public int shrinkHeight;
@@ -52,7 +52,7 @@ public class RankingListViewHolder {
             rankingListViewHolder.foldGroup = view.findViewById(R.id.fold_group);
             rankingListViewHolder.foldGroup.setZ(-100);
 
-            rankingListViewHolder.bottomDividor = view.findViewById(R.id.bottom_divider);
+            rankingListViewHolder.bottomDivider = view.findViewById(R.id.bottom_divider);
             rankingListViewHolder.foldImageView = view.findViewById(R.id.iv_fold);
 
             TextView titleTextView = view.findViewById(R.id.ranking_title);
@@ -105,13 +105,14 @@ public class RankingListViewHolder {
 
     public void close() {
         foldImageView.setImageResource(R.mipmap.ic_fold);
-        shrinkHeight = recyclerView.getHeight() + trendTextView.getHeight() + bottomDividor.getHeight();
+        shrinkHeight = recyclerView.getHeight() + trendTextView.getHeight() + bottomDivider.getHeight();
         Animation a = new Animation()
         {
             @Override
             protected void applyTransformation(float interpolatedTime, Transformation t) {
                 foldGroup.setAlpha(1 - interpolatedTime);
                 if(interpolatedTime == 1){
+                    foldGroup.getLayoutParams().height = 0;
                     foldGroup.setVisibility(View.GONE);
                     foldGroup.clearAnimation();
                 }else{
@@ -150,23 +151,7 @@ public class RankingListViewHolder {
 
         a.setDuration(300);
         a.setFillAfter(true);
-        a.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-                foldGroup.setVisibility(View.VISIBLE);
-                foldGroup.getLayoutParams().height = 1;
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
         foldGroup.startAnimation(a);
+        foldGroup.setVisibility(View.VISIBLE);
     }
 }

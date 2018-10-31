@@ -125,7 +125,9 @@ public class MarketSenseStockFetcher {
             MSLog.i("Loading stock list...(cache): " + cacheUrl);
             final Cache cache = Networking.getRequestQueue(context).getCache();
             Cache.Entry entry = cache.get(cacheUrl);
-            if (entry != null && (!mStockIsOpen || !entry.isExpired())) {
+
+            if (entry != null && (System.currentTimeMillis() - entry.serverDate) < 24 * 3600 * 1000
+                    && (!mStockIsOpen || !entry.isExpired())) {
                 try {
                     ArrayList<Stock> stockArrayList = StockRequest.stockParseResponse(entry.data);
                     MSLog.i("Loading stock list...(cache hit): " + new String(entry.data));

@@ -95,6 +95,13 @@
     <string name="title_disclosure_at_1500">15:00 公布</string>
     <string name="title_month_day_close_predict">%d/%d 收盤預測</string>
 
+    <string name="info_foundation">基本</string>
+    <string name="info_tech">技術</string>
+    <string name="info_news">新聞</string>
+    <string name="info_short">短期</string>
+    <string name="info_middle">中期</string>
+    <string name="info_long">長期</string>
+
     <string name="title_news">新聞面</string>
     <string name="title_tech">技術面</string>
     <string name="title_news_unavailable">近期無新聞</string>

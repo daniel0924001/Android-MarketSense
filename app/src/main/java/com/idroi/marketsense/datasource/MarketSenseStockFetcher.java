@@ -126,7 +126,7 @@ public class MarketSenseStockFetcher {
             final Cache cache = Networking.getRequestQueue(context).getCache();
             Cache.Entry entry = cache.get(cacheUrl);
 
-            if (entry != null && (System.currentTimeMillis() - entry.serverDate) < 24 * 3600 * 1000
+            if (entry != null && (System.currentTimeMillis() - entry.serverDate) < 19 * 3600 * 1000
                     && (!mStockIsOpen || !entry.isExpired())) {
                 try {
                     ArrayList<Stock> stockArrayList = StockRequest.stockParseResponse(entry.data);

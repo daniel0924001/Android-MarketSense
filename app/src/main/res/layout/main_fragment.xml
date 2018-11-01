@@ -54,15 +54,6 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/news_block"/>
 
-            <View
-                android:id="@+id/news_divider"
-                android:layout_width="match_parent"
-                android:layout_height="24dp"
-                android:background="@color/background"
-                app:layout_constraintTop_toBottomOf="@id/diff_block"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
             <TextView
                 android:id="@+id/tv_news"
                 android:layout_width="0dp"
@@ -77,7 +68,7 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:background="@drawable/border_on_top_layout"
-                app:layout_constraintTop_toBottomOf="@id/news_divider"
+                app:layout_constraintTop_toBottomOf="@id/diff_block"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 

@@ -158,6 +158,8 @@ public class StockActivity extends AppCompatActivity {
     private FiveBestPriceViewHolder mBestPriceRowViewHolder;
     private StockActivityBottomContent mStockActivityBottomContent;
 
+    private Button mFavoriteButton;
+
     private View.OnLayoutChangeListener mOnLayoutChangeListener;
     private int mRealTimeContainerShrinkHeight = Integer.MAX_VALUE;
     private int mSelectorTop = Integer.MAX_VALUE;
@@ -263,11 +265,17 @@ public class StockActivity extends AppCompatActivity {
 
     private void initSocialButtons() {
 
-        ImageView buttonGoUp = findViewById(R.id.btn_go_up);
-        buttonGoUp.setOnClickListener(new View.OnClickListener() {
+        mFavoriteButton = findViewById(R.id.btn_add_fav);
+        updateFavoriteButton();
+
+        mFavoriteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mNestedScrollView.scrollTo(0, 0);
+                if(FBHelper.checkFBLogin()) {
+                    changeFavorite();
+                } else {
+                    showLoginAlertDialog(CLICK_STAR_BEFORE_LOGIN);
+                }
             }
         });
 
@@ -315,7 +323,7 @@ public class StockActivity extends AppCompatActivity {
                             overridePendingTransition(R.anim.enter, R.anim.stop);
                             return;
                         case CLICK_STAR_BEFORE_LOGIN:
-                            changeFavorite(mStockActivityActionBarViewHolder.favoriteImageView);
+                            changeFavorite();
                             break;
                         case CLICK_LIKE_BEFORE_LOGIN:
                             mCommentsRecyclerViewAdapter.updateCommentsLike();
@@ -330,11 +338,7 @@ public class StockActivity extends AppCompatActivity {
                     }
                 } else if(notifyId == NOTIFY_ID_FAVORITE_LIST) {
                     mIsFavorite = mUserProfile.isFavoriteStock(mCode);
-                    if(mIsFavorite) {
-                        mStockActivityActionBarViewHolder.favoriteImageView.setImageResource(R.mipmap.ic_fav_on);
-                    } else {
-                        mStockActivityActionBarViewHolder.favoriteImageView.setImageResource(R.mipmap.ic_fav_off);
-                    }
+                    updateFavoriteButton();
                 } else if(notifyId == NOTIFY_ID_NEWS_READ_RECORD_LIST) {
                     MSLog.d("update user's read news records");
                     mNewsRecyclerAdapter.notifyItemRangeChanged(0, mNewsRecyclerAdapter.getItemCount());
@@ -342,6 +346,20 @@ public class StockActivity extends AppCompatActivity {
             }
         };
         mUserProfile.addGlobalBroadcastListener(mGlobalBroadcastListener);
+    }
+
+    private void updateFavoriteButton() {
+        if(mIsFavorite) {
+            MSLog.printStackTrace("updateFavoriteButton: true");
+            mFavoriteButton.setCompoundDrawablesWithIntrinsicBounds(0, R.mipmap.ic_stock_fav_on, 0, 0);
+            mFavoriteButton.setText(R.string.title_remove_favorite);
+            mFavoriteButton.setTextColor(getResources().getColor(R.color.text_first));
+        } else {
+            MSLog.printStackTrace("updateFavoriteButton: false");
+            mFavoriteButton.setCompoundDrawablesWithIntrinsicBounds(0, R.mipmap.ic_stock_fav_off, 0, 0);
+            mFavoriteButton.setText(R.string.title_add_favorite);
+            mFavoriteButton.setTextColor(getResources().getColor(R.color.text_third));
+        }
     }
 
     private void showLoginAlertDialog(int lastButton) {
@@ -876,22 +894,6 @@ public class StockActivity extends AppCompatActivity {
             String format = getResources().getString(R.string.title_company_name_code_format_no_decoration);
             mStockActivityActionBarViewHolder.titleTextView.setText(String.format(format, mStockName, mCode));
 
-            mStockActivityActionBarViewHolder.favoriteImageView.setVisibility(View.VISIBLE);
-            if(mIsFavorite) {
-                mStockActivityActionBarViewHolder.favoriteImageView.setImageResource(R.mipmap.ic_fav_on);
-            } else {
-                mStockActivityActionBarViewHolder.favoriteImageView.setImageResource(R.mipmap.ic_fav_off);
-            }
-            mStockActivityActionBarViewHolder.favoriteImageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(FBHelper.checkFBLogin()) {
-                        changeFavorite(mStockActivityActionBarViewHolder.favoriteImageView);
-                    } else {
-                        showLoginAlertDialog(CLICK_STAR_BEFORE_LOGIN);
-                    }
-                }
-            });
             mStockActivityActionBarViewHolder.moreImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -909,25 +911,24 @@ public class StockActivity extends AppCompatActivity {
         }
     }
 
-    private void changeFavorite(final ImageView imageView) {
+    private void changeFavorite() {
         if(mIsFavorite) {
-            mUserProfile.deleteFavoriteStock(mCode);
             PostEvent.sendFavoriteStocksDelete(this, mCode);
+            mUserProfile.deleteFavoriteStock(mCode);
             String format = getResources().getString(R.string.title_delete_complete);
             Toast.makeText(this, String.format(format, mStockName, mCode), Toast.LENGTH_SHORT).show();
-            imageView.setImageResource(R.mipmap.ic_fav_off);
         } else {
-            mUserProfile.addFavoriteStock(mCode);
             PostEvent.sendFavoriteStocksAdd(this, mCode);
+            mUserProfile.addFavoriteStock(mCode);
             String format = getResources().getString(R.string.title_add_complete);
             Toast.makeText(this, String.format(format, mStockName, mCode), Toast.LENGTH_SHORT).show();
-            imageView.setImageResource(R.mipmap.ic_fav_on);
 
             if(mUserProfile.canShowStarDialog(this)) {
                 showStarAlertDialog();
             }
         }
         mIsFavorite = mUserProfile.isFavoriteStock(mCode);
+        updateFavoriteButton();
         mUserProfile.globalBroadcast(NOTIFY_ID_FAVORITE_LIST);
     }
 

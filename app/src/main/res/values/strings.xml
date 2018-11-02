@@ -25,6 +25,9 @@
     <string name="title_profile_account">我的帳戶</string>
     <string name="title_market_trend">行情</string>
 
+    <string name="title_remove_favorite">取消自選</string>
+    <string name="title_add_favorite">自選</string>
+
     <string name="main_page_tech_ranking">技術面排行</string>
     <string name="main_page_tech_trend">技術風向</string>
     <string name="main_page_news_ranking">新聞面排行</string>

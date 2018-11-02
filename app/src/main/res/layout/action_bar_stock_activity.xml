@@ -30,17 +30,6 @@
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <ImageView
-        android:id="@+id/action_bar_favorite"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:srcCompat="@mipmap/ic_fav_off"
-        android:contentDescription="@string/title_choices_tab"
-        android:layout_marginEnd="18dp"
-        app:layout_constraintEnd_toStartOf="@id/action_bar_more"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
-    <ImageView
         android:id="@+id/action_bar_more"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

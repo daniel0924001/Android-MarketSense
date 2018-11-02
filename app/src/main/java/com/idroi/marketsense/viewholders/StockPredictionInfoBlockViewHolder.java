@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.support.constraint.ConstraintLayout;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.idroi.marketsense.Logging.MSLog;
@@ -28,6 +29,13 @@ public class StockPredictionInfoBlockViewHolder {
     public TextView tomorrowTitleTextView;
     public TextView tomorrowStatusTextView;
 
+    public ImageView foundationImageView;
+    public ImageView techImageView;
+    public ImageView newsImageView;
+    public ImageView shortImageView;
+    public ImageView middleImageView;
+    public ImageView longImageView;
+
     static final StockPredictionInfoBlockViewHolder EMPTY_VIEW_HOLDER
             = new StockPredictionInfoBlockViewHolder();
 
@@ -50,6 +58,15 @@ public class StockPredictionInfoBlockViewHolder {
             viewHolder.tomorrowStatusTextView =
                     tomorrowBlock.findViewById(R.id.date_block_prediction_diff);
 
+            // info part
+            ConstraintLayout infoBlock = view.findViewById(R.id.info_block);
+            viewHolder.foundationImageView = infoBlock.findViewById(R.id.info_foundation_iv);
+            viewHolder.techImageView = infoBlock.findViewById(R.id.info_tech_iv);
+            viewHolder.newsImageView = infoBlock.findViewById(R.id.info_news_iv);
+            viewHolder.shortImageView = infoBlock.findViewById(R.id.info_short_iv);
+            viewHolder.middleImageView = infoBlock.findViewById(R.id.info_middle_iv);
+            viewHolder.longImageView = infoBlock.findViewById(R.id.info_long_iv);
+
             return viewHolder;
 
         } catch (ClassCastException exception) {
@@ -61,11 +78,26 @@ public class StockPredictionInfoBlockViewHolder {
     public void render(Context context, Stock stock) {
         renderTodayBlock(context, stock);
         renderTomorrowBlock(context, stock);
-        renderInfoBlock(context, stock);
+        renderInfoBlock(stock);
     }
 
-    public void renderInfoBlock(Context context, Stock stock) {
+    public void renderInfoBlock(Stock stock) {
+        renderImageViewForDirection(foundationImageView, stock.getPredictFoundationDirection());
+        renderImageViewForDirection(techImageView, stock.getPredictTechDirection());
+        renderImageViewForDirection(newsImageView, stock.getConfidenceDirection());
+        renderImageViewForDirection(shortImageView, stock.get1DPredictionDirection());
+        renderImageViewForDirection(middleImageView, stock.get5DPredictionDirection());
+        renderImageViewForDirection(longImageView, stock.get20DPredictionDirection());
+    }
 
+    private void renderImageViewForDirection(ImageView imageView, int direction) {
+        if(direction > 0) {
+            imageView.setImageResource(R.mipmap.ic_trend_up_s);
+        } else if(direction < 0) {
+            imageView.setImageResource(R.mipmap.ic_trend_down_s);
+        } else {
+            imageView.setImageResource(R.mipmap.ic_trend_draw_s);
+        }
     }
 
     public void renderTodayBlock(Context context, Stock stock) {

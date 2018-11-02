@@ -38,6 +38,7 @@ public class Stock {
     private static final String FALL = "fall";
     private static final String TODAY_DIFF_PRED = "today_diff_predict";
     private static final String NEXT_DIFF_PRED = "next_diff_predict";
+    private static final String NEXT_1D_DIFF_PRED = "next_1d_diff_predict";
     private static final String NEXT_5D_DIFF_PRED = "next_5d_diff_predict";
     private static final String NEXT_20D_DIFF_PRED = "next_20d_diff_predict";
     private static final String YESTERDAY_VOLUME = "y_vol";
@@ -73,7 +74,7 @@ public class Stock {
     private double mTodayPredictionDiffPercentage, mTomorrowPredictionDiffPercentage, mPredictionDiffPercentage;
     private double mPredictionError, mPredictionErrorWhenClosed;
 
-    private int m5DPredictionDirection, m20DPredictionDirection;
+    private int m1DPredictionDirection, m5DPredictionDirection, m20DPredictionDirection;
 
     private boolean mIsUpOrDownStop;
 
@@ -237,6 +238,16 @@ public class Stock {
         }
     }
 
+    public void set1DPrediction(double prediction) {
+        if(prediction > 0) {
+            m1DPredictionDirection = TREND_UP;
+        } else if(prediction == 0) {
+            m1DPredictionDirection = TREND_FLAT;
+        } else {
+            m1DPredictionDirection = TREND_DOWN;
+        }
+    }
+
     public void set5DPrediction(double prediction) {
         if(prediction > 0) {
             m5DPredictionDirection = TREND_UP;
@@ -338,6 +349,10 @@ public class Stock {
 
     public int getFallNum() {
         return mFallNum;
+    }
+
+    public int get1DPredictionDirection() {
+        return m1DPredictionDirection;
     }
 
     public int get5DPredictionDirection() {
@@ -764,6 +779,9 @@ public class Stock {
                         break;
                     case YESTERDAY_VOLUME:
                         stock.setYesterdayVolume(jsonObject.optInt(YESTERDAY_VOLUME));
+                        break;
+                    case NEXT_1D_DIFF_PRED:
+                        stock.set1DPrediction(jsonObject.optDouble(NEXT_1D_DIFF_PRED));
                         break;
                     case NEXT_5D_DIFF_PRED:
                         stock.set5DPrediction(jsonObject.optDouble(NEXT_5D_DIFF_PRED));

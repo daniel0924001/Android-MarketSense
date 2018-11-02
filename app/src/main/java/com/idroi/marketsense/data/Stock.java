@@ -340,10 +340,6 @@ public class Stock {
         return mFallNum;
     }
 
-    public int getTomorrowPredictionDiffDirection() {
-        return mTomorrowPredictionDiffDirection;
-    }
-
     public int get5DPredictionDirection() {
         return m5DPredictionDirection;
     }
@@ -444,6 +440,22 @@ public class Stock {
         } else {
             mPredictionErrorWhenClosed = mPredictionDiffDirection * mPredictionDiffPercentage;
         }
+    }
+
+    public int getTomorrowPredictionDiffDirection() {
+        return mTomorrowPredictionDiffDirection;
+    }
+
+    public int getTodayPredictionDiffDirection() {
+        return mTodayPredictionDiffDirection;
+    }
+
+    public double getTomorrowPredictionDiffPercentage() {
+        return mTomorrowPredictionDiffPercentage;
+    }
+
+    public double getTodayPredictionDiffPercentage() {
+        return mTodayPredictionDiffPercentage;
     }
 
     public boolean isHitPredictionDirection(boolean isCountZero) {
@@ -562,27 +574,6 @@ public class Stock {
             for(int i = level + 1; i < 3; i++) {
                 imageViews[i].setVisibility(View.INVISIBLE);
             }
-        }
-    }
-
-    public void renderIsHit(Context context, TextView hitTextView) {
-        Resources resources = context.getResources();
-        ClientData clientData = ClientData.getInstance();
-
-        if(isHitPredictionDirection(false) && !clientData.isWorkDayAndStockMarketIsOpen()) {
-            hitTextView.setVisibility(View.VISIBLE);
-            if (mTodayPredictionDiffDirection == TREND_UP) {
-                hitTextView.setBackground(resources.getDrawable(R.drawable.block_red_border_with_radius_corner));
-                hitTextView.setTextColor(resources.getColor(R.color.trend_red));
-            } else if (mTodayPredictionDiffDirection == TREND_DOWN) {
-                hitTextView.setBackground(resources.getDrawable(R.drawable.block_green_border_with_radius_corner));
-                hitTextView.setTextColor(resources.getColor(R.color.trend_green));
-            } else {
-                hitTextView.setBackground(resources.getDrawable(R.drawable.block_flat_border_with_radius_corner));
-                hitTextView.setTextColor(resources.getColor(R.color.draw_grey));
-            }
-        } else {
-            hitTextView.setVisibility(View.GONE);
         }
     }
 

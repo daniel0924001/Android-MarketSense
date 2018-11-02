@@ -101,6 +101,7 @@
     <string name="info_short">短期</string>
     <string name="info_middle">中期</string>
     <string name="info_long">長期</string>
+    <string name="info_flat">平盤</string>
 
     <string name="title_news">新聞面</string>
     <string name="title_tech">技術面</string>

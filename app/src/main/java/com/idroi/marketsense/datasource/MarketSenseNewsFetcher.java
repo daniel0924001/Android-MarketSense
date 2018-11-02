@@ -195,6 +195,7 @@ public class MarketSenseNewsFetcher {
         };
 
         for(String networkUrl : networkUrls) {
+            MSLog.i("Loading news...: " + networkUrl);
             NewsRequest newsRequest = new NewsRequest(Request.Method.GET, networkUrl, null, responseListener, errorListener);
             mNewsRequests.add(newsRequest);
             Networking.getRequestQueue(context).add(newsRequest);

@@ -156,7 +156,6 @@ public class StockActivity extends AppCompatActivity {
     private ChartTaTopItemsViewHolder mChartTaTopItemsViewHolder;
     private ChartTickBottomItemsViewHolder mChartTickBottomItemsViewHolder;
     private FiveBestPriceViewHolder mBestPriceRowViewHolder;
-//    private PredictForDifferentPeriodViewHolder mPredictForDifferentPeriodViewHolder;
     private StockActivityBottomContent mStockActivityBottomContent;
 
     private View.OnLayoutChangeListener mOnLayoutChangeListener;
@@ -201,12 +200,6 @@ public class StockActivity extends AppCompatActivity {
         mStockActivityRealPriceBlockViewHolder =
                 StockActivityRealPriceBlockViewHolder
                         .convertToViewHolder(findViewById(R.id.top_real_price_block));
-//        mStockPredictionBlockViewHolder =
-//                StockPredictionBlockViewHolder
-//                        .convertToViewHolder(findViewById(R.id.stock_prediction_block));
-//        mStockPredictionInfoBlockViewHolder =
-//                StockPredictionInfoBlockViewHolder
-//                        .convertToViewHolder(findViewById());
         mChartPeriodSelectorViewHolder =
                 ChartPeriodSelectorViewHolder
                         .convertToViewHolder(findViewById(R.id.stock_period_block));
@@ -222,9 +215,9 @@ public class StockActivity extends AppCompatActivity {
         mBestPriceRowViewHolder =
                 FiveBestPriceViewHolder
                         .convertToViewHolder(findViewById(R.id.five_best_price));
-//        mPredictForDifferentPeriodViewHolder =
-//                PredictForDifferentPeriodViewHolder
-//                        .convertToViewHolder(findViewById(R.id.predict_for_different_period));
+        mStockPredictionInfoBlockViewHolder =
+                StockPredictionInfoBlockViewHolder
+                        .convertToViewHolder(findViewById(R.id.stock_prediction_block).findViewById(R.id.stock_prediction_block));
         mStockActivityBottomContent =
                 StockActivityBottomContent
                         .convertToViewHolder(findViewById(R.id.stock_activity_bottom_selector));
@@ -674,35 +667,7 @@ public class StockActivity extends AppCompatActivity {
         Stock stock = clientData.getPriceFromCode(mCode);
 
         if(stock != null) {
-//            Stock.renderTitleAndStars(this, stock.getPredictTechDirection(),
-//                    stock.getPredictTechLevel(),
-//                    mStockPredictionBlockViewHolder.techBlockView,
-//                    mStockPredictionBlockViewHolder.techTitleTextView,
-//                    mStockPredictionBlockViewHolder.techUnavailableTextView,
-//                    mStockPredictionBlockViewHolder.techImageViews);
-//
-//            Stock.renderTitleAndStars(this, stock.getConfidenceDirection(),
-//                    stock.getPredictNewsLevel(),
-//                    mStockPredictionBlockViewHolder.newsBlockView,
-//                    mStockPredictionBlockViewHolder.newsTitleTextView,
-//                    mStockPredictionBlockViewHolder.newsUnavailableTextView,
-//                    mStockPredictionBlockViewHolder.newsImageViews);
-//
-//
-//            stock.renderTodayBlock(this,
-//                    mStockPredictionBlockViewHolder.todayBlock,
-//                    mStockPredictionBlockViewHolder.todayTitleTextView,
-//                    mStockPredictionBlockViewHolder.todayStatusTextView);
-//
-//            stock.renderTomorrowBlock(this,
-//                    mStockPredictionBlockViewHolder.tomorrowBlock,
-//                    mStockPredictionBlockViewHolder.tomorrowTitleTextView,
-//                    mStockPredictionBlockViewHolder.tomorrowStatusTextView);
-
-//            PredictForDifferentPeriodViewHolder.update(mPredictForDifferentPeriodViewHolder,
-//                    stock.getTomorrowPredictionDiffDirection(),
-//                    stock.get5DPredictionDirection(),
-//                    stock.get20DPredictionDirection());
+            mStockPredictionInfoBlockViewHolder.render(this, stock);
         }
     }
 

@@ -67,6 +67,7 @@ import com.idroi.marketsense.viewholders.StockActivityActionBarViewHolder;
 import com.idroi.marketsense.viewholders.StockActivityBottomContent;
 import com.idroi.marketsense.viewholders.StockActivityRealPriceBlockViewHolder;
 import com.idroi.marketsense.viewholders.StockPredictionBlockViewHolder;
+import com.idroi.marketsense.viewholders.StockPredictionInfoBlockViewHolder;
 
 import org.json.JSONObject;
 
@@ -149,7 +150,7 @@ public class StockActivity extends AppCompatActivity {
 
     private StockActivityActionBarViewHolder mStockActivityActionBarViewHolder;
     private StockActivityRealPriceBlockViewHolder mStockActivityRealPriceBlockViewHolder;
-    private StockPredictionBlockViewHolder mStockPredictionBlockViewHolder;
+    private StockPredictionInfoBlockViewHolder mStockPredictionInfoBlockViewHolder;
     private ChartPeriodSelectorViewHolder mChartPeriodSelectorViewHolder;
     private ChartTickTopItemsViewHolder mChartTickTopItemsViewHolder;
     private ChartTaTopItemsViewHolder mChartTaTopItemsViewHolder;
@@ -200,9 +201,12 @@ public class StockActivity extends AppCompatActivity {
         mStockActivityRealPriceBlockViewHolder =
                 StockActivityRealPriceBlockViewHolder
                         .convertToViewHolder(findViewById(R.id.top_real_price_block));
-        mStockPredictionBlockViewHolder =
-                StockPredictionBlockViewHolder
-                        .convertToViewHolder(findViewById(R.id.stock_prediction_block));
+//        mStockPredictionBlockViewHolder =
+//                StockPredictionBlockViewHolder
+//                        .convertToViewHolder(findViewById(R.id.stock_prediction_block));
+//        mStockPredictionInfoBlockViewHolder =
+//                StockPredictionInfoBlockViewHolder
+//                        .convertToViewHolder(findViewById());
         mChartPeriodSelectorViewHolder =
                 ChartPeriodSelectorViewHolder
                         .convertToViewHolder(findViewById(R.id.stock_period_block));
@@ -668,30 +672,30 @@ public class StockActivity extends AppCompatActivity {
         Stock stock = clientData.getPriceFromCode(mCode);
 
         if(stock != null) {
-            Stock.renderTitleAndStars(this, stock.getPredictTechDirection(),
-                    stock.getPredictTechLevel(),
-                    mStockPredictionBlockViewHolder.techBlockView,
-                    mStockPredictionBlockViewHolder.techTitleTextView,
-                    mStockPredictionBlockViewHolder.techUnavailableTextView,
-                    mStockPredictionBlockViewHolder.techImageViews);
-
-            Stock.renderTitleAndStars(this, stock.getConfidenceDirection(),
-                    stock.getPredictNewsLevel(),
-                    mStockPredictionBlockViewHolder.newsBlockView,
-                    mStockPredictionBlockViewHolder.newsTitleTextView,
-                    mStockPredictionBlockViewHolder.newsUnavailableTextView,
-                    mStockPredictionBlockViewHolder.newsImageViews);
-
-
-            stock.renderTodayBlock(this,
-                    mStockPredictionBlockViewHolder.todayBlock,
-                    mStockPredictionBlockViewHolder.todayTitleTextView,
-                    mStockPredictionBlockViewHolder.todayStatusTextView);
-
-            stock.renderTomorrowBlock(this,
-                    mStockPredictionBlockViewHolder.tomorrowBlock,
-                    mStockPredictionBlockViewHolder.tomorrowTitleTextView,
-                    mStockPredictionBlockViewHolder.tomorrowStatusTextView);
+//            Stock.renderTitleAndStars(this, stock.getPredictTechDirection(),
+//                    stock.getPredictTechLevel(),
+//                    mStockPredictionBlockViewHolder.techBlockView,
+//                    mStockPredictionBlockViewHolder.techTitleTextView,
+//                    mStockPredictionBlockViewHolder.techUnavailableTextView,
+//                    mStockPredictionBlockViewHolder.techImageViews);
+//
+//            Stock.renderTitleAndStars(this, stock.getConfidenceDirection(),
+//                    stock.getPredictNewsLevel(),
+//                    mStockPredictionBlockViewHolder.newsBlockView,
+//                    mStockPredictionBlockViewHolder.newsTitleTextView,
+//                    mStockPredictionBlockViewHolder.newsUnavailableTextView,
+//                    mStockPredictionBlockViewHolder.newsImageViews);
+//
+//
+//            stock.renderTodayBlock(this,
+//                    mStockPredictionBlockViewHolder.todayBlock,
+//                    mStockPredictionBlockViewHolder.todayTitleTextView,
+//                    mStockPredictionBlockViewHolder.todayStatusTextView);
+//
+//            stock.renderTomorrowBlock(this,
+//                    mStockPredictionBlockViewHolder.tomorrowBlock,
+//                    mStockPredictionBlockViewHolder.tomorrowTitleTextView,
+//                    mStockPredictionBlockViewHolder.tomorrowStatusTextView);
 
             PredictForDifferentPeriodViewHolder.update(mPredictForDifferentPeriodViewHolder,
                     stock.getTomorrowPredictionDiffDirection(),
@@ -757,7 +761,8 @@ public class StockActivity extends AppCompatActivity {
         mChartPeriodSelectorViewHolder.chartType1M.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changeChartSelectorUI(mChartPeriodSelectorViewHolder.chartType1M);
+                changeChartSelectorUI(mChartPeriodSelectorViewHolder.chartType1M,
+                        mChartPeriodSelectorViewHolder.underline1M);
                 mYahooStxChartCrawler.loadStockChartData();
             }
         });
@@ -765,7 +770,8 @@ public class StockActivity extends AppCompatActivity {
         mChartPeriodSelectorViewHolder.chartTypeD.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changeChartSelectorUI(mChartPeriodSelectorViewHolder.chartTypeD);
+                changeChartSelectorUI(mChartPeriodSelectorViewHolder.chartTypeD,
+                        mChartPeriodSelectorViewHolder.underlineD);
                 mYahooStxChartCrawler.loadTaStockChartData(StockChartDataRequest.TA_TYPE_DAY);
             }
         });
@@ -773,7 +779,8 @@ public class StockActivity extends AppCompatActivity {
         mChartPeriodSelectorViewHolder.chartTypeW.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changeChartSelectorUI(mChartPeriodSelectorViewHolder.chartTypeW);
+                changeChartSelectorUI(mChartPeriodSelectorViewHolder.chartTypeW,
+                        mChartPeriodSelectorViewHolder.underlineW);
                 mYahooStxChartCrawler.loadTaStockChartData(StockChartDataRequest.TA_TYPE_WEEK);
             }
         });
@@ -781,7 +788,8 @@ public class StockActivity extends AppCompatActivity {
         mChartPeriodSelectorViewHolder.chartTypeM.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changeChartSelectorUI(mChartPeriodSelectorViewHolder.chartTypeM);
+                changeChartSelectorUI(mChartPeriodSelectorViewHolder.chartTypeM,
+                        mChartPeriodSelectorViewHolder.underlineM);
                 mYahooStxChartCrawler.loadTaStockChartData(StockChartDataRequest.TA_TYPE_MONTH);
             }
         });
@@ -817,8 +825,8 @@ public class StockActivity extends AppCompatActivity {
         FiveBestPriceViewHolder.update(mBestPriceRowViewHolder, bestPriceRows, yesterdayPrice);
     }
 
-    private void changeChartSelectorUI(TextView selected) {
-        mChartPeriodSelectorViewHolder.setSelected(this, selected);
+    private void changeChartSelectorUI(TextView selected, View underlineView) {
+        mChartPeriodSelectorViewHolder.setSelected(this, selected, underlineView);
         mSelectedChartTextView = selected;
         if(mLoadingProgressBar != null) {
             mLoadingProgressBar.setVisibility(View.VISIBLE);

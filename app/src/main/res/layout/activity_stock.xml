@@ -35,24 +35,14 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <include
-                    android:id="@+id/stock_prediction_block"
-                    layout="@layout/layout_stock_prediction_block"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="120dp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                <include
                     android:id="@+id/stock_period_block"
                     layout="@layout/layout_chart_period_selector"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="25dp"
+                    android:layout_marginTop="88dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/stock_prediction_block" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <include
                     android:id="@+id/stock_chart_tick_top_block"

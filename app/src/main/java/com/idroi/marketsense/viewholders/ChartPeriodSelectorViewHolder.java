@@ -17,7 +17,14 @@ public class ChartPeriodSelectorViewHolder {
     public TextView chartTypeD;
     public TextView chartTypeW;
     public TextView chartTypeM;
+
+    public View underline1M;
+    public View underlineD;
+    public View underlineW;
+    public View underlineM;
+
     private TextView[] chartTypesTextView;
+    private View[] underlineViews;
 
     static final ChartPeriodSelectorViewHolder EMPTY_VIEW_HOLDER = new ChartPeriodSelectorViewHolder();
 
@@ -26,33 +33,47 @@ public class ChartPeriodSelectorViewHolder {
     }
 
     public static ChartPeriodSelectorViewHolder convertToViewHolder(final View view) {
-        final ChartPeriodSelectorViewHolder chartPeriodSelectorViewHolder = new ChartPeriodSelectorViewHolder();
+        final ChartPeriodSelectorViewHolder viewHolder = new ChartPeriodSelectorViewHolder();
         try {
-            chartPeriodSelectorViewHolder.chartType1M = view.findViewById(R.id.chart_type_1m);
-            chartPeriodSelectorViewHolder.chartTypeD = view.findViewById(R.id.chart_type_d);
-            chartPeriodSelectorViewHolder.chartTypeW = view.findViewById(R.id.chart_type_w);
-            chartPeriodSelectorViewHolder.chartTypeM = view.findViewById(R.id.chart_type_m);
+            viewHolder.chartType1M = view.findViewById(R.id.chart_type_1m);
+            viewHolder.chartTypeD = view.findViewById(R.id.chart_type_d);
+            viewHolder.chartTypeW = view.findViewById(R.id.chart_type_w);
+            viewHolder.chartTypeM = view.findViewById(R.id.chart_type_m);
 
-            chartPeriodSelectorViewHolder.chartTypesTextView = new TextView[] {
-                    chartPeriodSelectorViewHolder.chartType1M,
-                    chartPeriodSelectorViewHolder.chartTypeD,
-                    chartPeriodSelectorViewHolder.chartTypeW,
-                    chartPeriodSelectorViewHolder.chartTypeM
+            viewHolder.underline1M = view.findViewById(R.id.chart_type_1m_underline);
+            viewHolder.underlineD = view.findViewById(R.id.chart_type_d_underline);
+            viewHolder.underlineW = view.findViewById(R.id.chart_type_w_underline);
+            viewHolder.underlineM = view.findViewById(R.id.chart_type_m_underline);
+
+            viewHolder.chartTypesTextView = new TextView[] {
+                    viewHolder.chartType1M,
+                    viewHolder.chartTypeD,
+                    viewHolder.chartTypeW,
+                    viewHolder.chartTypeM
             };
 
-            return chartPeriodSelectorViewHolder;
+            viewHolder.underlineViews = new View[] {
+                    viewHolder.underline1M,
+                    viewHolder.underlineD,
+                    viewHolder.underlineW,
+                    viewHolder.underlineM
+            };
+
+            return viewHolder;
         } catch (ClassCastException exception) {
             MSLog.e(exception.toString());
             return EMPTY_VIEW_HOLDER;
         }
     }
 
-    public void setSelected(Context context, TextView selectedTextView) {
+    public void setSelected(Context context, TextView selectedTextView, View selectUnderlineView) {
         for(TextView other : chartTypesTextView) {
             other.setTextColor(context.getResources().getColor(R.color.text_third));
-            other.setBackground(context.getDrawable(R.drawable.border_selector));
+        }
+        for(View other : underlineViews) {
+            other.setVisibility(View.GONE);
         }
         selectedTextView.setTextColor(context.getResources().getColor(R.color.text_first));
-        selectedTextView.setBackground(context.getDrawable(R.drawable.border_selector_selected));
+        selectUnderlineView.setVisibility(View.VISIBLE);
     }
 }

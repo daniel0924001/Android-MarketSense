@@ -151,7 +151,7 @@ public class MarketSenseRendererHelper {
                                                  @Nullable final String contents,
                                                  final String defaultContents,
                                                  float value, float baseline) {
-        addNumberStringToTextView(textView, contents, defaultContents, value, baseline, R.color.draw_grey);
+        addNumberStringToTextView(textView, contents, defaultContents, value, baseline, R.color.text_first);
     }
 
     public static void addNumberStringToTextView(@Nullable final TextView textView,
@@ -173,7 +173,7 @@ public class MarketSenseRendererHelper {
         } else {
             textView.setVisibility(View.VISIBLE); // 20161203 Ansel: to display CTA button and text view with content
             if(contents.equals("NaN")) {
-                addTextViewWithColor(textView, defaultContents, R.color.text_second);
+                addTextViewWithColor(textView, defaultContents, R.color.text_first);
             } else {
                 if(value > baseline) {
                     addTextViewWithColor(textView, contents, R.color.trend_red);

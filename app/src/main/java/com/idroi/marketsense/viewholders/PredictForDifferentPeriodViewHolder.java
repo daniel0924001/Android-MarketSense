@@ -9,6 +9,7 @@ import com.idroi.marketsense.R;
  * Created by daniel.hsieh on 2018/8/20.
  */
 
+@Deprecated
 public class PredictForDifferentPeriodViewHolder {
 
     public PredictSquareResultViewHolder shortPrediction;

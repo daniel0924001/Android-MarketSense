@@ -151,7 +151,7 @@
     <string name="title_chart_type_w">週K</string>
     <string name="title_chart_type_m">月K</string>
 
-    <string name="title_five_best_price">五檔</string>
+    <string name="title_five_best_price">前五檔</string>
     <string name="title_buy_volume">委買量</string>
     <string name="title_sell_volume">委賣量</string>
     <string name="title_buy_price">買價</string>
@@ -165,8 +165,8 @@
     <string name="title_predict_up">看多:</string>
     <string name="title_predict_down">看空:</string>
     <string name="title_vote">投票</string>
-    <string name="title_comment">留言</string>
-    <string name="title_comment_format">留言(%d)</string>
+    <string name="title_comment">討論</string>
+    <string name="title_comment_format">討論(%d)</string>
     <string name="title_comment_colon">留言:</string>
     <string name="title_comment_hint">留下你的評論 &#8230;</string>
     <string name="title_go_back">返回</string>

@@ -17,39 +17,55 @@ public class StockActivityBottomSelector {
     public TextView newsSelector;
     public TextView commentSelector;
 
+    public View newsUnderline;
+    public View commentUnderline;
+
     private TextView[] selectors;
+    private View[] underlines;
 
     static final StockActivityBottomSelector EMPTY_VIEW_HOLDER = new StockActivityBottomSelector();
 
     private StockActivityBottomSelector() {}
 
     public static StockActivityBottomSelector convertToViewHolder(final View view) {
-        final StockActivityBottomSelector stockActivityBottomSelector = new StockActivityBottomSelector();
+        final StockActivityBottomSelector viewHolder = new StockActivityBottomSelector();
         try {
-            stockActivityBottomSelector.mainView = view;
-            stockActivityBottomSelector.newsSelector = view.findViewById(R.id.selector_news_block);
-            stockActivityBottomSelector.commentSelector = view.findViewById(R.id.selector_comment_block);
+            viewHolder.mainView = view;
+            viewHolder.newsSelector = view.findViewById(R.id.selector_news_block);
+            viewHolder.commentSelector = view.findViewById(R.id.selector_comment_block);
+            viewHolder.newsUnderline = view.findViewById(R.id.news_block_underline);
+            viewHolder.commentUnderline = view.findViewById(R.id.comment_block_underline);
 
-            stockActivityBottomSelector.selectors = new TextView[] {
-                    stockActivityBottomSelector.newsSelector,
-                    stockActivityBottomSelector.commentSelector
+            viewHolder.selectors = new TextView[] {
+                    viewHolder.newsSelector,
+                    viewHolder.commentSelector
+            };
+            viewHolder.underlines = new View[] {
+                    viewHolder.newsUnderline,
+                    viewHolder.commentUnderline
             };
 
-            return stockActivityBottomSelector;
+            return viewHolder;
         } catch (ClassCastException exception) {
             MSLog.e(exception.toString());
             return EMPTY_VIEW_HOLDER;
         }
     }
 
-    void setSelected(Context context, TextView selected) {
+    void setSelected(Context context, TextView selected, View underline) {
         for(TextView other : selectors) {
             if(other != selected) {
-                other.setBackground(context.getDrawable(R.drawable.border_selector));
                 other.setTextColor(context.getResources().getColor(R.color.text_third));
             } else {
-                other.setBackground(context.getDrawable(R.drawable.border_selector_selected));
                 other.setTextColor(context.getResources().getColor(R.color.text_first));
+            }
+        }
+
+        for(View other : underlines) {
+            if(other != underline) {
+                other.setVisibility(View.GONE);
+            } else {
+                other.setVisibility(View.VISIBLE);
             }
         }
     }

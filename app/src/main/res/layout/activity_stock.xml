@@ -45,25 +45,35 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <include
+                    android:id="@+id/stock_chart_tick_bottom_block"
+                    layout="@layout/layout_chart_tick_bottom_items"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/stock_period_block" />
+
+                <include
                     android:id="@+id/stock_chart_tick_top_block"
                     layout="@layout/layout_chart_tick_top_items"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="19dp"
+                    android:layout_marginTop="35dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/stock_period_block" />
+                    app:layout_constraintTop_toBottomOf="@id/stock_chart_tick_bottom_block" />
 
                 <include
                     android:id="@+id/stock_chart_ta_top_block"
                     layout="@layout/layout_chart_ta_top_items"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="19dp"
+                    android:layout_marginTop="35dp"
                     android:visibility="gone"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/stock_period_block" />
+                    app:layout_constraintTop_toBottomOf="@id/stock_chart_tick_bottom_block" />
 
                 <com.github.mikephil.charting.charts.LineChart
                     android:id="@+id/stock_chart_price"
@@ -103,43 +113,15 @@
                     app:layout_constraintEnd_toEndOf="@id/stock_chart_price" />
 
                 <include
-                    android:id="@+id/stock_chart_tick_bottom_block"
-                    layout="@layout/layout_chart_tick_bottom_items"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="30dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/stock_chart_volume" />
-
-                <View
-                    android:id="@+id/end_of_chart"
-                    android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:background="@color/border_gray"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintTop_toBottomOf="@id/stock_chart_tick_bottom_block"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                <include
                     android:id="@+id/five_best_price"
                     layout="@layout/layout_five_best_price"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:visibility="gone"
+                    android:layout_marginTop="43dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/end_of_chart" />
-
-                <include
-                    android:id="@+id/predict_for_different_period"
-                    layout="@layout/layout_predict_for_different_period"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/five_best_price" />
+                    app:layout_constraintTop_toBottomOf="@id/stock_chart_volume" />
 
                 <include
                     android:id="@+id/stock_activity_bottom_selector"
@@ -147,7 +129,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="30dp"
-                    app:layout_constraintTop_toBottomOf="@id/predict_for_different_period"
+                    app:layout_constraintTop_toBottomOf="@id/five_best_price"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
 

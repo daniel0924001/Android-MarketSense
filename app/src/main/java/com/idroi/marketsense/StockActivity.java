@@ -156,7 +156,7 @@ public class StockActivity extends AppCompatActivity {
     private ChartTaTopItemsViewHolder mChartTaTopItemsViewHolder;
     private ChartTickBottomItemsViewHolder mChartTickBottomItemsViewHolder;
     private FiveBestPriceViewHolder mBestPriceRowViewHolder;
-    private PredictForDifferentPeriodViewHolder mPredictForDifferentPeriodViewHolder;
+//    private PredictForDifferentPeriodViewHolder mPredictForDifferentPeriodViewHolder;
     private StockActivityBottomContent mStockActivityBottomContent;
 
     private View.OnLayoutChangeListener mOnLayoutChangeListener;
@@ -222,9 +222,9 @@ public class StockActivity extends AppCompatActivity {
         mBestPriceRowViewHolder =
                 FiveBestPriceViewHolder
                         .convertToViewHolder(findViewById(R.id.five_best_price));
-        mPredictForDifferentPeriodViewHolder =
-                PredictForDifferentPeriodViewHolder
-                        .convertToViewHolder(findViewById(R.id.predict_for_different_period));
+//        mPredictForDifferentPeriodViewHolder =
+//                PredictForDifferentPeriodViewHolder
+//                        .convertToViewHolder(findViewById(R.id.predict_for_different_period));
         mStockActivityBottomContent =
                 StockActivityBottomContent
                         .convertToViewHolder(findViewById(R.id.stock_activity_bottom_selector));
@@ -473,11 +473,13 @@ public class StockActivity extends AppCompatActivity {
             case 0:
                 mStockActivityBottomContent.setSelected(this,
                         mStockActivityBottomContent.stockActivityBottomSelector.commentSelector,
+                        mStockActivityBottomContent.stockActivityBottomSelector.commentUnderline,
                         mStockActivityBottomContent.commentBlock);
                 break;
             case 1:
                 mStockActivityBottomContent.setSelected(this,
                         mStockActivityBottomContent.stockActivityBottomSelector.newsSelector,
+                        mStockActivityBottomContent.stockActivityBottomSelector.newsUnderline,
                         mStockActivityBottomContent.newsBlock);
                 break;
         }
@@ -697,10 +699,10 @@ public class StockActivity extends AppCompatActivity {
 //                    mStockPredictionBlockViewHolder.tomorrowTitleTextView,
 //                    mStockPredictionBlockViewHolder.tomorrowStatusTextView);
 
-            PredictForDifferentPeriodViewHolder.update(mPredictForDifferentPeriodViewHolder,
-                    stock.getTomorrowPredictionDiffDirection(),
-                    stock.get5DPredictionDirection(),
-                    stock.get20DPredictionDirection());
+//            PredictForDifferentPeriodViewHolder.update(mPredictForDifferentPeriodViewHolder,
+//                    stock.getTomorrowPredictionDiffDirection(),
+//                    stock.get5DPredictionDirection(),
+//                    stock.get20DPredictionDirection());
         }
     }
 

@@ -74,7 +74,6 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
                 });
             }
         });
-        Stock.initializeRightPartValue();
     }
 
     public void updatePriceInVisibleItems(int payload) {

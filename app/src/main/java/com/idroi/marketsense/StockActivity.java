@@ -353,12 +353,12 @@ public class StockActivity extends AppCompatActivity {
             MSLog.printStackTrace("updateFavoriteButton: true");
             mFavoriteButton.setCompoundDrawablesWithIntrinsicBounds(0, R.mipmap.ic_stock_fav_on, 0, 0);
             mFavoriteButton.setText(R.string.title_remove_favorite);
-            mFavoriteButton.setTextColor(getResources().getColor(R.color.text_first));
+            mFavoriteButton.setAlpha(1.0f);
         } else {
             MSLog.printStackTrace("updateFavoriteButton: false");
             mFavoriteButton.setCompoundDrawablesWithIntrinsicBounds(0, R.mipmap.ic_stock_fav_off, 0, 0);
             mFavoriteButton.setText(R.string.title_add_favorite);
-            mFavoriteButton.setTextColor(getResources().getColor(R.color.text_third));
+            mFavoriteButton.setAlpha(0.5f);
         }
     }
 

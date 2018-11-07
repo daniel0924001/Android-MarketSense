@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <TextView
+        android:id="@+id/selector_stock_block"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif"
+        android:textStyle="normal"
+        android:textColor="@color/text_first"
+        android:text="@string/title_stock_tab"
+        android:gravity="center"
+        android:background="@drawable/border_selector_gray"
+        android:foreground="@drawable/item_foreground_with_clicked_shadow"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/selector_news_block" />
+
+    <View
+        android:id="@+id/stock_block_underline"
+        android:layout_width="20dp"
+        android:layout_height="2dp"
+        android:background="@drawable/border_selector_selected"
+        app:layout_constraintBottom_toBottomOf="@id/selector_stock_block"
+        app:layout_constraintStart_toStartOf="@id/selector_stock_block"
+        app:layout_constraintEnd_toEndOf="@id/selector_stock_block"/>
+
+    <TextView
+        android:id="@+id/selector_news_block"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif"
+        android:textStyle="normal"
+        android:textColor="@color/text_third"
+        android:text="@string/title_news_tab"
+        android:gravity="center"
+        android:background="@drawable/border_selector_gray"
+        android:foreground="@drawable/item_foreground_with_clicked_shadow"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/selector_stock_block"
+        app:layout_constraintEnd_toStartOf="@id/selector_comment_block" />
+
+    <View
+        android:id="@+id/news_block_underline"
+        android:layout_width="20dp"
+        android:layout_height="2dp"
+        android:background="@drawable/border_selector_selected"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/selector_news_block"
+        app:layout_constraintStart_toStartOf="@id/selector_news_block"
+        app:layout_constraintEnd_toEndOf="@id/selector_news_block"/>
+
+    <TextView
+        android:id="@+id/selector_comment_block"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif"
+        android:textStyle="normal"
+        android:textColor="@color/text_third"
+        android:text="@string/title_comment"
+        android:gravity="center"
+        android:background="@drawable/border_selector_gray"
+        android:foreground="@drawable/item_foreground_with_clicked_shadow"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/selector_news_block"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <View
+        android:id="@+id/comment_block_underline"
+        android:layout_width="20dp"
+        android:layout_height="2dp"
+        android:background="@drawable/border_selector_selected"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/selector_comment_block"
+        app:layout_constraintStart_toStartOf="@id/selector_comment_block"
+        app:layout_constraintEnd_toEndOf="@id/selector_comment_block"/>
+
+</android.support.constraint.ConstraintLayout>

@@ -2,7 +2,7 @@
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/action_bar_background_with_border"
+    android:background="@color/white_eight"
     android:layout_width="match_parent"
     android:layout_height="56dp" >
 
@@ -15,30 +15,44 @@
         android:contentDescription="@string/title_search_cancel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <EditText
         android:id="@+id/search_text"
         android:layout_height="36dp"
         android:layout_width="0dp"
-        android:background="@color/white_eight"
+        android:background="@drawable/btn_oval_small_corner_background"
         android:imeOptions="actionDone"
         android:singleLine="true"
         android:inputType="text"
         android:hint="@string/title_search_hint_stock"
         android:textColorHint="@color/text_third"
-        android:layout_marginStart="16dp"
-        android:textSize="16sp"
-        android:letterSpacing="0.04"
+        android:layout_marginStart="8dp"
+        android:drawableStart="@mipmap/ic_searchbar_search"
+        android:drawablePadding="5dp"
+        android:paddingStart="9dp"
+        android:paddingEnd="9dp"
+        android:textSize="14sp"
         android:fontFamily="sans-serif"
         android:textStyle="normal"
-        android:textColor="@color/text_first"
+        android:textColor="@color/text_black"
         android:focusable="true"
         android:focusableInTouchMode="true"
         app:layout_constraintStart_toEndOf="@id/go_back"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+    <ImageButton
+        android:id="@+id/search_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_searchbar_cancel"
+        android:background="@null"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="@string/title_search_cancel"
+        app:layout_constraintEnd_toEndOf="@id/search_text"
+        app:layout_constraintTop_toTopOf="@id/search_text"
+        app:layout_constraintBottom_toBottomOf="@id/search_text" />
 
 </android.support.constraint.ConstraintLayout>

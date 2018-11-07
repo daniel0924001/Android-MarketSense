@@ -246,6 +246,10 @@ public class StockListPlacer {
         mStockListListener = listener;
     }
 
+    public void setStockArrayList(ArrayList<Stock> stockArrayList) {
+        mStockArrayList = stockArrayList;
+    }
+
     public void setLoadingPageListener(LoadingPageListener listener) {
         mLoadingPageListener = listener;
     }

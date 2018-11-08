@@ -33,7 +33,7 @@
         android:paddingStart="9dp"
         android:paddingEnd="9dp"
         android:textSize="14sp"
-        android:fontFamily="sans-serif"
+        android:fontFamily="sans-serif-medium"
         android:textStyle="normal"
         android:textColor="@color/text_black"
         android:focusable="true"

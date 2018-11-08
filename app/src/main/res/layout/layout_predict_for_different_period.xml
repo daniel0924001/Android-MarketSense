@@ -23,7 +23,7 @@
         android:maxLines="1"
         android:textColor="@color/text_first"
         android:textSize="16sp"
-        android:fontFamily="sans-serif"
+        android:fontFamily="sans-serif-medium"
         android:text="@string/title_predict_up_or_down"
         android:layout_marginStart="12dp"
         android:layout_marginTop="27dp"

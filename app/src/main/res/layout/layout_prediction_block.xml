@@ -23,7 +23,7 @@
         android:maxLines="1"
         android:textColor="@color/text_first"
         android:textSize="14sp"
-        android:fontFamily="sans-serif"
+        android:fontFamily="sans-serif-medium"
         android:text="@string/title_predict_trend"
         android:paddingStart="29dp"
         android:paddingEnd="29dp"

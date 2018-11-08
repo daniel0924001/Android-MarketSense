@@ -11,7 +11,7 @@
         android:layout_height="17dp"
         android:textSize="12sp"
         android:text="@string/title_month_day_close_predict"
-        android:fontFamily="sans-serif"
+        android:fontFamily="sans-serif-medium"
         android:textColor="@color/text_second"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
@@ -23,7 +23,7 @@
         android:background="@drawable/block_predict_up_background"
         android:textSize="18sp"
         android:text="@string/title_company_price_diff_percentage"
-        android:fontFamily="sans-serif"
+        android:fontFamily="sans-serif-medium"
         android:textStyle="normal"
         android:textColor="@color/white"
         android:layout_marginTop="7dp"

@@ -19,7 +19,13 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter;
@@ -40,6 +46,8 @@ import com.idroi.marketsense.request.NewsRequest;
 import com.idroi.marketsense.util.MarketSenseUtils;
 import com.idroi.marketsense.viewholders.SearchSelectorViewHolder;
 
+import org.json.JSONObject;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -51,10 +59,12 @@ import static com.idroi.marketsense.adapter.CommentsRecyclerViewAdapter.ADAPTER_
 import static com.idroi.marketsense.adapter.NewsRecyclerAdapter.NEWS_SINGLE_LAYOUT;
 import static com.idroi.marketsense.adapter.StockListRecyclerAdapter.ADAPTER_UPDATE_PRICE_ONLY;
 import static com.idroi.marketsense.adapter.StockListRecyclerAdapter.ADAPTER_UPDATE_RIGHT_BLOCK_ONLY;
+import static com.idroi.marketsense.common.Constants.FACEBOOK_CONSTANTS;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_DISCUSSION_COMMENT_CLICK;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_NEWS_READ_RECORD_LIST;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_PRICE_CHANGED;
+import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_REPLY_COMMENT_CLICK;
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_RIGHT_PART_CHANGE;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_BY_PREDICTION;
 import static com.idroi.marketsense.datasource.StockListPlacer.SORT_DOWNWARD;
@@ -100,8 +110,10 @@ public class SearchAndResponseActivity extends AppCompatActivity {
     private int mLastClickAction;
     private Comment mTempComment;
     private int mTempPosition;
+
     private AlertDialog mLoginAlertDialog;
     private LoginButton mFBLoginBtn;
+    private CallbackManager mFBCallbackManager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -110,6 +122,7 @@ public class SearchAndResponseActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search_v2);
 
         final UserProfile userProfile = ClientData.getInstance(this).getUserProfile();
+        initFBLogin();
         setInformation();
         initSuggestionLayout();
         intiResultsLayout();
@@ -438,6 +451,55 @@ public class SearchAndResponseActivity extends AppCompatActivity {
         }
     }
 
+    // fb login part when the user click fab
+    private void initFBLogin() {
+
+        MSLog.d("The user has logged in Facebook: " + FBHelper.checkFBLogin());
+
+        mFBCallbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().registerCallback(mFBCallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                MSLog.d("facebook registerCallback onSuccess in StockActivity");
+                getFBUserProfile();
+            }
+
+            @Override
+            public void onCancel() {
+                MSLog.d("facebook registerCallback onCancel");
+            }
+
+            @Override
+            public void onError(FacebookException exception) {
+                MSLog.d("facebook registerCallback onError: " + exception.toString());
+            }
+        });
+    }
+
+    private void getFBUserProfile() {
+        FBHelper.getFBUserProfile(this, new FBHelper.FBHelperListener() {
+            @Override
+            public void onTaskCompleted(JSONObject data, String avatarLink) {
+                String userName = FBHelper.fetchFbData(data, UserProfile.FB_USER_NAME_KEY);
+                String userId = FBHelper.fetchFbData(data, UserProfile.FB_USER_ID_KEY);
+                String userEmail = FBHelper.fetchFbData(data, UserProfile.FB_USER_EMAIL_KEY);
+                PostEvent.sendRegister(SearchAndResponseActivity.this, userId, userName, FACEBOOK_CONSTANTS,
+                        UserProfile.generatePassword(userId, FACEBOOK_CONSTANTS), userEmail, avatarLink, new PostEvent.PostEventListener() {
+                            @Override
+                            public void onResponse(boolean isSuccessful, Object data) {
+                                if(!isSuccessful) {
+                                    Toast.makeText(SearchAndResponseActivity.this, R.string.login_failed_description, Toast.LENGTH_SHORT).show();
+                                    LoginManager.getInstance().logOut();
+                                } else {
+                                    UserProfile userProfile = ClientData.getInstance(SearchAndResponseActivity.this).getUserProfile();
+                                    userProfile.globalBroadcast(NOTIFY_ID_REPLY_COMMENT_CLICK);
+                                }
+                            }
+                        });
+            }
+        });
+    }
+
     private void showLoginAlertDialog(int lastAction) {
         mLastClickAction = lastAction;
         if(mLoginAlertDialog != null) {
@@ -475,6 +537,16 @@ public class SearchAndResponseActivity extends AppCompatActivity {
                 }
             }
         }
+        mFBCallbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onPause() {
+        if(mLoginAlertDialog != null) {
+            mLoginAlertDialog.dismiss();
+            mLoginAlertDialog = null;
+        }
+        super.onPause();
     }
 
     @Override

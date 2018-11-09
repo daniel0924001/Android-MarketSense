@@ -53,11 +53,11 @@ public class LoadingDotsPageViewHolder {
                 dotsView[next(0)].setBackground(
                         context.getDrawable(R.drawable.top_banner_selector_red_first));
                 dotsView[next(1)].setBackground(
-                        context.getDrawable(R.drawable.top_banner_selector_red_first));
+                        context.getDrawable(R.drawable.top_banner_selector_red_third));
                 dotsView[next(2)].setBackground(
-                        context.getDrawable(R.drawable.top_banner_selector_red_first));
+                        context.getDrawable(R.drawable.top_banner_selector_red_second));
                 startIndex = (startIndex + 1) % dotsView.length;
-                mHandler.postDelayed(mRefreshRunnable, 200);
+                mHandler.postDelayed(mRefreshRunnable, 250);
             }
         };
         mainView.setVisibility(View.VISIBLE);

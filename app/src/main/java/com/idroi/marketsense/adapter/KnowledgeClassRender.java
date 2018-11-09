@@ -29,7 +29,6 @@ public class KnowledgeClassRender implements MarketSenseRenderer<KnowledgeClass>
 
     @Override
     public View createView(@NonNull Context context, @Nullable ViewGroup parent) {
-        MSLog.e("createView: KnowledgeClassRender");
         return LayoutInflater
                 .from(context)
                 .inflate(R.layout.knowledge_class_list_item, parent, false);
@@ -46,11 +45,26 @@ public class KnowledgeClassRender implements MarketSenseRenderer<KnowledgeClass>
         MarketSenseRendererHelper.addTextView(
                 knowledgeClassViewHolder.titleTextView, content.getTitle());
         knowledgeClassViewHolder.iconImageView.setImageDrawable(content.getIcon());
+        updateRedDot(view, content);
         view.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void clear() {
         mViewHolderMap.clear();
+    }
+
+    public void updateRedDot(View view, KnowledgeClass knowledgeClass) {
+        final KnowledgeClassViewHolder viewHolder = mViewHolderMap.get(view);
+        if(viewHolder == null) {
+            MSLog.e("knowledgeViewHolder is null in updateRedDot");
+            return;
+        }
+
+        if(knowledgeClass.isPresent()) {
+            viewHolder.presentImageView.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.presentImageView.setVisibility(View.GONE);
+        }
     }
 }

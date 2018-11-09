@@ -10,10 +10,12 @@ public class KnowledgeClass {
 
     private String mTitle;
     private Drawable mIcon;
+    private boolean mPresent;
 
-    public KnowledgeClass(String title, Drawable icon) {
+    public KnowledgeClass(String title, Drawable icon, boolean present) {
         mTitle = title;
         mIcon = icon;
+        mPresent = present;
     }
 
     public String getTitle() {
@@ -24,12 +26,21 @@ public class KnowledgeClass {
         return mIcon;
     }
 
+    public void setPresent(boolean present) {
+        mPresent = present;
+    }
+
+    public boolean isPresent() {
+        return mPresent;
+    }
+
     public static class Builder {
         private String mTitle;
         private Drawable mIcon;
+        private boolean mPresent;
 
         public Builder() {
-
+            mPresent = false;
         }
 
         public Builder title(final String title) {
@@ -42,8 +53,13 @@ public class KnowledgeClass {
             return this;
         }
 
+        public Builder present(final boolean present) {
+            mPresent = present;
+            return this;
+        }
+
         public KnowledgeClass build() {
-            return new KnowledgeClass(mTitle, mIcon);
+            return new KnowledgeClass(mTitle, mIcon, mPresent);
         }
     }
 }

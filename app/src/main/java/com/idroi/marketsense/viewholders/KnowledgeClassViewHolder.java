@@ -15,6 +15,7 @@ public class KnowledgeClassViewHolder {
 
     public TextView titleTextView;
     public ImageView iconImageView;
+    public ImageView presentImageView;
 
     static final KnowledgeClassViewHolder EMPTY_VIEW_HOLDER = new KnowledgeClassViewHolder();
 
@@ -26,6 +27,7 @@ public class KnowledgeClassViewHolder {
         try {
             viewHolder.titleTextView = view.findViewById(R.id.knowledge_class_title);
             viewHolder.iconImageView = view.findViewById(R.id.knowledge_class_icon);
+            viewHolder.presentImageView = view.findViewById(R.id.knowledge_present);
 
             return viewHolder;
         } catch (ClassCastException exception) {

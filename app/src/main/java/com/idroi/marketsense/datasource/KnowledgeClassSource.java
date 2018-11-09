@@ -28,6 +28,7 @@ public class KnowledgeClassSource {
                 new KnowledgeClass.Builder()
                         .title(resources.getString(R.string.knowledge_class_newbie))
                         .icon(resources.getDrawable(R.mipmap.ic_know_newbie))
+                        .present(true)
                         .build()
         );
         mKnowledgeClassList.add(

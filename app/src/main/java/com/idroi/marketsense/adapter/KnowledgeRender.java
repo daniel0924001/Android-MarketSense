@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.common.MarketSenseRendererHelper;
 import com.idroi.marketsense.data.Knowledge;

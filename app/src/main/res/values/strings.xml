@@ -245,6 +245,16 @@
     <string name="knowledge_content_unavailable">待更新</string>
     <string name="knowledge_many_words">當目前的狀態為多頭時，應該冷靜判斷…當目前的狀態為多頭時，應該冷靜判斷…當目前的狀態為多頭時，應該冷靜判斷…當目前的狀態為多頭時，應該冷靜判斷…</string>
 
+    <string name="knowledge_class_newbie">入門</string>
+    <string name="knowledge_class_fina">財報</string>
+    <string name="knowledge_class_trade">交易</string>
+    <string name="knowledge_class_apple">蘋概股</string>
+    <string name="knowledge_class_buffet">巴菲特</string>
+    <string name="knowledge_class_save">定存股</string>
+    <string name="knowledge_class_global">全球市場</string>
+    <string name="knowledge_class_material">商品期貨</string>
+    <string name="knowledge_class_icon">分類圖示</string>
+
     <string name="share_description">下載「市覺」App掌握即時鄉民與新聞動態！ </string>
 
     <string name="default_user_name">市覺投資專員</string>

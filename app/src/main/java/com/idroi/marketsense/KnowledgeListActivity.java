@@ -1,7 +1,6 @@
 package com.idroi.marketsense;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,11 +15,13 @@ import com.idroi.marketsense.datasource.KnowledgeClassSource;
 import com.idroi.marketsense.request.KnowledgeListRequest;
 import com.idroi.marketsense.util.ActionBarHelper;
 
+import java.util.ArrayList;
+
 /**
  * Created by daniel.hsieh on 2018/9/18.
  */
 
-public class StockKnowledgeListActivity extends AppCompatActivity {
+public class KnowledgeListActivity extends AppCompatActivity {
 
     private RecyclerView mClassRecyclerView;
     private KnowledgeClassAdapter mKnowledgeClassAdapter;
@@ -54,7 +55,7 @@ public class StockKnowledgeListActivity extends AppCompatActivity {
         mKnowledgeClassAdapter.setOnItemClickListener(new KnowledgeClassAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(KnowledgeClass knowledgeClass) {
-                MSLog.d("title: " + knowledgeClass.getTitle());
+                mKnowledgeRecyclerAdapter.setKnowledgeCategoryList(knowledgeClass.getTitle());
             }
         });
 
@@ -68,7 +69,7 @@ public class StockKnowledgeListActivity extends AppCompatActivity {
             @Override
             public void onItemClick(Knowledge knowledge) {
                 startActivity(KnowledgeActivity.generateKnowledgeActivityIntent(
-                        StockKnowledgeListActivity.this, knowledge));
+                        KnowledgeListActivity.this, knowledge));
                 overridePendingTransition(R.anim.enter, R.anim.stop);
             }
         });

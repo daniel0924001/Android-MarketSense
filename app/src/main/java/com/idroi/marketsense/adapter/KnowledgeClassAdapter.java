@@ -48,14 +48,7 @@ public class KnowledgeClassAdapter extends RecyclerView.Adapter {
         if(payloads.isEmpty()) {
             onBindViewHolder(holder, position);
         } else {
-            RedDotChangeData redDotChangeData = (RedDotChangeData) payloads.get(0);
             final KnowledgeClass knowledgeClass = mKnowledgeClassSource.getItem(position);
-
-            if(position == redDotChangeData.closePosition) {
-                knowledgeClass.setPresent(false);
-            } else if(position == redDotChangeData.openPosition) {
-                knowledgeClass.setPresent(true);
-            }
             mKnowledgeRender.updateRedDot(holder.itemView, knowledgeClass);
         }
     }
@@ -69,14 +62,20 @@ public class KnowledgeClassAdapter extends RecyclerView.Adapter {
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mRedDotChangeData.closePosition = mRedDotChangeData.openPosition;
-                mRedDotChangeData.openPosition = holder.getAdapterPosition();
+                int clickPosition = holder.getAdapterPosition();
+                if(clickPosition != mRedDotChangeData.openPosition) {
+                    mRedDotChangeData.closePosition = mRedDotChangeData.openPosition;
+                    mRedDotChangeData.openPosition = clickPosition;
 
-                notifyItemChanged(mRedDotChangeData.closePosition, mRedDotChangeData);
-                notifyItemChanged(mRedDotChangeData.openPosition, mRedDotChangeData);
+                    mKnowledgeClassSource.getItem(mRedDotChangeData.closePosition).setPresent(false);
+                    mKnowledgeClassSource.getItem(mRedDotChangeData.openPosition).setPresent(true);
 
-                if(mOnItemClickListener != null) {
-                    mOnItemClickListener.onItemClick(mKnowledgeClassSource.getItem(mRedDotChangeData.openPosition));
+                    notifyItemChanged(mRedDotChangeData.closePosition, mRedDotChangeData);
+                    notifyItemChanged(mRedDotChangeData.openPosition, mRedDotChangeData);
+
+                    if (mOnItemClickListener != null) {
+                        mOnItemClickListener.onItemClick(mKnowledgeClassSource.getItem(mRedDotChangeData.openPosition));
+                    }
                 }
             }
         });

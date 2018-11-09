@@ -26,10 +26,9 @@ import android.widget.TextView;
 import com.idroi.marketsense.NewsWebViewActivity;
 import com.idroi.marketsense.R;
 import com.idroi.marketsense.StockActivity;
-import com.idroi.marketsense.StockKnowledgeListActivity;
+import com.idroi.marketsense.KnowledgeListActivity;
 import com.idroi.marketsense.adapter.NewsRecyclerAdapter;
 import com.idroi.marketsense.adapter.StockRankingRecyclerAdapter;
-import com.idroi.marketsense.adapter.StockRankingRenderer;
 import com.idroi.marketsense.adapter.TopBannerPagerAdapter;
 import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.data.News;
@@ -355,7 +354,7 @@ public class MainFragment extends Fragment {
                         }
                         break;
                     case 1:
-                        Intent intent = new Intent(activity, StockKnowledgeListActivity.class);
+                        Intent intent = new Intent(activity, KnowledgeListActivity.class);
                         startActivity(intent);
                         activity.overridePendingTransition(R.anim.enter, R.anim.stop);
                         break;

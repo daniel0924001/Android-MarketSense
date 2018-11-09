@@ -19,12 +19,14 @@ public class Knowledge {
     private static final String DEFINITION = "definition";
     private static final String EXAMPLE = "example";
     private static final String STRATEGY = "strategy";
+    private static final String CATEGORY = "category";
     private static final String RELATED_KEYWORDS = "related_keywords";
 
     private String mKeyword;
     private String mDefinition;
     private String mExample;
     private String mStrategy;
+    private String mCategory;
     private ArrayList<String> mRelatedKeywords;
 
     public Knowledge() {
@@ -45,6 +47,10 @@ public class Knowledge {
 
     public void setStrategy(String strategy) {
         mStrategy = strategy;
+    }
+
+    public void setCategory(String category) {
+        mCategory = category;
     }
 
     public void setRelatedKeywords(JSONArray jsonArray) {
@@ -77,6 +83,10 @@ public class Knowledge {
         return mStrategy;
     }
 
+    public String getCategory() {
+        return mCategory;
+    }
+
     public ArrayList<String> getRelatedKeywords() {
         return mRelatedKeywords;
     }
@@ -102,6 +112,9 @@ public class Knowledge {
                         break;
                     case RELATED_KEYWORDS:
                         knowledge.setRelatedKeywords(jsonObject.optJSONArray(RELATED_KEYWORDS));
+                        break;
+                    case CATEGORY:
+                        knowledge.setCategory(jsonObject.optString(CATEGORY));
                         break;
                     default:
                         break;

@@ -75,6 +75,11 @@ public class KnowledgeRecyclerAdapter extends RecyclerView.Adapter {
         notifyDataSetChanged();
     }
 
+    public void setKnowledgeCategoryList(String category) {
+        mKnowledgePlacer.setKnowledgeCategoryList(category);
+        notifyDataSetChanged();
+    }
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new MarketSenseViewHolder(mKnowledgeRender.createView(mActivity, parent));

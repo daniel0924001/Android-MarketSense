@@ -72,7 +72,7 @@
             android:label="@string/activity_comment">
         </activity>
 
-        <activity android:name=".StockKnowledgeListActivity"
+        <activity android:name=".KnowledgeListActivity"
             android:label="@string/activity_knowledge_list">
         </activity>
 

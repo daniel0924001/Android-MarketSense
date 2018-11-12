@@ -56,6 +56,10 @@
             android:label="@string/activity_news_setting">
         </activity>
 
+        <activity android:name=".SearchAndResponseDeprecatedActivity"
+            android:label="@string/activity_news_search">
+        </activity>
+
         <activity android:name=".SearchAndResponseActivity"
             android:label="@string/activity_news_search">
         </activity>
@@ -68,7 +72,7 @@
             android:label="@string/activity_comment">
         </activity>
 
-        <activity android:name=".StockKnowledgeListActivity"
+        <activity android:name=".KnowledgeListActivity"
             android:label="@string/activity_knowledge_list">
         </activity>
 

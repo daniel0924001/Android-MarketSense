@@ -24,8 +24,6 @@ import java.util.Locale;
 
 public class Stock {
 
-    private static boolean sDisclosureState;
-
     private static final String CODE = "code";
     private static final String NAME = "name";
     private static final String DIFF = "diff";
@@ -38,6 +36,7 @@ public class Stock {
     private static final String FALL = "fall";
     private static final String TODAY_DIFF_PRED = "today_diff_predict";
     private static final String NEXT_DIFF_PRED = "next_diff_predict";
+    private static final String NEXT_1D_DIFF_PRED = "next_1d_diff_predict";
     private static final String NEXT_5D_DIFF_PRED = "next_5d_diff_predict";
     private static final String NEXT_20D_DIFF_PRED = "next_20d_diff_predict";
     private static final String YESTERDAY_VOLUME = "y_vol";
@@ -73,7 +72,7 @@ public class Stock {
     private double mTodayPredictionDiffPercentage, mTomorrowPredictionDiffPercentage, mPredictionDiffPercentage;
     private double mPredictionError, mPredictionErrorWhenClosed;
 
-    private int m5DPredictionDirection, m20DPredictionDirection;
+    private int m1DPredictionDirection, m5DPredictionDirection, m20DPredictionDirection;
 
     private boolean mIsUpOrDownStop;
 
@@ -237,6 +236,16 @@ public class Stock {
         }
     }
 
+    public void set1DPrediction(double prediction) {
+        if(prediction > 0) {
+            m1DPredictionDirection = TREND_UP;
+        } else if(prediction == 0) {
+            m1DPredictionDirection = TREND_FLAT;
+        } else {
+            m1DPredictionDirection = TREND_DOWN;
+        }
+    }
+
     public void set5DPrediction(double prediction) {
         if(prediction > 0) {
             m5DPredictionDirection = TREND_UP;
@@ -340,8 +349,8 @@ public class Stock {
         return mFallNum;
     }
 
-    public int getTomorrowPredictionDiffDirection() {
-        return mTomorrowPredictionDiffDirection;
+    public int get1DPredictionDirection() {
+        return m1DPredictionDirection;
     }
 
     public int get5DPredictionDirection() {
@@ -446,34 +455,25 @@ public class Stock {
         }
     }
 
+    public int getTomorrowPredictionDiffDirection() {
+        return mTomorrowPredictionDiffDirection;
+    }
+
+    public int getTodayPredictionDiffDirection() {
+        return mTodayPredictionDiffDirection;
+    }
+
+    public double getTomorrowPredictionDiffPercentage() {
+        return mTomorrowPredictionDiffPercentage;
+    }
+
+    public double getTodayPredictionDiffPercentage() {
+        return mTodayPredictionDiffPercentage;
+    }
+
     public boolean isHitPredictionDirection(boolean isCountZero) {
         return (isCountZero && mDiffDirection == TREND_FLAT)
                 || mTodayPredictionDiffDirection == mDiffDirection;
-    }
-
-    public static void initializeRightPartValue() {
-        sDisclosureState = false;
-    }
-
-    public static void changeRightPartValue() {
-        sDisclosureState = !sDisclosureState;
-    }
-
-    public double getEarnInPrediction(boolean simple) {
-        if(mPredictionDiffDirection == TREND_FLAT) {
-            return 0;
-        }
-        double weight;
-        if(simple) {
-            weight = 1;
-        } else {
-            weight = 1 + (mPredictionDiffPercentage / 10);
-        }
-        if(mPredictionDiffDirection == mDiffDirection) {
-            return weight * (1 + Math.abs(mDiffPercentage/100));
-        } else {
-            return weight * (1 - Math.abs(mDiffPercentage/100));
-        }
     }
 
     public double getPredictionSortScore() {
@@ -511,202 +511,6 @@ public class Stock {
                 default:
                     textView.setTextColor(context.getResources().getColor(R.color.draw_grey));
                     break;
-            }
-        }
-    }
-
-    public void renderDiffIcon(ImageView imageView) {
-        switch (mDiffDirection) {
-            case TREND_UP:
-                imageView.setVisibility(View.VISIBLE);
-                imageView.setImageResource(R.mipmap.ic_trend_arrow_up);
-                break;
-            case TREND_FLAT:
-                imageView.setVisibility(View.INVISIBLE);
-                break;
-            case TREND_DOWN:
-                imageView.setVisibility(View.VISIBLE);
-                imageView.setImageResource(R.mipmap.ic_trend_arrow_down);
-                break;
-            default:
-                imageView.setVisibility(View.INVISIBLE);
-                break;
-        }
-    }
-
-    public static void renderTitleAndStars(Context context, int direction, int level,
-                                           ConstraintLayout blockView,
-                                           TextView titleTextView,
-                                           TextView unavailableTextView,
-                                           ImageView[] imageViews) {
-        Resources resources = context.getResources();
-        if(direction == TREND_FLAT) {
-            titleTextView.setVisibility(View.GONE);
-            unavailableTextView.setVisibility(View.VISIBLE);
-            for(ImageView imageView : imageViews) {
-                imageView.setVisibility(View.INVISIBLE);
-            }
-        } else {
-            titleTextView.setVisibility(View.VISIBLE);
-            unavailableTextView.setVisibility(View.GONE);
-            int iconResourceId;
-            if(direction == TREND_UP) {
-                iconResourceId = R.mipmap.ic_trend_arrow_up;
-            } else {
-                iconResourceId = R.mipmap.ic_trend_arrow_down;
-            }
-            for(int i = 0; i <= level; i++) {
-                imageViews[i].setVisibility(View.VISIBLE);
-                imageViews[i].setImageResource(iconResourceId);
-            }
-            for(int i = level + 1; i < 3; i++) {
-                imageViews[i].setVisibility(View.INVISIBLE);
-            }
-        }
-    }
-
-    public void renderIsHit(Context context, TextView hitTextView) {
-        Resources resources = context.getResources();
-        ClientData clientData = ClientData.getInstance();
-
-        if(isHitPredictionDirection(false) && !clientData.isWorkDayAndStockMarketIsOpen()) {
-            hitTextView.setVisibility(View.VISIBLE);
-            if (mTodayPredictionDiffDirection == TREND_UP) {
-                hitTextView.setBackground(resources.getDrawable(R.drawable.block_red_border_with_radius_corner));
-                hitTextView.setTextColor(resources.getColor(R.color.trend_red));
-            } else if (mTodayPredictionDiffDirection == TREND_DOWN) {
-                hitTextView.setBackground(resources.getDrawable(R.drawable.block_green_border_with_radius_corner));
-                hitTextView.setTextColor(resources.getColor(R.color.trend_green));
-            } else {
-                hitTextView.setBackground(resources.getDrawable(R.drawable.block_flat_border_with_radius_corner));
-                hitTextView.setTextColor(resources.getColor(R.color.draw_grey));
-            }
-        } else {
-            hitTextView.setVisibility(View.GONE);
-        }
-    }
-
-    public void renderTodayBlock(Context context,
-                                 ConstraintLayout blockView,
-                                 TextView titleTextView,
-                                 TextView statusTextView) {
-        Resources resources = context.getResources();
-        ClientData clientData = ClientData.getInstance();
-
-        String todayFormat = resources.getString(R.string.title_month_day_close_predict);
-        if(clientData.isWorkDay()) {
-            if(clientData.isWorkDayBeforeStockOpen()) {
-                // D - 1
-                Calendar c = clientData.getWorkDayMinusOne();
-                titleTextView.setText(String.format(todayFormat,
-                        c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH)));
-            } else {
-                // D
-                Calendar c = clientData.getWorkDay();
-                titleTextView.setText(String.format(todayFormat,
-                        c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH)));
-            }
-        } else {
-            // D - n
-            Calendar c = clientData.getWorkDay();
-            titleTextView.setText(String.format(todayFormat,
-                    c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH)));
-        }
-
-        if(isHitPredictionDirection(false)) {
-            titleTextView.setTextColor(resources.getColor(R.color.white));
-            statusTextView.setTextColor(resources.getColor(R.color.white));
-            if (mTodayPredictionDiffDirection == TREND_UP) {
-                blockView.setBackground(resources.getDrawable(R.drawable.block_predict_up_background));
-                statusTextView.setText(String.format(Locale.US, "+%.2f%%", mTodayPredictionDiffPercentage));
-            } else if (mTodayPredictionDiffDirection == TREND_DOWN) {
-                blockView.setBackground(resources.getDrawable(R.drawable.block_predict_down_background));
-                statusTextView.setText(String.format(Locale.US, "-%.2f%%", mTodayPredictionDiffPercentage));
-            } else {
-                blockView.setBackground(resources.getDrawable(R.drawable.block_predict_flat_background));
-                statusTextView.setText(String.format(Locale.US, "%.2f%%", mTodayPredictionDiffPercentage));
-            }
-        } else {
-            blockView.setBackground(resources.getDrawable(R.drawable.block_predict_unavailable));
-            titleTextView.setTextColor(resources.getColor(R.color.pinkish_grey_four));
-            statusTextView.setTextColor(resources.getColor(R.color.warm_grey_four));
-            if (mTodayPredictionDiffDirection == TREND_UP) {
-                statusTextView.setText(String.format(Locale.US, "+%.2f%%", mTodayPredictionDiffPercentage));
-            } else if (mTodayPredictionDiffDirection == TREND_DOWN) {
-                statusTextView.setText(String.format(Locale.US, "-%.2f%%", mTodayPredictionDiffPercentage));
-            } else {
-                statusTextView.setText(String.format(Locale.US, "%.2f%%", mTodayPredictionDiffPercentage));
-            }
-        }
-    }
-
-    public void renderTomorrowBlock(Context context,
-                                    ConstraintLayout blockView,
-                                    TextView titleTextView,
-                                    TextView statusTextView) {
-
-        Resources resources = context.getResources();
-        ClientData clientData = ClientData.getInstance();
-
-        String todayFormat = resources.getString(R.string.title_month_day_close_predict);
-        if(clientData.isWorkDay()) {
-            if(clientData.isWorkDayBeforeStockOpen()) {
-                // D
-                Calendar c = clientData.getWorkDay();
-                titleTextView.setText(String.format(todayFormat,
-                        c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH)));
-                titleTextView.setTextColor(resources.getColor(R.color.white));
-                statusTextView.setTextColor(resources.getColor(R.color.white));
-                if (mTomorrowPredictionDiffDirection == TREND_UP) {
-                    blockView.setBackground(resources.getDrawable(R.drawable.block_predict_up_background));
-                    statusTextView.setText(String.format(Locale.US, "+%.2f%%", mTomorrowPredictionDiffPercentage));
-                } else if (mTomorrowPredictionDiffDirection == TREND_DOWN) {
-                    blockView.setBackground(resources.getDrawable(R.drawable.block_predict_down_background));
-                    statusTextView.setText(String.format(Locale.US, "-%.2f%%", mTomorrowPredictionDiffPercentage));
-                } else {
-                    blockView.setBackground(resources.getDrawable(R.drawable.block_predict_flat_background));
-                    statusTextView.setText(String.format(Locale.US, "%.2f%%", mTomorrowPredictionDiffPercentage));
-                }
-            } else {
-                // D + 1
-                Calendar c = clientData.getWorkDayPlusOne();
-                titleTextView.setText(String.format(todayFormat,
-                        c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH)));
-                if(clientData.isWorkDayAndStockMarketIsOpen() || clientData.isWorkDayAfterStockClosedBeforeAnswerDisclosure()) {
-                    statusTextView.setText(R.string.title_disclosure_at_1500);
-                    titleTextView.setTextColor(resources.getColor(R.color.pinkish_grey_four));
-                    statusTextView.setTextColor(resources.getColor(R.color.warm_grey_four));
-                } else {
-                    titleTextView.setTextColor(resources.getColor(R.color.white));
-                    statusTextView.setTextColor(resources.getColor(R.color.white));
-                    if (mTomorrowPredictionDiffDirection == TREND_UP) {
-                        blockView.setBackground(resources.getDrawable(R.drawable.block_predict_up_background));
-                        statusTextView.setText(String.format(Locale.US, "+%.2f%%", mTomorrowPredictionDiffPercentage));
-                    } else if (mTomorrowPredictionDiffDirection == TREND_DOWN) {
-                        blockView.setBackground(resources.getDrawable(R.drawable.block_predict_down_background));
-                        statusTextView.setText(String.format(Locale.US, "-%.2f%%", mTomorrowPredictionDiffPercentage));
-                    } else {
-                        blockView.setBackground(resources.getDrawable(R.drawable.block_predict_flat_background));
-                        statusTextView.setText(String.format(Locale.US, "%.2f%%", mTomorrowPredictionDiffPercentage));
-                    }
-                }
-            }
-        } else {
-            // D + n
-            Calendar c = clientData.getWorkDayPlusOne();
-            titleTextView.setText(String.format(todayFormat,
-                    c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH)));
-            titleTextView.setTextColor(resources.getColor(R.color.white));
-            statusTextView.setTextColor(resources.getColor(R.color.white));
-            if (mTomorrowPredictionDiffDirection == TREND_UP) {
-                blockView.setBackground(resources.getDrawable(R.drawable.block_predict_up_background));
-                statusTextView.setText(String.format(Locale.US, "+%.2f%%", mTomorrowPredictionDiffPercentage));
-            } else if (mTomorrowPredictionDiffDirection == TREND_DOWN) {
-                blockView.setBackground(resources.getDrawable(R.drawable.block_predict_down_background));
-                statusTextView.setText(String.format(Locale.US, "-%.2f%%", mTomorrowPredictionDiffPercentage));
-            } else {
-                blockView.setBackground(resources.getDrawable(R.drawable.block_predict_flat_background));
-                statusTextView.setText(String.format(Locale.US, "%.2f%%", mTomorrowPredictionDiffPercentage));
             }
         }
     }
@@ -773,6 +577,9 @@ public class Stock {
                         break;
                     case YESTERDAY_VOLUME:
                         stock.setYesterdayVolume(jsonObject.optInt(YESTERDAY_VOLUME));
+                        break;
+                    case NEXT_1D_DIFF_PRED:
+                        stock.set1DPrediction(jsonObject.optDouble(NEXT_1D_DIFF_PRED));
                         break;
                     case NEXT_5D_DIFF_PRED:
                         stock.set5DPrediction(jsonObject.optDouble(NEXT_5D_DIFF_PRED));

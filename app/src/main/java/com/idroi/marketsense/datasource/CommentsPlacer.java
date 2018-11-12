@@ -181,7 +181,13 @@ public class CommentsPlacer {
         return new Comparator<Comment>() {
             @Override
             public int compare(Comment comment1, Comment comment2) {
-                return comment2.getTimeStamp() - comment1.getTimeStamp();
+                if(comment1.getTimeStamp() == 0) {
+                    return -1;
+                } else if(comment2.getTimeStamp() == 0) {
+                    return 1;
+                } else {
+                    return comment2.getTimeStamp() - comment1.getTimeStamp();
+                }
             }
         };
     }

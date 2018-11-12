@@ -54,7 +54,7 @@
             android:textSize="20sp"
             android:text="@string/ops_something_wrong"
             android:textColor="@color/text_third"
-            android:fontFamily="sans-serif"
+            android:fontFamily="sans-serif-medium"
             android:gravity="center"
             app:layout_constraintTop_toBottomOf="@id/no_comment_iv"
             app:layout_constraintStart_toStartOf="parent"

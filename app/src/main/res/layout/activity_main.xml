@@ -12,7 +12,7 @@
         android:layout_width="0dp"
         android:layout_height="43dp"
         android:background="@drawable/background_tab"
-        android:fontFamily="sans-serif"
+        android:fontFamily="sans-serif-medium"
         android:textSize="18sp"
         android:textStyle="normal"
         android:textColor="@color/text_first"

@@ -8,27 +8,36 @@
     <TextView
         android:id="@+id/chart_type_1m"
         android:layout_width="0dp"
-        android:layout_height="30dp"
-        android:textSize="14sp"
-        android:fontFamily="sans-serif"
+        android:layout_height="48dp"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif-medium"
         android:textStyle="normal"
         android:textColor="@color/text_first"
         android:text="@string/title_chart_type_1m"
         android:gravity="center"
-        android:background="@drawable/border_selector_selected"
+        android:background="@drawable/border_selector"
         android:foreground="@drawable/item_foreground_with_clicked_shadow"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/chart_type_d" />
+    
+    <View
+        android:id="@+id/chart_type_1m_underline"
+        android:layout_width="20dp"
+        android:layout_height="2dp"
+        android:background="@drawable/border_selector_selected"
+        app:layout_constraintBottom_toBottomOf="@id/chart_type_1m"
+        app:layout_constraintStart_toStartOf="@id/chart_type_1m"
+        app:layout_constraintEnd_toEndOf="@id/chart_type_1m"/>
 
     <TextView
         android:id="@+id/chart_type_d"
         android:layout_width="0dp"
-        android:layout_height="30dp"
-        android:textSize="14sp"
-        android:fontFamily="sans-serif"
+        android:layout_height="48dp"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif-medium"
         android:textStyle="normal"
         android:textColor="@color/text_third"
         android:text="@string/title_chart_type_d"
@@ -40,12 +49,22 @@
         app:layout_constraintStart_toEndOf="@id/chart_type_1m"
         app:layout_constraintEnd_toStartOf="@id/chart_type_w" />
 
+    <View
+        android:id="@+id/chart_type_d_underline"
+        android:layout_width="20dp"
+        android:layout_height="2dp"
+        android:background="@drawable/border_selector_selected"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/chart_type_d"
+        app:layout_constraintStart_toStartOf="@id/chart_type_d"
+        app:layout_constraintEnd_toEndOf="@id/chart_type_d"/>
+
     <TextView
         android:id="@+id/chart_type_w"
         android:layout_width="0dp"
-        android:layout_height="30dp"
-        android:textSize="14sp"
-        android:fontFamily="sans-serif"
+        android:layout_height="48dp"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif-medium"
         android:textStyle="normal"
         android:textColor="@color/text_third"
         android:text="@string/title_chart_type_w"
@@ -57,12 +76,22 @@
         app:layout_constraintStart_toEndOf="@id/chart_type_d"
         app:layout_constraintEnd_toStartOf="@id/chart_type_m"/>
 
+    <View
+        android:id="@+id/chart_type_w_underline"
+        android:layout_width="20dp"
+        android:layout_height="2dp"
+        android:background="@drawable/border_selector_selected"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/chart_type_w"
+        app:layout_constraintStart_toStartOf="@id/chart_type_w"
+        app:layout_constraintEnd_toEndOf="@id/chart_type_w"/>
+
     <TextView
         android:id="@+id/chart_type_m"
         android:layout_width="0dp"
-        android:layout_height="30dp"
-        android:textSize="14sp"
-        android:fontFamily="sans-serif"
+        android:layout_height="48dp"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif-medium"
         android:textStyle="normal"
         android:textColor="@color/text_third"
         android:text="@string/title_chart_type_m"
@@ -73,5 +102,15 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/chart_type_w"
         app:layout_constraintEnd_toEndOf="parent"/>
+
+    <View
+        android:id="@+id/chart_type_m_underline"
+        android:layout_width="20dp"
+        android:layout_height="2dp"
+        android:background="@drawable/border_selector_selected"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/chart_type_m"
+        app:layout_constraintStart_toStartOf="@id/chart_type_m"
+        app:layout_constraintEnd_toEndOf="@id/chart_type_m"/>
 
 </android.support.constraint.ConstraintLayout>

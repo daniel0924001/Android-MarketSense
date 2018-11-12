@@ -236,7 +236,7 @@ public class YahooStxChartTickRenderer {
 
     private void renderStockChartDataFailed(Context context) {
         mPriceLineChart.setNoDataText(context.getResources().getString(R.string.no_transaction_date));
-        Typeface typeface = Typeface.create("sans-serif", Typeface.NORMAL);
+        Typeface typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL);
         mPriceLineChart.setNoDataTextTypeface(typeface);
         Paint paint = mPriceLineChart.getPaint(Chart.PAINT_INFO);
         paint.setTextSize(100);

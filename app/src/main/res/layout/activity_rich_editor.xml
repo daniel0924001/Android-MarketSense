@@ -12,7 +12,7 @@
         android:layout_height="45dp"
         android:background="@color/text_light_gray"
         android:textSize="14sp"
-        android:fontFamily="sans-serif"
+        android:fontFamily="sans-serif-medium"
         android:textStyle="normal"
         android:text="@string/tag_stock_code"
         android:textColor="@color/text_first"
@@ -74,7 +74,7 @@
             <!--android:ellipsize="end"-->
             <!--android:textColor="@color/text_first"-->
             <!--android:textSize="14sp"-->
-            <!--android:fontFamily="sans-serif"-->
+            <!--android:fontFamily="sans-serif-medium"-->
             <!--android:text="@string/title_news_title"-->
             <!--android:paddingLeft="5dp"-->
             <!--android:paddingStart="5dp"-->
@@ -91,7 +91,7 @@
             <!--android:textColor="@color/text_third"-->
             <!--android:layout_marginTop="12dp"-->
             <!--android:layout_marginBottom="16dp"-->
-            <!--android:fontFamily="sans-serif"-->
+            <!--android:fontFamily="sans-serif-medium"-->
             <!--android:textSize="14sp"-->
             <!--android:text="@string/title_news_date"-->
             <!--android:paddingLeft="5dp"-->
@@ -109,7 +109,7 @@
             <!--android:layout_marginEnd="16dp"-->
             <!--android:layout_marginBottom="16dp"-->
             <!--android:textColor="@color/white"-->
-            <!--android:fontFamily="sans-serif"-->
+            <!--android:fontFamily="sans-serif-medium"-->
             <!--android:textSize="13sp"-->
             <!--android:text="@string/title_news_good3"-->
             <!--android:paddingStart="12dp"-->

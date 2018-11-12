@@ -12,6 +12,7 @@ import com.idroi.marketsense.R;
  * Created by daniel.hsieh on 2018/8/15.
  */
 
+@Deprecated
 public class StockPredictionBlockViewHolder {
 
     public ConstraintLayout techBlockView;

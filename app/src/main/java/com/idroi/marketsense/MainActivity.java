@@ -2,6 +2,7 @@ package com.idroi.marketsense;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -38,6 +39,7 @@ import com.idroi.marketsense.common.ClientData;
 import com.idroi.marketsense.common.FBHelper;
 import com.idroi.marketsense.common.FrescoHelper;
 import com.idroi.marketsense.common.MarketSenseCommonNavigator;
+import com.idroi.marketsense.common.TimeTaskReceiver;
 import com.idroi.marketsense.data.Comment;
 import com.idroi.marketsense.data.PostEvent;
 import com.idroi.marketsense.data.Stock;
@@ -100,6 +102,8 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean mCanReturn = false;
 
+    private TimeTaskReceiver mTimeTaskReceiver = new TimeTaskReceiver();
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -109,8 +113,10 @@ public class MainActivity extends AppCompatActivity {
                 mLastSelectedItemId = item.getItemId();
                 // we have to overcome when the user profile is not initialized
                 // since FB is not ready.
-                UserProfile userProfile = ClientData.getInstance().getUserProfile();
-                userProfile.tryToLoginAndInitUserData(MainActivity.this);
+                if(FBHelper.checkFBLogin()) {
+                    UserProfile userProfile = ClientData.getInstance().getUserProfile();
+                    userProfile.tryToLoginAndInitUserData(MainActivity.this);
+                }
 
                 switch (item.getItemId()) {
                     case R.id.navigation_main_page:
@@ -158,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseMessaging.getInstance().subscribeToTopic(VOTING_GENERAL_ALL);
         String userRegistrationTokenTopic = USER_REGISTRATION_TOKEN_PREFIX+FirebaseInstanceId.getInstance().getId();
         FirebaseMessaging.getInstance().subscribeToTopic(userRegistrationTokenTopic);
+        TimeTaskReceiver.registerNextPredictionDisclosureBroadcast(this);
 
         MSLog.i("Initialize ClientData: " + userRegistrationTokenTopic);
         ClientData clientData = ClientData.getInstance(this);
@@ -220,8 +227,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        IntentFilter filter = new IntentFilter(TimeTaskReceiver.PREDICTION_DISCLOSURE);
+        registerReceiver(mTimeTaskReceiver, filter);
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
+
+        unregisterReceiver(mTimeTaskReceiver);
 
         if(mLoginAlertDialog != null) {
             mLoginAlertDialog.dismiss();

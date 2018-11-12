@@ -24,7 +24,7 @@ import com.facebook.login.widget.LoginButton;
 import com.idroi.marketsense.BuildConfig;
 import com.idroi.marketsense.Logging.MSLog;
 import com.idroi.marketsense.R;
-import com.idroi.marketsense.StockKnowledgeListActivity;
+import com.idroi.marketsense.KnowledgeListActivity;
 import com.idroi.marketsense.WebViewActivity;
 import com.idroi.marketsense.adapter.SettingAdapter;
 import com.idroi.marketsense.common.ClientData;
@@ -201,7 +201,7 @@ public class ProfileFragment extends Fragment {
         String title = getResources().getString(id);
         switch (id) {
             case R.string.preference_knowledge:
-                Intent intent = new Intent(activity, StockKnowledgeListActivity.class);
+                Intent intent = new Intent(activity, KnowledgeListActivity.class);
                 startActivity(intent);
                 break;
             // https://play.google.com/store/apps/details?id=com.idroi.marketsense&referrer=utm_source%3Dandroid_app%26utm_medium%3Dinapp%26utm_campaign%3Dshare%26

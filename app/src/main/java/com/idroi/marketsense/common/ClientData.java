@@ -2,6 +2,7 @@ package com.idroi.marketsense.common;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.SparseArray;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Cache;
@@ -39,7 +40,7 @@ public class ClientData {
     private Context mContext;
     private ArrayList<Stock> mAllStocksListInfo;
     private HashMap<String, Stock> mRealTimePricesHashMap;
-    private HashMap<Integer, ArrayList<Stock>> mSortedRealTimePrices;
+    private SparseArray<ArrayList<Stock>> mSortedRealTimePrices;
     private HashMap<String, Knowledge> mKnowledgeHashMap;
 
     private int mScreenWidth, mScreenHeight;
@@ -101,7 +102,7 @@ public class ClientData {
         mUserProfile = new UserProfile(context, true);
         mRealTimePricesHashMap = new HashMap<>();
         mKnowledgeHashMap = new HashMap<>();
-        mSortedRealTimePrices = new HashMap<>();
+        mSortedRealTimePrices = new SparseArray<>();
 
         updateClockInformation();
         loadAllStocksListTask(true);

@@ -121,7 +121,7 @@ public class StockRequest extends Request<ArrayList<Stock>> {
     }
 
     public static String queryStockList(Context context, boolean isNetworkUrl) {
-        if(isNetworkUrl && ClientData.getInstance().isWorkDayAndStockMarketIsOpen()) {
+        if(isNetworkUrl) {
             return API_URL + "?timestamp=" + System.currentTimeMillis() / (STOCK_REQUEST_SOFT_TTL);
         } else {
             SharedPreferences sharedPreferences =

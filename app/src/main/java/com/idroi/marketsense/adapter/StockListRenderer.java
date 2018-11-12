@@ -32,7 +32,7 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
     public View createView(@NonNull Context context, @Nullable ViewGroup parent) {
         return LayoutInflater
                 .from(context)
-                .inflate(R.layout.stock_list_item_v2, parent, false);
+                .inflate(R.layout.stock_list_item_v3, parent, false);
     }
 
     @Override
@@ -49,14 +49,12 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
     public void updateRightPartOnly(final View view, final Stock stock) {
         final StockViewHolder stockViewHolder = mViewHolderMap.get(view);
         if(stockViewHolder == null) {
-            MSLog.e("stockViewHolder is null in updatePriceOnly");
+            MSLog.e("stockViewHolder is null in updateRightPartOnly");
             return;
         }
 
-        stock.renderTomorrowBlock(view.getContext(),
-                stockViewHolder.stockPredictionBlockViewHolder.tomorrowBlock,
-                stockViewHolder.stockPredictionBlockViewHolder.tomorrowTitleTextView,
-                stockViewHolder.stockPredictionBlockViewHolder.tomorrowStatusTextView);
+        stockViewHolder.stockPredictionInfoBlockViewHolder
+                .renderTomorrowBlock(view.getContext(), stock);
     }
 
     public void updatePriceOnly(final View view, final Stock stock) {
@@ -112,33 +110,22 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
         MarketSenseRendererHelper.addTextView(stockViewHolder.diffView, content.getDiffPercentage());
 
         content.renderDiffColor(context, stockViewHolder.diffView);
-        content.renderDiffIcon(stockViewHolder.priceImageView);
 
-        Stock.renderTitleAndStars(context, content.getPredictTechDirection(),
-                content.getPredictTechLevel(),
-                stockViewHolder.stockPredictionBlockViewHolder.techBlockView,
-                stockViewHolder.stockPredictionBlockViewHolder.techTitleTextView,
-                stockViewHolder.stockPredictionBlockViewHolder.techUnavailableTextView,
-                stockViewHolder.stockPredictionBlockViewHolder.techImageViews);
+        stockViewHolder.stockPredictionInfoBlockViewHolder.render(context, content);
 
-        Stock.renderTitleAndStars(context, content.getConfidenceDirection(),
-                content.getPredictNewsLevel(),
-                stockViewHolder.stockPredictionBlockViewHolder.newsBlockView,
-                stockViewHolder.stockPredictionBlockViewHolder.newsTitleTextView,
-                stockViewHolder.stockPredictionBlockViewHolder.newsUnavailableTextView,
-                stockViewHolder.stockPredictionBlockViewHolder.newsImageViews);
-
-        content.renderIsHit(context, stockViewHolder.hitView);
-
-        content.renderTodayBlock(context,
-                stockViewHolder.stockPredictionBlockViewHolder.todayBlock,
-                stockViewHolder.stockPredictionBlockViewHolder.todayTitleTextView,
-                stockViewHolder.stockPredictionBlockViewHolder.todayStatusTextView);
-
-        content.renderTomorrowBlock(context,
-                stockViewHolder.stockPredictionBlockViewHolder.tomorrowBlock,
-                stockViewHolder.stockPredictionBlockViewHolder.tomorrowTitleTextView,
-                stockViewHolder.stockPredictionBlockViewHolder.tomorrowStatusTextView);
+//        Stock.renderTitleAndStars(context, content.getPredictTechDirection(),
+//                content.getPredictTechLevel(),
+//                stockViewHolder.stockPredictionBlockViewHolder.techBlockView,
+//                stockViewHolder.stockPredictionBlockViewHolder.techTitleTextView,
+//                stockViewHolder.stockPredictionBlockViewHolder.techUnavailableTextView,
+//                stockViewHolder.stockPredictionBlockViewHolder.techImageViews);
+//
+//        Stock.renderTitleAndStars(context, content.getConfidenceDirection(),
+//                content.getPredictNewsLevel(),
+//                stockViewHolder.stockPredictionBlockViewHolder.newsBlockView,
+//                stockViewHolder.stockPredictionBlockViewHolder.newsTitleTextView,
+//                stockViewHolder.stockPredictionBlockViewHolder.newsUnavailableTextView,
+//                stockViewHolder.stockPredictionBlockViewHolder.newsImageViews);
     }
 
     private void setViewVisibility(final StockViewHolder stockViewHolder, final int visibility) {

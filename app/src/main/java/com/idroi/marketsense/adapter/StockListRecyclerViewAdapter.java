@@ -26,6 +26,10 @@ public class StockListRecyclerViewAdapter extends RecyclerView.Adapter {
     private StockSearchResultRenderer mStockSearchResultRenderer;
     private OnItemClickListener mOnItemClickListener;
 
+    public StockListRecyclerViewAdapter(Context context) {
+        this(context, null);
+    }
+
     public StockListRecyclerViewAdapter(Context context, List<Stock> stockList) {
         mContext = context;
         if(stockList != null) {
@@ -75,5 +79,12 @@ public class StockListRecyclerViewAdapter extends RecyclerView.Adapter {
     public void filterList(ArrayList<Stock> filterStocks) {
         mStockList = filterStocks;
         notifyDataSetChanged();
+    }
+
+    public void destroy() {
+        if(mStockList != null) {
+            mStockList.clear();
+            mStockList = null;
+        }
     }
 }

@@ -212,7 +212,6 @@ public class StockListPlacer {
                 clientData.setRealTimeStockPriceHashMap(stock);
             }
             if(mTask == MAIN_ID) {
-//                clientData.getUserProfile().globalBroadcast(UserProfile.NOTIFY_ID_PRICE_CHANGED);
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -244,6 +243,10 @@ public class StockListPlacer {
 
     public void setStockListListener(StockListListener listener) {
         mStockListListener = listener;
+    }
+
+    public void setStockArrayList(ArrayList<Stock> stockArrayList) {
+        mStockArrayList = stockArrayList;
     }
 
     public void setLoadingPageListener(LoadingPageListener listener) {

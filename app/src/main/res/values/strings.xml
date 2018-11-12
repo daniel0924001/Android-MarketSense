@@ -15,6 +15,8 @@
     <string name="title_news_tab">新聞</string>
     <string name="title_choices_tab">自選</string>
     <string name="title_predict_tab">風向</string>
+    <string name="title_stock_tab">股票</string>
+    <string name="title_predict_trend">風向預測</string>
     <string name="title_main_page">首頁</string>
     <string name="title_discussion">動態</string>
     <string name="title_no_comment">目前暫無評論</string>
@@ -23,6 +25,9 @@
     <string name="title_profile">我的</string>
     <string name="title_profile_account">我的帳戶</string>
     <string name="title_market_trend">行情</string>
+
+    <string name="title_remove_favorite">取消自選</string>
+    <string name="title_add_favorite">自選</string>
 
     <string name="main_page_tech_ranking">技術面排行</string>
     <string name="main_page_tech_trend">技術風向</string>
@@ -95,6 +100,14 @@
     <string name="title_disclosure_at_1500">15:00 公布</string>
     <string name="title_month_day_close_predict">%d/%d 收盤預測</string>
 
+    <string name="info_foundation">基本</string>
+    <string name="info_tech">技術</string>
+    <string name="info_news">新聞</string>
+    <string name="info_short">短期</string>
+    <string name="info_middle">中期</string>
+    <string name="info_long">長期</string>
+    <string name="info_flat">平盤</string>
+
     <string name="title_news">新聞面</string>
     <string name="title_tech">技術面</string>
     <string name="title_news_unavailable">近期無新聞</string>
@@ -143,7 +156,7 @@
     <string name="title_chart_type_w">週K</string>
     <string name="title_chart_type_m">月K</string>
 
-    <string name="title_five_best_price">五檔</string>
+    <string name="title_five_best_price">前五檔</string>
     <string name="title_buy_volume">委買量</string>
     <string name="title_sell_volume">委賣量</string>
     <string name="title_buy_price">買價</string>
@@ -157,8 +170,8 @@
     <string name="title_predict_up">看多:</string>
     <string name="title_predict_down">看空:</string>
     <string name="title_vote">投票</string>
-    <string name="title_comment">留言</string>
-    <string name="title_comment_format">留言(%d)</string>
+    <string name="title_comment">討論</string>
+    <string name="title_comment_format">討論(%d)</string>
     <string name="title_comment_colon">留言:</string>
     <string name="title_comment_hint">留下你的評論 &#8230;</string>
     <string name="title_go_back">返回</string>
@@ -231,6 +244,16 @@
     <string name="knowledge_you_may_want_know">你可能會想知道</string>
     <string name="knowledge_content_unavailable">待更新</string>
     <string name="knowledge_many_words">當目前的狀態為多頭時，應該冷靜判斷…當目前的狀態為多頭時，應該冷靜判斷…當目前的狀態為多頭時，應該冷靜判斷…當目前的狀態為多頭時，應該冷靜判斷…</string>
+
+    <string name="knowledge_class_newbie">入門</string>
+    <string name="knowledge_class_fina">財報</string>
+    <string name="knowledge_class_trade">交易</string>
+    <string name="knowledge_class_apple">蘋概股</string>
+    <string name="knowledge_class_buffet">巴菲特</string>
+    <string name="knowledge_class_save">定存股</string>
+    <string name="knowledge_class_global">全球市場</string>
+    <string name="knowledge_class_material">商品期貨</string>
+    <string name="knowledge_class_icon">分類圖示</string>
 
     <string name="share_description">下載「市覺」App掌握即時鄉民與新聞動態！ </string>
 

@@ -14,7 +14,7 @@
         android:textSize="12sp"
         android:ellipsize="end"
         android:singleLine="true"
-        android:fontFamily="sans-serif"
+        android:fontFamily="sans-serif-medium"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
 
@@ -26,7 +26,7 @@
         android:textSize="12sp"
         android:ellipsize="end"
         android:singleLine="true"
-        android:fontFamily="sans-serif"
+        android:fontFamily="sans-serif-medium"
         app:layout_constraintTop_toBottomOf="@id/marker_chart_time"
         app:layout_constraintStart_toStartOf="parent"
         />
@@ -39,7 +39,7 @@
         android:textSize="12sp"
         android:ellipsize="end"
         android:singleLine="true"
-        android:fontFamily="sans-serif"
+        android:fontFamily="sans-serif-medium"
         app:layout_constraintTop_toBottomOf="@id/marker_chart_price"
         app:layout_constraintStart_toStartOf="parent"
         />

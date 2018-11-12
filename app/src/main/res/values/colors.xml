@@ -59,8 +59,11 @@
     <color name="text_black">#2b2b2b</color>
     <color name="draw_grey">#bfcad7</color>
     <color name="background">#ebedf0</color>
+    <color name="background_second">#99ebedf0</color>
 
     <color name="text_first">#3e5469</color>
     <color name="text_second">#b73e5469</color>
     <color name="text_third">#803e5469</color>
+
+    <color name="pure_black">#000000</color>
 </resources>

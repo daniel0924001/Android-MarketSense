@@ -314,7 +314,7 @@ public class YahooStxChartTaRenderer {
 
     private void renderStockChartDataFailed(Context context) {
         mCandleStickChart.setNoDataText(context.getResources().getString(R.string.no_data));
-        Typeface typeface = Typeface.create("sans-serif", Typeface.NORMAL);
+        Typeface typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL);
         mCandleStickChart.setNoDataTextTypeface(typeface);
         Paint paint = mCandleStickChart.getPaint(Chart.PAINT_INFO);
         paint.setTextSize(100);

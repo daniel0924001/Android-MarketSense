@@ -16,10 +16,10 @@ import com.idroi.marketsense.request.KnowledgeListRequest;
 import com.idroi.marketsense.util.MarketSenseUtils;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_REQUEST_NAME;
 
@@ -30,7 +30,7 @@ import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_REQUEST_N
 public class KnowledgeFetcher {
 
     public interface KnowledgeNetworkListener {
-        void onKnowledgeNetworkLoad(final ArrayList<Knowledge> knowledgeArrayList);
+        void onKnowledgeNetworkLoad(final HashMap<String, ArrayList<Knowledge>> knowledgeHashMap);
         void onKnowledgeNetworkFail(final MarketSenseError marketSenseError);
     }
 
@@ -39,7 +39,7 @@ public class KnowledgeFetcher {
 
     private static final KnowledgeNetworkListener EMPTY_NETWORK_LISTENER = new KnowledgeNetworkListener() {
         @Override
-        public void onKnowledgeNetworkLoad(ArrayList<Knowledge> knowledgeArrayList) {
+        public void onKnowledgeNetworkLoad(HashMap<String, ArrayList<Knowledge>> knowledgeHashMap) {
 
         }
 
@@ -106,7 +106,7 @@ public class KnowledgeFetcher {
         Cache.Entry entry = cache.get(cacheUrl);
         if(entry != null && !entry.isExpired()) {
             try {
-                ArrayList<Knowledge> knowledgeArrayList
+                HashMap<String, ArrayList<Knowledge>> knowledgeArrayList
                         = KnowledgeListRequest.parseKnowledgeList(entry.data);
                 MSLog.i("Loading knowledge list...(cache hit): " + new String(entry.data));
                 mKnowledgeNetworkListener.onKnowledgeNetworkLoad(knowledgeArrayList);
@@ -117,9 +117,9 @@ public class KnowledgeFetcher {
             MSLog.i("Loading knowledge list...(cache miss or expired)");
         }
 
-        mRequest = new KnowledgeListRequest(networkUrl, new Response.Listener<ArrayList<Knowledge>>() {
+        mRequest = new KnowledgeListRequest(networkUrl, new Response.Listener<HashMap<String, ArrayList<Knowledge>>>() {
             @Override
-            public void onResponse(ArrayList<Knowledge> response) {
+            public void onResponse(HashMap<String, ArrayList<Knowledge>> response) {
                 final Context context = getContextOrDestroy();
                 if(context == null) {
                     return;
@@ -186,9 +186,9 @@ public class KnowledgeFetcher {
     public static void prefetchKnowledgeList(final Context context) {
         final Context applicationContext = context.getApplicationContext();
         final String networkUrl = KnowledgeListRequest.queryKnowledgeList(context, true);
-        KnowledgeListRequest knowledgeListRequest = new KnowledgeListRequest(networkUrl, new Response.Listener<ArrayList<Knowledge>>() {
+        KnowledgeListRequest knowledgeListRequest = new KnowledgeListRequest(networkUrl, new Response.Listener<HashMap<String, ArrayList<Knowledge>>>() {
             @Override
-            public void onResponse(ArrayList<Knowledge> response) {
+            public void onResponse(HashMap<String, ArrayList<Knowledge>> response) {
                 if(applicationContext != null) {
                     SharedPreferences.Editor editor =
                             context.getSharedPreferences(SHARED_PREFERENCE_REQUEST_NAME, Context.MODE_PRIVATE).edit();

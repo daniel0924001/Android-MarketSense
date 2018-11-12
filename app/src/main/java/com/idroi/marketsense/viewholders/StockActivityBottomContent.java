@@ -46,9 +46,9 @@ public class StockActivityBottomContent {
         }
     }
 
-    public void setSelected(Context context, TextView selected, ConstraintLayout selectedBlock) {
+    public void setSelected(Context context, TextView selected, View underline, ConstraintLayout selectedBlock) {
 
-        stockActivityBottomSelector.setSelected(context, selected);
+        stockActivityBottomSelector.setSelected(context, selected, underline);
 
         for(ConstraintLayout other : blocks) {
             if(other != selectedBlock) {

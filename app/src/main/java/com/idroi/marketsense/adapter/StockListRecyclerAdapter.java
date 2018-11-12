@@ -17,6 +17,7 @@ import com.idroi.marketsense.data.Stock;
 import com.idroi.marketsense.data.UserProfile;
 import com.idroi.marketsense.datasource.StockListPlacer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.idroi.marketsense.data.UserProfile.NOTIFY_ID_FAVORITE_LIST;
@@ -74,7 +75,6 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
                 });
             }
         });
-        Stock.initializeRightPartValue();
     }
 
     public void updatePriceInVisibleItems(int payload) {
@@ -100,6 +100,11 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter {
 
     public void loadStockList(String networkUrl, String cacheUrl) {
         mStockListPlacer.loadStockList(networkUrl, cacheUrl);
+    }
+
+    public void setStockArrayList(ArrayList<Stock> stockArrayList) {
+        mStockListPlacer.setStockArrayList(stockArrayList);
+        notifyDataSetChanged();
     }
 
     @Override

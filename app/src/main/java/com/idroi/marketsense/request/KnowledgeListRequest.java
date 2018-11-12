@@ -18,6 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_REQUEST_NAME;
 
@@ -25,22 +26,22 @@ import static com.idroi.marketsense.common.Constants.SHARED_PREFERENCE_REQUEST_N
  * Created by daniel.hsieh on 2018/9/19.
  */
 
-public class KnowledgeListRequest extends Request<ArrayList<Knowledge>> {
+public class KnowledgeListRequest extends Request<HashMap<String, ArrayList<Knowledge>>> {
 
     private static final String PARAM_STATUS = "status";
     private static final String PARAM_RESULT = "result";
 
-    private final Response.Listener<ArrayList<Knowledge>> mListener;
+    private final Response.Listener<HashMap<String, ArrayList<Knowledge>>> mListener;
 
-    public KnowledgeListRequest(String url, Response.Listener<ArrayList<Knowledge>> listener, Response.ErrorListener errorListener) {
+    public KnowledgeListRequest(String url, Response.Listener<HashMap<String, ArrayList<Knowledge>>> listener, Response.ErrorListener errorListener) {
         super(Method.GET, url, errorListener);
         mListener = listener;
     }
 
     @Override
-    protected Response<ArrayList<Knowledge>> parseNetworkResponse(NetworkResponse response) {
+    protected Response<HashMap<String, ArrayList<Knowledge>>> parseNetworkResponse(NetworkResponse response) {
         try {
-            ArrayList<Knowledge> knowledgeArrayList = parseKnowledgeList(response.data);
+            HashMap<String, ArrayList<Knowledge>> knowledgeArrayList = parseKnowledgeList(response.data);
             if(knowledgeArrayList != null && knowledgeArrayList.size() != 0) {
                 MSLog.i("Knowledge list request success: " + new String(response.data));
                 return Response.success(knowledgeArrayList, HttpHeaderParser.parseCacheHeaders(response));
@@ -52,7 +53,7 @@ public class KnowledgeListRequest extends Request<ArrayList<Knowledge>> {
         }
     }
 
-    public static ArrayList<Knowledge> parseKnowledgeList(byte[] data) throws JSONException {
+    public static HashMap<String, ArrayList<Knowledge>> parseKnowledgeList(byte[] data) throws JSONException {
         JSONObject jsonObject = new JSONObject(new String(data));
 
         if(jsonObject.optBoolean(PARAM_STATUS)) {
@@ -68,11 +69,25 @@ public class KnowledgeListRequest extends Request<ArrayList<Knowledge>> {
                     clientData.setKnowledgeHashMap(knowledge);
                 }
             }
-            return knowledgeArrayList;
+            return convertListToMapByCategory(knowledgeArrayList);
         } else {
             MSLog.e("knowledge response status is false: " + jsonObject);
             return null;
         }
+    }
+
+    public static HashMap<String, ArrayList<Knowledge>> convertListToMapByCategory(ArrayList<Knowledge> knowledgeArrayList) {
+        HashMap<String, ArrayList<Knowledge>> knowledgeHashMap = new HashMap<>();
+        for(Knowledge knowledge : knowledgeArrayList) {
+            String category = knowledge.getCategory();
+            ArrayList<Knowledge> categoryKnowledge = knowledgeHashMap.get(category);
+            if(categoryKnowledge == null) {
+                categoryKnowledge = new ArrayList<>();
+            }
+            categoryKnowledge.add(knowledge);
+            knowledgeHashMap.put(category, categoryKnowledge);
+        }
+        return knowledgeHashMap;
     }
 
     private static Knowledge parseKnowledge(JSONObject jsonObject) {
@@ -84,7 +99,7 @@ public class KnowledgeListRequest extends Request<ArrayList<Knowledge>> {
     }
 
     @Override
-    protected void deliverResponse(ArrayList<Knowledge> response) {
+    protected void deliverResponse(HashMap<String, ArrayList<Knowledge>> response) {
         mListener.onResponse(response);
     }
 

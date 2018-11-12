@@ -23,8 +23,6 @@ public class StockActivityActionBarViewHolder {
     public ImageView backImageView;
     public TextView titleTextView;
 
-    public ImageView favoriteImageView;
-
     public ImageView moreImageView;
 
     static final StockActivityActionBarViewHolder EMPTY_VIEW_HOLDER = new StockActivityActionBarViewHolder();
@@ -39,7 +37,6 @@ public class StockActivityActionBarViewHolder {
             stockActivityActionBarViewHolder.actionBar = actionBar;
             stockActivityActionBarViewHolder.backImageView = view.findViewById(R.id.action_bar_back);
             stockActivityActionBarViewHolder.titleTextView = view.findViewById(R.id.action_bar_title);
-            stockActivityActionBarViewHolder.favoriteImageView = view.findViewById(R.id.action_bar_favorite);
             stockActivityActionBarViewHolder.moreImageView = view.findViewById(R.id.action_bar_more);
             return stockActivityActionBarViewHolder;
         } catch (ClassCastException exception) {

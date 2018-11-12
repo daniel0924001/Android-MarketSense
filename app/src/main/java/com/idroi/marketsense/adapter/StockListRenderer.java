@@ -49,7 +49,7 @@ public class StockListRenderer implements MarketSenseRenderer<Stock>{
     public void updateRightPartOnly(final View view, final Stock stock) {
         final StockViewHolder stockViewHolder = mViewHolderMap.get(view);
         if(stockViewHolder == null) {
-            MSLog.e("stockViewHolder is null in updatePriceOnly");
+            MSLog.e("stockViewHolder is null in updateRightPartOnly");
             return;
         }
 
